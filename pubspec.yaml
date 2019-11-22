@@ -1,0 +1,29 @@
+name: flutter_reactive_ble
+description: A new flutter plugin project.
+version: 0.1.0
+author:
+homepage:
+
+environment:
+  sdk: ^2.3.0-dev
+
+dependencies:
+  flutter:
+    sdk: flutter
+  functional_data:
+  protobuf:
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  build_runner:
+  mockito:
+  dependency_validator:
+  functional_data_generator:
+  flutter_reactive_ble_example:
+    path: example
+
+flutter:
+  plugin:
+    androidPackage: com.signify.hue.flutterreactiveble
+    pluginClass: ReactiveBlePlugin

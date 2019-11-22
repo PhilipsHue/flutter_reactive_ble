@@ -1,0 +1,14 @@
+rootProject.name = 'hue_ble_lib'
+
+ext.isCiServer = System.getenv().containsKey("JOB_NAME")
+
+buildCache {
+    local {
+        enabled = true
+    }
+    remote(HttpBuildCache) {
+        url = "https://35.187.101.18:443/cache/"
+        push = isCiServer
+        allowUntrustedServer = true
+    }
+}

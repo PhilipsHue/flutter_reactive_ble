@@ -1,0 +1,5 @@
+#include "Pods/Target Support Files/Pods-Runner/Pods-Runner.debug.xcconfig"
+#include "Generated.xcconfig"
+
+// See https://github.com/flutter/flutter/issues/17735#issuecomment-400837152
+FLUTTER_BUILD_MODE=debug

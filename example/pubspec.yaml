@@ -1,0 +1,24 @@
+name: flutter_reactive_ble_example
+description: Demonstrates how to use the flutter_reactive_ble plugin.
+publish_to: 'none'
+
+environment:
+  sdk: ">=2.0.0-dev.68.0 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^0.1.2
+
+  flutter_reactive_ble:
+    path: ../
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  dependency_validator:
+
+flutter:
+  uses-material-design: true
