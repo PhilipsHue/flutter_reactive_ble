@@ -28,7 +28,8 @@
 .pub-cache/
 .pub/
 build/
-
+.flutter-plugins-dependencies
+Flutter.podspec
 # Android related
 **/android/**/gradle-wrapper.jar
 **/android/.gradle
