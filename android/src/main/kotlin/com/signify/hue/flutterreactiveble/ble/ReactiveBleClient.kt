@@ -28,28 +28,28 @@ import java.util.UUID
 import java.util.concurrent.TimeUnit
 
 @Suppress("TooManyFunctions")
-open class ReactiveBleClient(private val context: Context) : com.signify.hue.flutterreactiveble.ble.BleClient {
-    private val connectionQueue = com.signify.hue.flutterreactiveble.ble.ConnectionQueue()
+open class ReactiveBleClient(private val context: Context) : BleClient {
+    private val connectionQueue = ConnectionQueue()
     private val allConnections = CompositeDisposable()
 
-    override val connectionUpdateSubject: BehaviorSubject<com.signify.hue.flutterreactiveble.ble.ConnectionUpdate> = BehaviorSubject.create()
+    override val connectionUpdateSubject: BehaviorSubject<ConnectionUpdate> = BehaviorSubject.create()
 
     companion object {
 
         lateinit var rxBleClient: RxBleClient
             internal set
-        internal lateinit var activeConnections: MutableMap<String, com.signify.hue.flutterreactiveble.ble.DeviceConnector>
+        internal lateinit var activeConnections: MutableMap<String, DeviceConnector>
     }
 
     override fun initializeClient() {
-        com.signify.hue.flutterreactiveble.ble.ReactiveBleClient.Companion.activeConnections = mutableMapOf()
-        com.signify.hue.flutterreactiveble.ble.ReactiveBleClient.Companion.rxBleClient = RxBleClient.create(context)
+        ReactiveBleClient.Companion.activeConnections = mutableMapOf()
+        ReactiveBleClient.Companion.rxBleClient = RxBleClient.create(context)
 
         Timber.d("Created bleclient")
     }
 
-    override fun scanForDevices(service: ParcelUuid, scanMode: ScanMode): Observable<com.signify.hue.flutterreactiveble.ble.ScanInfo> {
-        return com.signify.hue.flutterreactiveble.ble.ReactiveBleClient.Companion.rxBleClient.scanBleDevices(
+    override fun scanForDevices(service: ParcelUuid, scanMode: ScanMode): Observable<ScanInfo> {
+        return ReactiveBleClient.Companion.rxBleClient.scanBleDevices(
                 ScanSettings.Builder()
                         .setScanMode(scanMode.toScanSettings())
                         .setCallbackType(ScanSettings.CALLBACK_TYPE_ALL_MATCHES)
@@ -59,7 +59,7 @@ open class ReactiveBleClient(private val context: Context) : com.signify.hue.flu
                         .build()
         )
                 .map { result ->
-                    com.signify.hue.flutterreactiveble.ble.ScanInfo(result.bleDevice.macAddress, result.bleDevice.name
+                    ScanInfo(result.bleDevice.macAddress, result.bleDevice.name
                             ?: "",
                             result.rssi, result.scanRecord.serviceData.mapKeys { it.key.uuid })
                 }
@@ -69,38 +69,38 @@ open class ReactiveBleClient(private val context: Context) : com.signify.hue.flu
         allConnections.add(getConnection(deviceId, timeout)
                 .subscribe({ result ->
                     when (result) {
-                        is com.signify.hue.flutterreactiveble.ble.EstablishedConnection -> {
+                        is EstablishedConnection -> {
                             Timber.d("Connection established for ${result.deviceId}")
                         }
-                        is com.signify.hue.flutterreactiveble.ble.EstablishConnectionFailure -> {
+                        is EstablishConnectionFailure -> {
                             Timber.d("Connect ${result.deviceId} fails: ${result.errorMessage}")
-                            connectionUpdateSubject.onNext(com.signify.hue.flutterreactiveble.ble.ConnectionUpdateError(deviceId, result.errorMessage))
+                            connectionUpdateSubject.onNext(ConnectionUpdateError(deviceId, result.errorMessage))
                         }
                     }
                 }, { error ->
-                    connectionUpdateSubject.onNext(com.signify.hue.flutterreactiveble.ble.ConnectionUpdateError(deviceId, error?.message
+                    connectionUpdateSubject.onNext(ConnectionUpdateError(deviceId, error?.message
                             ?: "unknown error"))
                 }))
     }
 
     override fun disconnectDevice(deviceId: String) {
-        com.signify.hue.flutterreactiveble.ble.ReactiveBleClient.Companion.activeConnections[deviceId]?.disconnectDevice()
-        com.signify.hue.flutterreactiveble.ble.ReactiveBleClient.Companion.activeConnections.remove(deviceId)
+        ReactiveBleClient.Companion.activeConnections[deviceId]?.disconnectDevice()
+        ReactiveBleClient.Companion.activeConnections.remove(deviceId)
     }
 
     override fun disconnectAllDevices() {
-        com.signify.hue.flutterreactiveble.ble.ReactiveBleClient.Companion.activeConnections.forEach { (_, connector) -> connector.disconnectDevice() }
+        ReactiveBleClient.Companion.activeConnections.forEach { (_, connector) -> connector.disconnectDevice() }
         allConnections.dispose()
     }
 
     override fun clearGattCache(deviceId: String): Completable =
-            com.signify.hue.flutterreactiveble.ble.ReactiveBleClient.Companion.activeConnections[deviceId]?.let(com.signify.hue.flutterreactiveble.ble.DeviceConnector::clearGattCache)
+            ReactiveBleClient.Companion.activeConnections[deviceId]?.let(DeviceConnector::clearGattCache)
                     ?: Completable.error(IllegalStateException("Device is not connected"))
 
-    override fun readCharacteristic(deviceId: String, characteristic: UUID): Single<com.signify.hue.flutterreactiveble.ble.CharOperationResult> =
-            getConnection(deviceId).flatMapSingle<com.signify.hue.flutterreactiveble.ble.CharOperationResult> { connectionResult ->
+    override fun readCharacteristic(deviceId: String, characteristic: UUID): Single<CharOperationResult> =
+            getConnection(deviceId).flatMapSingle<CharOperationResult> { connectionResult ->
                 when (connectionResult) {
-                    is com.signify.hue.flutterreactiveble.ble.EstablishedConnection ->
+                    is EstablishedConnection ->
                         connectionResult.rxConnection.readCharacteristic(characteristic)
                                 /*
                                 On Android7 the ble stack frequently gives incorrectly
@@ -110,27 +110,27 @@ open class ReactiveBleClient(private val context: Context) : com.signify.hue.flu
                                 */
                                 .retry(1) { Build.VERSION.SDK_INT < Build.VERSION_CODES.O }
                                 .map { value ->
-                                    com.signify.hue.flutterreactiveble.ble.CharOperationSuccessful(deviceId, value.asList())
+                                    CharOperationSuccessful(deviceId, value.asList())
                                 }
-                    is com.signify.hue.flutterreactiveble.ble.EstablishConnectionFailure ->
+                    is EstablishConnectionFailure ->
                         Single.just(
-                                com.signify.hue.flutterreactiveble.ble.CharOperationFailed(deviceId,
+                                CharOperationFailed(deviceId,
                                         "failed to connect ${connectionResult.errorMessage}"))
                 }
-            }.first(com.signify.hue.flutterreactiveble.ble.CharOperationFailed(deviceId, "read char failed"))
+            }.first(CharOperationFailed(deviceId, "read char failed"))
 
     override fun writeCharacteristicWithResponse(
-        deviceId: String,
-        characteristic: UUID,
-        value: ByteArray
-    ): Single<com.signify.hue.flutterreactiveble.ble.CharOperationResult> =
+            deviceId: String,
+            characteristic: UUID,
+            value: ByteArray
+    ): Single<CharOperationResult> =
             executeWriteOperation(deviceId, characteristic, value, RxBleConnection::writeCharWithResponse)
 
     override fun writeCharacteristicWithoutResponse(
-        deviceId: String,
-        characteristic: UUID,
-        value: ByteArray
-    ): Single<com.signify.hue.flutterreactiveble.ble.CharOperationResult> =
+            deviceId: String,
+            characteristic: UUID,
+            value: ByteArray
+    ): Single<CharOperationResult> =
 
             executeWriteOperation(deviceId, characteristic, value, RxBleConnection::writeCharWithoutResponse)
 
@@ -144,66 +144,66 @@ open class ReactiveBleClient(private val context: Context) : com.signify.hue.flu
                 }
     }
 
-    override fun negotiateMtuSize(deviceId: String, size: Int): Single<com.signify.hue.flutterreactiveble.ble.MtuNegotiateResult> =
+    override fun negotiateMtuSize(deviceId: String, size: Int): Single<MtuNegotiateResult> =
             getConnection(deviceId).flatMapSingle { connectionResult ->
                 when (connectionResult) {
-                    is com.signify.hue.flutterreactiveble.ble.EstablishedConnection -> connectionResult.rxConnection.requestMtu(size)
-                            .map { value -> com.signify.hue.flutterreactiveble.ble.MtuNegotiateSuccesful(deviceId, value) }
+                    is EstablishedConnection -> connectionResult.rxConnection.requestMtu(size)
+                            .map { value -> MtuNegotiateSuccesful(deviceId, value) }
 
-                    is com.signify.hue.flutterreactiveble.ble.EstablishConnectionFailure ->
-                        Single.just(com.signify.hue.flutterreactiveble.ble.MtuNegotiateFailed(deviceId,
+                    is EstablishConnectionFailure ->
+                        Single.just(MtuNegotiateFailed(deviceId,
                                 "failed to connect ${connectionResult.errorMessage}"))
                 }
-            }.first(com.signify.hue.flutterreactiveble.ble.MtuNegotiateFailed(deviceId, "negotiate mtu timed out"))
+            }.first(MtuNegotiateFailed(deviceId, "negotiate mtu timed out"))
 
-    override fun observeBleStatus(): Observable<com.signify.hue.flutterreactiveble.ble.BleStatus> = com.signify.hue.flutterreactiveble.ble.ReactiveBleClient.Companion.rxBleClient.observeStateChanges()
-            .startWith(com.signify.hue.flutterreactiveble.ble.ReactiveBleClient.Companion.rxBleClient.state)
+    override fun observeBleStatus(): Observable<BleStatus> = ReactiveBleClient.Companion.rxBleClient.observeStateChanges()
+            .startWith(ReactiveBleClient.Companion.rxBleClient.state)
             .map { it.toBleState() }
 
     @VisibleForTesting
     internal open fun createDeviceConnector(device: RxBleDevice, timeout: Duration) =
-            com.signify.hue.flutterreactiveble.ble.DeviceConnector(device, timeout, connectionUpdateSubject::onNext, connectionQueue)
+            DeviceConnector(device, timeout, connectionUpdateSubject::onNext, connectionQueue)
 
     private fun getConnection(
-        deviceId: String,
-        timeout: Duration = Duration(0, TimeUnit.MILLISECONDS)
-    ): Observable<com.signify.hue.flutterreactiveble.ble.EstablishConnectionResult> {
-        val device = com.signify.hue.flutterreactiveble.ble.ReactiveBleClient.Companion.rxBleClient.getBleDevice(deviceId)
-        val connector = com.signify.hue.flutterreactiveble.ble.ReactiveBleClient.Companion.activeConnections.getOrPut(deviceId) { createDeviceConnector(device, timeout) }
+            deviceId: String,
+            timeout: Duration = Duration(0, TimeUnit.MILLISECONDS)
+    ): Observable<EstablishConnectionResult> {
+        val device = ReactiveBleClient.Companion.rxBleClient.getBleDevice(deviceId)
+        val connector = ReactiveBleClient.Companion.activeConnections.getOrPut(deviceId) { createDeviceConnector(device, timeout) }
 
         return connector.connection
     }
 
     private fun executeWriteOperation(
-        deviceId: String,
-        characteristic: UUID,
-        value: ByteArray,
-        bleOperation: RxBleConnection.(characteristic: UUID, value: ByteArray) -> Single<ByteArray>
-    ): Single<com.signify.hue.flutterreactiveble.ble.CharOperationResult> {
+            deviceId: String,
+            characteristic: UUID,
+            value: ByteArray,
+            bleOperation: RxBleConnection.(characteristic: UUID, value: ByteArray) -> Single<ByteArray>
+    ): Single<CharOperationResult> {
         return getConnection(deviceId)
-                .flatMapSingle<com.signify.hue.flutterreactiveble.ble.CharOperationResult> { connectionResult ->
+                .flatMapSingle<CharOperationResult> { connectionResult ->
                     when (connectionResult) {
-                        is com.signify.hue.flutterreactiveble.ble.EstablishedConnection -> {
+                        is EstablishedConnection -> {
                             connectionResult.rxConnection.bleOperation(characteristic, value)
-                                    .map { value -> com.signify.hue.flutterreactiveble.ble.CharOperationSuccessful(deviceId, value.asList()) }
+                                    .map { value -> CharOperationSuccessful(deviceId, value.asList()) }
                         }
-                        is com.signify.hue.flutterreactiveble.ble.EstablishConnectionFailure -> {
+                        is EstablishConnectionFailure -> {
                             Timber.d("Failed conn for write ")
                             Single.just(
-                                    com.signify.hue.flutterreactiveble.ble.CharOperationFailed(deviceId,
+                                    CharOperationFailed(deviceId,
                                             "failed to connect ${connectionResult.errorMessage}"))
                         }
                     }
-                }.first(com.signify.hue.flutterreactiveble.ble.CharOperationFailed(deviceId, "Writechar timed-out"))
+                }.first(CharOperationFailed(deviceId, "Writechar timed-out"))
     }
 
     private fun setupNotificationOrIndication(
-            deviceConnection: com.signify.hue.flutterreactiveble.ble.EstablishConnectionResult,
+            deviceConnection: EstablishConnectionResult,
             characteristic: UUID
     ): Observable<Observable<ByteArray>> =
 
             when (deviceConnection) {
-                is com.signify.hue.flutterreactiveble.ble.EstablishedConnection -> {
+                is EstablishedConnection -> {
                     deviceConnection.rxConnection.discoverServices()
                             .flatMap { deviceServices -> deviceServices.getCharacteristic(characteristic) }
                             .flatMapObservable { char ->
@@ -214,24 +214,27 @@ open class ReactiveBleClient(private val context: Context) : com.signify.hue.flu
                                 }
                             }
                 }
-                is com.signify.hue.flutterreactiveble.ble.EstablishConnectionFailure -> {
+                is EstablishConnectionFailure -> {
                     Observable.just(Observable.empty<ByteArray>())
                 }
             }
 
-    override fun requestConnectionPriority(deviceId: String, priority: com.signify.hue.flutterreactiveble.ble.ConnectionPriority): Single<com.signify.hue.flutterreactiveble.ble.RequestConnectionPriorityResult> =
-            getConnection(deviceId).switchMapSingle<com.signify.hue.flutterreactiveble.ble.RequestConnectionPriorityResult> { connectionResult ->
+    override fun requestConnectionPriority(
+            deviceId: String,
+            priority: ConnectionPriority
+    ): Single<RequestConnectionPriorityResult> =
+            getConnection(deviceId).switchMapSingle<RequestConnectionPriorityResult> { connectionResult ->
                 when (connectionResult) {
-                    is com.signify.hue.flutterreactiveble.ble.EstablishedConnection ->
+                    is EstablishedConnection ->
                         connectionResult.rxConnection.requestConnectionPriority(priority.code, 2, TimeUnit.SECONDS)
                                 .toSingle {
-                                    com.signify.hue.flutterreactiveble.ble.RequestConnectionPrioritySuccess(deviceId)
+                                    RequestConnectionPrioritySuccess(deviceId)
                                 }
-                    is com.signify.hue.flutterreactiveble.ble.EstablishConnectionFailure -> Single.fromCallable {
-                        com.signify.hue.flutterreactiveble.ble.RequestConnectionPriorityFailed(deviceId, connectionResult.errorMessage)
+                    is EstablishConnectionFailure -> Single.fromCallable {
+                        RequestConnectionPriorityFailed(deviceId, connectionResult.errorMessage)
                     }
                 }
-            }.first(com.signify.hue.flutterreactiveble.ble.RequestConnectionPriorityFailed(deviceId, "Unknown failure"))
+            }.first(RequestConnectionPriorityFailed(deviceId, "Unknown failure"))
 
     // enable this for extra debug output on the android stack
     private fun enableDebugLogging() = RxBleClient

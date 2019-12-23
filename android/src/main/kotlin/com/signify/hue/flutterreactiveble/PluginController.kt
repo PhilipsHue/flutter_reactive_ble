@@ -1,5 +1,6 @@
 package com.signify.hue.flutterreactiveble
 
+import com.signify.hue.flutterreactiveble.ble.RequestConnectionPriorityFailed
 import com.signify.hue.flutterreactiveble.channelhandlers.BleStatusHandler
 import com.signify.hue.flutterreactiveble.channelhandlers.CharNotificationHandler
 import com.signify.hue.flutterreactiveble.channelhandlers.DeviceConnectionHandler
@@ -248,8 +249,15 @@ class PluginController {
 
         bleClient.requestConnectionPriority(request.deviceId, request.priority.toConnectionPriority())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe { requestResult -> result.success(protoConverter
-                        .convertRequestConnectionPriorityInfo(requestResult).toByteArray()) }
+                .subscribe({ requestResult ->
+                    result.success(protoConverter
+                            .convertRequestConnectionPriorityInfo(requestResult).toByteArray())
+                },
+                        { throwable ->
+                            result.success(protoConverter.convertRequestConnectionPriorityInfo(
+                                    RequestConnectionPriorityFailed(request.deviceId, throwable?.message
+                                            ?: "Unknown error")).toByteArray())
+                        })
                 .discard()
     }
 }

@@ -10,7 +10,7 @@ import com.signify.hue.flutterreactiveble.model.NegotiateMtuErrorType
 import com.signify.hue.flutterreactiveble.model.ConnectionErrorType
 
 import java.util.UUID
-
+@Suppress("TooManyFunctions")
 class ProtobufMessageConverter {
 
     companion object {
@@ -129,7 +129,9 @@ class ProtobufMessageConverter {
                 }
             }
 
-    fun convertRequestConnectionPriorityInfo(result: com.signify.hue.flutterreactiveble.ble.RequestConnectionPriorityResult): pb.ChangeConnectionPriorityInfo {
+    fun convertRequestConnectionPriorityInfo(
+        result: com.signify.hue.flutterreactiveble.ble.RequestConnectionPriorityResult
+    ): pb.ChangeConnectionPriorityInfo {
         return when (result) {
             is com.signify.hue.flutterreactiveble.ble.RequestConnectionPrioritySuccess -> pb.ChangeConnectionPriorityInfo.newBuilder()
                     .setDeviceId(result.deviceId)

@@ -17,10 +17,10 @@ import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
 internal class DeviceConnector(
-        private val device: RxBleDevice,
-        private val connectionTimeout: Duration,
-        private val updateListeners: (update: com.signify.hue.flutterreactiveble.ble.ConnectionUpdate) -> Unit,
-        private val connectionQueue: com.signify.hue.flutterreactiveble.ble.ConnectionQueue
+    private val device: RxBleDevice,
+    private val connectionTimeout: Duration,
+    private val updateListeners: (update: com.signify.hue.flutterreactiveble.ble.ConnectionUpdate) -> Unit,
+    private val connectionQueue: com.signify.hue.flutterreactiveble.ble.ConnectionQueue
 ) {
 
     companion object {
@@ -127,26 +127,28 @@ internal class DeviceConnector(
                 .doOnDispose {
                     Timber.d("Close connection for device ${rxBleDevice.macAddress}")
                 }
-                .subscribe(connectDeviceSubject::onNext)
+                .subscribe({ connectDeviceSubject.onNext(it) }, { error ->
+                    Timber.d("Connection error for device ${rxBleDevice.macAddress}: ${error.message}")
+                })
     }
 
     private fun connectDevice(rxBleDevice: RxBleDevice, shouldNotTimeout: Boolean): Observable<RxBleConnection> =
             rxBleDevice.establishConnection(shouldNotTimeout)
-                .compose {
-                    if (shouldNotTimeout) {
-                        it
-                    } else {
-                        it.timeout(
-                                Observable.timer(connectionTimeout.value, connectionTimeout.unit)
-                                        .doOnNext {
-                                            Timber.d("Connection timed out for device ${rxBleDevice.macAddress}")
-                                        },
-                                Function<RxBleConnection, Observable<Unit>> {
-                                    Observable.never<Unit>()
-                                }
-                        )
+                    .compose {
+                        if (shouldNotTimeout) {
+                            it
+                        } else {
+                            it.timeout(
+                                    Observable.timer(connectionTimeout.value, connectionTimeout.unit)
+                                            .doOnNext {
+                                                Timber.d("Connection timed out for device ${rxBleDevice.macAddress}")
+                                            },
+                                    Function<RxBleConnection, Observable<Unit>> {
+                                        Observable.never<Unit>()
+                                    }
+                            )
+                        }
                     }
-                }
 
     internal fun clearGattCache(): Completable = currentConnection?.let { connection ->
         when (connection) {
