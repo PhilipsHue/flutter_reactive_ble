@@ -180,7 +180,7 @@ packages:
       path: example
       relative: true
     source: path
-    version: "0.0.0"
+    version: "0.1.0"
   flutter_test:
     dependency: "direct dev"
     description: flutter
