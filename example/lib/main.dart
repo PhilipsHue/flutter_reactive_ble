@@ -1,10 +1,18 @@
 import 'package:flutter/material.dart';
 
+import 'src/utils.dart';
 import 'ui/device_list.dart';
 
 const _themeColor = Colors.lightGreen;
 
-void main() => runApp(const FlutterReactiveBleExampleApp());
+void main() {
+  FlutterError.onError = (error) {
+    log("An error occurred: ${error.exception}");
+    log(error.stack.toString());
+  };
+
+  runApp(const FlutterReactiveBleExampleApp());
+}
 
 class FlutterReactiveBleExampleApp extends StatelessWidget {
   const FlutterReactiveBleExampleApp();

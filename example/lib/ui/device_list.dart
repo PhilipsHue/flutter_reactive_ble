@@ -7,8 +7,6 @@ import '../src/utils.dart';
 import '../src/widgets.dart';
 import 'device_detail_screen.dart';
 
-final _uuid = Uuid.parse('0000FE0F-0000-1000-8000-00805F9B34FB');
-
 class DeviceList extends StatefulWidget {
   const DeviceList();
 
@@ -24,10 +22,13 @@ class _DeviceListState extends State<DeviceList> {
   StreamSubscription _scanSubscription;
   BleStatus _status;
 
+  TextEditingController _uuidController;
+
   @override
   void initState() {
     super.initState();
     _initBleState();
+    _uuidController = TextEditingController()..addListener(() => setState(() {}));
   }
 
   @override
@@ -35,6 +36,9 @@ class _DeviceListState extends State<DeviceList> {
     super.dispose();
     _statusSubscription?.cancel();
     _scanSubscription?.cancel();
+    _uuidController
+      ..removeListener(() => setState(() {}))
+      ..dispose();
   }
 
   void _initBleState() {
@@ -49,11 +53,27 @@ class _DeviceListState extends State<DeviceList> {
     });
   }
 
+  bool _isValidUuidInput() {
+    final uuidText = _uuidController.text;
+    if (uuidText.length > 3) {
+      try {
+        Uuid.parse(uuidText);
+        return true;
+      } on Exception {
+        return false;
+      }
+    } else {
+      return false;
+    }
+  }
+
   void _startScanning() {
     if (_scanSubscription == null) {
+      final uuid = Uuid.parse(_uuidController.text);
       log("Starting to listen for devices...");
 
-      _scanSubscription = _ble.scanForDevices(withService: _uuid).listen((device) {
+      _clearDeviceList();
+      _scanSubscription = _ble.scanForDevices(withService: uuid).listen((device) {
         if (!_devices.any((d) => d.id == device.id)) {
           log("New device found: $device");
 
@@ -87,63 +107,74 @@ class _DeviceListState extends State<DeviceList> {
         appBar: AppBar(
           title: Text('BLE $_status'),
         ),
-        body: Center(
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    RaisedButton(
-                      child: const Text('Start scanning'),
-                      onPressed: _scanSubscription == null && _status == BleStatus.ready ? _startScanning : null,
-                    ),
-                    RaisedButton(
-                      child: const Text('Stop scanning'),
-                      onPressed: _scanSubscription != null ? _stopScanning : null,
-                    ),
-                    RaisedButton(
-                      child: const Text('Clear scanlist'),
-                      onPressed: _clearDeviceList,
-                    ),
-                  ],
-                ),
+        body: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 16),
+                  const Text('UUID to use for scanning: (short or long version)'),
+                  TextField(
+                    controller: _uuidController,
+                    enabled: _scanSubscription == null,
+                    decoration: InputDecoration(errorText: _uuidController.text.isEmpty || _isValidUuidInput() ? null : 'Invalid UUID format'),
+                    autofocus: true,
+                    autocorrect: false,
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      RaisedButton(
+                        child: const Text('Start scanning'),
+                        onPressed: _scanSubscription == null && _status == BleStatus.ready && _isValidUuidInput() ? _startScanning : null,
+                      ),
+                      RaisedButton(
+                        child: const Text('Stop scanning'),
+                        onPressed: _scanSubscription != null ? _stopScanning : null,
+                      ),
+                      RaisedButton(
+                        child: const Text('Clear scanlist'),
+                        onPressed: _devices.isNotEmpty ? _clearDeviceList : null,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      if (_status == BleStatus.ready) ...[
+                        Text(_scanSubscription == null ? 'Enter a UUID above and tap start to begin scanning' : 'Tap a device to connect to it'),
+                        if (_scanSubscription != null || _devices.isNotEmpty) Text('count: ${_devices.length}'),
+                      ] else
+                        const Text("BLE Status isn't valid for scanning"),
+                    ],
+                  ),
+                ],
               ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    if (_status == BleStatus.ready) ...[
-                      Text(_scanSubscription == null ? 'Tap start to begin scanning' : 'Tap a device to connect to it'),
-                      Text('count: ${_devices.length}'),
-                    ] else
-                      const Text("BLE Status isn't valid for scanning"),
-                  ],
-                ),
+            ),
+            const SizedBox(height: 8),
+            Flexible(
+              child: ListView(
+                children: _devices
+                    .map(
+                      (device) => ListTile(
+                        title: Text(device.name),
+                        subtitle: Text(device.id),
+                        leading: const BluetoothIcon(),
+                        onTap: () async {
+                          _stopScanning();
+                          _clearDeviceList();
+                          await Navigator.push<void>(context, MaterialPageRoute(builder: (_) => DeviceDetailScreen(device: device)));
+                        },
+                      ),
+                    )
+                    .toList(),
               ),
-              const SizedBox(height: 8),
-              Flexible(
-                child: ListView(
-                  children: _devices
-                      .map(
-                        (device) => ListTile(
-                          title: Text(device.name),
-                          subtitle: Text(device.id),
-                          leading: const BluetoothIcon(),
-                          onTap: () async {
-                            _stopScanning();
-                            _clearDeviceList();
-                            await Navigator.push<void>(context, MaterialPageRoute(builder: (_) => DeviceDetailScreen(device: device)));
-                          },
-                        ),
-                      )
-                      .toList(),
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       );
 }

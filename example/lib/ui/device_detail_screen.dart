@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
@@ -33,16 +34,20 @@ class _DetailState extends State<DeviceDetailScreen> {
   DeviceConnectionState _connectionState;
   int _currentValue;
 
+  TextEditingController _textController;
+
   @override
   void initState() {
     super.initState();
     _connectToDevice();
+    _textController = TextEditingController();
   }
 
   @override
   void dispose() {
     super.dispose();
     _currentValueUpdateSubscription?.cancel();
+    _textController.dispose();
   }
 
   void _connectToDevice() {
@@ -50,11 +55,11 @@ class _DetailState extends State<DeviceDetailScreen> {
     _connectedDeviceStream = _ble
         .connectToDevice(
           id: deviceId,
-          connectionTimeout: const Duration(seconds: 5),
+          connectionTimeout: const Duration(seconds: 10),
         )
         .asBroadcastStream();
 
-    _charValueStream = _connectedDeviceStream.where((device) => device.connectionState == DeviceConnectionState.connected).take(1).asyncExpand((d) {
+    _charValueStream = _connectedDeviceStream.where((device) => device.connectionState == DeviceConnectionState.connected).take(1).asyncExpand((_) {
       log("Connected to $deviceName ($deviceId), getting characteristic");
 
       return _ble.subscribeToCharacteristic(QualifiedCharacteristic(
@@ -69,7 +74,7 @@ class _DetailState extends State<DeviceDetailScreen> {
     _connectedDeviceStream
         .where((device) => device.connectionState == DeviceConnectionState.connected)
         .first
-        .then((_) => Future<void>.delayed(const Duration(milliseconds: 20)))
+        .then((_) => Future<void>.delayed(const Duration(milliseconds: 100)))
         .then((_) => _readCharacteristic());
   }
 
@@ -87,16 +92,16 @@ class _DetailState extends State<DeviceDetailScreen> {
   }
 
   Future<void> _writeCharacteristic() async {
-    final value = _currentValue == 0 ? 0x01 : 0x00;
+    final value = _textController.text;
 
-    log("Writing characteristic...");
+    log("Writing $value to characteristic...");
     await _ble.writeCharacteristicWithResponse(
       QualifiedCharacteristic(
         characteristicId: _charUuid,
         serviceId: _serviceUuid,
         deviceId: deviceId,
       ),
-      value: List.of([value]),
+      value: utf8.encode(value),
     );
     log("Characteristic written");
   }
@@ -110,49 +115,66 @@ class _DetailState extends State<DeviceDetailScreen> {
         ),
         body: Padding(
           padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('Device ID: $deviceId'),
-              StreamBuilder(
-                stream: _connectedDeviceStream,
-                builder: (_, AsyncSnapshot<ConnectionStateUpdate> snapshot) {
-                  if (snapshot.hasData) {
-                    WidgetsBinding.instance.addPostFrameCallback((_) => setState(() => _connectionState = snapshot.data.connectionState));
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.max,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text('Device ID: $deviceId'),
+                StreamBuilder(
+                  stream: _connectedDeviceStream,
+                  builder: (_, AsyncSnapshot<ConnectionStateUpdate> snapshot) {
+                    if (snapshot.hasData) {
+                      WidgetsBinding.instance.addPostFrameCallback((_) => setState(() => _connectionState = snapshot.data.connectionState));
 
-                    return StatusMessage('Connection state is: ${snapshot.data.connectionState}');
-                  } else {
-                    return const StatusMessage('No data yet...');
-                  }
-                },
-              ),
-              StreamBuilder(
-                stream: _charValueStream,
-                builder: (_, AsyncSnapshot<List<int>> snapshot) {
-                  if (snapshot.hasData) {
-                    return StatusMessage('Value for notification is: ${snapshot.data}');
-                  } else if (_currentValue == null) {
-                    return const StatusMessage('No data for characteristic retrieved yet...');
-                  } else {
-                    return StatusMessage('Value for notification is: $_currentValue');
-                  }
-                },
-              ),
-              RaisedButton(
-                child: const Text('Read characteristic'),
-                onPressed: _isConnected ? _readCharacteristic : null,
-              ),
-              RaisedButton(
-                child: const Text('Write characteristic'),
-                onPressed: _isConnected ? _writeCharacteristic : null,
-              ),
-              const SizedBox(height: 64),
-              if (_connectionState == DeviceConnectionState.disconnected)
-                RaisedButton(
-                  child: const Text('Connect to device'),
-                  onPressed: _connectToDevice,
+                      return StatusMessage('Connection state is: ${snapshot.data.connectionState}');
+                    } else {
+                      return const StatusMessage('No data yet...');
+                    }
+                  },
                 ),
-            ],
+                StreamBuilder(
+                  stream: _charValueStream,
+                  builder: (_, AsyncSnapshot<List<int>> snapshot) {
+                    if (snapshot.hasData) {
+                      return StatusMessage('Value for notification is: ${snapshot.data}');
+                    } else if (_currentValue == null) {
+                      return const StatusMessage('No data for characteristic retrieved yet...');
+                    } else {
+                      return StatusMessage('Value for notification is: $_currentValue');
+                    }
+                  },
+                ),
+                RaisedButton(
+                  child: const Text('Read characteristic'),
+                  onPressed: _isConnected ? _readCharacteristic : null,
+                ),
+                const SizedBox(height: 32),
+                const Text('Write characteristic value:'),
+                Row(
+                  mainAxisSize: MainAxisSize.max,
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: _textController,
+                        enabled: _isConnected,
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    RaisedButton(
+                      child: const Text('Write characteristic'),
+                      onPressed: _isConnected && _textController.text.isNotEmpty ? _writeCharacteristic : null,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 64),
+                if (_connectionState == DeviceConnectionState.disconnected)
+                  RaisedButton(
+                    child: const Text('Connect to device'),
+                    onPressed: _connectToDevice,
+                  ),
+              ],
+            ),
           ),
         ),
       );
