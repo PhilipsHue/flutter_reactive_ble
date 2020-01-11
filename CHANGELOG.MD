@@ -1,3 +1,9 @@
+## 1.0.1
+
+* Fixes #5 Undeliverable exception.
+
+* Small fixes for example app.
+
 ## 1.0.0+1
 
 * Update homepage
