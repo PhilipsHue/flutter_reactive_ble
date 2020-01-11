@@ -8,7 +8,7 @@ import 'package:meta/meta.dart';
 
 part 'discovered_device.g.dart';
 
-// ignore_for_file: annotate_overrides
+// ignore_for_file: annotate_overrides, avoid_classes_with_only_static_members, non_constant_identifier_names
 
 @immutable
 class ScanResult {
@@ -27,8 +27,7 @@ class DiscoveredDevice extends $DiscoveredDevice {
   @CustomEquality(DeepCollectionEquality())
   final Map<Uuid, Uint8List> serviceData;
 
-  const DiscoveredDevice(
-      {@required this.id, @required this.name, @required this.serviceData});
+  const DiscoveredDevice({@required this.id, @required this.name, @required this.serviceData});
 }
 
 enum ConnectionStatus { disconnected, connecting, connected, disconnecting }
