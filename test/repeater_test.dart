@@ -19,14 +19,16 @@ void main() {
         isSync: true,
       );
 
-      when(handler.onListenEmitFrom()).thenAnswer((_) => underlyingStreamController.stream);
+      when(handler.onListenEmitFrom())
+          .thenAnswer((_) => underlyingStreamController.stream);
     });
 
     tearDown(() {
       underlyingStreamController.close();
     });
 
-    test("does not subscribe to the underlying stream in absence of listeners", () {
+    test("does not subscribe to the underlying stream in absence of listeners",
+        () {
       verifyNever(handler.onListenEmitFrom());
     });
 
@@ -46,7 +48,9 @@ void main() {
       expect(underlyingStreamController.hasListener, true);
     });
 
-    test("unsubscribes from the underlying stream when there are no listeners left", () async {
+    test(
+        "unsubscribes from the underlying stream when there are no listeners left",
+        () async {
       await sut.stream.listen((_) {}).cancel();
 
       verify(handler.onCancel()).called(1);

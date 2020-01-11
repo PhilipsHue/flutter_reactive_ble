@@ -18,15 +18,23 @@ void main() {
     setUp(() {
       timestampMock = DateTimeMock();
       when(timestampMock.getTimestamp()).thenReturn(timestamp);
-      sut = DiscoveredDevicesRegistry.withGetTimestamp(timestampMock.getTimestamp)..add(device);
+      sut =
+          DiscoveredDevicesRegistry.withGetTimestamp(timestampMock.getTimestamp)
+            ..add(device);
     });
 
     test("Device is in cache", () {
-      expect(sut.deviceIsDiscoveredRecently(deviceId: device, cacheValidity: const Duration(minutes: 10)), true);
+      expect(
+          sut.deviceIsDiscoveredRecently(
+              deviceId: device, cacheValidity: const Duration(minutes: 10)),
+          true);
     });
 
     test("Device is not in cache", () {
-      expect(sut.deviceIsDiscoveredRecently(deviceId: "NotInCacheDevice", cacheValidity: const Duration(seconds: 10)),
+      expect(
+          sut.deviceIsDiscoveredRecently(
+              deviceId: "NotInCacheDevice",
+              cacheValidity: const Duration(seconds: 10)),
           false);
     });
 
@@ -40,10 +48,16 @@ void main() {
       final dateTime = DateTime(2018, 1, 1);
 
       final responses = [dateTime, timestamp];
-      when(timestampMock.getTimestamp()).thenAnswer((_) => responses.removeAt(0));
-      sut = DiscoveredDevicesRegistry.withGetTimestamp(timestampMock.getTimestamp)..add(device);
+      when(timestampMock.getTimestamp())
+          .thenAnswer((_) => responses.removeAt(0));
+      sut =
+          DiscoveredDevicesRegistry.withGetTimestamp(timestampMock.getTimestamp)
+            ..add(device);
 
-      expect(sut.deviceIsDiscoveredRecently(deviceId: device, cacheValidity: const Duration(days: 1)), false);
+      expect(
+          sut.deviceIsDiscoveredRecently(
+              deviceId: device, cacheValidity: const Duration(days: 1)),
+          false);
     });
   });
 }

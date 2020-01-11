@@ -59,7 +59,11 @@ class _DetailState extends State<DeviceDetailScreen> {
         )
         .asBroadcastStream();
 
-    _charValueStream = _connectedDeviceStream.where((device) => device.connectionState == DeviceConnectionState.connected).take(1).asyncExpand((_) {
+    _charValueStream = _connectedDeviceStream
+        .where((device) =>
+            device.connectionState == DeviceConnectionState.connected)
+        .take(1)
+        .asyncExpand((_) {
       log("Connected to $deviceName ($deviceId), getting characteristic");
 
       return _ble.subscribeToCharacteristic(QualifiedCharacteristic(
@@ -69,10 +73,12 @@ class _DetailState extends State<DeviceDetailScreen> {
       ));
     });
 
-    _currentValueUpdateSubscription = _charValueStream.listen((data) => _currentValue = data.first);
+    _currentValueUpdateSubscription =
+        _charValueStream.listen((data) => _currentValue = data.first);
 
     _connectedDeviceStream
-        .where((device) => device.connectionState == DeviceConnectionState.connected)
+        .where((device) =>
+            device.connectionState == DeviceConnectionState.connected)
         .first
         .then((_) => Future<void>.delayed(const Duration(milliseconds: 100)))
         .then((_) => _readCharacteristic());
@@ -111,7 +117,8 @@ class _DetailState extends State<DeviceDetailScreen> {
   @override
   Widget build(BuildContext context) => Scaffold(
         appBar: AppBar(
-          title: Text("${_isConnected ? 'Connected' : 'Connecting'} to: $deviceName"),
+          title: Text(
+              "${_isConnected ? 'Connected' : 'Connecting'} to: $deviceName"),
         ),
         body: Padding(
           padding: const EdgeInsets.all(16),
@@ -125,9 +132,12 @@ class _DetailState extends State<DeviceDetailScreen> {
                   stream: _connectedDeviceStream,
                   builder: (_, AsyncSnapshot<ConnectionStateUpdate> snapshot) {
                     if (snapshot.hasData) {
-                      WidgetsBinding.instance.addPostFrameCallback((_) => setState(() => _connectionState = snapshot.data.connectionState));
+                      WidgetsBinding.instance.addPostFrameCallback((_) =>
+                          setState(() => _connectionState =
+                              snapshot.data.connectionState));
 
-                      return StatusMessage('Connection state is: ${snapshot.data.connectionState}');
+                      return StatusMessage(
+                          'Connection state is: ${snapshot.data.connectionState}');
                     } else {
                       return const StatusMessage('No data yet...');
                     }
@@ -137,11 +147,14 @@ class _DetailState extends State<DeviceDetailScreen> {
                   stream: _charValueStream,
                   builder: (_, AsyncSnapshot<List<int>> snapshot) {
                     if (snapshot.hasData) {
-                      return StatusMessage('Value for notification is: ${snapshot.data}');
+                      return StatusMessage(
+                          'Value for notification is: ${snapshot.data}');
                     } else if (_currentValue == null) {
-                      return const StatusMessage('No data for characteristic retrieved yet...');
+                      return const StatusMessage(
+                          'No data for characteristic retrieved yet...');
                     } else {
-                      return StatusMessage('Value for notification is: $_currentValue');
+                      return StatusMessage(
+                          'Value for notification is: $_currentValue');
                     }
                   },
                 ),
@@ -163,7 +176,9 @@ class _DetailState extends State<DeviceDetailScreen> {
                     const SizedBox(width: 16),
                     RaisedButton(
                       child: const Text('Write characteristic'),
-                      onPressed: _isConnected && _textController.text.isNotEmpty ? _writeCharacteristic : null,
+                      onPressed: _isConnected && _textController.text.isNotEmpty
+                          ? _writeCharacteristic
+                          : null,
                     ),
                   ],
                 ),

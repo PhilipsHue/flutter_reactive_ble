@@ -27,7 +27,8 @@ class DiscoveredDevice extends $DiscoveredDevice {
   @CustomEquality(DeepCollectionEquality())
   final Map<Uuid, Uint8List> serviceData;
 
-  const DiscoveredDevice({@required this.id, @required this.name, @required this.serviceData});
+  const DiscoveredDevice(
+      {@required this.id, @required this.name, @required this.serviceData});
 }
 
 enum ConnectionStatus { disconnected, connecting, connected, disconnecting }

@@ -8,7 +8,14 @@
 const ScanForDevicesRequest$json = const {
   '1': 'ScanForDevicesRequest',
   '2': const [
-    const {'1': 'serviceUuid', '3': 1, '4': 1, '5': 11, '6': '.Uuid', '10': 'serviceUuid'},
+    const {
+      '1': 'serviceUuid',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.Uuid',
+      '10': 'serviceUuid'
+    },
     const {'1': 'scanMode', '3': 2, '4': 1, '5': 5, '10': 'scanMode'},
   ],
 };
@@ -18,8 +25,22 @@ const DeviceScanInfo$json = const {
   '2': const [
     const {'1': 'id', '3': 1, '4': 1, '5': 9, '10': 'id'},
     const {'1': 'name', '3': 2, '4': 1, '5': 9, '10': 'name'},
-    const {'1': 'failure', '3': 3, '4': 1, '5': 11, '6': '.GenericFailure', '10': 'failure'},
-    const {'1': 'serviceData', '3': 4, '4': 3, '5': 11, '6': '.ServiceDataEntry', '10': 'serviceData'},
+    const {
+      '1': 'failure',
+      '3': 3,
+      '4': 1,
+      '5': 11,
+      '6': '.GenericFailure',
+      '10': 'failure'
+    },
+    const {
+      '1': 'serviceData',
+      '3': 4,
+      '4': 3,
+      '5': 11,
+      '6': '.ServiceDataEntry',
+      '10': 'serviceData'
+    },
     const {'1': 'rssi', '3': 5, '4': 1, '5': 5, '10': 'rssi'},
   ],
 };
@@ -28,7 +49,14 @@ const ConnectToDeviceRequest$json = const {
   '1': 'ConnectToDeviceRequest',
   '2': const [
     const {'1': 'deviceId', '3': 1, '4': 1, '5': 9, '10': 'deviceId'},
-    const {'1': 'servicesWithCharacteristicsToDiscover', '3': 2, '4': 1, '5': 11, '6': '.ServicesWithCharacteristics', '10': 'servicesWithCharacteristicsToDiscover'},
+    const {
+      '1': 'servicesWithCharacteristicsToDiscover',
+      '3': 2,
+      '4': 1,
+      '5': 11,
+      '6': '.ServicesWithCharacteristics',
+      '10': 'servicesWithCharacteristicsToDiscover'
+    },
     const {'1': 'timeoutInMs', '3': 3, '4': 1, '5': 5, '10': 'timeoutInMs'},
   ],
 };
@@ -37,8 +65,21 @@ const DeviceInfo$json = const {
   '1': 'DeviceInfo',
   '2': const [
     const {'1': 'id', '3': 1, '4': 1, '5': 9, '10': 'id'},
-    const {'1': 'connectionState', '3': 2, '4': 1, '5': 5, '10': 'connectionState'},
-    const {'1': 'failure', '3': 3, '4': 1, '5': 11, '6': '.GenericFailure', '10': 'failure'},
+    const {
+      '1': 'connectionState',
+      '3': 2,
+      '4': 1,
+      '5': 5,
+      '10': 'connectionState'
+    },
+    const {
+      '1': 'failure',
+      '3': 3,
+      '4': 1,
+      '5': 11,
+      '6': '.GenericFailure',
+      '10': 'failure'
+    },
   ],
 };
 
@@ -59,44 +100,93 @@ const ClearGattCacheRequest$json = const {
 const ClearGattCacheInfo$json = const {
   '1': 'ClearGattCacheInfo',
   '2': const [
-    const {'1': 'failure', '3': 1, '4': 1, '5': 11, '6': '.GenericFailure', '10': 'failure'},
+    const {
+      '1': 'failure',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.GenericFailure',
+      '10': 'failure'
+    },
   ],
 };
 
 const NotifyCharacteristicRequest$json = const {
   '1': 'NotifyCharacteristicRequest',
   '2': const [
-    const {'1': 'characteristic', '3': 1, '4': 1, '5': 11, '6': '.CharacteristicAddress', '10': 'characteristic'},
+    const {
+      '1': 'characteristic',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.CharacteristicAddress',
+      '10': 'characteristic'
+    },
   ],
 };
 
 const NotifyNoMoreCharacteristicRequest$json = const {
   '1': 'NotifyNoMoreCharacteristicRequest',
   '2': const [
-    const {'1': 'characteristic', '3': 1, '4': 1, '5': 11, '6': '.CharacteristicAddress', '10': 'characteristic'},
+    const {
+      '1': 'characteristic',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.CharacteristicAddress',
+      '10': 'characteristic'
+    },
   ],
 };
 
 const ReadCharacteristicRequest$json = const {
   '1': 'ReadCharacteristicRequest',
   '2': const [
-    const {'1': 'characteristic', '3': 1, '4': 1, '5': 11, '6': '.CharacteristicAddress', '10': 'characteristic'},
+    const {
+      '1': 'characteristic',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.CharacteristicAddress',
+      '10': 'characteristic'
+    },
   ],
 };
 
 const CharacteristicValueInfo$json = const {
   '1': 'CharacteristicValueInfo',
   '2': const [
-    const {'1': 'characteristic', '3': 1, '4': 1, '5': 11, '6': '.CharacteristicAddress', '10': 'characteristic'},
+    const {
+      '1': 'characteristic',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.CharacteristicAddress',
+      '10': 'characteristic'
+    },
     const {'1': 'value', '3': 2, '4': 1, '5': 12, '10': 'value'},
-    const {'1': 'failure', '3': 3, '4': 1, '5': 11, '6': '.GenericFailure', '10': 'failure'},
+    const {
+      '1': 'failure',
+      '3': 3,
+      '4': 1,
+      '5': 11,
+      '6': '.GenericFailure',
+      '10': 'failure'
+    },
   ],
 };
 
 const WriteCharacteristicRequest$json = const {
   '1': 'WriteCharacteristicRequest',
   '2': const [
-    const {'1': 'characteristic', '3': 1, '4': 1, '5': 11, '6': '.CharacteristicAddress', '10': 'characteristic'},
+    const {
+      '1': 'characteristic',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.CharacteristicAddress',
+      '10': 'characteristic'
+    },
     const {'1': 'value', '3': 2, '4': 1, '5': 12, '10': 'value'},
   ],
 };
@@ -104,8 +194,22 @@ const WriteCharacteristicRequest$json = const {
 const WriteCharacteristicInfo$json = const {
   '1': 'WriteCharacteristicInfo',
   '2': const [
-    const {'1': 'characteristic', '3': 1, '4': 1, '5': 11, '6': '.CharacteristicAddress', '10': 'characteristic'},
-    const {'1': 'failure', '3': 3, '4': 1, '5': 11, '6': '.GenericFailure', '10': 'failure'},
+    const {
+      '1': 'characteristic',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.CharacteristicAddress',
+      '10': 'characteristic'
+    },
+    const {
+      '1': 'failure',
+      '3': 3,
+      '4': 1,
+      '5': 11,
+      '6': '.GenericFailure',
+      '10': 'failure'
+    },
   ],
 };
 
@@ -122,7 +226,14 @@ const NegotiateMtuInfo$json = const {
   '2': const [
     const {'1': 'deviceId', '3': 1, '4': 1, '5': 9, '10': 'deviceId'},
     const {'1': 'mtuSize', '3': 2, '4': 1, '5': 5, '10': 'mtuSize'},
-    const {'1': 'failure', '3': 3, '4': 1, '5': 11, '6': '.GenericFailure', '10': 'failure'},
+    const {
+      '1': 'failure',
+      '3': 3,
+      '4': 1,
+      '5': 11,
+      '6': '.GenericFailure',
+      '10': 'failure'
+    },
   ],
 };
 
@@ -145,7 +256,14 @@ const ChangeConnectionPriorityInfo$json = const {
   '1': 'ChangeConnectionPriorityInfo',
   '2': const [
     const {'1': 'deviceId', '3': 1, '4': 1, '5': 9, '10': 'deviceId'},
-    const {'1': 'failure', '3': 2, '4': 1, '5': 11, '6': '.GenericFailure', '10': 'failure'},
+    const {
+      '1': 'failure',
+      '3': 2,
+      '4': 1,
+      '5': 11,
+      '6': '.GenericFailure',
+      '10': 'failure'
+    },
   ],
 };
 
@@ -153,15 +271,36 @@ const CharacteristicAddress$json = const {
   '1': 'CharacteristicAddress',
   '2': const [
     const {'1': 'deviceId', '3': 1, '4': 1, '5': 9, '10': 'deviceId'},
-    const {'1': 'serviceUuid', '3': 2, '4': 1, '5': 11, '6': '.Uuid', '10': 'serviceUuid'},
-    const {'1': 'characteristicUuid', '3': 3, '4': 1, '5': 11, '6': '.Uuid', '10': 'characteristicUuid'},
+    const {
+      '1': 'serviceUuid',
+      '3': 2,
+      '4': 1,
+      '5': 11,
+      '6': '.Uuid',
+      '10': 'serviceUuid'
+    },
+    const {
+      '1': 'characteristicUuid',
+      '3': 3,
+      '4': 1,
+      '5': 11,
+      '6': '.Uuid',
+      '10': 'characteristicUuid'
+    },
   ],
 };
 
 const ServiceDataEntry$json = const {
   '1': 'ServiceDataEntry',
   '2': const [
-    const {'1': 'serviceUuid', '3': 1, '4': 1, '5': 11, '6': '.Uuid', '10': 'serviceUuid'},
+    const {
+      '1': 'serviceUuid',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.Uuid',
+      '10': 'serviceUuid'
+    },
     const {'1': 'data', '3': 2, '4': 1, '5': 12, '10': 'data'},
   ],
 };
@@ -169,15 +308,36 @@ const ServiceDataEntry$json = const {
 const ServicesWithCharacteristics$json = const {
   '1': 'ServicesWithCharacteristics',
   '2': const [
-    const {'1': 'items', '3': 1, '4': 3, '5': 11, '6': '.ServiceWithCharacteristics', '10': 'items'},
+    const {
+      '1': 'items',
+      '3': 1,
+      '4': 3,
+      '5': 11,
+      '6': '.ServiceWithCharacteristics',
+      '10': 'items'
+    },
   ],
 };
 
 const ServiceWithCharacteristics$json = const {
   '1': 'ServiceWithCharacteristics',
   '2': const [
-    const {'1': 'serviceId', '3': 1, '4': 1, '5': 11, '6': '.Uuid', '10': 'serviceId'},
-    const {'1': 'characteristics', '3': 2, '4': 3, '5': 11, '6': '.Uuid', '10': 'characteristics'},
+    const {
+      '1': 'serviceId',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.Uuid',
+      '10': 'serviceId'
+    },
+    const {
+      '1': 'characteristics',
+      '3': 2,
+      '4': 3,
+      '5': 11,
+      '6': '.Uuid',
+      '10': 'characteristics'
+    },
   ],
 };
 
@@ -195,4 +355,3 @@ const GenericFailure$json = const {
     const {'1': 'message', '3': 2, '4': 1, '5': 9, '10': 'message'},
   ],
 };
-

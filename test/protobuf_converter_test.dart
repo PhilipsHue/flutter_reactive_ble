@@ -25,24 +25,32 @@ void main() {
 
       test('converts id', () {
         final scanresult = sut.scanResultFrom(message).result;
-        expect(scanresult.iif(success: (d) => d.id, failure: (_) => throw Exception()), id);
+        expect(
+            scanresult.iif(
+                success: (d) => d.id, failure: (_) => throw Exception()),
+            id);
       });
 
       test('converts name', () {
         final scanresult = sut.scanResultFrom(message).result;
-        expect(scanresult.iif(success: (d) => d.name, failure: (_) => throw Exception()), name);
+        expect(
+            scanresult.iif(
+                success: (d) => d.name, failure: (_) => throw Exception()),
+            name);
       });
 
       test('converts service data', () {
         final scanresult = sut.scanResultFrom(message).result;
         expect(
             scanresult.iif(
-                success: (d) => d.serviceData[Uuid(serviceDataEntry1.serviceUuid.data)],
+                success: (d) =>
+                    d.serviceData[Uuid(serviceDataEntry1.serviceUuid.data)],
                 failure: (_) => throw Exception()),
             serviceDataEntry1.data);
         expect(
             scanresult.iif(
-                success: (d) => d.serviceData[Uuid(serviceDataEntry2.serviceUuid.data)],
+                success: (d) =>
+                    d.serviceData[Uuid(serviceDataEntry2.serviceUuid.data)],
                 failure: (_) => throw Exception()),
             serviceDataEntry2.data);
       });
@@ -56,7 +64,9 @@ void main() {
         final scanresult = sut.scanResultFrom(failedScan).result;
         expect(
             scanresult.iif(
-                success: (d) => d.serviceData[Uuid(serviceDataEntry1.serviceUuid.data)], failure: (_) => "Failed"),
+                success: (d) =>
+                    d.serviceData[Uuid(serviceDataEntry1.serviceUuid.data)],
+                failure: (_) => "Failed"),
             "Failed");
       });
     });
@@ -156,7 +166,8 @@ void main() {
         final result = sut.resultFrom(getValue: getter.call, failure: failure);
 
         verifyNever(getter.call());
-        expect(result.iif(success: (_) => throw Exception(), failure: id), failure);
+        expect(result.iif(success: (_) => throw Exception(), failure: id),
+            failure);
       });
 
       test("converts a value", () {
@@ -168,20 +179,23 @@ void main() {
         final result = sut.resultFrom(getValue: getter.call, failure: failure);
 
         verify(getter.call()).called(1);
-        expect(result.iif(success: id, failure: (_) => throw Exception()), value);
+        expect(
+            result.iif(success: id, failure: (_) => throw Exception()), value);
       });
     });
   });
 }
 
-class _GenericFailureCodeFallbackMock extends Mock implements _GenericFailureCodeFallback {}
+class _GenericFailureCodeFallbackMock extends Mock
+    implements _GenericFailureCodeFallback {}
 
 // ignore: one_member_abstracts
 abstract class _GenericFailureCodeFallback {
   String call(int rawOrNull);
 }
 
-class _ResultValueGetterMock<Value> extends Mock implements _ResultValueGetter<Value> {}
+class _ResultValueGetterMock<Value> extends Mock
+    implements _ResultValueGetter<Value> {}
 
 // ignore: one_member_abstracts
 abstract class _ResultValueGetter<Value> {

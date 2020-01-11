@@ -16,8 +16,14 @@ class ConnectionStateUpdate {
   });
 
   @override
-  String toString() => "$runtimeType(deviceId: $deviceId, connectionState: $connectionState, error: $failure)";
+  String toString() =>
+      "$runtimeType(deviceId: $deviceId, connectionState: $connectionState, error: $failure)";
 }
 
-enum DeviceConnectionState { connecting, connected, disconnecting, disconnected }
+enum DeviceConnectionState {
+  connecting,
+  connected,
+  disconnecting,
+  disconnected
+}
 enum ConnectionError { unknown, failedToConnect }

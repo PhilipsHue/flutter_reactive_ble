@@ -5,12 +5,15 @@ import 'package:meta/meta.dart';
 
 class CharacteristicValue {
   final QualifiedCharacteristic characteristic;
-  final Result<List<int>, GenericFailure<CharacteristicValueUpdateError>> result;
+  final Result<List<int>, GenericFailure<CharacteristicValueUpdateError>>
+      result;
 
-  const CharacteristicValue({@required this.characteristic, @required this.result});
+  const CharacteristicValue(
+      {@required this.characteristic, @required this.result});
 
   @override
-  String toString() => "$runtimeType(characteristic: $characteristic, value: $result)";
+  String toString() =>
+      "$runtimeType(characteristic: $characteristic, value: $result)";
 }
 
 enum CharacteristicValueUpdateError { unknown }

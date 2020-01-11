@@ -14,10 +14,13 @@ class QualifiedCharacteristic {
   });
 
   @override
-  String toString() => "$runtimeType(characteristicId: $characteristicId, serviceId: $serviceId, deviceId: $deviceId)";
+  String toString() =>
+      "$runtimeType(characteristicId: $characteristicId, serviceId: $serviceId, deviceId: $deviceId)";
 
   @override
-  int get hashCode => (((17 * 37) + characteristicId.hashCode) * 37 + serviceId.hashCode) * 37 + deviceId.hashCode;
+  int get hashCode =>
+      (((17 * 37) + characteristicId.hashCode) * 37 + serviceId.hashCode) * 37 +
+      deviceId.hashCode;
 
   @override
   bool operator ==(dynamic other) =>

@@ -11,9 +11,14 @@ abstract class $DiscoveredDevice {
   String get name;
   Map<Uuid, Uint8List> get serviceData;
   const $DiscoveredDevice();
-  DiscoveredDevice copyWith({String id, String name, Map<Uuid, Uint8List> serviceData}) =>
-      DiscoveredDevice(id: id ?? this.id, name: name ?? this.name, serviceData: serviceData ?? this.serviceData);
-  String toString() => "DiscoveredDevice(id: $id, name: $name, serviceData: $serviceData)";
+  DiscoveredDevice copyWith(
+          {String id, String name, Map<Uuid, Uint8List> serviceData}) =>
+      DiscoveredDevice(
+          id: id ?? this.id,
+          name: name ?? this.name,
+          serviceData: serviceData ?? this.serviceData);
+  String toString() =>
+      "DiscoveredDevice(id: $id, name: $name, serviceData: $serviceData)";
   bool operator ==(dynamic other) =>
       other.runtimeType == runtimeType &&
       id == other.id &&
@@ -30,8 +35,11 @@ abstract class $DiscoveredDevice {
 }
 
 class DiscoveredDevice$ {
-  static final id = Lens<DiscoveredDevice, String>((s_) => s_.id, (s_, id) => s_.copyWith(id: id));
-  static final name = Lens<DiscoveredDevice, String>((s_) => s_.name, (s_, name) => s_.copyWith(name: name));
+  static final id = Lens<DiscoveredDevice, String>(
+      (s_) => s_.id, (s_, id) => s_.copyWith(id: id));
+  static final name = Lens<DiscoveredDevice, String>(
+      (s_) => s_.name, (s_, name) => s_.copyWith(name: name));
   static final serviceData = Lens<DiscoveredDevice, Map<Uuid, Uint8List>>(
-      (s_) => s_.serviceData, (s_, serviceData) => s_.copyWith(serviceData: serviceData));
+      (s_) => s_.serviceData,
+      (s_, serviceData) => s_.copyWith(serviceData: serviceData));
 }

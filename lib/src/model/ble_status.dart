@@ -1,1 +1,8 @@
-enum BleStatus { unknown, unsupported, unauthorized, poweredOff, discoveryDisabled, ready }
+enum BleStatus {
+  unknown,
+  unsupported,
+  unauthorized,
+  poweredOff,
+  discoveryDisabled,
+  ready
+}

@@ -19,7 +19,8 @@ class ProtobufConverter {
   const ProtobufConverter();
 
   BleStatus bleStatusFrom(pb.BleStatusInfo message) =>
-      selectFrom(BleStatus.values, index: message.status, fallback: (_) => BleStatus.unknown);
+      selectFrom(BleStatus.values,
+          index: message.status, fallback: (_) => BleStatus.unknown);
 
   ScanResult scanResultFrom(pb.DeviceScanInfo message) {
     final serviceData = Map.fromIterables(
@@ -29,7 +30,8 @@ class ProtobufConverter {
 
     return ScanResult(
       result: resultFrom(
-          getValue: () => DiscoveredDevice(id: message.id, name: message.name, serviceData: serviceData),
+          getValue: () => DiscoveredDevice(
+              id: message.id, name: message.name, serviceData: serviceData),
           failure: genericFailureFrom(
               hasFailure: message.hasFailure(),
               getFailure: () => message.failure,
@@ -38,7 +40,8 @@ class ProtobufConverter {
     );
   }
 
-  ConnectionStateUpdate connectionStateUpdateFrom(pb.DeviceInfo deviceInfo) => ConnectionStateUpdate(
+  ConnectionStateUpdate connectionStateUpdateFrom(pb.DeviceInfo deviceInfo) =>
+      ConnectionStateUpdate(
         deviceId: deviceInfo.id,
         connectionState: selectFrom(
           DeviceConnectionState.values,
@@ -49,11 +52,13 @@ class ProtobufConverter {
           hasFailure: deviceInfo.hasFailure(),
           getFailure: () => deviceInfo.failure,
           codes: ConnectionError.values,
-          fallback: (rawOrNull) => rawOrNull == null ? null : ConnectionError.unknown,
+          fallback: (rawOrNull) =>
+              rawOrNull == null ? null : ConnectionError.unknown,
         ),
       );
 
-  Result<void, GenericFailure<ClearGattCacheError>> clearGattCacheResultFrom(pb.ClearGattCacheInfo message) =>
+  Result<void, GenericFailure<ClearGattCacheError>> clearGattCacheResultFrom(
+          pb.ClearGattCacheInfo message) =>
       resultFrom(
         getValue: () {},
         failure: genericFailureFrom(
@@ -64,7 +69,9 @@ class ProtobufConverter {
         ),
       );
 
-  CharacteristicValue characteristicValueFrom(pb.CharacteristicValueInfo message) => CharacteristicValue(
+  CharacteristicValue characteristicValueFrom(
+          pb.CharacteristicValueInfo message) =>
+      CharacteristicValue(
         characteristic: qualifiedCharacteristicFrom(message.characteristic),
         result: resultFrom(
           getValue: () => message.value,
@@ -77,7 +84,9 @@ class ProtobufConverter {
         ),
       );
 
-  WriteCharacteristicInfo writeCharacteristicInfoFrom(pb.WriteCharacteristicInfo message) => WriteCharacteristicInfo(
+  WriteCharacteristicInfo writeCharacteristicInfoFrom(
+          pb.WriteCharacteristicInfo message) =>
+      WriteCharacteristicInfo(
         characteristic: qualifiedCharacteristicFrom(message.characteristic),
         result: resultFrom(
           getValue: () {},
@@ -90,7 +99,9 @@ class ProtobufConverter {
         ),
       );
 
-  ConnectionPriorityInfo connectionPriorityInfoFrom(pb.ChangeConnectionPriorityInfo message) => ConnectionPriorityInfo(
+  ConnectionPriorityInfo connectionPriorityInfoFrom(
+          pb.ChangeConnectionPriorityInfo message) =>
+      ConnectionPriorityInfo(
         result: resultFrom(
           getValue: () {},
           failure: genericFailureFrom(
@@ -102,7 +113,9 @@ class ProtobufConverter {
         ),
       );
 
-  QualifiedCharacteristic qualifiedCharacteristicFrom(pb.CharacteristicAddress message) => QualifiedCharacteristic(
+  QualifiedCharacteristic qualifiedCharacteristicFrom(
+          pb.CharacteristicAddress message) =>
+      QualifiedCharacteristic(
         characteristicId: Uuid(message.characteristicUuid.data),
         serviceId: Uuid(message.serviceUuid.data),
         deviceId: message.deviceId,
@@ -118,7 +131,9 @@ class ProtobufConverter {
     if (hasFailure) {
       final error = getFailure();
       return GenericFailure(
-        code: error.hasCode() ? selectFrom(codes, index: error.code, fallback: fallback) : fallback(null),
+        code: error.hasCode()
+            ? selectFrom(codes, index: error.code, fallback: fallback)
+            : fallback(null),
         message: error.message,
       );
     }
@@ -126,8 +141,11 @@ class ProtobufConverter {
   }
 
   @visibleForTesting
-  Result<Value, Failure> resultFrom<Value, Failure>({@required Value Function() getValue, @required Failure failure}) =>
-      failure != null ? Result<Value, Failure>.failure(failure) : Result.success(getValue());
+  Result<Value, Failure> resultFrom<Value, Failure>(
+          {@required Value Function() getValue, @required Failure failure}) =>
+      failure != null
+          ? Result<Value, Failure>.failure(failure)
+          : Result.success(getValue());
 }
 
 class _InvalidConnectionState extends Error {

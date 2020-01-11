@@ -35,6 +35,8 @@ class _SerialAlreadyDisposed extends Error {
   String toString() => "An instance of $_type has already been disposed";
 }
 
-class StreamSubscriptionSerialDisposable extends SerialDisposable<StreamSubscription> {
-  StreamSubscriptionSerialDisposable() : super((StreamSubscription subscription) => subscription.cancel());
+class StreamSubscriptionSerialDisposable
+    extends SerialDisposable<StreamSubscription> {
+  StreamSubscriptionSerialDisposable()
+      : super((StreamSubscription subscription) => subscription.cancel());
 }
