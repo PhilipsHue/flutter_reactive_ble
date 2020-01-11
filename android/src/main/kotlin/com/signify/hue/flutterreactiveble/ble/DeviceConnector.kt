@@ -19,8 +19,8 @@ import java.util.concurrent.TimeUnit
 internal class DeviceConnector(
     private val device: RxBleDevice,
     private val connectionTimeout: Duration,
-    private val updateListeners: (update: com.signify.hue.flutterreactiveble.ble.ConnectionUpdate) -> Unit,
-    private val connectionQueue: com.signify.hue.flutterreactiveble.ble.ConnectionQueue
+    private val updateListeners: (update: ConnectionUpdate) -> Unit,
+    private val connectionQueue: ConnectionQueue
 ) {
 
     companion object {
@@ -28,7 +28,7 @@ internal class DeviceConnector(
         private const val delayMsAfterClearingCache = 300L
     }
 
-    private val connectDeviceSubject = BehaviorSubject.create<com.signify.hue.flutterreactiveble.ble.EstablishConnectionResult>()
+    private val connectDeviceSubject = BehaviorSubject.create<EstablishConnectionResult>()
 
     private var timestampEstablishConnection: Long = 0
 
@@ -40,7 +40,7 @@ internal class DeviceConnector(
         connectDeviceSubject
     }
 
-    private val currentConnection: com.signify.hue.flutterreactiveble.ble.EstablishConnectionResult?
+    private val currentConnection: EstablishConnectionResult?
         get() = if (lazyConnection.isInitialized()) connection.value else null
 
     internal val connection by lazyConnection
@@ -48,9 +48,9 @@ internal class DeviceConnector(
     private val connectionStatusUpdates by lazy {
         device.observeConnectionStateChanges()
                 .startWith(device.connectionState)
-                .map<com.signify.hue.flutterreactiveble.ble.ConnectionUpdate> { com.signify.hue.flutterreactiveble.ble.ConnectionUpdateSuccess(device.macAddress, it.toConnectionState().code) }
+                .map<ConnectionUpdate> { ConnectionUpdateSuccess(device.macAddress, it.toConnectionState().code) }
                 .onErrorReturn {
-                    com.signify.hue.flutterreactiveble.ble.ConnectionUpdateError(device.macAddress, it.message
+                    ConnectionUpdateError(device.macAddress, it.message
                             ?: "Unknown error")
                 }
                 .subscribe(
@@ -70,8 +70,8 @@ internal class DeviceConnector(
         in order to prevent Android from ignoring disconnects we add a delay when we try to
         disconnect to quickly after establishing connection. https://issuetracker.google.com/issues/37121223
          */
-        if (diff < com.signify.hue.flutterreactiveble.ble.DeviceConnector.Companion.minTimeMsBeforeDisconnectingIsAllowed) {
-            Single.timer(com.signify.hue.flutterreactiveble.ble.DeviceConnector.Companion.minTimeMsBeforeDisconnectingIsAllowed - diff, TimeUnit.MILLISECONDS)
+        if (diff < DeviceConnector.Companion.minTimeMsBeforeDisconnectingIsAllowed) {
+            Single.timer(DeviceConnector.Companion.minTimeMsBeforeDisconnectingIsAllowed - diff, TimeUnit.MILLISECONDS)
                     .doFinally {
                         disposeSubscriptions()
                     }.subscribe()
@@ -92,20 +92,20 @@ internal class DeviceConnector(
 
         val shouldNotTimeout = connectionTimeout.value <= 0L
         connectionQueue.addToQueue(deviceId)
-        updateListeners(com.signify.hue.flutterreactiveble.ble.ConnectionUpdateSuccess(deviceId, ConnectionState.CONNECTING.code))
+        updateListeners(ConnectionUpdateSuccess(deviceId, ConnectionState.CONNECTING.code))
 
         return waitUntilFirstOfQueue(deviceId)
                 .switchMap { queue ->
                     if (!queue.contains(deviceId)) {
-                        Observable.just(com.signify.hue.flutterreactiveble.ble.EstablishConnectionFailure(deviceId,
+                        Observable.just(EstablishConnectionFailure(deviceId,
                                 "Device is not in queue"))
                     } else {
                         connectDevice(rxBleDevice, shouldNotTimeout)
-                                .map<com.signify.hue.flutterreactiveble.ble.EstablishConnectionResult> { com.signify.hue.flutterreactiveble.ble.EstablishedConnection(rxBleDevice.macAddress, it) }
+                                .map<EstablishConnectionResult> { EstablishedConnection(rxBleDevice.macAddress, it) }
                     }
                 }
                 .onErrorReturn { error ->
-                    com.signify.hue.flutterreactiveble.ble.EstablishConnectionFailure(rxBleDevice.macAddress,
+                    EstablishConnectionFailure(rxBleDevice.macAddress,
                             error.message ?: "Unknown error")
                 }
                 .doOnNext {
@@ -115,13 +115,13 @@ internal class DeviceConnector(
                     connectionStatusUpdates
                     timestampEstablishConnection = System.currentTimeMillis()
                     connectionQueue.removeFromQueue(deviceId)
-                    if (it is com.signify.hue.flutterreactiveble.ble.EstablishConnectionFailure) {
-                        updateListeners.invoke(com.signify.hue.flutterreactiveble.ble.ConnectionUpdateError(deviceId, it.errorMessage))
+                    if (it is EstablishConnectionFailure) {
+                        updateListeners.invoke(ConnectionUpdateError(deviceId, it.errorMessage))
                     }
                 }
                 .doOnError {
                     connectionQueue.removeFromQueue(deviceId)
-                    updateListeners.invoke(com.signify.hue.flutterreactiveble.ble.ConnectionUpdateError(deviceId, it.message
+                    updateListeners.invoke(ConnectionUpdateError(deviceId, it.message
                             ?: "Unknown error"))
                 }
                 .doOnDispose {
@@ -152,8 +152,8 @@ internal class DeviceConnector(
 
     internal fun clearGattCache(): Completable = currentConnection?.let { connection ->
         when (connection) {
-            is com.signify.hue.flutterreactiveble.ble.EstablishedConnection -> clearGattCache(connection.rxConnection)
-            is com.signify.hue.flutterreactiveble.ble.EstablishConnectionFailure -> Completable.error(Throwable(connection.errorMessage))
+            is EstablishedConnection -> clearGattCache(connection.rxConnection)
+            is EstablishConnectionFailure -> Completable.error(Throwable(connection.errorMessage))
         }
     } ?: Completable.error(IllegalStateException("Connection is not established"))
 
@@ -174,7 +174,7 @@ internal class DeviceConnector(
                 val success = refreshMethod.invoke(bluetoothGatt) as Boolean
                 if (success) {
                     Observable.empty<Unit>()
-                            .delay(com.signify.hue.flutterreactiveble.ble.DeviceConnector.Companion.delayMsAfterClearingCache, TimeUnit.MILLISECONDS)
+                            .delay(DeviceConnector.Companion.delayMsAfterClearingCache, TimeUnit.MILLISECONDS)
                             .doOnComplete { Timber.d("Clearing GATT cache completed") }
                 } else {
                     val reason = "BluetoothGatt.refresh() returned false"
