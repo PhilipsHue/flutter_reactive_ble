@@ -28,7 +28,8 @@ class _DeviceListState extends State<DeviceList> {
   void initState() {
     super.initState();
     _initBleState();
-    _uuidController = TextEditingController()..addListener(() => setState(() {}));
+    _uuidController = TextEditingController()
+      ..addListener(() => setState(() {}));
   }
 
   @override
@@ -55,7 +56,7 @@ class _DeviceListState extends State<DeviceList> {
 
   bool _isValidUuidInput() {
     final uuidText = _uuidController.text;
-    if (uuidText.length > 3) {
+    if (uuidText.length > 3 && uuidText.length.isEven) {
       try {
         Uuid.parse(uuidText);
         return true;
@@ -73,7 +74,8 @@ class _DeviceListState extends State<DeviceList> {
       log("Starting to listen for devices...");
 
       _clearDeviceList();
-      _scanSubscription = _ble.scanForDevices(withService: uuid).listen((device) {
+      _scanSubscription =
+          _ble.scanForDevices(withService: uuid).listen((device) {
         if (!_devices.any((d) => d.id == device.id)) {
           log("New device found: $device");
 
@@ -115,12 +117,16 @@ class _DeviceListState extends State<DeviceList> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(height: 16),
-                  const Text('UUID to use for scanning: (short or long version)'),
+                  const Text(
+                      'UUID to use for scanning: (short or long version)'),
                   TextField(
                     controller: _uuidController,
                     enabled: _scanSubscription == null,
-                    decoration: InputDecoration(errorText: _uuidController.text.isEmpty || _isValidUuidInput() ? null : 'Invalid UUID format'),
-                    autofocus: true,
+                    decoration: InputDecoration(
+                        errorText:
+                            _uuidController.text.isEmpty || _isValidUuidInput()
+                                ? null
+                                : 'Invalid UUID format'),
                     autocorrect: false,
                   ),
                   const SizedBox(height: 16),
@@ -129,15 +135,21 @@ class _DeviceListState extends State<DeviceList> {
                     children: [
                       RaisedButton(
                         child: const Text('Start scanning'),
-                        onPressed: _scanSubscription == null && _status == BleStatus.ready && _isValidUuidInput() ? _startScanning : null,
+                        onPressed: _scanSubscription == null &&
+                                _status == BleStatus.ready &&
+                                _isValidUuidInput()
+                            ? _startScanning
+                            : null,
                       ),
                       RaisedButton(
                         child: const Text('Stop scanning'),
-                        onPressed: _scanSubscription != null ? _stopScanning : null,
+                        onPressed:
+                            _scanSubscription != null ? _stopScanning : null,
                       ),
                       RaisedButton(
                         child: const Text('Clear scanlist'),
-                        onPressed: _devices.isNotEmpty ? _clearDeviceList : null,
+                        onPressed:
+                            _devices.isNotEmpty ? _clearDeviceList : null,
                       ),
                     ],
                   ),
@@ -146,8 +158,11 @@ class _DeviceListState extends State<DeviceList> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       if (_status == BleStatus.ready) ...[
-                        Text(_scanSubscription == null ? 'Enter a UUID above and tap start to begin scanning' : 'Tap a device to connect to it'),
-                        if (_scanSubscription != null || _devices.isNotEmpty) Text('count: ${_devices.length}'),
+                        Text(_scanSubscription == null
+                            ? 'Enter a UUID above and tap start to begin scanning'
+                            : 'Tap a device to connect to it'),
+                        if (_scanSubscription != null || _devices.isNotEmpty)
+                          Text('count: ${_devices.length}'),
                       ] else
                         const Text("BLE Status isn't valid for scanning"),
                     ],
@@ -167,7 +182,11 @@ class _DeviceListState extends State<DeviceList> {
                         onTap: () async {
                           _stopScanning();
                           _clearDeviceList();
-                          await Navigator.push<void>(context, MaterialPageRoute(builder: (_) => DeviceDetailScreen(device: device)));
+                          await Navigator.push<void>(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (_) =>
+                                      DeviceDetailScreen(device: device)));
                         },
                       ),
                     )

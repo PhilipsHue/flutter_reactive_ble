@@ -1,5 +1,6 @@
 package com.signify.hue.flutterreactiveble
 
+import com.polidea.rxandroidble2.exceptions.BleException
 import com.signify.hue.flutterreactiveble.ble.RequestConnectionPriorityFailed
 import com.signify.hue.flutterreactiveble.channelhandlers.BleStatusHandler
 import com.signify.hue.flutterreactiveble.channelhandlers.CharNotificationHandler
@@ -16,6 +17,8 @@ import io.flutter.plugin.common.MethodChannel.Result
 import io.flutter.plugin.common.PluginRegistry
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.exceptions.UndeliverableException
+import io.reactivex.plugins.RxJavaPlugins
 import timber.log.Timber
 import java.util.UUID
 import com.signify.hue.flutterreactiveble.ProtobufModel as pb
@@ -68,6 +71,19 @@ class PluginController {
         deviceConnectionChannel.setStreamHandler(deviceConnectionHandler)
         charNotificationChannel.setStreamHandler(charNotificationHandler)
         bleStatusChannel.setStreamHandler(bleStatusHandler)
+
+        /*Workaround for issue undeliverable https://github.com/Polidea/RxAndroidBle/wiki/FAQ:-UndeliverableException
+        note that this not override the onError for the observable only the RXJAVA error handler like described in:
+        https://github.com/ReactiveX/RxJava/wiki/What's-different-in-2.0#error-handling
+        */
+        RxJavaPlugins.setErrorHandler { throwable ->
+            if (throwable is UndeliverableException && throwable.cause is BleException) {
+                return@setErrorHandler // ignore BleExceptions as they were surely delivered at least once
+            }
+            // add other custom handlers if needed
+            @Suppress("TooGenericExceptionThrown")
+            throw RuntimeException("Unexpected Throwable in RxJavaPlugins error handler", throwable)
+        }
     }
 
     internal fun execute(call: MethodCall, result: Result) {

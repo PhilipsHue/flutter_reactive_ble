@@ -3,7 +3,8 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group("selectFrom", () {
-    _Enum sut(int raw) => selectFrom(_Enum.values, index: raw, fallback: (raw) => _Enum.unknown);
+    _Enum sut(int raw) =>
+        selectFrom(_Enum.values, index: raw, fallback: (raw) => _Enum.unknown);
 
     test("selects a value by index", () {
       expect(sut(1), _Enum.a);

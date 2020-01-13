@@ -8,7 +8,7 @@ import 'package:meta/meta.dart';
 
 part 'discovered_device.g.dart';
 
-// ignore_for_file: annotate_overrides
+// ignore_for_file: annotate_overrides, avoid_classes_with_only_static_members, non_constant_identifier_names
 
 @immutable
 class ScanResult {

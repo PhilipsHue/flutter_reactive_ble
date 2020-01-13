@@ -53,7 +53,8 @@ void main() {
   });
 }
 
-class _ResultHandlerMock<Value, Failure, T> extends Mock implements _ResultHandler<Value, Failure, T> {}
+class _ResultHandlerMock<Value, Failure, T> extends Mock
+    implements _ResultHandler<Value, Failure, T> {}
 
 abstract class _ResultHandler<Value, Failure, T> {
   T success(Value value);

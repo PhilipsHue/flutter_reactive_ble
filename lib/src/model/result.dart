@@ -2,7 +2,8 @@ import 'package:meta/meta.dart';
 
 @immutable
 class Result<Value, Failure> {
-  const Result.success(this._value) : _failure = null; // ignore: avoid_field_initializers_in_const_classes
+  const Result.success(this._value)
+      : _failure = null; // ignore: avoid_field_initializers_in_const_classes
   const Result.failure(this._failure)
       : assert(_failure != null),
         _value = null; // ignore: avoid_field_initializers_in_const_classes
@@ -19,7 +20,9 @@ class Result<Value, Failure> {
         },
       );
 
-  T iif<T>({@required T Function(Value value) success, @required T Function(Failure failure) failure}) {
+  T iif<T>(
+      {@required T Function(Value value) success,
+      @required T Function(Failure failure) failure}) {
     assert(_value == null || _failure == null);
 
     if (_failure != null) {
@@ -41,11 +44,14 @@ class Result<Value, Failure> {
   }
 
   @override
-  int get hashCode => ((17 * 37) + (_value?.hashCode ?? 0)) * 37 + (_failure?.hashCode ?? 0);
+  int get hashCode =>
+      ((17 * 37) + (_value?.hashCode ?? 0)) * 37 + (_failure?.hashCode ?? 0);
 
   @override
   bool operator ==(dynamic other) =>
-      runtimeType == other.runtimeType && _value == other._value && _failure == other._failure;
+      runtimeType == other.runtimeType &&
+      _value == other._value &&
+      _failure == other._failure;
 
   final Value _value;
   final Failure _failure;

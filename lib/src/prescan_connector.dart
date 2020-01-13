@@ -27,7 +27,8 @@ class PrescanConnector {
     Duration connectionTimeout,
   }) connectDevice;
 
-  final Stream<DiscoveredDevice> Function({Uuid withService, ScanMode scanMode}) scanDevices;
+  final Stream<DiscoveredDevice> Function({Uuid withService, ScanMode scanMode})
+      scanDevices;
 
   final ScanSession Function() getCurrentScan;
   final Duration delayAfterScanFailure;
@@ -66,30 +67,41 @@ class PrescanConnector {
     Uuid withService,
     Duration prescanDuration,
   ) {
-    if (scanRegistry.deviceIsDiscoveredRecently(deviceId: id, cacheValidity: scanRegistryCacheValidityPeriod)) {
+    if (scanRegistry.deviceIsDiscoveredRecently(
+        deviceId: id, cacheValidity: scanRegistryCacheValidityPeriod)) {
       return connectDevice(
         id: id,
-        servicesWithCharacteristicsToDiscover: servicesWithCharacteristicsToDiscover,
+        servicesWithCharacteristicsToDiscover:
+            servicesWithCharacteristicsToDiscover,
         connectionTimeout: connectionTimeout,
       );
     } else {
-      final scanSubscription = scanDevices(withService: withService, scanMode: ScanMode.lowLatency)
-          .listen((DiscoveredDevice scanData) {}, onError: (Object _) {});
+      final scanSubscription =
+          scanDevices(withService: withService, scanMode: ScanMode.lowLatency)
+              .listen((DiscoveredDevice scanData) {}, onError: (Object _) {});
       Future<void>.delayed(prescanDuration).then<void>((_) {
         scanSubscription.cancel();
       });
 
-      return getCurrentScan().future.then((_) => true).catchError((Object _) => false).asStream().asyncExpand(
+      return getCurrentScan()
+          .future
+          .then((_) => true)
+          .catchError((Object _) => false)
+          .asStream()
+          .asyncExpand(
         (succeeded) {
           if (succeeded) {
-            return connectIfRecentlyDiscovered(id, servicesWithCharacteristicsToDiscover, connectionTimeout);
+            return connectIfRecentlyDiscovered(
+                id, servicesWithCharacteristicsToDiscover, connectionTimeout);
           } else {
             /*When the scan fails 99% of the times it is due to violation of the scan threshold:
             https://blog.classycode.com/undocumented-android-7-ble-behavior-changes-d1a9bd87d983 . Previously we did
             autoconnect but that gives slow connection times (up to 2 min) on a lot of devices.
              */
-            return Future<void>.delayed(delayAfterScanFailure).asStream().asyncExpand(
-                (_) => connectIfRecentlyDiscovered(id, servicesWithCharacteristicsToDiscover, connectionTimeout));
+            return Future<void>.delayed(delayAfterScanFailure)
+                .asStream()
+                .asyncExpand((_) => connectIfRecentlyDiscovered(id,
+                    servicesWithCharacteristicsToDiscover, connectionTimeout));
           }
         },
       );
@@ -136,10 +148,12 @@ class PrescanConnector {
     Map<Uuid, List<Uuid>> servicesWithCharacteristicsToDiscover,
     Duration connectionTimeout,
   ) {
-    if (scanRegistry.deviceIsDiscoveredRecently(deviceId: id, cacheValidity: scanRegistryCacheValidityPeriod)) {
+    if (scanRegistry.deviceIsDiscoveredRecently(
+        deviceId: id, cacheValidity: scanRegistryCacheValidityPeriod)) {
       return connectDevice(
         id: id,
-        servicesWithCharacteristicsToDiscover: servicesWithCharacteristicsToDiscover,
+        servicesWithCharacteristicsToDiscover:
+            servicesWithCharacteristicsToDiscover,
         connectionTimeout: connectionTimeout,
       );
     } else {
@@ -148,7 +162,9 @@ class PrescanConnector {
           ConnectionStateUpdate(
             deviceId: id,
             connectionState: DeviceConnectionState.disconnected,
-            failure: const GenericFailure(code: ConnectionError.failedToConnect, message: "Device is not advertising"),
+            failure: const GenericFailure(
+                code: ConnectionError.failedToConnect,
+                message: "Device is not advertising"),
           ),
         ],
       );

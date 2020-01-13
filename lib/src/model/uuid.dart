@@ -22,7 +22,9 @@ class Uuid {
         continue;
       }
 
-      final byte = int.tryParse(string.substring(substringStart, substringStart + 2), radix: 16);
+      final byte = int.tryParse(
+          string.substring(substringStart, substringStart + 2),
+          radix: 16);
       if (byte == null) throw _UuidParseFailure(string);
 
       data[byteOffset] = byte;
@@ -57,11 +59,13 @@ class Uuid {
   }
 
   @override
-  int get hashCode => data.fold(17, (hash, octet) => 37 * hash + octet.hashCode);
+  int get hashCode =>
+      data.fold(17, (hash, octet) => 37 * hash + octet.hashCode);
 
   @override
   bool operator ==(dynamic other) =>
-      other.runtimeType == runtimeType && const DeepCollectionEquality().equals(other.data, data);
+      other.runtimeType == runtimeType &&
+      const DeepCollectionEquality().equals(other.data, data);
 }
 
 @immutable

@@ -14,7 +14,9 @@ class MockRegistry extends Mock implements DiscoveredDevicesRegistry {}
 
 abstract class _PrescanConnectorStub {
   Stream<ConnectionStateUpdate> connect(
-      {String id, Map<Uuid, List<Uuid>> servicesWithCharacteristicsToDiscover, Duration connectionTimeout});
+      {String id,
+      Map<Uuid, List<Uuid>> servicesWithCharacteristicsToDiscover,
+      Duration connectionTimeout});
 
   Stream<DiscoveredDevice> scan({Uuid withService, ScanMode scanMode});
 
@@ -54,7 +56,8 @@ void main() {
       group("And device is in cache when I connect", () {
         setUp(() {
           when(_registry.deviceIsDiscoveredRecently(
-                  deviceId: anyNamed("deviceId"), cacheValidity: anyNamed("cacheValidity")))
+                  deviceId: anyNamed("deviceId"),
+                  cacheValidity: anyNamed("cacheValidity")))
               .thenReturn(true);
 
           _sut.connectToAdvertisingDevice(
@@ -68,20 +71,24 @@ void main() {
         test("Then connect device directly", () {
           verify(_prescanMock.connect(
                   id: anyNamed("id"),
-                  servicesWithCharacteristicsToDiscover: anyNamed("servicesWithCharacteristicsToDiscover"),
+                  servicesWithCharacteristicsToDiscover:
+                      anyNamed("servicesWithCharacteristicsToDiscover"),
                   connectionTimeout: anyNamed("connectionTimeout")))
               .called(1);
         });
 
         test("And does not scan for the device", () {
-          verifyNever(_prescanMock.scan(withService: anyNamed("withService"), scanMode: anyNamed("scanMode")));
+          verifyNever(_prescanMock.scan(
+              withService: anyNamed("withService"),
+              scanMode: anyNamed("scanMode")));
         });
       });
 
       group("And device is not in cache", () {
         setUp(() {
           when(_registry.deviceIsDiscoveredRecently(
-                  deviceId: anyNamed("deviceId"), cacheValidity: anyNamed("cacheValidity")))
+                  deviceId: anyNamed("deviceId"),
+                  cacheValidity: anyNamed("cacheValidity")))
               .thenReturn(false);
         });
 
@@ -94,11 +101,17 @@ void main() {
             completer = Completer();
             session = ScanSession(withService: _uuid, future: completer.future);
 
-            when(_prescanMock.currentScan()).thenAnswer((_) => currentScanResponses.removeAt(0));
+            when(_prescanMock.currentScan())
+                .thenAnswer((_) => currentScanResponses.removeAt(0));
             completer.complete();
 
-            when(_prescanMock.scan(withService: anyNamed("withService"), scanMode: anyNamed("scanMode"))).thenAnswer(
-                (_) => Stream.fromIterable([const DiscoveredDevice(id: _device, name: _device, serviceData: {})]));
+            when(_prescanMock.scan(
+                    withService: anyNamed("withService"),
+                    scanMode: anyNamed("scanMode")))
+                .thenAnswer((_) => Stream.fromIterable([
+                      const DiscoveredDevice(
+                          id: _device, name: _device, serviceData: {})
+                    ]));
           });
 
           test("It scans for the device", () {
@@ -111,7 +124,10 @@ void main() {
                 servicesWithCharacteristicsToDiscover: {},
                 connectionTimeout: _duration);
 
-            verify(_prescanMock.scan(withService: anyNamed("withService"), scanMode: anyNamed("scanMode"))).called(1);
+            verify(_prescanMock.scan(
+                    withService: anyNamed("withService"),
+                    scanMode: anyNamed("scanMode")))
+                .called(1);
           });
 
           test("Connects when device is in registry", () async {
@@ -119,46 +135,61 @@ void main() {
 
             final connectResponses = [false, true];
             when(_registry.deviceIsDiscoveredRecently(
-                    deviceId: anyNamed("deviceId"), cacheValidity: anyNamed("cacheValidity")))
+                    deviceId: anyNamed("deviceId"),
+                    cacheValidity: anyNamed("cacheValidity")))
                 .thenAnswer((_) => connectResponses.removeAt(0));
 
             when(_prescanMock.connect(
                     id: anyNamed("id"),
-                    servicesWithCharacteristicsToDiscover: anyNamed("servicesWithCharacteristicsToDiscover"),
+                    servicesWithCharacteristicsToDiscover:
+                        anyNamed("servicesWithCharacteristicsToDiscover"),
                     connectionTimeout: anyNamed("connectionTimeout")))
                 .thenAnswer((_) => Stream.fromIterable([
                       const ConnectionStateUpdate(
-                          deviceId: "", connectionState: DeviceConnectionState.connected, failure: null)
+                          deviceId: "",
+                          connectionState: DeviceConnectionState.connected,
+                          failure: null)
                     ]));
 
-            await _sut.prescanAndConnect(_device, {}, _duration, _uuid, _duration).first;
+            await _sut
+                .prescanAndConnect(_device, {}, _duration, _uuid, _duration)
+                .first;
 
             verify(_prescanMock.connect(
                     id: anyNamed("id"),
-                    servicesWithCharacteristicsToDiscover: anyNamed("servicesWithCharacteristicsToDiscover"),
+                    servicesWithCharacteristicsToDiscover:
+                        anyNamed("servicesWithCharacteristicsToDiscover"),
                     connectionTimeout: _duration))
                 .called(1);
           });
 
-          test("Does not connect when device is not found after scanning", () async {
+          test("Does not connect when device is not found after scanning",
+              () async {
             when(_registry.deviceIsDiscoveredRecently(
-                    deviceId: anyNamed("deviceId"), cacheValidity: anyNamed("cacheValidity")))
+                    deviceId: anyNamed("deviceId"),
+                    cacheValidity: anyNamed("cacheValidity")))
                 .thenReturn(false);
 
             when(_prescanMock.connect(
                     id: anyNamed("id"),
-                    servicesWithCharacteristicsToDiscover: anyNamed("servicesWithCharacteristicsToDiscover"),
+                    servicesWithCharacteristicsToDiscover:
+                        anyNamed("servicesWithCharacteristicsToDiscover"),
                     connectionTimeout: anyNamed("connectionTimeout")))
                 .thenAnswer((_) => Stream.fromIterable([
                       const ConnectionStateUpdate(
-                          deviceId: "", connectionState: DeviceConnectionState.connected, failure: null)
+                          deviceId: "",
+                          connectionState: DeviceConnectionState.connected,
+                          failure: null)
                     ]));
 
-            await _sut.prescanAndConnect(_device, {}, _duration, _uuid, _duration).first;
+            await _sut
+                .prescanAndConnect(_device, {}, _duration, _uuid, _duration)
+                .first;
 
             verifyNever(_prescanMock.connect(
                 id: anyNamed("id"),
-                servicesWithCharacteristicsToDiscover: anyNamed("servicesWithCharacteristicsToDiscover"),
+                servicesWithCharacteristicsToDiscover:
+                    anyNamed("servicesWithCharacteristicsToDiscover"),
                 connectionTimeout: _duration));
           });
         });
@@ -168,30 +199,43 @@ void main() {
 
           setUp(() {
             completer = Completer();
-            final session = ScanSession(withService: _uuid, future: completer.future);
+            final session =
+                ScanSession(withService: _uuid, future: completer.future);
             final response = [session, session];
-            when(_prescanMock.currentScan()).thenAnswer((_) => response.removeAt(0));
+            when(_prescanMock.currentScan())
+                .thenAnswer((_) => response.removeAt(0));
 
-            when(_prescanMock.scan(withService: anyNamed("withService"), scanMode: anyNamed("scanMode"))).thenAnswer(
-                (_) => Stream.fromIterable([const DiscoveredDevice(id: _device, name: _device, serviceData: {})]));
+            when(_prescanMock.scan(
+                    withService: anyNamed("withService"),
+                    scanMode: anyNamed("scanMode")))
+                .thenAnswer((_) => Stream.fromIterable([
+                      const DiscoveredDevice(
+                          id: _device, name: _device, serviceData: {})
+                    ]));
           });
 
           test("Will attempt to connect after delay", () async {
             when(_prescanMock.connect(
                     id: anyNamed("id"),
-                    servicesWithCharacteristicsToDiscover: anyNamed("servicesWithCharacteristicsToDiscover"),
+                    servicesWithCharacteristicsToDiscover:
+                        anyNamed("servicesWithCharacteristicsToDiscover"),
                     connectionTimeout: anyNamed("connectionTimeout")))
                 .thenAnswer((_) => Stream.fromIterable([
                       const ConnectionStateUpdate(
-                          deviceId: "", connectionState: DeviceConnectionState.connected, failure: null)
+                          deviceId: "",
+                          connectionState: DeviceConnectionState.connected,
+                          failure: null)
                     ]));
 
             completer.completeError(null);
 
-            await _sut.prescanAndConnect(_device, {}, _duration, _uuid, _duration).first;
+            await _sut
+                .prescanAndConnect(_device, {}, _duration, _uuid, _duration)
+                .first;
 
             verify(_registry.deviceIsDiscoveredRecently(
-                    deviceId: anyNamed("deviceId"), cacheValidity: anyNamed("cacheValidity")))
+                    deviceId: anyNamed("deviceId"),
+                    cacheValidity: anyNamed("cacheValidity")))
                 .called(2);
           });
         });
@@ -199,11 +243,16 @@ void main() {
     });
 
     group("And there is already a scan running", () {
-      test("Fails to connect when there is already a scan running for another service", () async {
-        when(_prescanMock.currentScan())
-            .thenReturn(ScanSession(withService: Uuid.parse("432A"), future: Future.value()));
+      test(
+          "Fails to connect when there is already a scan running for another service",
+          () async {
+        when(_prescanMock.currentScan()).thenReturn(ScanSession(
+            withService: Uuid.parse("432A"), future: Future.value()));
 
-        final update = await _sut.awaitCurrentScanAndConnect(_uuid, _duration, _device, {}, _duration).first;
+        final update = await _sut
+            .awaitCurrentScanAndConnect(
+                _uuid, _duration, _device, {}, _duration)
+            .first;
 
         expect(update.failure.code, ConnectionError.failedToConnect);
       });
@@ -211,16 +260,22 @@ void main() {
       test("Checks registry after completion of scan", () async {
         final completer = Completer<void>();
 
-        when(_prescanMock.currentScan()).thenReturn(ScanSession(withService: _uuid, future: completer.future));
+        when(_prescanMock.currentScan()).thenReturn(
+            ScanSession(withService: _uuid, future: completer.future));
 
         when(_registry.deviceIsDiscoveredRecently(
-                deviceId: anyNamed("deviceId"), cacheValidity: anyNamed("cacheValidity")))
+                deviceId: anyNamed("deviceId"),
+                cacheValidity: anyNamed("cacheValidity")))
             .thenReturn(false);
 
         completer.complete();
-        await _sut.awaitCurrentScanAndConnect(_uuid, _duration, _device, {}, _duration).first;
+        await _sut
+            .awaitCurrentScanAndConnect(
+                _uuid, _duration, _device, {}, _duration)
+            .first;
 
-        verify(_registry.deviceIsDiscoveredRecently(deviceId: _device, cacheValidity: anyNamed("cacheValidity")))
+        verify(_registry.deviceIsDiscoveredRecently(
+                deviceId: _device, cacheValidity: anyNamed("cacheValidity")))
             .called(1);
       });
     });
