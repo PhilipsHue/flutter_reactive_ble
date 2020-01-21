@@ -1,3 +1,6 @@
+## 1.0.2
+* Fix crash on clear Gattcache
+
 ## 1.0.1
 
 * Fixes #5 Undeliverable exception.
