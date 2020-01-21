@@ -117,6 +117,7 @@ class PluginController {
     private fun clearGattCache(call: MethodCall, result: Result) {
         val args = pb.ClearGattCacheRequest.parseFrom(call.arguments as ByteArray)
         bleClient.clearGattCache(args.deviceId)
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
                         {
                             val info = pb.ClearGattCacheInfo.getDefaultInstance()
