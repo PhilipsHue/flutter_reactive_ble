@@ -8,23 +8,29 @@ class Repeater<T> {
   final bool _isSync;
   final bool _isBroadcast;
   int detachCount = 0;
-  void Function(String) log = (_) {}; // ignore: prefer_function_declarations_over_variables
+
+  // ignore: prefer_function_declarations_over_variables
+  void Function(String) log = (_) {};
 
   StreamController<T> _streamController;
   StreamSubscription<T> _sourceSubscription;
 
   /// The output stream.
-  Stream<T> get stream => (_streamController ??= _makeStreamController()).stream;
+  Stream<T> get stream =>
+      (_streamController ??= _makeStreamController()).stream;
 
   /// Resumes forwarding events from the source stream.
   ///
   /// Normally called automatically when the `stream` gets the first subscription.
   /// You may want to call this method manually after a call to `detach()`.
   void attach() {
-    assert(detachCount >= 0, "A call to `attach()` should follow a call to `detach()` (nesting is allowed)");
+    assert(detachCount >= 0,
+        "A call to `attach()` should follow a call to `detach()` (nesting is allowed)");
     detachCount -= 1;
 
-    if (detachCount < 0 && _streamController.hasListener && _sourceSubscription == null) {
+    if (detachCount < 0 &&
+        _streamController.hasListener &&
+        _sourceSubscription == null) {
       log("ATTACH");
       try {
         _sourceSubscription = _onListenEmitFrom().listen(
@@ -44,7 +50,8 @@ class Repeater<T> {
   Future<void> detach() async {
     detachCount += 1;
 
-    if ((detachCount >= 0 || !_streamController.hasListener) && _sourceSubscription != null) {
+    if ((detachCount >= 0 || !_streamController.hasListener) &&
+        _sourceSubscription != null) {
       log("DETACH");
       await _sourceSubscription.cancel();
       _sourceSubscription = null;
@@ -76,10 +83,17 @@ class Repeater<T> {
         _isBroadcast = true,
         _isSync = isSync;
 
-  factory Repeater.fromStream(Stream<T> source, {Future<dynamic> Function() onCancel, bool isSync = false}) =>
+  factory Repeater.fromStream(Stream<T> source,
+          {Future<dynamic> Function() onCancel, bool isSync = false}) =>
       source.isBroadcast
-          ? Repeater.broadcast(onListenEmitFrom: () => source, onCancel: onCancel, isSync: isSync)
-          : Repeater(onListenEmitFrom: () => source, onCancel: onCancel, isSync: isSync);
+          ? Repeater.broadcast(
+              onListenEmitFrom: () => source,
+              onCancel: onCancel,
+              isSync: isSync)
+          : Repeater(
+              onListenEmitFrom: () => source,
+              onCancel: onCancel,
+              isSync: isSync);
 
   StreamController<T> _makeStreamController<T>() => _isBroadcast
       ? StreamController.broadcast(
