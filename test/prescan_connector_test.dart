@@ -110,7 +110,11 @@ void main() {
                     scanMode: anyNamed("scanMode")))
                 .thenAnswer((_) => Stream.fromIterable([
                       const DiscoveredDevice(
-                          id: _device, name: _device, serviceData: {})
+                        id: _device,
+                        name: _device,
+                        serviceData: {},
+                        rssi: -40,
+                      )
                     ]));
           });
 
@@ -210,7 +214,11 @@ void main() {
                     scanMode: anyNamed("scanMode")))
                 .thenAnswer((_) => Stream.fromIterable([
                       const DiscoveredDevice(
-                          id: _device, name: _device, serviceData: {})
+                        id: _device,
+                        name: _device,
+                        serviceData: {},
+                        rssi: -40,
+                      )
                     ]));
           });
 
