@@ -42,14 +42,14 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
     }
 
     override fun initializeClient() {
-        ReactiveBleClient.Companion.activeConnections = mutableMapOf()
-        ReactiveBleClient.Companion.rxBleClient = RxBleClient.create(context)
+        activeConnections = mutableMapOf()
+        rxBleClient = RxBleClient.create(context)
 
         Timber.d("Created bleclient")
     }
 
     override fun scanForDevices(service: ParcelUuid, scanMode: ScanMode): Observable<ScanInfo> {
-        return ReactiveBleClient.Companion.rxBleClient.scanBleDevices(
+        return rxBleClient.scanBleDevices(
                 ScanSettings.Builder()
                         .setScanMode(scanMode.toScanSettings())
                         .setCallbackType(ScanSettings.CALLBACK_TYPE_ALL_MATCHES)
@@ -84,17 +84,17 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
     }
 
     override fun disconnectDevice(deviceId: String) {
-        ReactiveBleClient.Companion.activeConnections[deviceId]?.disconnectDevice()
-        ReactiveBleClient.Companion.activeConnections.remove(deviceId)
+        activeConnections[deviceId]?.disconnectDevice()
+        activeConnections.remove(deviceId)
     }
 
     override fun disconnectAllDevices() {
-        ReactiveBleClient.Companion.activeConnections.forEach { (_, connector) -> connector.disconnectDevice() }
+        activeConnections.forEach { (_, connector) -> connector.disconnectDevice() }
         allConnections.dispose()
     }
 
     override fun clearGattCache(deviceId: String): Completable =
-            ReactiveBleClient.Companion.activeConnections[deviceId]?.let(DeviceConnector::clearGattCache)
+            activeConnections[deviceId]?.let(DeviceConnector::clearGattCache)
                     ?: Completable.error(IllegalStateException("Device is not connected"))
 
     override fun readCharacteristic(deviceId: String, characteristic: UUID): Single<CharOperationResult> =
@@ -156,8 +156,8 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
                 }
             }.first(MtuNegotiateFailed(deviceId, "negotiate mtu timed out"))
 
-    override fun observeBleStatus(): Observable<BleStatus> = ReactiveBleClient.Companion.rxBleClient.observeStateChanges()
-            .startWith(ReactiveBleClient.Companion.rxBleClient.state)
+    override fun observeBleStatus(): Observable<BleStatus> = rxBleClient.observeStateChanges()
+            .startWith(rxBleClient.state)
             .map { it.toBleState() }
 
     @VisibleForTesting
@@ -168,8 +168,8 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
             deviceId: String,
             timeout: Duration = Duration(0, TimeUnit.MILLISECONDS)
     ): Observable<EstablishConnectionResult> {
-        val device = ReactiveBleClient.Companion.rxBleClient.getBleDevice(deviceId)
-        val connector = ReactiveBleClient.Companion.activeConnections.getOrPut(deviceId) { createDeviceConnector(device, timeout) }
+        val device = rxBleClient.getBleDevice(deviceId)
+        val connector = activeConnections.getOrPut(deviceId) { createDeviceConnector(device, timeout) }
 
         return connector.connection
     }
