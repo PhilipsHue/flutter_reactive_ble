@@ -13,18 +13,19 @@ class Uuid {
 
     var byteOffset = 0;
     for (var substringStart = 0; substringStart < string.length;) {
-      if (byteOffset >= 16) {
-        throw _UuidParseFailure(string);
-      }
-
       if (string[substringStart] == "-") {
         substringStart += 1;
         continue;
       }
 
+      if (byteOffset >= 16 || substringStart + 2 > string.length) {
+        throw _UuidParseFailure(string);
+      }
+
       final byte = int.tryParse(
-          string.substring(substringStart, substringStart + 2),
-          radix: 16);
+        string.substring(substringStart, substringStart + 2),
+        radix: 16,
+      );
       if (byte == null) throw _UuidParseFailure(string);
 
       data[byteOffset] = byte;
@@ -32,8 +33,11 @@ class Uuid {
       byteOffset += 1;
       substringStart += 2;
     }
-
-    return Uuid(data.buffer.asUint8List(0, byteOffset));
+    if (byteOffset == 2 || byteOffset == 4 || byteOffset == 16) {
+      return Uuid(data.buffer.asUint8List(0, byteOffset));
+    } else {
+      throw _UuidParseFailure(string);
+    }
   }
 
   @override

@@ -56,14 +56,10 @@ class _DeviceListState extends State<DeviceList> {
 
   bool _isValidUuidInput() {
     final uuidText = _uuidController.text;
-    if (uuidText.length > 3 && uuidText.length.isEven) {
-      try {
-        Uuid.parse(uuidText);
-        return true;
-      } on Exception {
-        return false;
-      }
-    } else {
+    try {
+      Uuid.parse(uuidText);
+      return true;
+    } on Exception {
       return false;
     }
   }
