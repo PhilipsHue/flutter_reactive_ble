@@ -113,8 +113,7 @@ class _DeviceListState extends State<DeviceList> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(height: 16),
-                  const Text(
-                      'UUID to use for scanning: (short or long version)'),
+                  const Text('Service UUID (2, 4, 16 bytes):'),
                   TextField(
                     controller: _uuidController,
                     enabled: _scanSubscription == null,
@@ -130,7 +129,7 @@ class _DeviceListState extends State<DeviceList> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       RaisedButton(
-                        child: const Text('Start scanning'),
+                        child: const Text('Scan'),
                         onPressed: _scanSubscription == null &&
                                 _status == BleStatus.ready &&
                                 _isValidUuidInput()
@@ -138,12 +137,12 @@ class _DeviceListState extends State<DeviceList> {
                             : null,
                       ),
                       RaisedButton(
-                        child: const Text('Stop scanning'),
+                        child: const Text('Stop'),
                         onPressed:
                             _scanSubscription != null ? _stopScanning : null,
                       ),
                       RaisedButton(
-                        child: const Text('Clear scanlist'),
+                        child: const Text('Clear'),
                         onPressed:
                             _devices.isNotEmpty ? _clearDeviceList : null,
                       ),
