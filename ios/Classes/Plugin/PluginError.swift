@@ -13,7 +13,6 @@ enum PluginError: Error {
     case messageSerializationFailure(type: Message.Type, underlyingError: Error)
 
     case notInitialized
-    case alreadyInitialized
 
     case connectionLost
 
@@ -35,8 +34,6 @@ enum PluginError: Error {
             return makeFlutterError(message: "failed to serialize a message of type \(type) (\(underlyingError))")
         case .notInitialized:
             return makeFlutterError(message: "not initialized")
-        case .alreadyInitialized:
-            return makeFlutterError(message: "already initialized")
         case .connectionLost:
             return makeFlutterError(message: "connection lost")
         }
