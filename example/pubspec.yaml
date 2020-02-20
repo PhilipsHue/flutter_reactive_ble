@@ -1,6 +1,6 @@
 name: flutter_reactive_ble_example
 description: Demonstrates how to use the flutter_reactive_ble plugin.
-version: 0.1.0
+version: 1.1.0
 publish_to: 'none'
 
 environment:

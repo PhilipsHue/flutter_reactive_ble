@@ -2,9 +2,6 @@
 
 Flutter library that handles BLE operations for multiple devices.
 
-## Work in progress
-The library is feature complete but we are working at the moment on improving documentation and the example app.
-
 ## Usage
 The reactive BLE lib supports the following:
 - BLE device discovery
@@ -126,7 +123,7 @@ await reactiveBleClient.requestConnectionPriority(deviceId: 'AA:BB:CC:DD:EE:FF',
 #### Clear GATT cache
 The Android OS maintains a table per device of the discovered service in cache. Sometimes it happens that after a firmware update a new service is introduced but the cache is not updated. To invalidate the cache you can use the cleargattCache operation. 
 
-**This is a hidden BLE operation and should be used with extreme caution since usage is not encouraged by the Android team**  
+** This is a hidden BLE operation and should be used with extreme caution since this operation is on the [greylist](https://developer.android.com/distribute/best-practices/develop/restrictions-non-sdk-interfaces). **  
 
 ```dart
 await reactiveBleClient.clearGattCache('AA:BB:CC:DD:EE:FF');
