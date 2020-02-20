@@ -3,8 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
 
-import '../src/utils.dart';
-import '../src/widgets.dart';
+import '../utils.dart';
+import '../widgets.dart';
 import 'device_detail_screen.dart';
 
 class DeviceList extends StatefulWidget {
@@ -56,14 +56,10 @@ class _DeviceListState extends State<DeviceList> {
 
   bool _isValidUuidInput() {
     final uuidText = _uuidController.text;
-    if (uuidText.length > 3 && uuidText.length.isEven) {
-      try {
-        Uuid.parse(uuidText);
-        return true;
-      } on Exception {
-        return false;
-      }
-    } else {
+    try {
+      Uuid.parse(uuidText);
+      return true;
+    } on Exception {
       return false;
     }
   }

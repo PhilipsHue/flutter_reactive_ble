@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'src/ui/device_list.dart';
 import 'src/utils.dart';
-import 'ui/device_list.dart';
 
 const _themeColor = Colors.lightGreen;
 
