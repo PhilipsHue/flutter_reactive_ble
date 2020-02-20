@@ -162,6 +162,8 @@ internal class DeviceConnector(
      *
      * May trigger the following warning in the system message log:
      *
+     * https://android.googlesource.com/platform/frameworks/base/+/pie-release/config/hiddenapi-light-greylist.txt
+     *
      *     Accessing hidden method Landroid/bluetooth/BluetoothGatt;->refresh()Z (light greylist, reflection)
      *
      * Known to work up to Android Q beta 2.

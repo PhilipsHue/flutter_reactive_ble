@@ -1,5 +1,6 @@
 package com.signify.hue.flutterreactiveble
 
+import android.content.Context
 import com.polidea.rxandroidble2.exceptions.BleException
 import com.signify.hue.flutterreactiveble.ble.RequestConnectionPriorityFailed
 import com.signify.hue.flutterreactiveble.channelhandlers.BleStatusHandler
@@ -11,10 +12,10 @@ import com.signify.hue.flutterreactiveble.converters.UuidConverter
 import com.signify.hue.flutterreactiveble.model.ClearGattCacheErrorType
 import com.signify.hue.flutterreactiveble.utils.discard
 import com.signify.hue.flutterreactiveble.utils.toConnectionPriority
+import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.EventChannel
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel.Result
-import io.flutter.plugin.common.PluginRegistry
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.exceptions.UndeliverableException
@@ -54,13 +55,13 @@ class PluginController {
     private val uuidConverter = UuidConverter()
     private val protoConverter = ProtobufMessageConverter()
 
-    internal fun initialize(registrar: PluginRegistry.Registrar) {
-        bleClient = com.signify.hue.flutterreactiveble.ble.ReactiveBleClient(registrar.context())
+    internal fun initialize(messenger: BinaryMessenger, context: Context) {
+        bleClient = com.signify.hue.flutterreactiveble.ble.ReactiveBleClient(context)
 
-        scanchannel = EventChannel(registrar.messenger(), "flutter_reactive_ble_scan")
-        deviceConnectionChannel = EventChannel(registrar.messenger(), "flutter_reactive_ble_connected_device")
-        charNotificationChannel = EventChannel(registrar.messenger(), "flutter_reactive_ble_char_update")
-        val bleStatusChannel = EventChannel(registrar.messenger(), "flutter_reactive_ble_status")
+        scanchannel = EventChannel(messenger, "flutter_reactive_ble_scan")
+        deviceConnectionChannel = EventChannel(messenger, "flutter_reactive_ble_connected_device")
+        charNotificationChannel = EventChannel(messenger, "flutter_reactive_ble_char_update")
+        val bleStatusChannel = EventChannel(messenger, "flutter_reactive_ble_status")
 
         scandevicesHandler = ScanDevicesHandler(bleClient)
         deviceConnectionHandler = DeviceConnectionHandler(bleClient)
