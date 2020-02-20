@@ -4,8 +4,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
 
-import '../src/utils.dart';
-import '../src/widgets.dart';
+import '../utils.dart';
+import '../widgets.dart';
 
 final _serviceUuid = Uuid.parse("932C32BD-0000-47A2-835A-A8D455B859DD");
 final _charUuid = Uuid.parse("932C32BD-0002-47A2-835A-A8D455B859DD");
