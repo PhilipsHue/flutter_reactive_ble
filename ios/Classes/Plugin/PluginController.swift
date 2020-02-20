@@ -20,10 +20,9 @@ final class PluginController {
     var characteristicValueUpdateSink: EventSink?
 
     func initialize(name: String, completion: @escaping PlatformMethodCompletionHandler) {
-        guard central == nil
-        else {
-            completion(.failure(PluginError.alreadyInitialized.asFlutterError))
-            return
+        if let central = central {
+            central.stopScan()
+            central.disconnectAll()
         }
 
         central = Central(
