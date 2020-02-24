@@ -24,25 +24,15 @@ struct ScanForDevicesRequest {
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  var serviceUuid: Uuid {
-    get {return _storage._serviceUuid ?? Uuid()}
-    set {_uniqueStorage()._serviceUuid = newValue}
-  }
-  /// Returns true if `serviceUuid` has been explicitly set.
-  var hasServiceUuid: Bool {return _storage._serviceUuid != nil}
-  /// Clears the value of `serviceUuid`. Subsequent reads from it will return its default value.
-  mutating func clearServiceUuid() {_uniqueStorage()._serviceUuid = nil}
+  var serviceUuids: [Uuid] = []
 
-  var scanMode: Int32 {
-    get {return _storage._scanMode}
-    set {_uniqueStorage()._scanMode = newValue}
-  }
+  var scanMode: Int32 = 0
+
+  var requireLocationServicesEnabled: Bool = false
 
   var unknownFields = SwiftProtobuf.UnknownStorage()
 
   init() {}
-
-  fileprivate var _storage = _StorageClass.defaultInstance
 }
 
 struct DeviceScanInfo {
@@ -579,67 +569,39 @@ struct GenericFailure {
 extension ScanForDevicesRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = "ScanForDevicesRequest"
   static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
-    1: .same(proto: "serviceUuid"),
+    1: .same(proto: "serviceUuids"),
     2: .same(proto: "scanMode"),
+    3: .same(proto: "requireLocationServicesEnabled"),
   ]
 
-  fileprivate class _StorageClass {
-    var _serviceUuid: Uuid? = nil
-    var _scanMode: Int32 = 0
-
-    static let defaultInstance = _StorageClass()
-
-    private init() {}
-
-    init(copying source: _StorageClass) {
-      _serviceUuid = source._serviceUuid
-      _scanMode = source._scanMode
-    }
-  }
-
-  fileprivate mutating func _uniqueStorage() -> _StorageClass {
-    if !isKnownUniquelyReferenced(&_storage) {
-      _storage = _StorageClass(copying: _storage)
-    }
-    return _storage
-  }
-
   mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
-    _ = _uniqueStorage()
-    try withExtendedLifetime(_storage) { (_storage: _StorageClass) in
-      while let fieldNumber = try decoder.nextFieldNumber() {
-        switch fieldNumber {
-        case 1: try decoder.decodeSingularMessageField(value: &_storage._serviceUuid)
-        case 2: try decoder.decodeSingularInt32Field(value: &_storage._scanMode)
-        default: break
-        }
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      switch fieldNumber {
+      case 1: try decoder.decodeRepeatedMessageField(value: &self.serviceUuids)
+      case 2: try decoder.decodeSingularInt32Field(value: &self.scanMode)
+      case 3: try decoder.decodeSingularBoolField(value: &self.requireLocationServicesEnabled)
+      default: break
       }
     }
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    try withExtendedLifetime(_storage) { (_storage: _StorageClass) in
-      if let v = _storage._serviceUuid {
-        try visitor.visitSingularMessageField(value: v, fieldNumber: 1)
-      }
-      if _storage._scanMode != 0 {
-        try visitor.visitSingularInt32Field(value: _storage._scanMode, fieldNumber: 2)
-      }
+    if !self.serviceUuids.isEmpty {
+      try visitor.visitRepeatedMessageField(value: self.serviceUuids, fieldNumber: 1)
+    }
+    if self.scanMode != 0 {
+      try visitor.visitSingularInt32Field(value: self.scanMode, fieldNumber: 2)
+    }
+    if self.requireLocationServicesEnabled != false {
+      try visitor.visitSingularBoolField(value: self.requireLocationServicesEnabled, fieldNumber: 3)
     }
     try unknownFields.traverse(visitor: &visitor)
   }
 
   static func ==(lhs: ScanForDevicesRequest, rhs: ScanForDevicesRequest) -> Bool {
-    if lhs._storage !== rhs._storage {
-      let storagesAreEqual: Bool = withExtendedLifetime((lhs._storage, rhs._storage)) { (_args: (_StorageClass, _StorageClass)) in
-        let _storage = _args.0
-        let rhs_storage = _args.1
-        if _storage._serviceUuid != rhs_storage._serviceUuid {return false}
-        if _storage._scanMode != rhs_storage._scanMode {return false}
-        return true
-      }
-      if !storagesAreEqual {return false}
-    }
+    if lhs.serviceUuids != rhs.serviceUuids {return false}
+    if lhs.scanMode != rhs.scanMode {return false}
+    if lhs.requireLocationServicesEnabled != rhs.requireLocationServicesEnabled {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }

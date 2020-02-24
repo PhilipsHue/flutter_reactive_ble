@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_reactive_ble/src/discovered_devices_registry.dart';
 import 'package:flutter_reactive_ble/src/model/connection_state_update.dart';
@@ -27,22 +28,22 @@ class PrescanConnector {
     Duration connectionTimeout,
   }) connectDevice;
 
-  final Stream<DiscoveredDevice> Function({Uuid withService, ScanMode scanMode})
-      scanDevices;
+  final Stream<DiscoveredDevice> Function(
+      {List<Uuid> withServices, ScanMode scanMode}) scanDevices;
 
   final ScanSession Function() getCurrentScan;
   final Duration delayAfterScanFailure;
 
   Stream<ConnectionStateUpdate> connectToAdvertisingDevice({
     @required String id,
-    @required Uuid withService,
+    @required List<Uuid> withServices,
     @required Duration prescanDuration,
     Map<Uuid, List<Uuid>> servicesWithCharacteristicsToDiscover,
     Duration connectionTimeout,
   }) {
     if (getCurrentScan() != null) {
       return awaitCurrentScanAndConnect(
-        withService,
+        withServices,
         prescanDuration,
         id,
         servicesWithCharacteristicsToDiscover,
@@ -53,7 +54,7 @@ class PrescanConnector {
         id,
         servicesWithCharacteristicsToDiscover,
         connectionTimeout,
-        withService,
+        withServices,
         prescanDuration,
       );
     }
@@ -64,7 +65,7 @@ class PrescanConnector {
     String id,
     Map<Uuid, List<Uuid>> servicesWithCharacteristicsToDiscover,
     Duration connectionTimeout,
-    Uuid withService,
+    List<Uuid> withServices,
     Duration prescanDuration,
   ) {
     if (scanRegistry.deviceIsDiscoveredRecently(
@@ -77,7 +78,7 @@ class PrescanConnector {
       );
     } else {
       final scanSubscription =
-          scanDevices(withService: withService, scanMode: ScanMode.lowLatency)
+          scanDevices(withServices: withServices, scanMode: ScanMode.lowLatency)
               .listen((DiscoveredDevice scanData) {}, onError: (Object _) {});
       Future<void>.delayed(prescanDuration).then<void>((_) {
         scanSubscription.cancel();
@@ -110,13 +111,14 @@ class PrescanConnector {
 
   @visibleForTesting
   Stream<ConnectionStateUpdate> awaitCurrentScanAndConnect(
-    Uuid withService,
+    List<Uuid> withServices,
     Duration prescanDuration,
     String id,
     Map<Uuid, List<Uuid>> servicesWithCharacteristicsToDiscover,
     Duration connectionTimeout,
   ) {
-    if (getCurrentScan().withService == withService) {
+    if (const DeepCollectionEquality()
+        .equals(getCurrentScan().withServices, withServices)) {
       return getCurrentScan()
           .future
           .timeout(prescanDuration + const Duration(seconds: 1))

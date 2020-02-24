@@ -12,9 +12,11 @@ import 'package:protobuf/protobuf.dart' as $pb;
 class ScanForDevicesRequest extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i =
       $pb.BuilderInfo('ScanForDevicesRequest', createEmptyInstance: create)
-        ..aOM<Uuid>(1, 'serviceUuid',
-            protoName: 'serviceUuid', subBuilder: Uuid.create)
+        ..pc<Uuid>(1, 'serviceUuids', $pb.PbFieldType.PM,
+            protoName: 'serviceUuids', subBuilder: Uuid.create)
         ..a<$core.int>(2, 'scanMode', $pb.PbFieldType.O3, protoName: 'scanMode')
+        ..aOB(3, 'requireLocationServicesEnabled',
+            protoName: 'requireLocationServicesEnabled')
         ..hasRequiredFields = false;
 
   ScanForDevicesRequest._() : super();
@@ -42,18 +44,7 @@ class ScanForDevicesRequest extends $pb.GeneratedMessage {
   static ScanForDevicesRequest _defaultInstance;
 
   @$pb.TagNumber(1)
-  Uuid get serviceUuid => $_getN(0);
-  @$pb.TagNumber(1)
-  set serviceUuid(Uuid v) {
-    setField(1, v);
-  }
-
-  @$pb.TagNumber(1)
-  $core.bool hasServiceUuid() => $_has(0);
-  @$pb.TagNumber(1)
-  void clearServiceUuid() => clearField(1);
-  @$pb.TagNumber(1)
-  Uuid ensureServiceUuid() => $_ensure(0);
+  $core.List<Uuid> get serviceUuids => $_getList(0);
 
   @$pb.TagNumber(2)
   $core.int get scanMode => $_getIZ(1);
@@ -66,6 +57,18 @@ class ScanForDevicesRequest extends $pb.GeneratedMessage {
   $core.bool hasScanMode() => $_has(1);
   @$pb.TagNumber(2)
   void clearScanMode() => clearField(2);
+
+  @$pb.TagNumber(3)
+  $core.bool get requireLocationServicesEnabled => $_getBF(2);
+  @$pb.TagNumber(3)
+  set requireLocationServicesEnabled($core.bool v) {
+    $_setBool(2, v);
+  }
+
+  @$pb.TagNumber(3)
+  $core.bool hasRequireLocationServicesEnabled() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearRequireLocationServicesEnabled() => clearField(3);
 }
 
 class DeviceScanInfo extends $pb.GeneratedMessage {

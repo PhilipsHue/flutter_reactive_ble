@@ -6,7 +6,7 @@ import var CoreBluetooth.CBAdvertisementDataManufacturerDataKey
 final class PluginController {
 
     struct Scan {
-        let service: CBUUID
+        let services: [CBUUID]
     }
 
     private var central: Central?
@@ -145,13 +145,7 @@ final class PluginController {
 
         assert(!central.isScanning)
 
-        guard args.hasServiceUuid && !args.serviceUuid.data.isEmpty
-        else {
-            completion(.failure(PluginError.invalidMethodCall(method: name, details: "\"serviceUuid\" is required").asFlutterError))
-            return
-        }
-
-        scan = StreamingTask(parameters: .init(service: CBUUID(data: args.serviceUuid.data)))
+        scan = StreamingTask(parameters: .init(services: args.serviceUuids.map({ uuid in CBUUID(data: uuid.data) })))
 
         completion(.success(nil))
     }
@@ -165,7 +159,7 @@ final class PluginController {
 
         self.scan = scan.with(sink: sink)
 
-        central.scanForDevices(with: [scan.parameters.service])
+        central.scanForDevices(with: scan.parameters.services)
 
         return nil
     }

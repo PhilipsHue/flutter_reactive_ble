@@ -54,7 +54,7 @@ enum class BleStatus(val code: Int) {
     UNSUPPORTED(code = 1),
     UNAUTHORIZED(code = 2),
     POWERED_OFF(code = 3),
-    DISCOVERY_DISABLED(code = 4),
+    LOCATION_SERVICES_DISABLED(code = 4),
     READY(code = 5)
 }
 

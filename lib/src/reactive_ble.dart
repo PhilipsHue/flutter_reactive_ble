@@ -220,14 +220,22 @@ class FlutterReactiveBle {
         .then((message) => message.result.dematerialize());
   }
 
-  /// Scan for devices that are advertising a specific service
-  /// [scanMode] is used only on Android to enforce a more battery or latency intensive scan strategy
+  /// Scan for devices that are advertising a specific services. Use [withServices] filter on devices that are advertising
+  /// the defined services.
   ///
-  Stream<DiscoveredDevice> scanForDevices(
-      {@required Uuid withService, ScanMode scanMode = ScanMode.balanced}) {
+  /// There are two Android specific parameters that will be ignored on iOS:
+  /// [scanMode] allows to choose between different levels of power efficient and/or low latency scan modes.
+  /// [requireLocationServicesEnabled] is used to enforce location services to be enabled while scanning. If this parameter set to
+  /// true and the location services on the device are disabled it will throw [Exception]. Default is set to true,
+  /// setting the value to false can result in not finding BLE devices on some Android devices.
+  Stream<DiscoveredDevice> scanForDevices({
+    @required List<Uuid> withServices,
+    ScanMode scanMode = ScanMode.balanced,
+    bool requireLocationServicesEnabled = true,
+  }) {
     final completer = Completer<void>();
     _currentScan =
-        ScanSession(withService: withService, future: completer.future);
+        ScanSession(withServices: withServices, future: completer.future);
 
     final scanRepeater = Repeater(
       onListenEmitFrom: () =>
@@ -253,14 +261,20 @@ class FlutterReactiveBle {
 
     _scanStreamDisposable.set(scanRepeater);
 
-    final args = pb.ScanForDevicesRequest()
-      ..serviceUuid = (pb.Uuid()..data = withService.data)
-      ..scanMode = convertScanModeToArgs(scanMode);
+    final scanRequest = pb.ScanForDevicesRequest()
+      ..scanMode = convertScanModeToArgs(scanMode)
+      ..requireLocationServicesEnabled = requireLocationServicesEnabled;
+
+    if (withServices != null) {
+      for (final withService in withServices) {
+        scanRequest.serviceUuids.add((pb.Uuid()..data = withService.data));
+      }
+    }
 
     return initialize()
         .then((_) {
           _methodChannel.invokeMethod<void>(
-              "scanForDevices", args.writeToBuffer());
+              "scanForDevices", scanRequest.writeToBuffer());
         })
         .asStream()
         .asyncExpand((Object _) => scanRepeater.stream)
@@ -325,14 +339,14 @@ class FlutterReactiveBle {
 
   Stream<ConnectionStateUpdate> connectToAdvertisingDevice({
     @required String id,
-    @required Uuid withService,
+    @required List<Uuid> withServices,
     @required Duration prescanDuration,
     Map<Uuid, List<Uuid>> servicesWithCharacteristicsToDiscover,
     Duration connectionTimeout,
   }) =>
       _prescanConnector.connectToAdvertisingDevice(
         id: id,
-        withService: withService,
+        withServices: withServices,
         prescanDuration: prescanDuration,
         servicesWithCharacteristicsToDiscover:
             servicesWithCharacteristicsToDiscover,
