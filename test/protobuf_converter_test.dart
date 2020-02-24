@@ -2,6 +2,7 @@ import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
 import 'package:flutter_reactive_ble/src/converter/protobuf_converter.dart';
 import 'package:flutter_reactive_ble/src/generated/bledata.pb.dart' as pb;
 import 'package:flutter_reactive_ble/src/model/clear_gatt_cache_error.dart';
+import 'package:flutter_reactive_ble/src/model/unit.dart';
 import 'package:flutter_reactive_ble/src/model/uuid.dart';
 import 'package:flutter_reactive_ble/src/model/write_characteristic_info.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -14,17 +15,25 @@ void main() {
     group("DeviceScanInfo conversion", () {
       const id = 'id';
       const name = 'name';
-      final serviceDataEntry1 = pb.ServiceDataEntry()
-        ..serviceUuid = (pb.Uuid()..data = [0])
-        ..data = [1, 2, 3];
-      final serviceDataEntry2 = pb.ServiceDataEntry()
-        ..serviceUuid = (pb.Uuid()..data = [1])
-        ..data = [4, 5, 6];
-      final message = pb.DeviceScanInfo()
-        ..id = id
-        ..name = name
-        ..serviceData.add(serviceDataEntry1)
-        ..serviceData.add(serviceDataEntry2);
+
+      pb.ServiceDataEntry serviceDataEntry1;
+      pb.ServiceDataEntry serviceDataEntry2;
+      pb.DeviceScanInfo message;
+
+      setUp(() {
+        serviceDataEntry1 = pb.ServiceDataEntry()
+          ..serviceUuid = (pb.Uuid()..data = [0])
+          ..data = [1, 2, 3];
+        serviceDataEntry2 = pb.ServiceDataEntry()
+          ..serviceUuid = (pb.Uuid()..data = [1])
+          ..data = [4, 5, 6];
+
+        message = pb.DeviceScanInfo()
+          ..id = id
+          ..name = name
+          ..serviceData.add(serviceDataEntry1)
+          ..serviceData.add(serviceDataEntry2);
+      });
 
       test('converts id', () {
         final scanresult = sut.scanResultFrom(message).result;
@@ -190,36 +199,52 @@ void main() {
     group("ConnectionStateUpdate conversion", () {
       const id = 'id';
       const connectionState = 1;
-      final message = pb.DeviceInfo()
-        ..id = id
-        ..connectionState = connectionState;
 
-      test('Converts id', () {
-        final result = sut.connectionStateUpdateFrom(message);
-        expect(result.deviceId, id);
+      pb.DeviceInfo message;
+
+      group('Message without failure', () {
+        setUp(() {
+          message = pb.DeviceInfo()
+            ..id = id
+            ..connectionState = connectionState;
+        });
+
+        test('Converts id', () {
+          final result = sut.connectionStateUpdateFrom(message);
+          expect(result.deviceId, id);
+        });
+
+        test('Converts status update', () {
+          final result = sut.connectionStateUpdateFrom(message);
+          expect(result.connectionState, DeviceConnectionState.connected);
+        });
       });
 
-      test('Converts status update', () {
-        final result = sut.connectionStateUpdateFrom(message);
-        expect(result.connectionState, DeviceConnectionState.connected);
+      group('Message with failure', () {
+        setUp(() {
+          final failure = pb.GenericFailure()
+            ..code = 0
+            ..message = "failure";
+          message = pb.DeviceInfo()..failure = failure;
+        });
+        test('converts failure', () {
+          final updateResult = sut.connectionStateUpdateFrom(message).failure;
+          expect(updateResult.message, "failure");
+          expect(updateResult.code, ConnectionError.unknown);
+        });
       });
 
-      test('converts failure', () {
-        final failure = pb.GenericFailure()
-          ..code = 0
-          ..message = "failure";
-        final failedUpdate = pb.DeviceInfo()..failure = failure;
+      group('Irregular statuscode ', () {
+        setUp(() {
+          message = pb.DeviceInfo()
+            ..id = id
+            ..connectionState = 100;
+        });
 
-        final updateResult =
-            sut.connectionStateUpdateFrom(failedUpdate).failure;
-        expect(updateResult.message, "failure");
-        expect(updateResult.code, ConnectionError.unknown);
-      });
-
-      test('converts unknown code throws', () {
-        final unknownCodeMessage = message..connectionState = 100;
-        expect(() => sut.connectionStateUpdateFrom(unknownCodeMessage),
-            throwsA(anything));
+        test('converts unknown code throws', () {
+          expect(
+              () => sut.connectionStateUpdateFrom(message), throwsA(anything));
+        });
       });
     });
 
@@ -228,10 +253,9 @@ void main() {
         final result = sut.clearGattCacheResultFrom(pb.ClearGattCacheInfo());
 
         expect(
-            result.iif(
-                success: (_) => "success",
-                failure: (_) => throw AssertionError("Not expected to fail")),
-            "success");
+            result,
+            const Result<Unit, GenericFailure<ClearGattCacheError>>.success(
+                Unit()));
       });
 
       test('Fails', () {
@@ -246,14 +270,18 @@ void main() {
     group("Converts characteristic value", () {
       const id = 'id';
       const value = [2, 3];
-      final characteristic = pb.CharacteristicAddress()
-        ..deviceId = id
-        ..serviceUuid = (pb.Uuid()..data = [0])
-        ..characteristicUuid = (pb.Uuid()..data = [1]);
+      pb.CharacteristicValueInfo message;
 
-      final message = pb.CharacteristicValueInfo()
-        ..characteristic = characteristic
-        ..value = value;
+      setUp(() {
+        final characteristic = pb.CharacteristicAddress()
+          ..deviceId = id
+          ..serviceUuid = (pb.Uuid()..data = [0])
+          ..characteristicUuid = (pb.Uuid()..data = [1]);
+
+        message = pb.CharacteristicValueInfo()
+          ..characteristic = characteristic
+          ..value = value;
+      });
 
       test('It converts device id', () {
         final result = sut.characteristicValueFrom(message);
@@ -288,13 +316,17 @@ void main() {
 
     group("Converts writecharacteristic info", () {
       const id = 'id';
-      final characteristic = pb.CharacteristicAddress()
-        ..deviceId = id
-        ..serviceUuid = (pb.Uuid()..data = [0])
-        ..characteristicUuid = (pb.Uuid()..data = [1]);
 
-      final message = pb.WriteCharacteristicInfo()
-        ..characteristic = characteristic;
+      pb.WriteCharacteristicInfo message;
+
+      setUp(() {
+        final characteristic = pb.CharacteristicAddress()
+          ..deviceId = id
+          ..serviceUuid = (pb.Uuid()..data = [0])
+          ..characteristicUuid = (pb.Uuid()..data = [1]);
+
+        message = pb.WriteCharacteristicInfo()..characteristic = characteristic;
+      });
 
       test('It converts device id', () {
         final result = sut.writeCharacteristicInfoFrom(message);
@@ -335,7 +367,11 @@ void main() {
     group('Converts connection priority info', () {
       const id = 'id';
 
-      final message = pb.ChangeConnectionPriorityInfo()..deviceId = id;
+      pb.ChangeConnectionPriorityInfo message;
+
+      setUp(() {
+        message = pb.ChangeConnectionPriorityInfo()..deviceId = id;
+      });
 
       test('Succeeds', () {
         final result = sut.connectionPriorityInfoFrom(message).result;

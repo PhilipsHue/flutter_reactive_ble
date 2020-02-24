@@ -30,56 +30,52 @@ void main() {
         when(handler.onListenEmitFrom())
             .thenAnswer((_) => underlyingStreamController.stream);
       });
+      group('Has subscription', () {
+        StreamSubscription<int> subscription;
 
-      test(
-          "does not subscribe to the underlying stream in absence of listeners",
-          () {
-        verifyNever(handler.onListenEmitFrom());
+        setUp(() {
+          subscription = sut.stream.listen((_) {});
+        });
+
+        test("subscribes to the underlying stream when a listener connects",
+            () {
+          verify(handler.onListenEmitFrom()).called(1);
+          expect(underlyingStreamController.hasListener, true);
+        });
+        test(
+            "unsubscribes from the underlying stream when there are no listeners left",
+            () async {
+          await subscription.cancel();
+
+          verify(handler.onCancel()).called(1);
+          expect(underlyingStreamController.hasListener, false);
+        });
+
+        test("unsubscribes from the underlying stream when detached", () async {
+          await sut.detach();
+
+          verify(handler.onCancel()).called(1);
+          expect(underlyingStreamController.hasListener, false);
+        });
+
+        test("unsubscribes from the underlying stream when disposed", () async {
+          await sut.dispose();
+
+          verify(handler.onCancel()).called(1);
+          expect(underlyingStreamController.hasListener, false);
+        });
+
+        test("safely disposes when has not been listened to", () {
+          expect(() async => sut.dispose(), returnsNormally);
+        });
       });
 
-      test("subscribes to the underlying stream when a listener connects", () {
-        sut.stream.listen((_) {});
-
-        verify(handler.onListenEmitFrom()).called(1);
-        expect(underlyingStreamController.hasListener, true);
-      });
-
-      test("subscribes to the underlying stream when attached", () {
-        sut.detach();
-        sut.stream.listen((_) {});
-        sut.attach();
-
-        verify(handler.onListenEmitFrom()).called(1);
-        expect(underlyingStreamController.hasListener, true);
-      });
-
-      test(
-          "unsubscribes from the underlying stream when there are no listeners left",
-          () async {
-        await sut.stream.listen((_) {}).cancel();
-
-        verify(handler.onCancel()).called(1);
-        expect(underlyingStreamController.hasListener, false);
-      });
-
-      test("unsubscribes from the underlying stream when detached", () async {
-        sut.stream.listen((_) {});
-        await sut.detach();
-
-        verify(handler.onCancel()).called(1);
-        expect(underlyingStreamController.hasListener, false);
-      });
-
-      test("unsubscribes from the underlying stream when disposed", () async {
-        sut.stream.listen((_) {});
-        await sut.dispose();
-
-        verify(handler.onCancel()).called(1);
-        expect(underlyingStreamController.hasListener, false);
-      });
-
-      test("safely disposes when has not been listened to", () {
-        expect(() async => sut.dispose(), returnsNormally);
+      group('No subscription', () {
+        test(
+            "does not subscribe to the underlying stream in absence of listeners",
+            () {
+          verifyNever(handler.onListenEmitFrom());
+        });
       });
     });
 
@@ -101,19 +97,23 @@ void main() {
 
     group('Repeater from stream', () {
       Repeater<int> sut;
+      StreamSubscription<int> subscription;
 
       setUp(() {
         sut = Repeater.fromStream(underlyingStreamController.stream);
+        subscription = sut.stream.listen((_) {});
+      });
+
+      tearDown(() async {
+        await subscription.cancel();
       });
 
       test('It subscribes to stream supplied in constructor', () {
-        sut.stream.listen((_) {});
-
         expect(underlyingStreamController.hasListener, true);
       });
 
       test('It pauses the stream when pause is called', () async {
-        sut.stream.listen((_) {}).pause();
+        subscription.pause();
         expect(underlyingStreamController.isPaused, true);
       });
 

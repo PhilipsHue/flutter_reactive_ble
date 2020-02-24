@@ -10,6 +10,7 @@ import 'package:flutter_reactive_ble/src/model/discovered_device.dart';
 import 'package:flutter_reactive_ble/src/model/generic_failure.dart';
 import 'package:flutter_reactive_ble/src/model/qualified_characteristic.dart';
 import 'package:flutter_reactive_ble/src/model/result.dart';
+import 'package:flutter_reactive_ble/src/model/unit.dart';
 import 'package:flutter_reactive_ble/src/model/uuid.dart';
 import 'package:flutter_reactive_ble/src/model/write_characteristic_info.dart';
 import 'package:flutter_reactive_ble/src/select_from.dart';
@@ -61,10 +62,10 @@ class ProtobufConverter {
         ),
       );
 
-  Result<void, GenericFailure<ClearGattCacheError>> clearGattCacheResultFrom(
+  Result<Unit, GenericFailure<ClearGattCacheError>> clearGattCacheResultFrom(
           pb.ClearGattCacheInfo message) =>
       resultFrom(
-        getValue: () {},
+        getValue: () => const Unit(),
         failure: genericFailureFrom(
           hasFailure: message.hasFailure(),
           getFailure: () => message.failure,
