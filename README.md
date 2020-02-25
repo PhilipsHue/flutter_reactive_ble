@@ -64,6 +64,43 @@ issue use the method `connectToAdvertisingDevice` to first scan for the device a
 ```
 Besides the normal connection parameters that are described at above this function also has 2 additional required parameters: `withService` and  `prescanDuration`. PreScanDuration is the amount of time the ble stack will scan for the device before it attempts to connect (if the device is found)
 
+### Disconnect from device
+
+When you connect to a device with `connectToDevice(⋯)` and you subscribe to a characteristic you get a `StreamSubscription` Keep a subscription to this StreamSubscription as long as you need the connection. By closing the StreamSubscription you terminate the connection.
+
+```dart
+// connect
+void _connectToDevice() {
+  Stream<ConnectionStateUpdate> connectedDeviceStream = reactiveBleClient
+        .connectToDevice(
+          id: 'AA:BB:CC:DD:EE:FF',
+          connectionTimeout: const Duration(seconds: 10),
+        )
+        .asBroadcastStream();
+
+    Stream<List<int>> charValueStream = connectedDeviceStream
+        .where((device) =>
+            device.connectionState == DeviceConnectionState.connected)
+        .take(1)
+        .asyncExpand((_) {
+      print("Connected to 'AA:BB:CC:DD:EE:FF', getting characteristic");
+
+      return reactiveBleClient.subscribeToCharacteristic(QualifiedCharacteristic(
+        characteristicId: charUuid,
+        serviceId: serviceUuid,
+        deviceId: 'AA:BB:CC:DD:EE:FF',
+      ));
+    });
+
+    StreamSubscription currentValueUpdateSubscription =
+        charValueStream.listen((data) => print(data));
+}
+// disconnect
+void _disconnectFromDevice() {
+  _currentValueUpdateSubscription?.cancel();
+}
+```
+
 ### Read / write characteristics
 
 #### Read characteristic

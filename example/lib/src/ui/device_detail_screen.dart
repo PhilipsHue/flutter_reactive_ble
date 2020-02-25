@@ -84,6 +84,10 @@ class _DetailState extends State<DeviceDetailScreen> {
         .then((_) => _readCharacteristic());
   }
 
+  void _disconnectFromDevice() {
+    _currentValueUpdateSubscription?.cancel();
+  }
+
   Future<void> _readCharacteristic() async {
     log("Reading characteristic...");
 
@@ -187,6 +191,11 @@ class _DetailState extends State<DeviceDetailScreen> {
                   RaisedButton(
                     child: const Text('Connect to device'),
                     onPressed: _connectToDevice,
+                  ),
+                if (_connectionState == DeviceConnectionState.connected)
+                  RaisedButton(
+                    child: const Text('Disconnect from device'),
+                    onPressed: _disconnectFromDevice,
                   ),
               ],
             ),
