@@ -129,6 +129,24 @@ The Android OS maintains a table per device of the discovered service in cache. 
 await reactiveBleClient.clearGattCache('AA:BB:CC:DD:EE:FF');
 ```
 
+### Common issues
+
+#### BLE undeliverable exception
+On Android side we use the [RxAndroidBle](https://github.com/Polidea/RxAndroidBle) library of Polidea. After migration towards RxJava 2 some of the errors are not routed properly to their listeners and thus this will result in a BLE Undeliverable Exception. The root cause lies in the threading of the Android OS. As workaround RxJava has a hook where you can set the global errorhandler. For more info see [RxJava docs](https://github.com/ReactiveX/RxJava/wiki/What's-different-in-2.0#error-handling) .
+
+A default workaround implementation in the Flutter app (needs to be in the Java / Kotlin part e.g. mainactivity) would be:
+
+```kotlin
+RxJavaPlugins.setErrorHandler { throwable ->
+  if (throwable is UndeliverableException && throwable.cause is BleException) {
+    return@setErrorHandler // ignore BleExceptions since we do not have subscriber
+  }
+  else {
+    throw throwable
+  }
+}
+```
+
 
 
 
