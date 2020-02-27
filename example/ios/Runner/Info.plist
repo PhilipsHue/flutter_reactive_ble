@@ -46,8 +46,8 @@
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
 	<key>NSBluetoothAlwaysUsageDescription</key>
-    <string>The app uses bluetooth to find, connect and transfer data between different devices</string>
-    <key>NSBluetoothPeripheralUsageDescription</key>
-    <string>The app uses bluetooth to find, connect and transfer data between different devices</string>
+	<string>The app uses bluetooth to find, connect and transfer data between different devices</string>
+	<key>NSBluetoothPeripheralUsageDescription</key>
+	<string>The app uses bluetooth to find, connect and transfer data between different devices</string>
 </dict>
 </plist>
