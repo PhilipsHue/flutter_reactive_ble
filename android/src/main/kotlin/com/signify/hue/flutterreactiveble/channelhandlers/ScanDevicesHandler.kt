@@ -38,7 +38,6 @@ class ScanDevicesHandler(private val bleClient: com.signify.hue.flutterreactiveb
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(
                         { scanResult ->
-                            Timber.d("Device found ${scanResult.deviceId} ${scanResult.name}")
                             handleDeviceScanResult(converter.convertScanInfo(scanResult))
                         },
                         { throwable ->
