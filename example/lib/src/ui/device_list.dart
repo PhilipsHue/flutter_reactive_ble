@@ -34,12 +34,10 @@ class _DeviceListState extends State<DeviceList> {
 
   @override
   void dispose() {
-    super.dispose();
     _statusSubscription?.cancel();
     _scanSubscription?.cancel();
-    _uuidController
-      ..removeListener(() => setState(() {}))
-      ..dispose();
+    _uuidController?.dispose();
+    super.dispose();
   }
 
   void _initBleState() {
@@ -70,19 +68,24 @@ class _DeviceListState extends State<DeviceList> {
       log("Starting to listen for devices...");
 
       _clearDeviceList();
-      _scanSubscription =
-          _ble.scanForDevices(withService: uuid).listen((device) {
-        if (!_devices.any((d) => d.id == device.id)) {
-          log("New device found: $device");
-
+      setState(() {
+        _scanSubscription =
+            _ble.scanForDevices(withService: uuid).listen((device) {
           if (mounted) {
             setState(() {
-              _devices.add(device);
+              final knownDeviceIndex =
+                  _devices.indexWhere((d) => d.id == device.id);
+
+              if (knownDeviceIndex >= 0) {
+                _devices[knownDeviceIndex] = device;
+              } else {
+                log("New device found: $device");
+                _devices.add(device);
+              }
             });
           }
-        }
+        });
       });
-      setState(() {}); // Because _scanSubscription isn't null anymore
     } else {
       log("Scanning is already in progress");
     }
@@ -172,7 +175,7 @@ class _DeviceListState extends State<DeviceList> {
                     .map(
                       (device) => ListTile(
                         title: Text(device.name),
-                        subtitle: Text(device.id),
+                        subtitle: Text("${device.id}\nRSSI: ${device.rssi}"),
                         leading: const BluetoothIcon(),
                         onTap: () async {
                           _stopScanning();
