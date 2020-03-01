@@ -69,7 +69,7 @@ class _DeviceListState extends State<_DeviceList> {
   @override
   Widget build(BuildContext context) => Scaffold(
         appBar: AppBar(
-          title: const Text('BLE todo status'),
+          title: const Text('Scan for devices'),
         ),
         body: Column(
           children: [

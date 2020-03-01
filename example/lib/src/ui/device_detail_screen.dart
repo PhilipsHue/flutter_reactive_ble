@@ -67,7 +67,7 @@ class _DeviceDetail extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Text(
-                    "Id: ${connectionUpdate.deviceId}",
+                    "ID: ${connectionUpdate.deviceId}",
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ),

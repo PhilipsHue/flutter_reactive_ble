@@ -32,8 +32,12 @@ class BleScanner implements ReactiveState<BleScannerState> {
   }
 
   void _pushState() {
-    _stateStreamController.add(BleScannerState(
-        discoveredDevices: _devices, scanIsInProgress: _subscription != null));
+    _stateStreamController.add(
+      BleScannerState(
+        discoveredDevices: _devices,
+        scanIsInProgress: _subscription != null,
+      ),
+    );
   }
 
   Future<void> stopScan() async {
@@ -51,8 +55,10 @@ class BleScanner implements ReactiveState<BleScannerState> {
 
 @immutable
 class BleScannerState {
-  const BleScannerState(
-      {@required this.discoveredDevices, @required this.scanIsInProgress});
+  const BleScannerState({
+    @required this.discoveredDevices,
+    @required this.scanIsInProgress,
+  });
 
   final List<DiscoveredDevice> discoveredDevices;
   final bool scanIsInProgress;

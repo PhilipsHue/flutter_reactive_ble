@@ -31,6 +31,7 @@ class BleDeviceConnector extends ReactiveState<ConnectionStateUpdate> {
       } on Exception catch (e, _) {
         print("Error disconnecting from a device: $e");
       } finally {
+        // Since [_connection] subscription is terminated, the "disconnected" state cannot be received and propagated
         _deviceConnectionController.add(
           ConnectionStateUpdate(
             deviceId: deviceId,
