@@ -30,7 +30,6 @@ class DiscoveredDevice extends $DiscoveredDevice {
   /// Manufacturer specific data. The first 2 bytes are the Company Identifier Codes.
   final Uint8List manufacturerData;
 
-  @CustomEquality(Ignore())
   final int rssi;
 
   const DiscoveredDevice({
