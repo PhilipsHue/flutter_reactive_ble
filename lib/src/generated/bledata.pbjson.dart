@@ -41,6 +41,13 @@ const DeviceScanInfo$json = const {
       '6': '.ServiceDataEntry',
       '10': 'serviceData'
     },
+    const {
+      '1': 'manufacturerData',
+      '3': 6,
+      '4': 1,
+      '5': 12,
+      '10': 'manufacturerData'
+    },
     const {'1': 'rssi', '3': 5, '4': 1, '5': 5, '10': 'rssi'},
   ],
 };

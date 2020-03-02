@@ -9,7 +9,7 @@ enum ConnectionChange {
 final class CentralManagerDelegate: NSObject, CBCentralManagerDelegate {
 
     typealias StateChangeHandler = (CBManagerState) -> Void
-    typealias DiscoveryHandler = (CBPeripheral, ServiceData, RSSI) -> Void
+    typealias DiscoveryHandler = (CBPeripheral, AdvertisementData, RSSI) -> Void
     typealias ConnectionChangeHandler = (CBPeripheral, ConnectionChange) -> Void
 
     private let onStateChange: StateChangeHandler
@@ -31,8 +31,7 @@ final class CentralManagerDelegate: NSObject, CBCentralManagerDelegate {
     }
 
     func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String : Any], rssi: NSNumber) {
-        let serviceData = advertisementData[CBAdvertisementDataServiceDataKey] as? ServiceData ?? [:]
-        onDiscovery(peripheral, serviceData, rssi.intValue)
+        onDiscovery(peripheral, advertisementData, rssi.intValue)
     }
 
     func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {

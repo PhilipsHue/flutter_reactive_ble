@@ -35,6 +35,7 @@ class ProtobufConverter {
                 id: message.id,
                 name: message.name,
                 serviceData: serviceData,
+                manufacturerData: Uint8List.fromList(message.manufacturerData),
                 rssi: message.rssi,
               ),
           failure: genericFailureFrom(

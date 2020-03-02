@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
 import 'package:flutter_reactive_ble/src/converter/protobuf_converter.dart';
 import 'package:flutter_reactive_ble/src/generated/bledata.pb.dart' as pb;
@@ -19,6 +21,7 @@ void main() {
       pb.ServiceDataEntry serviceDataEntry1;
       pb.ServiceDataEntry serviceDataEntry2;
       pb.DeviceScanInfo message;
+      Uint8List manufacturerData;
 
       setUp(() {
         serviceDataEntry1 = pb.ServiceDataEntry()
@@ -27,12 +30,14 @@ void main() {
         serviceDataEntry2 = pb.ServiceDataEntry()
           ..serviceUuid = (pb.Uuid()..data = [1])
           ..data = [4, 5, 6];
+        manufacturerData = Uint8List.fromList([1, 2, 3]);
 
         message = pb.DeviceScanInfo()
           ..id = id
           ..name = name
           ..serviceData.add(serviceDataEntry1)
-          ..serviceData.add(serviceDataEntry2);
+          ..serviceData.add(serviceDataEntry2)
+          ..manufacturerData = manufacturerData;
       });
 
       test('converts id', () {
@@ -65,6 +70,15 @@ void main() {
                     d.serviceData[Uuid(serviceDataEntry2.serviceUuid.data)],
                 failure: (_) => throw Exception()),
             serviceDataEntry2.data);
+      });
+
+      test('converts manufacturer data', () {
+        final scanresult = sut.scanResultFrom(message).result;
+        expect(
+            scanresult.iif(
+                success: (d) => d.manufacturerData,
+                failure: (_) => throw Exception()),
+            manufacturerData);
       });
 
       test('converts failure', () {

@@ -77,6 +77,8 @@ class DeviceScanInfo extends $pb.GeneratedMessage {
         ..pc<ServiceDataEntry>(4, 'serviceData', $pb.PbFieldType.PM,
             protoName: 'serviceData', subBuilder: ServiceDataEntry.create)
         ..a<$core.int>(5, 'rssi', $pb.PbFieldType.O3)
+        ..a<$core.List<$core.int>>(6, 'manufacturerData', $pb.PbFieldType.OY,
+            protoName: 'manufacturerData')
         ..hasRequiredFields = false;
 
   DeviceScanInfo._() : super();
@@ -153,6 +155,18 @@ class DeviceScanInfo extends $pb.GeneratedMessage {
   $core.bool hasRssi() => $_has(4);
   @$pb.TagNumber(5)
   void clearRssi() => clearField(5);
+
+  @$pb.TagNumber(6)
+  $core.List<$core.int> get manufacturerData => $_getN(5);
+  @$pb.TagNumber(6)
+  set manufacturerData($core.List<$core.int> v) {
+    $_setBytes(5, v);
+  }
+
+  @$pb.TagNumber(6)
+  $core.bool hasManufacturerData() => $_has(5);
+  @$pb.TagNumber(6)
+  void clearManufacturerData() => clearField(6);
 }
 
 class ConnectToDeviceRequest extends $pb.GeneratedMessage {

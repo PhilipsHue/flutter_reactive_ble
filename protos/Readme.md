@@ -12,7 +12,7 @@
 7. Make sure protoc + protoc-gen-dart + dart bins are all in the same path
 8. Run the following command from the protos folder
 ```
-protoc --dart_out=../lib/generated ./bledata.proto
+protoc --dart_out=../lib/src/generated ./bledata.proto
 protoc --swift_out=../ios/Classes/BleData ./bledata.proto
 ```
 

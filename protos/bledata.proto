@@ -12,6 +12,7 @@ message DeviceScanInfo {
     string name = 2;
     GenericFailure failure = 3;
     repeated ServiceDataEntry serviceData = 4;
+    bytes manufacturerData = 6;
     int32 rssi = 5;
 }
 

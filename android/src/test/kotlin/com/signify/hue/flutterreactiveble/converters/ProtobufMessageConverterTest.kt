@@ -71,6 +71,15 @@ class ProtobufMessageConverterTest {
 
             assertThat(value).isEqualTo(expected)
         }
+
+        @Test
+        fun `converts manufacturer data into message manufacturer data`() {
+            val scanInfo = createScanInfo()
+
+            val result = protobufConverter.convertScanInfo(scanInfo)
+
+            assertThat(result.manufacturerData.toByteArray()).isEqualTo(scanInfo.manufacturerData)
+        }
     }
 
     @Nested
@@ -170,7 +179,10 @@ class ProtobufMessageConverterTest {
         val serviceData = mutableMapOf<UUID, ByteArray>()
         serviceData[uuid] = testString
 
-        return com.signify.hue.flutterreactiveble.ble.ScanInfo(deviceId = macAdress, name = deviceName, rssi = rssi, serviceData = serviceData)
+        val manufacturerData = "123".toByteArray()
+
+        return com.signify.hue.flutterreactiveble.ble.ScanInfo(deviceId = macAdress, name = deviceName,
+                rssi = rssi, serviceData = serviceData, manufacturerData = manufacturerData)
     }
 
     private fun createCharacteristicRequest(deviceId: String, serviceUuid: UUID): pb.ReadCharacteristicRequest {

@@ -3,7 +3,31 @@ package com.signify.hue.flutterreactiveble.ble
 import com.polidea.rxandroidble2.RxBleConnection
 import java.util.UUID
 
-data class ScanInfo(val deviceId: String, val name: String, val rssi: Int, val serviceData: Map<UUID, ByteArray>)
+data class ScanInfo(val deviceId: String, val name: String, val rssi: Int, val serviceData: Map<UUID, ByteArray>, val manufacturerData: ByteArray) {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as ScanInfo
+
+        if (deviceId != other.deviceId) return false
+        if (name != other.name) return false
+        if (rssi != other.rssi) return false
+        if (serviceData != other.serviceData) return false
+        if (!manufacturerData.contentEquals(other.manufacturerData)) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = deviceId.hashCode()
+        result = 31 * result + name.hashCode()
+        result = 31 * result + rssi
+        result = 31 * result + serviceData.hashCode()
+        result = 31 * result + manufacturerData.contentHashCode()
+        return result
+    }
+}
 
 sealed class ConnectionUpdate
 data class ConnectionUpdateSuccess(val deviceId: String, val connectionState: Int) : com.signify.hue.flutterreactiveble.ble.ConnectionUpdate()
