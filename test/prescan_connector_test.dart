@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:flutter_reactive_ble/src/discovered_devices_registry.dart';
 import 'package:flutter_reactive_ble/src/model/connection_state_update.dart';
@@ -109,10 +110,11 @@ void main() {
                     withService: anyNamed("withService"),
                     scanMode: anyNamed("scanMode")))
                 .thenAnswer((_) => Stream.fromIterable([
-                      const DiscoveredDevice(
+                      DiscoveredDevice(
                         id: _device,
                         name: _device,
-                        serviceData: {},
+                        serviceData: const {},
+                        manufacturerData: Uint8List(0),
                         rssi: -40,
                       )
                     ]));
@@ -213,10 +215,11 @@ void main() {
                     withService: anyNamed("withService"),
                     scanMode: anyNamed("scanMode")))
                 .thenAnswer((_) => Stream.fromIterable([
-                      const DiscoveredDevice(
+                      DiscoveredDevice(
                         id: _device,
                         name: _device,
-                        serviceData: {},
+                        serviceData: const {},
+                        manufacturerData: Uint8List(0),
                         rssi: -40,
                       )
                     ]));

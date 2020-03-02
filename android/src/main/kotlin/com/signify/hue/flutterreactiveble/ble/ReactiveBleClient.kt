@@ -14,6 +14,7 @@ import com.polidea.rxandroidble2.scan.ScanFilter
 import com.polidea.rxandroidble2.scan.ScanSettings
 import com.signify.hue.flutterreactiveble.ble.extensions.writeCharWithResponse
 import com.signify.hue.flutterreactiveble.ble.extensions.writeCharWithoutResponse
+import com.signify.hue.flutterreactiveble.converters.extractManufacturerData
 import com.signify.hue.flutterreactiveble.model.ScanMode
 import com.signify.hue.flutterreactiveble.model.toScanSettings
 import com.signify.hue.flutterreactiveble.utils.Duration
@@ -61,7 +62,9 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
                 .map { result ->
                     ScanInfo(result.bleDevice.macAddress, result.bleDevice.name
                             ?: "",
-                            result.rssi, result.scanRecord.serviceData.mapKeys { it.key.uuid })
+                            result.rssi,
+                            result.scanRecord.serviceData.mapKeys { it.key.uuid },
+                            extractManufacturerData(result.scanRecord.manufacturerSpecificData))
                 }
     }
 

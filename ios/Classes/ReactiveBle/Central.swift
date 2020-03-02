@@ -7,11 +7,12 @@ typealias ServiceID = CBUUID
 typealias CharacteristicID = CBUUID
 
 typealias ServiceData = [ServiceID: Data]
+typealias AdvertisementData = [String: Any]
 
 final class Central {
 
     typealias StateChangeHandler = (Central, CBManagerState) -> Void
-    typealias DiscoveryHandler = (Central, CBPeripheral, ServiceData, RSSI) -> Void
+    typealias DiscoveryHandler = (Central, CBPeripheral, AdvertisementData, RSSI) -> Void
     typealias ConnectionChangeHandler = (Central, CBPeripheral, ConnectionChange) -> Void
     typealias ServicesWithCharacteristicsDiscoveryHandler = (Central, CBPeripheral, [Error]) -> Void
     typealias CharacteristicNotifyCompletionHandler = (Central, Error?) -> Void
