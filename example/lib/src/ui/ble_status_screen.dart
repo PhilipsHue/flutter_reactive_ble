@@ -16,8 +16,8 @@ class BleStatusScreen extends StatelessWidget {
         return "Authorize the FlutterReactiveBle example app to use Bluetooth and location";
       case BleStatus.poweredOff:
         return "Bluetooth is powered off on your device turn it on";
-      case BleStatus.discoveryDisabled:
-        return "Bluetooth discovery is disabled turn on location services";
+      case BleStatus.locationServicesDisabled:
+        return "Enable location services";
       case BleStatus.ready:
         return "Bluetooth is up and running";
       default:
