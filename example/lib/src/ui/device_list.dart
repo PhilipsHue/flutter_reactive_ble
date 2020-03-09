@@ -67,7 +67,7 @@ class _DeviceListState extends State<_DeviceList> {
 
   void _startScanning() {
     final text = _uuidController.text;
-    widget.startScan(text.isEmpty ? null : [Uuid.parse(_uuidController.text)]);
+    widget.startScan(text.isEmpty ? [] : [Uuid.parse(_uuidController.text)]);
   }
 
   @override

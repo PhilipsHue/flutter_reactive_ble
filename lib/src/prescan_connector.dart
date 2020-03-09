@@ -28,8 +28,10 @@ class PrescanConnector {
     Duration connectionTimeout,
   }) connectDevice;
 
-  final Stream<DiscoveredDevice> Function(
-      {List<Uuid> withServices, ScanMode scanMode}) scanDevices;
+  final Stream<DiscoveredDevice> Function({
+    List<Uuid> withServices,
+    ScanMode scanMode,
+  }) scanDevices;
 
   final ScanSession Function() getCurrentScan;
   final Duration delayAfterScanFailure;
@@ -95,14 +97,17 @@ class PrescanConnector {
             return connectIfRecentlyDiscovered(
                 id, servicesWithCharacteristicsToDiscover, connectionTimeout);
           } else {
-            /*When the scan fails 99% of the times it is due to violation of the scan threshold:
-            https://blog.classycode.com/undocumented-android-7-ble-behavior-changes-d1a9bd87d983 . Previously we did
-            autoconnect but that gives slow connection times (up to 2 min) on a lot of devices.
-             */
+            // When the scan fails 99% of the times it is due to violation of the scan threshold:
+            // https://blog.classycode.com/undocumented-android-7-ble-behavior-changes-d1a9bd87d983
+            //
+            // Previously we used "autoconnect" but that gives slow connection times (up to 2 min) on a lot of devices.
             return Future<void>.delayed(delayAfterScanFailure)
                 .asStream()
-                .asyncExpand((_) => connectIfRecentlyDiscovered(id,
-                    servicesWithCharacteristicsToDiscover, connectionTimeout));
+                .asyncExpand((_) => connectIfRecentlyDiscovered(
+                      id,
+                      servicesWithCharacteristicsToDiscover,
+                      connectionTimeout,
+                    ));
           }
         },
       );

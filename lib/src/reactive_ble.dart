@@ -220,14 +220,15 @@ class FlutterReactiveBle {
         .then((message) => message.result.dematerialize());
   }
 
-  /// Scan for devices that are advertising a specific services. Use [withServices] filter on devices that are advertising
-  /// the defined services.
+  /// Scan for BLE peripherals advertising the services specified in [withServices]
+  /// or for all BLE peripherals, if no services is specified. It is recommended to always specify some services.
   ///
-  /// There are two Android specific parameters that will be ignored on iOS:
-  /// [scanMode] allows to choose between different levels of power efficient and/or low latency scan modes.
-  /// [requireLocationServicesEnabled] is used to enforce location services to be enabled while scanning. If this parameter set to
-  /// true and the location services on the device are disabled it will throw [Exception]. Default is set to true,
-  /// setting the value to false can result in not finding BLE devices on some Android devices.
+  /// There are two Android specific parameters that are ignored on iOS:
+  ///
+  /// - [scanMode] allows to choose between different levels of power efficient and/or low latency scan modes.
+  /// - [requireLocationServicesEnabled] specifies whether to check if location services are enabled before scanning.
+  ///   When set to true and location services are disabled, an exception is thrown. Default is true.
+  ///   Setting the value to false can result in not finding BLE peripherals on some Android devices.
   Stream<DiscoveredDevice> scanForDevices({
     @required List<Uuid> withServices,
     ScanMode scanMode = ScanMode.balanced,

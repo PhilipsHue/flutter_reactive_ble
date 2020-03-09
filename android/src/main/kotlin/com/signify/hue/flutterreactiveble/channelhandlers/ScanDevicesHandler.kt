@@ -19,7 +19,6 @@ class ScanDevicesHandler(private val bleClient: com.signify.hue.flutterreactiveb
     private var scanParameters: ScanParameters? = null
 
     override fun onListen(objectSink: Any?, eventSink: EventChannel.EventSink?) {
-
         eventSink?.let {
             scanDevicesSink = eventSink
             startDeviceScan()
@@ -27,7 +26,7 @@ class ScanDevicesHandler(private val bleClient: com.signify.hue.flutterreactiveb
     }
 
     override fun onCancel(objectSink: Any?) {
-        Timber.d("Scanfordevices cancelled called")
+        Timber.d("Scanning canceled")
         stopDeviceScan()
         scanDevicesSink = null
     }
@@ -41,13 +40,12 @@ class ScanDevicesHandler(private val bleClient: com.signify.hue.flutterreactiveb
                                 handleDeviceScanResult(converter.convertScanInfo(scanResult))
                             },
                             { throwable ->
-
-                                Timber.d("Error while scanning for devices:  ${throwable.message}")
+                                Timber.d("Error while scanning for devices: ${throwable.message}")
                                 handleDeviceScanResult(converter.convertScanErrorInfo(throwable.message))
                             }
                     )
         }
-                ?: handleDeviceScanResult(converter.convertScanErrorInfo("Scanparameters are not being set"))
+                ?: handleDeviceScanResult(converter.convertScanErrorInfo("Scanning parameters are not set"))
     }
 
     fun stopDeviceScan() {

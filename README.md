@@ -22,7 +22,7 @@ The reactive BLE lib supports the following:
 Discovering BLE devices should be done like this:
 
 ```dart
-reactivebleclient.scanForDevices(withServices: [uuid], scanMode: ScanMode.lowLatency).listen((device) {
+reactivebleclient.scanForDevices(withServices: [serviceId], scanMode: ScanMode.lowLatency).listen((device) {
       //code for handling results
     }, onError: () {
       //code for handling error
@@ -30,7 +30,7 @@ reactivebleclient.scanForDevices(withServices: [uuid], scanMode: ScanMode.lowLat
   
 ```
 
-The `withServices` parameter is required if you do not want to filter on services pass an empty list.  The parameter `scanMode` is only used on Android and follows the conventions described on [ScanSettings](https://developer.android.com/reference/android/bluetooth/le/ScanSettings#SCAN_MODE_BALANCED) Android reference page. If `scanMode` is omitted the balanced scan mode will be used.
+The `withServices` parameter specifies the advertised service IDs to look for. If an empty list is passed, all the advertising devices will be reported. The parameter `scanMode` is only used on Android and follows the conventions described on [ScanSettings](https://developer.android.com/reference/android/bluetooth/le/ScanSettings#SCAN_MODE_BALANCED) Android reference page. If `scanMode` is omitted the balanced scan mode will be used.
 
 ### Establishing connection
 
