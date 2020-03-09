@@ -1,7 +1,18 @@
+## 2.0.0
+This version is introducing the following breaking changes:
+* Add parameter requireLocationServicesEnabled to Ble scan that can toggle requirement of location services to be running
+* Make filter on advertising services optional and add possibility to filter on more services
+* Add manufacturer specific data to scanresults
+* Remove global set error handler java
+
+Other improvements:
+* Improvements for example app
+* Add support for Flutter hot reload on iOS
+
 ## 1.1.0
 * Add RSSI value to discovered device results
-* Improved parsing of UUIDs
-* Migrated to latest Android plugin binding
+* Improve parsing of UUIDs
+* Migrate to latest Android plugin binding
 * Small improvements 
 
 ## 1.0.2

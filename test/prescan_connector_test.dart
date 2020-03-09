@@ -19,7 +19,7 @@ abstract class _PrescanConnectorStub {
       Map<Uuid, List<Uuid>> servicesWithCharacteristicsToDiscover,
       Duration connectionTimeout});
 
-  Stream<DiscoveredDevice> scan({Uuid withService, ScanMode scanMode});
+  Stream<DiscoveredDevice> scan({List<Uuid> withServices, ScanMode scanMode});
 
   ScanSession currentScan();
 }
@@ -63,7 +63,7 @@ void main() {
 
           _sut.connectToAdvertisingDevice(
               id: _device,
-              withService: _uuid,
+              withServices: [_uuid],
               prescanDuration: _duration,
               servicesWithCharacteristicsToDiscover: {},
               connectionTimeout: _duration);
@@ -80,7 +80,7 @@ void main() {
 
         test("And does not scan for the device", () {
           verifyNever(_prescanMock.scan(
-              withService: anyNamed("withService"),
+              withServices: anyNamed("withServices"),
               scanMode: anyNamed("scanMode")));
         });
       });
@@ -100,14 +100,15 @@ void main() {
 
           setUp(() {
             completer = Completer();
-            session = ScanSession(withService: _uuid, future: completer.future);
+            session =
+                ScanSession(withServices: [_uuid], future: completer.future);
 
             when(_prescanMock.currentScan())
                 .thenAnswer((_) => currentScanResponses.removeAt(0));
             completer.complete();
 
             when(_prescanMock.scan(
-                    withService: anyNamed("withService"),
+                    withServices: anyNamed("withServices"),
                     scanMode: anyNamed("scanMode")))
                 .thenAnswer((_) => Stream.fromIterable([
                       DiscoveredDevice(
@@ -125,13 +126,13 @@ void main() {
 
             _sut.connectToAdvertisingDevice(
                 id: _device,
-                withService: _uuid,
+                withServices: [_uuid],
                 prescanDuration: _duration,
                 servicesWithCharacteristicsToDiscover: {},
                 connectionTimeout: _duration);
 
             verify(_prescanMock.scan(
-                    withService: anyNamed("withService"),
+                    withServices: anyNamed("withServices"),
                     scanMode: anyNamed("scanMode")))
                 .called(1);
           });
@@ -158,7 +159,7 @@ void main() {
                     ]));
 
             await _sut
-                .prescanAndConnect(_device, {}, _duration, _uuid, _duration)
+                .prescanAndConnect(_device, {}, _duration, [_uuid], _duration)
                 .first;
 
             verify(_prescanMock.connect(
@@ -189,7 +190,7 @@ void main() {
                     ]));
 
             await _sut
-                .prescanAndConnect(_device, {}, _duration, _uuid, _duration)
+                .prescanAndConnect(_device, {}, _duration, [_uuid], _duration)
                 .first;
 
             verifyNever(_prescanMock.connect(
@@ -206,13 +207,13 @@ void main() {
           setUp(() {
             completer = Completer();
             final session =
-                ScanSession(withService: _uuid, future: completer.future);
+                ScanSession(withServices: [_uuid], future: completer.future);
             final response = [session, session];
             when(_prescanMock.currentScan())
                 .thenAnswer((_) => response.removeAt(0));
 
             when(_prescanMock.scan(
-                    withService: anyNamed("withService"),
+                    withServices: anyNamed("withServices"),
                     scanMode: anyNamed("scanMode")))
                 .thenAnswer((_) => Stream.fromIterable([
                       DiscoveredDevice(
@@ -241,7 +242,7 @@ void main() {
             completer.completeError(null);
 
             await _sut
-                .prescanAndConnect(_device, {}, _duration, _uuid, _duration)
+                .prescanAndConnect(_device, {}, _duration, [_uuid], _duration)
                 .first;
 
             verify(_registry.deviceIsDiscoveredRecently(
@@ -258,11 +259,11 @@ void main() {
           "Fails to connect when there is already a scan running for another service",
           () async {
         when(_prescanMock.currentScan()).thenReturn(ScanSession(
-            withService: Uuid.parse("432A"), future: Future.value()));
+            withServices: [Uuid.parse("432A")], future: Future.value()));
 
         final update = await _sut
             .awaitCurrentScanAndConnect(
-                _uuid, _duration, _device, {}, _duration)
+                [_uuid], _duration, _device, {}, _duration)
             .first;
 
         expect(update.failure.code, ConnectionError.failedToConnect);
@@ -272,7 +273,7 @@ void main() {
         final completer = Completer<void>();
 
         when(_prescanMock.currentScan()).thenReturn(
-            ScanSession(withService: _uuid, future: completer.future));
+            ScanSession(withServices: [_uuid], future: completer.future));
 
         when(_registry.deviceIsDiscoveredRecently(
                 deviceId: anyNamed("deviceId"),
@@ -282,7 +283,7 @@ void main() {
         completer.complete();
         await _sut
             .awaitCurrentScanAndConnect(
-                _uuid, _duration, _device, {}, _duration)
+                [_uuid], _duration, _device, {}, _duration)
             .first;
 
         verify(_registry.deviceIsDiscoveredRecently(

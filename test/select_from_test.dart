@@ -24,4 +24,4 @@ void main() {
   });
 }
 
-enum _Enum { unknown, a, b }
+enum _Enum { unknown, a }

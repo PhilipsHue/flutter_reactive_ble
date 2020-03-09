@@ -27,7 +27,7 @@ class _DeviceList extends StatefulWidget {
         assert(stopScan != null);
 
   final BleScannerState scannerState;
-  final void Function(Uuid) startScan;
+  final void Function(List<Uuid>) startScan;
   final VoidCallback stopScan;
 
   @override
@@ -53,17 +53,21 @@ class _DeviceListState extends State<_DeviceList> {
 
   bool _isValidUuidInput() {
     final uuidText = _uuidController.text;
-    try {
-      Uuid.parse(uuidText);
+    if (uuidText.isEmpty) {
       return true;
-    } on Exception {
-      return false;
+    } else {
+      try {
+        Uuid.parse(uuidText);
+        return true;
+      } on Exception {
+        return false;
+      }
     }
   }
 
   void _startScanning() {
-    final uuid = Uuid.parse(_uuidController.text);
-    widget.startScan(uuid);
+    final text = _uuidController.text;
+    widget.startScan(text.isEmpty ? [] : [Uuid.parse(_uuidController.text)]);
   }
 
   @override

@@ -16,10 +16,11 @@ class BleScanner implements ReactiveState<BleScannerState> {
   @override
   Stream<BleScannerState> get state => _stateStreamController.stream;
 
-  void startScan(Uuid uuid) {
+  void startScan(List<Uuid> serviceIds) {
     _devices.clear();
     _subscription?.cancel();
-    _subscription = _ble.scanForDevices(withService: uuid).listen((device) {
+    _subscription =
+        _ble.scanForDevices(withServices: serviceIds).listen((device) {
       final knownDeviceIndex = _devices.indexWhere((d) => d.id == device.id);
       if (knownDeviceIndex >= 0) {
         _devices[knownDeviceIndex] = device;

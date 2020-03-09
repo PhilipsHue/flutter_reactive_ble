@@ -19,33 +19,33 @@ class ScanDevicesHandler(private val bleClient: com.signify.hue.flutterreactiveb
     private var scanParameters: ScanParameters? = null
 
     override fun onListen(objectSink: Any?, eventSink: EventChannel.EventSink?) {
-
         eventSink?.let {
             scanDevicesSink = eventSink
-                startDeviceScan()
+            startDeviceScan()
         }
     }
 
     override fun onCancel(objectSink: Any?) {
-        Timber.d("Scanfordevices cancelled called")
+        Timber.d("Scanning canceled")
         stopDeviceScan()
         scanDevicesSink = null
     }
 
     private fun startDeviceScan() {
-            scanParameters?.let { params ->
-                scanForDevicesDisposable = bleClient.scanForDevices(params.filter, params.mode)
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(
-                        { scanResult ->
-                            handleDeviceScanResult(converter.convertScanInfo(scanResult))
-                        },
-                        { throwable ->
-                            Timber.d("Error while scanning for devices:  ${throwable.message}")
-                            handleDeviceScanResult(converter.convertScanErrorInfo(throwable.message))
-                        }
-                )
-            } ?: handleDeviceScanResult(converter.convertScanErrorInfo("Scanparameters are not being set"))
+        scanParameters?.let { params ->
+            scanForDevicesDisposable = bleClient.scanForDevices(params.filter, params.mode, params.locationServiceIsMandatory)
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(
+                            { scanResult ->
+                                handleDeviceScanResult(converter.convertScanInfo(scanResult))
+                            },
+                            { throwable ->
+                                Timber.d("Error while scanning for devices: ${throwable.message}")
+                                handleDeviceScanResult(converter.convertScanErrorInfo(throwable.message))
+                            }
+                    )
+        }
+                ?: handleDeviceScanResult(converter.convertScanErrorInfo("Scanning parameters are not set"))
     }
 
     fun stopDeviceScan() {
@@ -54,11 +54,11 @@ class ScanDevicesHandler(private val bleClient: com.signify.hue.flutterreactiveb
     }
 
     fun prepareScan(scanMessage: pb.ScanForDevicesRequest) {
-        val scanUuid = scanMessage.serviceUuid.data.toByteArray()
-        val filter = ParcelUuid(UuidConverter().uuidFromByteArray(scanUuid))
+        val filter = scanMessage.serviceUuidsList
+                .map { ParcelUuid(UuidConverter().uuidFromByteArray(it.data.toByteArray())) }
         val scanMode = createScanMode(scanMessage.scanMode)
 
-        scanParameters = ScanParameters(filter, scanMode)
+        scanParameters = ScanParameters(filter, scanMode, scanMessage.requireLocationServicesEnabled)
     }
 
     private fun handleDeviceScanResult(discoveryMessage: pb.DeviceScanInfo) {
@@ -66,4 +66,4 @@ class ScanDevicesHandler(private val bleClient: com.signify.hue.flutterreactiveb
     }
 }
 
-private data class ScanParameters(val filter: ParcelUuid, val mode: ScanMode)
+private data class ScanParameters(val filter: List<ParcelUuid>, val mode: ScanMode, val locationServiceIsMandatory: Boolean)

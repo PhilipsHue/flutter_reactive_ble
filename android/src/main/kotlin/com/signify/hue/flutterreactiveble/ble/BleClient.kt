@@ -15,7 +15,7 @@ interface BleClient {
     val connectionUpdateSubject: BehaviorSubject<com.signify.hue.flutterreactiveble.ble.ConnectionUpdate>
 
     fun initializeClient()
-    fun scanForDevices(service: ParcelUuid, scanMode: ScanMode): Observable<com.signify.hue.flutterreactiveble.ble.ScanInfo>
+    fun scanForDevices(services: List<ParcelUuid>, scanMode: ScanMode, requireLocationServicesEnabled: Boolean): Observable<com.signify.hue.flutterreactiveble.ble.ScanInfo>
     fun connectToDevice(deviceId: String, timeout: Duration)
     fun disconnectDevice(deviceId: String)
     fun disconnectAllDevices()

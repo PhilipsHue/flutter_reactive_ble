@@ -3,6 +3,6 @@ enum BleStatus {
   unsupported,
   unauthorized,
   poweredOff,
-  discoveryDisabled,
+  locationServicesDisabled,
   ready
 }

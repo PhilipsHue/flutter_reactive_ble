@@ -9,14 +9,21 @@ const ScanForDevicesRequest$json = const {
   '1': 'ScanForDevicesRequest',
   '2': const [
     const {
-      '1': 'serviceUuid',
+      '1': 'serviceUuids',
       '3': 1,
-      '4': 1,
+      '4': 3,
       '5': 11,
       '6': '.Uuid',
-      '10': 'serviceUuid'
+      '10': 'serviceUuids'
     },
     const {'1': 'scanMode', '3': 2, '4': 1, '5': 5, '10': 'scanMode'},
+    const {
+      '1': 'requireLocationServicesEnabled',
+      '3': 3,
+      '4': 1,
+      '5': 8,
+      '10': 'requireLocationServicesEnabled'
+    },
   ],
 };
 
