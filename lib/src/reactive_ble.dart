@@ -19,6 +19,7 @@ import 'package:flutter_reactive_ble/src/rx_ext/repeater.dart';
 import 'package:flutter_reactive_ble/src/rx_ext/serial_disposable.dart';
 import 'package:meta/meta.dart';
 
+///  Ble client that is single point of entry for ble operations
 class FlutterReactiveBle {
   static final FlutterReactiveBle _sharedInstance = FlutterReactiveBle._();
 
@@ -28,9 +29,42 @@ class FlutterReactiveBle {
     _trackStatus();
   }
 
-  final _methodChannel = const MethodChannel("flutter_reactive_ble_method");
-
+  /// Registry that keeps track of all BLE devices found during BLE scan.
   final scanRegistry = DiscoveredDevicesRegistry();
+
+  /// A stream that provides information about the status of BLE on the device.
+  ///
+  /// Emits the current [BleStatus] on subscription.
+  Stream<BleStatus> get statusStream => Repeater(onListenEmitFrom: () async* {
+        await initialize();
+        yield _status;
+        yield* _statusStream;
+      }).stream;
+
+  /// Returns the current [BleStatus] of the device.
+  BleStatus get status => _status;
+
+  /// A stream that provides connection updates over various BLE devices.
+  final Stream<ConnectionStateUpdate> connectedDeviceStream =
+      const EventChannel("flutter_reactive_ble_connected_device")
+          .receiveBroadcastStream()
+          .cast<List<int>>()
+          .map((data) => pb.DeviceInfo.fromBuffer(data))
+          .map(const ProtobufConverter().connectionStateUpdateFrom)
+            ..listen((_) {});
+
+  /// A stream that provides value updates for all the BLE devices connected to.
+  ///
+  /// The stream will receives updates from either read request or notifications from the ble device.
+  final Stream<CharacteristicValue> characteristicValueStream =
+      const EventChannel("flutter_reactive_ble_char_update")
+          .receiveBroadcastStream()
+          .cast<List<int>>()
+          .map((data) => pb.CharacteristicValueInfo.fromBuffer(data))
+          .map(const ProtobufConverter().characteristicValueFrom)
+            ..listen((_) {});
+
+  final _methodChannel = const MethodChannel("flutter_reactive_ble_method");
 
   BleStatus _status = BleStatus.unknown;
 
@@ -42,14 +76,6 @@ class FlutterReactiveBle {
           .map(const ProtobufConverter().bleStatusFrom);
 
   PrescanConnector _prescanConnector;
-
-  BleStatus get status => _status;
-
-  Stream<BleStatus> get statusStream => Repeater(onListenEmitFrom: () async* {
-        await initialize();
-        yield _status;
-        yield* _statusStream;
-      }).stream;
 
   Future<void> _trackStatus() async {
     await initialize();
@@ -63,22 +89,6 @@ class FlutterReactiveBle {
           .map((data) => pb.DeviceScanInfo.fromBuffer(data))
           .map(const ProtobufConverter().scanResultFrom);
 
-  final Stream<ConnectionStateUpdate> connectedDeviceStream =
-      const EventChannel("flutter_reactive_ble_connected_device")
-          .receiveBroadcastStream()
-          .cast<List<int>>()
-          .map((data) => pb.DeviceInfo.fromBuffer(data))
-          .map(const ProtobufConverter().connectionStateUpdateFrom)
-            ..listen((_) {});
-
-  final Stream<CharacteristicValue> characteristicValueStream =
-      const EventChannel("flutter_reactive_ble_char_update")
-          .receiveBroadcastStream()
-          .cast<List<int>>()
-          .map((data) => pb.CharacteristicValueInfo.fromBuffer(data))
-          .map(const ProtobufConverter().characteristicValueFrom)
-            ..listen((_) {});
-
   final SerialDisposable<Repeater<DiscoveredDevice>> _scanStreamDisposable =
       SerialDisposable((repeater) => repeater.dispose());
 
@@ -86,6 +96,11 @@ class FlutterReactiveBle {
 
   ScanSession _currentScan;
 
+  /// Initializes the BLE client on native level.
+  ///
+  /// Use this method to explicitly initialize the client. It is not required
+  /// to call initialize before starting a ble operation, the [FlutterReactiveBle]
+  /// make sure that it is initialized before executing the operation.
   Future<void> initialize() async {
     _initialization ??= _methodChannel.invokeMethod("initialize");
     _prescanConnector = PrescanConnector(
@@ -98,6 +113,10 @@ class FlutterReactiveBle {
     await _initialization;
   }
 
+  /// Closes the BLE client on native level
+  ///
+  /// Use this operation to unsubscribe to all streams on the native level. This will result
+  /// in closing BLE operations and not receiving any value updates.
   Future<void> deinitialize() async {
     _initialization = null;
     await _methodChannel.invokeMethod<void>("deinitialize");
@@ -105,10 +124,12 @@ class FlutterReactiveBle {
 
   /// Reads the value of the specified characteristic.
   ///
-  /// Be aware that a read request could be satisfied by a notification delivered for the same characteristic
-  /// before the actual read response arrives (due to the design of iOS BLE API).
-  ///
   /// The returned future completes with an error in case of a failure during reading.
+  ///
+  /// Be aware that a read request could be satisfied by a notification delivered
+  /// for the same characteristic in the [characteristicValueStream] before the actual
+  /// read response arrives (due to the design of iOS BLE API).
+  ///
   Future<List<int>> readCharacteristic(
       QualifiedCharacteristic characteristic) async {
     await initialize();
@@ -158,6 +179,11 @@ class FlutterReactiveBle {
   }
 
   /// Writes a value to the specified characteristic without waiting for an acknowledgement.
+  ///
+  /// Use this method in case the  client does not need an acknowledgement
+  /// that the write was successfully performed. For subsequent write operations it is
+  /// recommended to execute a [writeCharacteristicWithResponse] each n times to make sure
+  /// the BLE device is still responsive.
   ///
   /// The returned future completes with an error in case of a failure during writing.
   Future<void> writeCharacteristicWithoutResponse(
