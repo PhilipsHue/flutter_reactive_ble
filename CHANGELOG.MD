@@ -1,3 +1,8 @@
+## 2.0.0+1
+* Remove unused dependencies from pubspec.yaml
+* Fix static analysis warning in example app
+* Fix test in prescan_connector_test  
+
 ## 2.0.0
 This version is introducing the following breaking changes:
 * Add parameter requireLocationServicesEnabled to Ble scan that can toggle requirement of location services to be running
