@@ -7,8 +7,6 @@ environment:
   sdk: ">=2.3.0-dev <3.0.0"
 
 dependencies:
-  flutter:
-    sdk: flutter
   functional_data: ^0.2.3
   protobuf: ^1.0.1
   meta: ^1.1.8
@@ -21,8 +19,6 @@ dev_dependencies:
   mockito: ^4.1.1
   dependency_validator: ^1.4.2
   functional_data_generator: ^0.2.3
-  flutter_reactive_ble_example:
-    path: example
 
 flutter:
   plugin:
