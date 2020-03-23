@@ -1,17 +1,12 @@
 import 'package:meta/meta.dart';
 
 class DiscoveredDevicesRegistry {
-  DateTime Function() getTimestamp;
+  DiscoveredDevicesRegistry({@required this.getTimestamp});
 
-  DiscoveredDevicesRegistry() {
-    getTimestamp = () => DateTime.now();
-  }
+  DiscoveredDevicesRegistry.standard()
+      : this(getTimestamp: () => DateTime.now());
 
-  DiscoveredDevicesRegistry.withGetTimestamp(DateTime Function() dateFunction)
-      :
-        // ignore: prefer_initializing_formals
-        getTimestamp = dateFunction;
-
+  final DateTime Function() getTimestamp;
   @visibleForTesting
   final discoveredDevices = <String, DateTime>{};
 

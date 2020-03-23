@@ -2,24 +2,17 @@ import 'package:flutter_reactive_ble/src/discovered_devices_registry.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 
-abstract class DateTimeStub {
-  DateTime getTimestamp();
-}
-
-class DateTimeMock extends Mock implements DateTimeStub {}
-
 void main() {
   group("$DiscoveredDevicesRegistry", () {
     DiscoveredDevicesRegistry sut;
     const device = "Testdevice";
-    DateTimeMock timestampMock;
     final timestamp = DateTime(2019);
+    TimestampProviderMock timestampMock;
 
     setUp(() {
-      timestampMock = DateTimeMock();
+      timestampMock = TimestampProviderMock();
       when(timestampMock.getTimestamp()).thenReturn(timestamp);
-      sut = DiscoveredDevicesRegistry.withGetTimestamp(
-          timestampMock.getTimestamp);
+      sut = DiscoveredDevicesRegistry(getTimestamp: timestampMock.getTimestamp);
     });
     group('Given device is added', () {
       setUp(() {
@@ -53,9 +46,9 @@ void main() {
         final responses = [dateTime, timestamp];
         when(timestampMock.getTimestamp())
             .thenAnswer((_) => responses.removeAt(0));
-        sut = DiscoveredDevicesRegistry.withGetTimestamp(
-            timestampMock.getTimestamp)
-          ..add(device);
+        sut = DiscoveredDevicesRegistry(
+          getTimestamp: timestampMock.getTimestamp,
+        )..add(device);
 
         expect(
             sut.deviceIsDiscoveredRecently(
@@ -70,3 +63,9 @@ void main() {
     });
   });
 }
+
+abstract class TimestampProvider {
+  DateTime getTimestamp();
+}
+
+class TimestampProviderMock extends Mock implements TimestampProvider {}
