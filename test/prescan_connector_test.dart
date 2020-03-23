@@ -239,7 +239,7 @@ void main() {
                           failure: null)
                     ]));
 
-            completer.completeError(null);
+            completer.completeError(Exception());
 
             await _sut
                 .prescanAndConnect(_device, {}, _duration, [_uuid], _duration)
