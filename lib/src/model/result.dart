@@ -1,5 +1,8 @@
 import 'package:meta/meta.dart';
 
+///Result of a ble operation.
+///
+/// In case the result is succesfull [Failure] is null.
 @immutable
 class Result<Value, Failure> {
   const Result.success(this._value)
@@ -8,6 +11,7 @@ class Result<Value, Failure> {
       : assert(_failure != null),
         _value = null; // ignore: avoid_field_initializers_in_const_classes
 
+  /// Provides the value in case of success or throws [Exception] in case of failure.
   Value dematerialize() => iif(
         success: (value) => value,
         failure: (failure) {
@@ -20,6 +24,7 @@ class Result<Value, Failure> {
         },
       );
 
+  /// Execute specific actions on success and on failure.
   T iif<T>(
       {@required T Function(Value value) success,
       @required T Function(Failure failure) failure}) {
