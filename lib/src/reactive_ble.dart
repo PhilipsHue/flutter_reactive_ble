@@ -231,6 +231,9 @@ class FlutterReactiveBle {
         .then((message) => message.mtuSize);
   }
 
+  /// Requests for a connection parameter update on the connected device.
+  ///
+  /// Always completes with an error on iOS, as there is no way (and no need) to perform this operation on iOS.
   Future<void> requestConnectionPriority(
       {@required String deviceId,
       @required ConnectionPriority priority}) async {
@@ -315,6 +318,18 @@ class FlutterReactiveBle {
         });
   }
 
+  /// Establishes a connection to a BLE device.
+  ///
+  /// Disconnecting the device is achieved by cancelling the stream subscription.
+  ///
+  /// [id] is the unique device id of the BLE device: in iOS this is a uuid and on Android this is
+  /// a Mac-Adress.
+  /// Use [servicesWithCharacteristicsToDiscover] to scan only for the specific services mentioned in this map,
+  /// this can improve the connection speed on iOS since no full service discovery will be executed. On Android
+  /// this variable is ignored since partial discovery is not possible.
+  /// The [connectionTimeout] parameter can be used to emit a failure after a certain period in case the connection
+  /// is not established. The pending connection attempt will be cancelled.
+
   Stream<ConnectionStateUpdate> connectToDevice({
     @required String id,
     Map<Uuid, List<Uuid>> servicesWithCharacteristicsToDiscover,
@@ -368,6 +383,17 @@ class FlutterReactiveBle {
         .asyncExpand((_) => autoconnectingRepeater.stream);
   }
 
+  /// Scans for a specific device and connects to it in case a device containing the specified [id]
+  /// is found and that is advertising the services specified in [withServices].
+  ///
+  /// Disconnecting the device is achieved by cancelling the stream subscription.
+  ///
+  /// The [prescanDuration] is the amount of time BLE disovery should run in order to find the device.
+  /// Use [servicesWithCharacteristicsToDiscover] to scan only for the specific services mentioned in this map,
+  /// this can improve the connection speed on iOS since no full service discovery will be executed. On Android
+  /// this variable is ignored since partial discovery is not possible.
+  /// The [connectionTimeout] parameter can be used to emit a failure after a certain period in case the connection
+  /// is not established. The pending connection attempt will be cancelled.
   Stream<ConnectionStateUpdate> connectToAdvertisingDevice({
     @required String id,
     @required List<Uuid> withServices,
@@ -401,7 +427,7 @@ class FlutterReactiveBle {
   /// Subscribes to notifications for a characteristic.
   ///
   /// The current implementation unsubscribes from notifications when the returned stream is not listened to,
-  /// which affects other notification streams created for the same characteristic.
+  /// which also affects other notification streams created for the same characteristic.
   Stream<List<int>> subscribeToCharacteristic(
       QualifiedCharacteristic characteristic) {
     final specificCharacteristicValueStream = characteristicValueStream

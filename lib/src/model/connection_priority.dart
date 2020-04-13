@@ -1,8 +1,18 @@
 import 'package:flutter_reactive_ble/src/model/generic_failure.dart';
 import 'package:flutter_reactive_ble/src/model/result.dart';
 
-enum ConnectionPriority { balanced, highPerformance, lowPower }
+/// The priority that can be requested to update the connection parameter.
+enum ConnectionPriority {
+  /// connection with recommended parameters.
+  balanced,
 
+  /// high priority, low latency connection.
+  highPerformance,
+  // reduced power, low data rate connennection.
+  lowPower,
+}
+
+///util function to convert priority to a integer.
 int convertPriorityToInt(ConnectionPriority priority) {
   switch (priority) {
     case ConnectionPriority.balanced:
@@ -17,10 +27,12 @@ int convertPriorityToInt(ConnectionPriority priority) {
   }
 }
 
+/// Result of the connection priority request
 class ConnectionPriorityInfo {
   const ConnectionPriorityInfo({this.result});
 
   final Result<void, GenericFailure<ConnectionPriorityFailure>> result;
 }
 
+/// Error type for connection priority.
 enum ConnectionPriorityFailure { unknown }

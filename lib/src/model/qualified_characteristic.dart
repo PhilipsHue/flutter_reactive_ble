@@ -1,10 +1,17 @@
 import 'package:flutter_reactive_ble/src/model/uuid.dart';
 import 'package:meta/meta.dart';
 
+/// Specific BLE characteristic for a BLE device characterised by [deviceId], [serviceId] and
+/// [characteristicId].
 @immutable
 class QualifiedCharacteristic {
+  /// Unique uuid of the specific characteristic
   final Uuid characteristicId;
+
+  /// Service uuid of the characteristic
   final Uuid serviceId;
+
+  /// Device id of the BLE device
   final String deviceId;
 
   const QualifiedCharacteristic({

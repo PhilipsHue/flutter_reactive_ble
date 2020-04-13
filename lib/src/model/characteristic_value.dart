@@ -3,6 +3,7 @@ import 'package:flutter_reactive_ble/src/model/qualified_characteristic.dart';
 import 'package:flutter_reactive_ble/src/model/result.dart';
 import 'package:meta/meta.dart';
 
+/// Value update for specific [QualifiedCharacteristic].
 class CharacteristicValue {
   final QualifiedCharacteristic characteristic;
   final Result<List<int>, GenericFailure<CharacteristicValueUpdateError>>
@@ -16,4 +17,5 @@ class CharacteristicValue {
       "$runtimeType(characteristic: $characteristic, value: $result)";
 }
 
+/// Error type for characteristic value update.
 enum CharacteristicValueUpdateError { unknown }

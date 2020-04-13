@@ -1,12 +1,13 @@
 import 'package:flutter_reactive_ble/src/model/generic_failure.dart';
 import 'package:meta/meta.dart';
 
+///Status update for a specic BLE device.
 @immutable
 class ConnectionStateUpdate {
   final String deviceId;
   final DeviceConnectionState connectionState;
 
-  /// Field `error` is null if there is no error reported
+  /// Field `error` is null if there is no error reported.
   final GenericFailure<ConnectionError> failure;
 
   const ConnectionStateUpdate({
@@ -20,10 +21,26 @@ class ConnectionStateUpdate {
       "$runtimeType(deviceId: $deviceId, connectionState: $connectionState, error: $failure)";
 }
 
+/// Connection status.
 enum DeviceConnectionState {
+  /// Currently establishing a connection.
   connecting,
+
+  /// Connection is established.
   connected,
+
+  /// Terminating the connection.
   disconnecting,
+
+  /// Device is disconnected.
   disconnected
 }
-enum ConnectionError { unknown, failedToConnect }
+
+/// Type of connection error.
+enum ConnectionError {
+  /// Connection failed for an unknown reason.
+  unknown,
+
+  /// An attempt to connect was made but it failed.
+  failedToConnect,
+}
