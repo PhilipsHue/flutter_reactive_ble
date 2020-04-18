@@ -9,6 +9,7 @@ Flutter library that handles BLE operations for multiple devices.
 The reactive BLE lib supports the following:
 
 - BLE device discovery
+- Observe host device BLE status
 - Establishing a BLE connection
 - Maintaining connection status of multiple BLE devices 
 - Discover services(will be implicit)
@@ -31,6 +32,19 @@ reactivebleclient.scanForDevices(withServices: [serviceId], scanMode: ScanMode.l
 ```
 
 The `withServices` parameter specifies the advertised service IDs to look for. If an empty list is passed, all the advertising devices will be reported. The parameter `scanMode` is only used on Android and follows the conventions described on [ScanSettings](https://developer.android.com/reference/android/bluetooth/le/ScanSettings#SCAN_MODE_BALANCED) Android reference page. If `scanMode` is omitted the balanced scan mode will be used.
+
+
+### Observe host device BLE status
+
+Use `statusStream` to retrieve updates about the BLE status of the host device (the device running the app) . This stream can be used in order to determine if the BLE is turned on, on the device or if the required permissions are granted. Example usage:
+
+``` dart
+_ble.statusStream.listen((status) {
+  //code for handling status update
+});
+```
+
+Use ` _ble.status` to get the current status of the host device.
 
 ### Establishing connection
 
