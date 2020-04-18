@@ -234,7 +234,7 @@ final class Central {
     ) throws {
         let characteristic = try resolve(characteristic: qualifiedCharacteristic)
 
-        guard characteristic.properties.contains(.write)
+        guard characteristic.properties.contains(.writeWithoutResponse)
         else { throw Failure.notWritable(qualifiedCharacteristic) }
         
         characteristic.service.peripheral.writeValue(value, for: characteristic, type: .withoutResponse)
