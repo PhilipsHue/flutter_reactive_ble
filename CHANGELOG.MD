@@ -1,3 +1,7 @@
+## 2.1.0
+* Improve documentation of public API
+* Fix for write without response on iOS
+
 ## 2.0.0+1
 * Remove unused dependencies from pubspec.yaml
 * Fix static analysis warning in example app
