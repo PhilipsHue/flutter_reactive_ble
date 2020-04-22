@@ -1,6 +1,7 @@
 ## 2.1.0
 * Improve documentation of public API
 * Fix for write without response on iOS
+* Add support for newer Flutter versions. Remove support for FLutter lower than v1.10
 
 ## 2.0.0+1
 * Remove unused dependencies from pubspec.yaml
