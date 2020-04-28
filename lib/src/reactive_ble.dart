@@ -328,7 +328,8 @@ class FlutterReactiveBle {
   /// this can improve the connection speed on iOS since no full service discovery will be executed. On Android
   /// this variable is ignored since partial discovery is not possible.
   /// The [connectionTimeout] parameter can be used to emit a failure after a certain period in case the connection
-  /// is not established. The pending connection attempt will be cancelled.
+  /// is not established. The pending connection attempt will be cancelled. On Android when no timeout is specified
+  /// the `autoConnect` flag is set in the [connectGatt()](https://developer.android.com/reference/android/bluetooth/BluetoothDevice#connectGatt(android.content.Context,%20boolean,%20android.bluetooth.BluetoothGattCallback)) call, otherwise it's cleared.```
 
   Stream<ConnectionStateUpdate> connectToDevice({
     @required String id,
