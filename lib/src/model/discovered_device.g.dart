@@ -6,13 +6,17 @@ part of 'discovered_device.dart';
 // FunctionalDataGenerator
 // **************************************************************************
 
+// ignore_for_file: join_return_with_assignment
+// ignore_for_file: avoid_classes_with_only_static_members
+// ignore_for_file: non_constant_identifier_names
+// ignore_for_file: avoid_equals_and_hash_code_on_mutable_classes
 abstract class $DiscoveredDevice {
+  const $DiscoveredDevice();
   String get id;
   String get name;
   Map<Uuid, Uint8List> get serviceData;
   Uint8List get manufacturerData;
   int get rssi;
-  const $DiscoveredDevice();
   DiscoveredDevice copyWith(
           {String id,
           String name,
@@ -25,8 +29,10 @@ abstract class $DiscoveredDevice {
           serviceData: serviceData ?? this.serviceData,
           manufacturerData: manufacturerData ?? this.manufacturerData,
           rssi: rssi ?? this.rssi);
+  @override
   String toString() =>
       "DiscoveredDevice(id: $id, name: $name, serviceData: $serviceData, manufacturerData: $manufacturerData, rssi: $rssi)";
+  @override
   bool operator ==(dynamic other) =>
       other.runtimeType == runtimeType &&
       id == other.id &&

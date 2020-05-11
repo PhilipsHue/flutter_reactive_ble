@@ -1,10 +1,10 @@
 name: flutter_reactive_ble_example
 description: Demonstrates how to use the flutter_reactive_ble plugin.
-version: 2.1.0
+version: 2.2.0
 publish_to: 'none'
 
 environment:
-  sdk: ">=2.3.0 <3.0.0"
+  sdk: ">=2.7.0 <3.0.0"
   flutter: ">=1.10.0"
 
 dependencies:
