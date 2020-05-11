@@ -1,5 +1,7 @@
 import 'dart:async';
 
+/// A disposable resource whose underlying resource can be replaced by another resource
+/// causing automatic disposal of the previous underlying resource.
 class SerialDisposable<T> {
   SerialDisposable(this._dispose);
 
@@ -12,6 +14,7 @@ class SerialDisposable<T> {
     return newValue;
   }
 
+  /// Dispose underlying resource
   Future<void> dispose() async {
     _isDisposed = true;
     if (_value != null) {
@@ -19,6 +22,7 @@ class SerialDisposable<T> {
     }
   }
 
+  /// Returns whether or not the underlying resource is disposed
   bool get isDisposed => _isDisposed;
 
   final Future<void> Function(T) _dispose;
@@ -35,6 +39,7 @@ class _SerialAlreadyDisposed extends Error {
   String toString() => "An instance of $_type has already been disposed";
 }
 
+/// A [SerialDisposable] that constains an underlying stream subscription.
 class StreamSubscriptionSerialDisposable
     extends SerialDisposable<StreamSubscription> {
   StreamSubscriptionSerialDisposable()

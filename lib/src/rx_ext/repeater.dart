@@ -2,6 +2,12 @@ import 'dart:async';
 
 import 'package:meta/meta.dart';
 
+/// [Repeater] sets an underlying stream up on the first subscription to
+/// the output [stream] and shuts it down when there are no more subscriptions.
+///
+/// The underlying stream can be manually shut down by calling [detach] and set
+/// up again by calling [attach] without terminating the existing subscriptions
+/// to the output stream.
 class Repeater<T> {
   final Stream<T> Function() _onListenEmitFrom;
   final Future<dynamic> Function() _onCancel;

@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:collection/collection.dart';
 import 'package:meta/meta.dart';
 
+/// Representation of a 16, 32 or 128-bit number used to identify BLE services and characteristics.
 class Uuid {
   final Uint8List data;
 
