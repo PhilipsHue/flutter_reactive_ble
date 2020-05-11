@@ -1,3 +1,7 @@
+## 2.2.0
+* Upgrade dependencies
+* Bump min Dart sdk version to 2.7
+
 ## 2.1.0
 * Improve documentation of public API
 * Fix for write without response on iOS
