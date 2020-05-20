@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/services.dart';
 import 'package:flutter_reactive_ble/src/converter/protobuf_converter.dart';
+import 'package:flutter_reactive_ble/src/device_connector.dart';
 import 'package:flutter_reactive_ble/src/discovered_devices_registry.dart';
 import 'package:flutter_reactive_ble/src/generated/bledata.pb.dart' as pb;
 import 'package:flutter_reactive_ble/src/model/ble_status.dart';
@@ -335,54 +336,15 @@ class FlutterReactiveBle {
     @required String id,
     Map<Uuid, List<Uuid>> servicesWithCharacteristicsToDiscover,
     Duration connectionTimeout,
-  }) {
-    final specificConnectedDeviceStream = connectedDeviceStream
-        .where((update) => update.deviceId == id)
-        .expand((update) =>
-            update.connectionState != DeviceConnectionState.disconnected
-                ? [update]
-                : [update, null])
-        .takeWhile((update) => update != null);
-
-    final autoconnectingRepeater = Repeater.broadcast(
-      onListenEmitFrom: () {
-        final args = pb.ConnectToDeviceRequest()..deviceId = id;
-
-        if (connectionTimeout != null) {
-          args.timeoutInMs = connectionTimeout.inMilliseconds;
-        }
-
-        if (servicesWithCharacteristicsToDiscover != null) {
-          final items = <pb.ServiceWithCharacteristics>[];
-          for (final serviceId in servicesWithCharacteristicsToDiscover.keys) {
-            final characteristicIds =
-                servicesWithCharacteristicsToDiscover[serviceId];
-            items.add(
-              pb.ServiceWithCharacteristics()
-                ..serviceId = (pb.Uuid()..data = serviceId.data)
-                ..characteristics.addAll(
-                    characteristicIds.map((c) => pb.Uuid()..data = c.data)),
-            );
-          }
-          args.servicesWithCharacteristicsToDiscover =
-              pb.ServicesWithCharacteristics()..items.addAll(items);
-        }
-        return _methodChannel
-            .invokeMethod<void>("connectToDevice", args.writeToBuffer())
-            .asStream()
-            .asyncExpand((Object _) => specificConnectedDeviceStream);
-      },
-      onCancel: () {
-        final args = pb.DisconnectFromDeviceRequest()..deviceId = id;
-        return _methodChannel.invokeMethod<void>(
-            "disconnectFromDevice", args.writeToBuffer());
-      },
-    );
-
-    return initialize()
-        .asStream()
-        .asyncExpand((_) => autoconnectingRepeater.stream);
-  }
+  }) =>
+      initialize().asStream().asyncExpand((_) => DeviceConnector(
+            bleMethodChannel: _methodChannel,
+            connectionStateUpdateStream: connectedDeviceStream,
+          ).connect(
+            id,
+            servicesWithCharacteristicsToDiscover,
+            connectionTimeout,
+          ));
 
   /// Scans for a specific device and connects to it in case a device containing the specified [id]
   /// is found and that is advertising the services specified in [withServices].
