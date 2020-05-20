@@ -14,6 +14,7 @@ enum ScanMode {
   lowLatency,
 }
 
+/// Converts [ScanMode] to integer representation.
 int convertScanModeToArgs(ScanMode scanMode) {
   switch (scanMode) {
     case ScanMode.opportunistic:
@@ -25,6 +26,5 @@ int convertScanModeToArgs(ScanMode scanMode) {
     case ScanMode.lowLatency:
       return 2;
   }
-  assert(false);
-  return -1000;
+  throw AssertionError("Unknown scanmode provided.");
 }
