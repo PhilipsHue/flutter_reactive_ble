@@ -1,11 +1,16 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_reactive_ble/src/converter/args_to_protubuf_converter.dart';
 import 'package:flutter_reactive_ble/src/model/uuid.dart';
+import 'package:meta/meta.dart';
 
 class PluginController {
-  const PluginController(this.converter, this.bleMethodChannel);
+  const PluginController({
+    @required this.argsToProtobufConverter,
+    @required this.bleMethodChannel,
+  })  : assert(argsToProtobufConverter != null),
+        assert(bleMethodChannel != null);
 
-  final ArgsToProtobufConverter converter;
+  final ArgsToProtobufConverter argsToProtobufConverter;
   final MethodChannel bleMethodChannel;
 
   Stream<Object> connectToDevice(
@@ -16,7 +21,7 @@ class PluginController {
       bleMethodChannel
           .invokeMethod<void>(
             "connectToDevice",
-            converter
+            argsToProtobufConverter
                 .createConnectToDeviceArgs(
                   id,
                   servicesWithCharacteristicsToDiscover,
@@ -29,6 +34,8 @@ class PluginController {
   Future<void> disconnectDevice(String deviceId) =>
       bleMethodChannel.invokeMethod<void>(
         "disconnectFromDevice",
-        converter.createDisconnectDeviceArgs(deviceId).writeToBuffer(),
+        argsToProtobufConverter
+            .createDisconnectDeviceArgs(deviceId)
+            .writeToBuffer(),
       );
 }

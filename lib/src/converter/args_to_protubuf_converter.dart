@@ -2,11 +2,14 @@ import 'package:flutter_reactive_ble/src/generated/bledata.pb.dart' as pb;
 import 'package:flutter_reactive_ble/src/model/uuid.dart';
 
 class ArgsToProtobufConverter {
+  const ArgsToProtobufConverter();
   pb.ConnectToDeviceRequest createConnectToDeviceArgs(
     String id,
     Map<Uuid, List<Uuid>> servicesWithCharacteristicsToDiscover,
     Duration connectionTimeout,
   ) {
+    assert(id != null);
+
     final args = pb.ConnectToDeviceRequest()..deviceId = id;
 
     if (connectionTimeout != null) {
