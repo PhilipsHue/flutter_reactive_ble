@@ -2,7 +2,9 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/services.dart';
+import 'package:flutter_reactive_ble/src/converter/args_to_protubuf_converter.dart';
 import 'package:flutter_reactive_ble/src/converter/protobuf_converter.dart';
+import 'package:flutter_reactive_ble/src/device_connector.dart';
 import 'package:flutter_reactive_ble/src/discovered_devices_registry.dart';
 import 'package:flutter_reactive_ble/src/generated/bledata.pb.dart' as pb;
 import 'package:flutter_reactive_ble/src/model/ble_status.dart';
@@ -14,6 +16,7 @@ import 'package:flutter_reactive_ble/src/model/qualified_characteristic.dart';
 import 'package:flutter_reactive_ble/src/model/scan_mode.dart';
 import 'package:flutter_reactive_ble/src/model/scan_session.dart';
 import 'package:flutter_reactive_ble/src/model/uuid.dart';
+import 'package:flutter_reactive_ble/src/plugin_controller.dart';
 import 'package:flutter_reactive_ble/src/prescan_connector.dart';
 import 'package:flutter_reactive_ble/src/rx_ext/repeater.dart';
 import 'package:flutter_reactive_ble/src/rx_ext/serial_disposable.dart';
@@ -69,6 +72,8 @@ class FlutterReactiveBle {
 
   final _methodChannel = const MethodChannel("flutter_reactive_ble_method");
 
+  PluginController _pluginController;
+
   BleStatus _status = BleStatus.unknown;
 
   final Stream<BleStatus> _statusStream =
@@ -98,6 +103,7 @@ class FlutterReactiveBle {
   Future<void> _initialization;
 
   ScanSession _currentScan;
+  DeviceConnector _deviceConnector;
 
   /// Initializes this [FlutterReactiveBle] instance and its platform-specific
   /// counterparts.
@@ -105,7 +111,17 @@ class FlutterReactiveBle {
   /// The initialization is performed automatically the first time any BLE
   /// operation is triggered.
   Future<void> initialize() async {
+    _pluginController ??= PluginController(
+      argsToProtobufConverter: const ArgsToProtobufConverter(),
+      bleMethodChannel: _methodChannel,
+    );
+
     _initialization ??= _methodChannel.invokeMethod("initialize");
+    _deviceConnector ??= DeviceConnector(
+      connectionStateUpdateStream: connectedDeviceStream,
+      pluginController: _pluginController,
+    );
+
     _prescanConnector = PrescanConnector(
       scanRegistry: scanRegistry,
       connectDevice: connectToDevice,
@@ -335,54 +351,14 @@ class FlutterReactiveBle {
     @required String id,
     Map<Uuid, List<Uuid>> servicesWithCharacteristicsToDiscover,
     Duration connectionTimeout,
-  }) {
-    final specificConnectedDeviceStream = connectedDeviceStream
-        .where((update) => update.deviceId == id)
-        .expand((update) =>
-            update.connectionState != DeviceConnectionState.disconnected
-                ? [update]
-                : [update, null])
-        .takeWhile((update) => update != null);
-
-    final autoconnectingRepeater = Repeater.broadcast(
-      onListenEmitFrom: () {
-        final args = pb.ConnectToDeviceRequest()..deviceId = id;
-
-        if (connectionTimeout != null) {
-          args.timeoutInMs = connectionTimeout.inMilliseconds;
-        }
-
-        if (servicesWithCharacteristicsToDiscover != null) {
-          final items = <pb.ServiceWithCharacteristics>[];
-          for (final serviceId in servicesWithCharacteristicsToDiscover.keys) {
-            final characteristicIds =
-                servicesWithCharacteristicsToDiscover[serviceId];
-            items.add(
-              pb.ServiceWithCharacteristics()
-                ..serviceId = (pb.Uuid()..data = serviceId.data)
-                ..characteristics.addAll(
-                    characteristicIds.map((c) => pb.Uuid()..data = c.data)),
-            );
-          }
-          args.servicesWithCharacteristicsToDiscover =
-              pb.ServicesWithCharacteristics()..items.addAll(items);
-        }
-        return _methodChannel
-            .invokeMethod<void>("connectToDevice", args.writeToBuffer())
-            .asStream()
-            .asyncExpand((Object _) => specificConnectedDeviceStream);
-      },
-      onCancel: () {
-        final args = pb.DisconnectFromDeviceRequest()..deviceId = id;
-        return _methodChannel.invokeMethod<void>(
-            "disconnectFromDevice", args.writeToBuffer());
-      },
-    );
-
-    return initialize()
-        .asStream()
-        .asyncExpand((_) => autoconnectingRepeater.stream);
-  }
+  }) =>
+      initialize().asStream().asyncExpand(
+            (_) => _deviceConnector.connect(
+              id,
+              servicesWithCharacteristicsToDiscover,
+              connectionTimeout,
+            ),
+          );
 
   /// Scans for a specific device and connects to it in case a device containing the specified [id]
   /// is found and that is advertising the services specified in [withServices].
