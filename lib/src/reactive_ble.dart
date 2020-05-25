@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/services.dart';
+import 'package:flutter_reactive_ble/src/converter/args_to_protubuf_converter.dart';
 import 'package:flutter_reactive_ble/src/converter/protobuf_converter.dart';
 import 'package:flutter_reactive_ble/src/device_connector.dart';
 import 'package:flutter_reactive_ble/src/discovered_devices_registry.dart';
@@ -15,6 +16,7 @@ import 'package:flutter_reactive_ble/src/model/qualified_characteristic.dart';
 import 'package:flutter_reactive_ble/src/model/scan_mode.dart';
 import 'package:flutter_reactive_ble/src/model/scan_session.dart';
 import 'package:flutter_reactive_ble/src/model/uuid.dart';
+import 'package:flutter_reactive_ble/src/plugin_controller.dart';
 import 'package:flutter_reactive_ble/src/prescan_connector.dart';
 import 'package:flutter_reactive_ble/src/rx_ext/repeater.dart';
 import 'package:flutter_reactive_ble/src/rx_ext/serial_disposable.dart';
@@ -70,6 +72,8 @@ class FlutterReactiveBle {
 
   final _methodChannel = const MethodChannel("flutter_reactive_ble_method");
 
+  PluginController _pluginController;
+
   BleStatus _status = BleStatus.unknown;
 
   final Stream<BleStatus> _statusStream =
@@ -99,6 +103,7 @@ class FlutterReactiveBle {
   Future<void> _initialization;
 
   ScanSession _currentScan;
+  DeviceConnector _deviceConnector;
 
   /// Initializes this [FlutterReactiveBle] instance and its platform-specific
   /// counterparts.
@@ -106,7 +111,13 @@ class FlutterReactiveBle {
   /// The initialization is performed automatically the first time any BLE
   /// operation is triggered.
   Future<void> initialize() async {
+    _pluginController ??=
+        PluginController(ArgsToProtobufConverter(), _methodChannel);
     _initialization ??= _methodChannel.invokeMethod("initialize");
+    _deviceConnector ??= DeviceConnector(
+      connectionStateUpdateStream: connectedDeviceStream,
+      pluginController: _pluginController,
+    );
     _prescanConnector = PrescanConnector(
       scanRegistry: scanRegistry,
       connectDevice: connectToDevice,
@@ -337,14 +348,13 @@ class FlutterReactiveBle {
     Map<Uuid, List<Uuid>> servicesWithCharacteristicsToDiscover,
     Duration connectionTimeout,
   }) =>
-      initialize().asStream().asyncExpand((_) => DeviceConnector(
-            bleMethodChannel: _methodChannel,
-            connectionStateUpdateStream: connectedDeviceStream,
-          ).connect(
-            id,
-            servicesWithCharacteristicsToDiscover,
-            connectionTimeout,
-          ));
+      initialize().asStream().asyncExpand(
+            (_) => _deviceConnector.connect(
+              id,
+              servicesWithCharacteristicsToDiscover,
+              connectionTimeout,
+            ),
+          );
 
   /// Scans for a specific device and connects to it in case a device containing the specified [id]
   /// is found and that is advertising the services specified in [withServices].

@@ -1,20 +1,26 @@
-import 'package:flutter/services.dart';
 import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
 import 'package:flutter_reactive_ble/src/device_connector.dart';
+import 'package:flutter_reactive_ble/src/plugin_controller.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 
 void main() {
   group('$DeviceConnector', () {
     DeviceConnector _sut;
-    _MethodChannelMock _methodChannel;
+    _PluginControllerMock _pluginController;
     Stream<ConnectionStateUpdate> _connectionStateUpdateStream;
     Stream<ConnectionStateUpdate> _result;
 
+    Map<Uuid, List<Uuid>> _servicesToDiscover;
+
     const _deviceId = '123';
+    const _connectionTimeout = Duration(seconds: 1);
 
     setUp(() {
-      _methodChannel = _MethodChannelMock();
+      _pluginController = _PluginControllerMock();
+      _servicesToDiscover = {
+        Uuid.parse('FEFE'): [Uuid.parse('FEFE')]
+      };
     });
 
     group('Given connection update stream has updates for device', () {
@@ -41,18 +47,17 @@ void main() {
 
       group('And invoking connect method succeeds', () {
         setUp(() async {
-          when(_methodChannel.invokeMethod<void>('connectToDevice', any))
-              .thenAnswer((_) => Future.value());
+          when(_pluginController.connectToDevice(any, any, any)).thenAnswer(
+            (_) => Stream.fromIterable([1]),
+          );
           _sut = DeviceConnector(
-            bleMethodChannel: _methodChannel,
+            pluginController: _pluginController,
             connectionStateUpdateStream: _connectionStateUpdateStream,
           );
           _result = _sut.connect(
             _deviceId,
-            {
-              Uuid.parse('FEFE'): [Uuid.parse('FEFE')]
-            },
-            const Duration(seconds: 1),
+            _servicesToDiscover,
+            _connectionTimeout,
           );
         });
 
@@ -63,8 +68,11 @@ void main() {
 
         test('It invokes method connect device', () async {
           await _result.first;
-          verify(_methodChannel.invokeMethod<void>('connectToDevice', any))
-              .called(1);
+          verify(_pluginController.connectToDevice(
+            _deviceId,
+            _servicesToDiscover,
+            _connectionTimeout,
+          )).called(1);
         });
 
         test('It invokes method disconnect when stream is cancelled', () async {
@@ -72,12 +80,11 @@ void main() {
 
           await subscription.cancel();
 
-          verify(_methodChannel.invokeMethod<void>('disconnectFromDevice', any))
-              .called(1);
+          verify(_pluginController.disconnectDevice(_deviceId)).called(1);
         });
       });
     });
   });
 }
 
-class _MethodChannelMock extends Mock implements MethodChannel {}
+class _PluginControllerMock extends Mock implements PluginController {}
