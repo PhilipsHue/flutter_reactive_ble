@@ -13,29 +13,31 @@ import 'model/uuid.dart';
 
 class DeviceConnector {
   const DeviceConnector({
-    @required Stream<ConnectionStateUpdate> connectionStateUpdateStream,
-    @required PluginController pluginController,
-    @required ScanSession Function() getCurrentScan,
-    @required DiscoveredDevicesRegistry discoveredDevicesRegistry,
     @required
-        Stream<DiscoveredDevice> Function(
-                {List<Uuid> withServices, ScanMode scanMode})
+        PluginController pluginController,
+    @required
+        ScanSession Function() getCurrentScan,
+    @required
+        DiscoveredDevicesRegistry discoveredDevicesRegistry,
+    @required
+        Stream<DiscoveredDevice> Function({
+      List<Uuid> withServices,
+      ScanMode scanMode,
+    })
             scanForDevices,
-    @required Duration delayAfterScanFailure,
-  })  : assert(connectionStateUpdateStream != null),
-        assert(pluginController != null),
+    @required
+        Duration delayAfterScanFailure,
+  })  : assert(pluginController != null),
         assert(getCurrentScan != null),
         assert(scanForDevices != null),
         assert(discoveredDevicesRegistry != null),
         assert(delayAfterScanFailure != null),
-        _connectionStateUpdateStream = connectionStateUpdateStream,
         _getCurrentScan = getCurrentScan,
         _discoveredDevicesRegistry = discoveredDevicesRegistry,
         _scanForDevices = scanForDevices,
         _controller = pluginController,
         _delayAfterScanFailure = delayAfterScanFailure;
 
-  final Stream<ConnectionStateUpdate> _connectionStateUpdateStream;
   final PluginController _controller;
   final ScanSession Function() _getCurrentScan;
   final DiscoveredDevicesRegistry _discoveredDevicesRegistry;
@@ -47,12 +49,15 @@ class DeviceConnector {
 
   static const _scanRegistryCacheValidityPeriod = Duration(seconds: 25);
 
+  Stream<ConnectionStateUpdate> get deviceConnectionStateUpdateStream =>
+      _controller.connectionUpdateStream;
+
   Stream<ConnectionStateUpdate> connect({
     @required String id,
     Map<Uuid, List<Uuid>> servicesWithCharacteristicsToDiscover,
     Duration connectionTimeout,
   }) {
-    final specificConnectedDeviceStream = _connectionStateUpdateStream
+    final specificConnectedDeviceStream = deviceConnectionStateUpdateStream
         .where((update) => update.deviceId == id)
         .expand((update) =>
             update.connectionState != DeviceConnectionState.disconnected

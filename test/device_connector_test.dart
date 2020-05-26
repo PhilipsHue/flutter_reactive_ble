@@ -30,6 +30,8 @@ void main() {
       _servicesToDiscover = {
         Uuid.parse('FEFE'): [Uuid.parse('FEFE')]
       };
+      when(_pluginController.connectionUpdateStream)
+          .thenAnswer((_) => _connectionStateUpdateStream);
 
       updateForDevice = const ConnectionStateUpdate(
         deviceId: _deviceId,
@@ -58,9 +60,9 @@ void main() {
             when(_pluginController.connectToDevice(any, any, any)).thenAnswer(
               (_) => Stream.fromIterable([1]),
             );
+
             _sut = DeviceConnector(
               pluginController: _pluginController,
-              connectionStateUpdateStream: _connectionStateUpdateStream,
               discoveredDevicesRegistry: _registry,
               scanForDevices: _scanner.scanForDevices,
               getCurrentScan: _scanner.getCurrentScan,
@@ -127,7 +129,6 @@ void main() {
 
           _sut = DeviceConnector(
             pluginController: _pluginController,
-            connectionStateUpdateStream: _connectionStateUpdateStream,
             discoveredDevicesRegistry: _registry,
             scanForDevices: _scanner.scanForDevices,
             getCurrentScan: _scanner.getCurrentScan,
@@ -178,7 +179,6 @@ void main() {
                 .thenAnswer((_) => Stream.fromIterable([1]));
             _sut = DeviceConnector(
               pluginController: _pluginController,
-              connectionStateUpdateStream: _connectionStateUpdateStream,
               discoveredDevicesRegistry: _registry,
               scanForDevices: _scanner.scanForDevices,
               getCurrentScan: _scanner.getCurrentScan,
@@ -206,7 +206,6 @@ void main() {
 
             _sut = DeviceConnector(
               pluginController: _pluginController,
-              connectionStateUpdateStream: _connectionStateUpdateStream,
               discoveredDevicesRegistry: _registry,
               scanForDevices: _scanner.scanForDevices,
               getCurrentScan: _scanner.getCurrentScan,
@@ -255,7 +254,6 @@ void main() {
                 .thenAnswer((_) => Stream.fromIterable([1]));
             _sut = DeviceConnector(
               pluginController: _pluginController,
-              connectionStateUpdateStream: _connectionStateUpdateStream,
               discoveredDevicesRegistry: _registry,
               scanForDevices: _scanner.scanForDevices,
               getCurrentScan: _scanner.getCurrentScan,
@@ -300,7 +298,6 @@ void main() {
 
               _sut = DeviceConnector(
                 pluginController: _pluginController,
-                connectionStateUpdateStream: _connectionStateUpdateStream,
                 discoveredDevicesRegistry: _registry,
                 scanForDevices: _scanner.scanForDevices,
                 getCurrentScan: _scanner.getCurrentScan,
@@ -349,7 +346,6 @@ void main() {
 
               _sut = DeviceConnector(
                 pluginController: _pluginController,
-                connectionStateUpdateStream: _connectionStateUpdateStream,
                 discoveredDevicesRegistry: _registry,
                 scanForDevices: _scanner.scanForDevices,
                 getCurrentScan: _scanner.getCurrentScan,

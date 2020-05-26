@@ -46,22 +46,24 @@ class ProtobufConverter {
     );
   }
 
-  ConnectionStateUpdate connectionStateUpdateFrom(pb.DeviceInfo deviceInfo) =>
-      ConnectionStateUpdate(
-        deviceId: deviceInfo.id,
-        connectionState: selectFrom(
-          DeviceConnectionState.values,
-          index: deviceInfo.connectionState,
-          fallback: (raw) => throw _InvalidConnectionState(raw),
-        ),
-        failure: genericFailureFrom(
-          hasFailure: deviceInfo.hasFailure(),
-          getFailure: () => deviceInfo.failure,
-          codes: ConnectionError.values,
-          fallback: (rawOrNull) =>
-              rawOrNull == null ? null : ConnectionError.unknown,
-        ),
-      );
+  ConnectionStateUpdate connectionStateUpdateFrom(List<int> data) {
+    final deviceInfo = pb.DeviceInfo.fromBuffer(data);
+    return ConnectionStateUpdate(
+      deviceId: deviceInfo.id,
+      connectionState: selectFrom(
+        DeviceConnectionState.values,
+        index: deviceInfo.connectionState,
+        fallback: (raw) => throw _InvalidConnectionState(raw),
+      ),
+      failure: genericFailureFrom(
+        hasFailure: deviceInfo.hasFailure(),
+        getFailure: () => deviceInfo.failure,
+        codes: ConnectionError.values,
+        fallback: (rawOrNull) =>
+            rawOrNull == null ? null : ConnectionError.unknown,
+      ),
+    );
+  }
 
   Result<Unit, GenericFailure<ClearGattCacheError>> clearGattCacheResultFrom(
           pb.ClearGattCacheInfo message) =>

@@ -15,10 +15,11 @@ class GenericFailure<T> {
   String toString() => "$runtimeType(code: $code, message: \"$message\")";
 
   @override
-  bool operator ==(dynamic other) =>
-      other.runtimeType == runtimeType &&
-      code == other.code &&
-      message == other.message;
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is GenericFailure &&
+          code == other.code &&
+          message == other.message);
 
   @override
   int get hashCode {
