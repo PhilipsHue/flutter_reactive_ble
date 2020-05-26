@@ -1,9 +1,14 @@
 import 'package:flutter_reactive_ble/src/model/generic_failure.dart';
+import 'package:functional_data/functional_data.dart';
 import 'package:meta/meta.dart';
+
+part 'connection_state_update.g.dart';
+//ignore_for_file: annotate_overrides
 
 ///Status update for a specic BLE device.
 @immutable
-class ConnectionStateUpdate {
+@FunctionalData()
+class ConnectionStateUpdate extends $ConnectionStateUpdate {
   final String deviceId;
   final DeviceConnectionState connectionState;
 
