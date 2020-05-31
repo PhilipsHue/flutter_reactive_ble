@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/services.dart';
-import 'package:flutter_reactive_ble/src/converter/args_to_protubuf_converter.dart';
 import 'package:flutter_reactive_ble/src/converter/protobuf_converter.dart';
 import 'package:flutter_reactive_ble/src/device_connector.dart';
 import 'package:flutter_reactive_ble/src/discovered_devices_registry.dart';
@@ -17,7 +16,6 @@ import 'package:flutter_reactive_ble/src/model/scan_mode.dart';
 import 'package:flutter_reactive_ble/src/model/scan_session.dart';
 import 'package:flutter_reactive_ble/src/model/uuid.dart';
 import 'package:flutter_reactive_ble/src/plugin_controller.dart';
-import 'package:flutter_reactive_ble/src/prescan_connector.dart';
 import 'package:flutter_reactive_ble/src/rx_ext/repeater.dart';
 import 'package:flutter_reactive_ble/src/rx_ext/serial_disposable.dart';
 import 'package:meta/meta.dart';
@@ -51,13 +49,12 @@ class FlutterReactiveBle {
   BleStatus get status => _status;
 
   /// A stream providing connection updates for all the connected BLE devices.
-  final Stream<ConnectionStateUpdate> connectedDeviceStream =
-      const EventChannel("flutter_reactive_ble_connected_device")
-          .receiveBroadcastStream()
-          .cast<List<int>>()
-          .map((data) => pb.DeviceInfo.fromBuffer(data))
-          .map(const ProtobufConverter().connectionStateUpdateFrom)
-            ..listen((_) {});
+  Stream<ConnectionStateUpdate> get connectedDeviceStream =>
+      Repeater(onListenEmitFrom: () async* {
+        await initialize();
+        yield* _deviceConnector.deviceConnectionStateUpdateStream;
+      }).stream
+        ..listen((_) {});
 
   /// A stream providing value updates for all the connected BLE devices.
   ///
@@ -82,8 +79,6 @@ class FlutterReactiveBle {
           .cast<List<int>>()
           .map((data) => pb.BleStatusInfo.fromBuffer(data))
           .map(const ProtobufConverter().bleStatusFrom);
-
-  PrescanConnector _prescanConnector;
 
   Future<void> _trackStatus() async {
     await initialize();
@@ -111,24 +106,17 @@ class FlutterReactiveBle {
   /// The initialization is performed automatically the first time any BLE
   /// operation is triggered.
   Future<void> initialize() async {
-    _pluginController ??= PluginController(
-      argsToProtobufConverter: const ArgsToProtobufConverter(),
-      bleMethodChannel: _methodChannel,
-    );
+    _pluginController ??= PluginControllerFactory(_methodChannel).create();
 
     _initialization ??= _methodChannel.invokeMethod("initialize");
     _deviceConnector ??= DeviceConnector(
-      connectionStateUpdateStream: connectedDeviceStream,
       pluginController: _pluginController,
-    );
-
-    _prescanConnector = PrescanConnector(
-      scanRegistry: scanRegistry,
-      connectDevice: connectToDevice,
-      scanDevices: scanForDevices,
+      discoveredDevicesRegistry: scanRegistry,
+      scanForDevices: scanForDevices,
       getCurrentScan: () => _currentScan,
       delayAfterScanFailure: const Duration(seconds: 10),
     );
+
     await _initialization;
   }
 
@@ -354,9 +342,10 @@ class FlutterReactiveBle {
   }) =>
       initialize().asStream().asyncExpand(
             (_) => _deviceConnector.connect(
-              id,
-              servicesWithCharacteristicsToDiscover,
-              connectionTimeout,
+              id: id,
+              servicesWithCharacteristicsToDiscover:
+                  servicesWithCharacteristicsToDiscover,
+              connectionTimeout: connectionTimeout,
             ),
           );
 
@@ -378,14 +367,16 @@ class FlutterReactiveBle {
     Map<Uuid, List<Uuid>> servicesWithCharacteristicsToDiscover,
     Duration connectionTimeout,
   }) =>
-      _prescanConnector.connectToAdvertisingDevice(
-        id: id,
-        withServices: withServices,
-        prescanDuration: prescanDuration,
-        servicesWithCharacteristicsToDiscover:
-            servicesWithCharacteristicsToDiscover,
-        connectionTimeout: connectionTimeout,
-      );
+      initialize().asStream().asyncExpand(
+            (_) => _deviceConnector.connectToAdvertisingDevice(
+              id: id,
+              withServices: withServices,
+              prescanDuration: prescanDuration,
+              servicesWithCharacteristicsToDiscover:
+                  servicesWithCharacteristicsToDiscover,
+              connectionTimeout: connectionTimeout,
+            ),
+          );
 
   /// Clears GATT attribute cache on Android using undocumented API. Completes with an error in case of a failure.
   ///

@@ -1,7 +1,9 @@
 import 'dart:async';
 
 import 'package:flutter/services.dart';
+import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
 import 'package:flutter_reactive_ble/src/converter/args_to_protubuf_converter.dart';
+import 'package:flutter_reactive_ble/src/converter/protobuf_converter.dart';
 import 'package:flutter_reactive_ble/src/generated/bledata.pbserver.dart' as pb;
 import 'package:flutter_reactive_ble/src/plugin_controller.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -11,14 +13,21 @@ void main() {
   group('$PluginController', () {
     PluginController _sut;
     _MethodChannelMock _methodChannel;
-    _Converter _converter;
+    _ArgsToProtobufConverterMock _argsConverter;
+    ProtobufConverter _protobufConverter;
+    _EventChannelMock _connectedDeviceChannel;
 
     setUp(() {
-      _converter = _Converter();
+      _argsConverter = _ArgsToProtobufConverterMock();
       _methodChannel = _MethodChannelMock();
+      _protobufConverter = _ProtobufConverterMock();
+      _connectedDeviceChannel = _EventChannelMock();
       _sut = PluginController(
-          argsToProtobufConverter: _converter,
-          bleMethodChannel: _methodChannel);
+        argsToProtobufConverter: _argsConverter,
+        bleMethodChannel: _methodChannel,
+        protobufConverter: _protobufConverter,
+        connectedDeviceChannel: _connectedDeviceChannel,
+      );
     });
 
     group('connect to device', () {
@@ -26,7 +35,7 @@ void main() {
       StreamSubscription subscription;
       setUp(() {
         request = pb.ConnectToDeviceRequest();
-        when(_converter.createConnectToDeviceArgs(any, any, any))
+        when(_argsConverter.createConnectToDeviceArgs(any, any, any))
             .thenReturn(request);
         when(_methodChannel.invokeMethod<void>(any, any)).thenAnswer(
           (_) => Future<void>.value(),
@@ -50,7 +59,8 @@ void main() {
       pb.DisconnectFromDeviceRequest request;
       setUp(() async {
         request = pb.DisconnectFromDeviceRequest();
-        when(_converter.createDisconnectDeviceArgs(any)).thenReturn(request);
+        when(_argsConverter.createDisconnectDeviceArgs(any))
+            .thenReturn(request);
         when(_methodChannel.invokeMethod<void>(any, any)).thenAnswer(
           (_) => Future<void>.value(),
         );
@@ -65,9 +75,40 @@ void main() {
         )).called(1);
       });
     });
+
+    group('Connect to device stream', () {
+      const update = ConnectionStateUpdate(
+        deviceId: '123',
+        connectionState: DeviceConnectionState.connecting,
+        failure: null,
+      );
+
+      Stream<ConnectionStateUpdate> result;
+
+      setUp(() {
+        when(_connectedDeviceChannel.receiveBroadcastStream()).thenAnswer(
+          (_) => Stream<dynamic>.fromIterable(<dynamic>[
+            [1, 2, 3],
+          ]),
+        );
+
+        when(_protobufConverter.connectionStateUpdateFrom(any))
+            .thenReturn(update);
+        result = _sut.connectionUpdateStream;
+      });
+
+      test('It emits correct value', () {
+        expect(result, emitsInOrder(<ConnectionStateUpdate>[update]));
+      });
+    });
   });
 }
 
 class _MethodChannelMock extends Mock implements MethodChannel {}
 
-class _Converter extends Mock implements ArgsToProtobufConverter {}
+class _EventChannelMock extends Mock implements EventChannel {}
+
+class _ArgsToProtobufConverterMock extends Mock
+    implements ArgsToProtobufConverter {}
+
+class _ProtobufConverterMock extends Mock implements ProtobufConverter {}

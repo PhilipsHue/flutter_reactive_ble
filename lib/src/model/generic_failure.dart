@@ -13,4 +13,19 @@ class GenericFailure<T> {
 
   @override
   String toString() => "$runtimeType(code: $code, message: \"$message\")";
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is GenericFailure &&
+          code == other.code &&
+          message == other.message);
+
+  @override
+  int get hashCode {
+    var result = 17;
+    result = 37 * result + code.hashCode;
+    result = 37 * result + message.hashCode;
+    return result;
+  }
 }

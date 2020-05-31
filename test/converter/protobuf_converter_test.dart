@@ -214,13 +214,15 @@ void main() {
       const id = 'id';
       const connectionState = 1;
 
-      pb.DeviceInfo message;
+      List<int> message;
 
       group('Message without failure', () {
         setUp(() {
-          message = pb.DeviceInfo()
+          final info = pb.DeviceInfo()
             ..id = id
             ..connectionState = connectionState;
+
+          message = info.writeToBuffer();
         });
 
         test('Converts id', () {
@@ -239,8 +241,10 @@ void main() {
           final failure = pb.GenericFailure()
             ..code = 0
             ..message = "failure";
-          message = pb.DeviceInfo()..failure = failure;
+          final deviceInfo = pb.DeviceInfo()..failure = failure;
+          message = deviceInfo.writeToBuffer();
         });
+
         test('converts failure', () {
           final updateResult = sut.connectionStateUpdateFrom(message).failure;
           expect(updateResult.message, "failure");
@@ -250,9 +254,11 @@ void main() {
 
       group('Irregular statuscode ', () {
         setUp(() {
-          message = pb.DeviceInfo()
+          final info = pb.DeviceInfo()
             ..id = id
             ..connectionState = 100;
+
+          message = info.writeToBuffer();
         });
 
         test('converts unknown code throws', () {
