@@ -16,17 +16,20 @@ void main() {
     _ArgsToProtobufConverterMock _argsConverter;
     ProtobufConverter _protobufConverter;
     _EventChannelMock _connectedDeviceChannel;
+    _EventChannelMock _argsChannel;
 
     setUp(() {
       _argsConverter = _ArgsToProtobufConverterMock();
       _methodChannel = _MethodChannelMock();
       _protobufConverter = _ProtobufConverterMock();
       _connectedDeviceChannel = _EventChannelMock();
+      _argsChannel = _EventChannelMock();
       _sut = PluginController(
         argsToProtobufConverter: _argsConverter,
         bleMethodChannel: _methodChannel,
         protobufConverter: _protobufConverter,
         connectedDeviceChannel: _connectedDeviceChannel,
+        charUpdateChannel: _argsChannel,
       );
     });
 
@@ -99,6 +102,37 @@ void main() {
 
       test('It emits correct value', () {
         expect(result, emitsInOrder(<ConnectionStateUpdate>[update]));
+      });
+    });
+
+    group('Char update stream', () {
+      CharacteristicValue valueUpdate;
+      Stream<CharacteristicValue> result;
+
+      setUp(() {
+        valueUpdate = CharacteristicValue(
+          characteristic: QualifiedCharacteristic(
+            characteristicId: Uuid.parse('FEFF'),
+            serviceId: Uuid.parse('FEFF'),
+            deviceId: '123',
+          ),
+          result: const Result.success([1]),
+        );
+
+        when(_sut.charUpdateChannel.receiveBroadcastStream()).thenAnswer(
+          (realInvocation) => Stream<List<int>>.fromIterable([
+            [0, 1]
+          ]),
+        );
+
+        when(_protobufConverter.characteristicValueFrom(any))
+            .thenReturn(valueUpdate);
+
+        result = _sut.charValueUpdateStream;
+      });
+
+      test('It emits updates', () {
+        expect(result, emitsInOrder(<CharacteristicValue>[valueUpdate]));
       });
     });
   });

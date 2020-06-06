@@ -12,13 +12,18 @@ class PluginController {
     @required this.protobufConverter,
     @required this.bleMethodChannel,
     @required this.connectedDeviceChannel,
+    @required this.charUpdateChannel,
   })  : assert(argsToProtobufConverter != null),
-        assert(bleMethodChannel != null);
+        assert(protobufConverter != null),
+        assert(bleMethodChannel != null),
+        assert(connectedDeviceChannel != null),
+        assert(charUpdateChannel != null);
 
   final ArgsToProtobufConverter argsToProtobufConverter;
   final ProtobufConverter protobufConverter;
   final MethodChannel bleMethodChannel;
   final EventChannel connectedDeviceChannel;
+  final EventChannel charUpdateChannel;
 
   Stream<Object> connectToDevice(
     String id,
@@ -51,6 +56,11 @@ class PluginController {
           .receiveBroadcastStream()
           .cast<List<int>>()
           .map(protobufConverter.connectionStateUpdateFrom);
+
+  Stream<CharacteristicValue> get charValueUpdateStream => charUpdateChannel
+      .receiveBroadcastStream()
+      .cast<List<int>>()
+      .map(protobufConverter.characteristicValueFrom);
 }
 
 class PluginControllerFactory {
@@ -62,12 +72,14 @@ class PluginControllerFactory {
   PluginController create() {
     const connectedDeviceChannel =
         EventChannel("flutter_reactive_ble_connected_device");
+    const charEventChannel = EventChannel("flutter_reactive_ble_char_update");
 
     return PluginController(
       protobufConverter: const ProtobufConverter(),
       argsToProtobufConverter: const ArgsToProtobufConverter(),
       bleMethodChannel: _bleMethodChannel,
       connectedDeviceChannel: connectedDeviceChannel,
+      charUpdateChannel: charEventChannel,
     );
   }
 }

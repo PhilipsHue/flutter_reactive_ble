@@ -77,20 +77,22 @@ class ProtobufConverter {
         ),
       );
 
-  CharacteristicValue characteristicValueFrom(
-          pb.CharacteristicValueInfo message) =>
-      CharacteristicValue(
-        characteristic: qualifiedCharacteristicFrom(message.characteristic),
-        result: resultFrom(
-          getValue: () => message.value,
-          failure: genericFailureFrom(
-            hasFailure: message.hasFailure(),
-            getFailure: () => message.failure,
-            codes: CharacteristicValueUpdateError.values,
-            fallback: (rawOrNull) => CharacteristicValueUpdateError.unknown,
-          ),
+  CharacteristicValue characteristicValueFrom(List<int> data) {
+    final message = pb.CharacteristicValueInfo.fromBuffer(data);
+
+    return CharacteristicValue(
+      characteristic: qualifiedCharacteristicFrom(message.characteristic),
+      result: resultFrom(
+        getValue: () => message.value,
+        failure: genericFailureFrom(
+          hasFailure: message.hasFailure(),
+          getFailure: () => message.failure,
+          codes: CharacteristicValueUpdateError.values,
+          fallback: (rawOrNull) => CharacteristicValueUpdateError.unknown,
         ),
-      );
+      ),
+    );
+  }
 
   WriteCharacteristicInfo writeCharacteristicInfoFrom(
           pb.WriteCharacteristicInfo message) =>

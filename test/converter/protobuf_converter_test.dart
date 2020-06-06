@@ -287,50 +287,63 @@ void main() {
         expect(result.code, ClearGattCacheError.unknown);
       });
     });
-    group("Converts characteristic value", () {
+    group("Characteristic value", () {
       const id = 'id';
       const value = [2, 3];
       pb.CharacteristicValueInfo message;
+      pb.CharacteristicAddress characteristic;
 
       setUp(() {
-        final characteristic = pb.CharacteristicAddress()
+        characteristic = pb.CharacteristicAddress()
           ..deviceId = id
           ..serviceUuid = (pb.Uuid()..data = [0])
           ..characteristicUuid = (pb.Uuid()..data = [1]);
-
-        message = pb.CharacteristicValueInfo()
-          ..characteristic = characteristic
-          ..value = value;
       });
 
-      test('It converts device id', () {
-        final result = sut.characteristicValueFrom(message);
-        expect(result.characteristic.deviceId, id);
-      });
-      test('It converts service uuid', () {
-        final result = sut.characteristicValueFrom(message);
-        expect(result.characteristic.serviceId, Uuid([00]));
-      });
+      group('Given no error occured', () {
+        CharacteristicValue result;
 
-      test('It converts characteristic uuid', () {
-        final result = sut.characteristicValueFrom(message);
-        expect(result.characteristic.characteristicId, Uuid([01]));
-      });
+        setUp(() {
+          message = pb.CharacteristicValueInfo()
+            ..characteristic = characteristic
+            ..value = value;
 
-      test('it converts value', () {
-        final result = sut.characteristicValueFrom(message);
-        final charValue = result.result.iif(
+          result = sut.characteristicValueFrom(message.writeToBuffer());
+        });
+
+        test('It converts device id', () {
+          expect(result.characteristic.deviceId, id);
+        });
+        test('It converts service uuid', () {
+          expect(result.characteristic.serviceId, Uuid([00]));
+        });
+
+        test('It converts characteristic uuid', () {
+          expect(result.characteristic.characteristicId, Uuid([01]));
+        });
+
+        test('it converts value', () {
+          final charValue = result.result.iif(
             success: (v) => v,
-            failure: (_) => throw AssertionError("Not expected to fail"));
-        expect(charValue, value);
+            failure: (_) => throw AssertionError("Not expected to fail"),
+          );
+          expect(charValue, value);
+        });
       });
 
-      test('it converts failure', () {
-        final failureMessage = message..failure = pb.GenericFailure();
-        final result = sut.characteristicValueFrom(failureMessage).result.iif(
-            success: (_) => throw AssertionError("Not expected to succeed"),
-            failure: (_) => "failure");
-        expect(result, "failure");
+      group('Given error occured', () {
+        List<int> failureMessage;
+        String result;
+        setUp(() {
+          failureMessage =
+              (message..failure = pb.GenericFailure()).writeToBuffer();
+          result = sut.characteristicValueFrom(failureMessage).result.iif(
+              success: (_) => throw AssertionError("Not expected to succeed"),
+              failure: (_) => "failure");
+        });
+        test('it converts failure', () {
+          expect(result, "failure");
+        });
       });
     });
 

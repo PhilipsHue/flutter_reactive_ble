@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/services.dart';
+import 'package:flutter_reactive_ble/src/connected_device_operator.dart';
 import 'package:flutter_reactive_ble/src/converter/protobuf_converter.dart';
 import 'package:flutter_reactive_ble/src/device_connector.dart';
 import 'package:flutter_reactive_ble/src/discovered_devices_registry.dart';
@@ -59,13 +60,10 @@ class FlutterReactiveBle {
   /// A stream providing value updates for all the connected BLE devices.
   ///
   /// The updates include read responses as well as notifications.
-  final Stream<CharacteristicValue> characteristicValueStream =
-      const EventChannel("flutter_reactive_ble_char_update")
-          .receiveBroadcastStream()
-          .cast<List<int>>()
-          .map((data) => pb.CharacteristicValueInfo.fromBuffer(data))
-          .map(const ProtobufConverter().characteristicValueFrom)
-            ..listen((_) {});
+  Stream<CharacteristicValue> get characteristicValueStream async* {
+    await initialize();
+    yield* _connectedDeviceOperator.characteristicValueStream;
+  }
 
   final _methodChannel = const MethodChannel("flutter_reactive_ble_method");
 
@@ -99,6 +97,7 @@ class FlutterReactiveBle {
 
   ScanSession _currentScan;
   DeviceConnector _deviceConnector;
+  ConnectedDeviceOperator _connectedDeviceOperator;
 
   /// Initializes this [FlutterReactiveBle] instance and its platform-specific
   /// counterparts.
@@ -109,6 +108,10 @@ class FlutterReactiveBle {
     _pluginController ??= PluginControllerFactory(_methodChannel).create();
 
     _initialization ??= _methodChannel.invokeMethod("initialize");
+
+    _connectedDeviceOperator ??=
+        ConnectedDeviceOperator(pluginController: _pluginController);
+
     _deviceConnector ??= DeviceConnector(
       pluginController: _pluginController,
       discoveredDevicesRegistry: scanRegistry,
