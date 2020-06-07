@@ -1,8 +1,10 @@
+import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
 import 'package:flutter_reactive_ble/src/connected_device_operator.dart';
 import 'package:flutter_reactive_ble/src/model/characteristic_value.dart';
 import 'package:flutter_reactive_ble/src/model/qualified_characteristic.dart';
 import 'package:flutter_reactive_ble/src/model/result.dart';
 import 'package:flutter_reactive_ble/src/model/uuid.dart';
+import 'package:flutter_reactive_ble/src/model/write_characteristic_info.dart';
 import 'package:flutter_reactive_ble/src/plugin_controller.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
@@ -134,6 +136,77 @@ void main() {
             () => _sut.readCharacteristic(charDevice),
             throwsA(isInstanceOf<NoBleCharacteristicDataReceived>()),
           );
+        });
+      });
+    });
+
+    group('Write characteristic', () {
+      QualifiedCharacteristic characteristic;
+      WriteCharacteristicInfo info;
+      const value = [1, 0];
+
+      setUp(() {
+        characteristic = QualifiedCharacteristic(
+          characteristicId: Uuid.parse('FEFF'),
+          serviceId: Uuid.parse('FEFF'),
+          deviceId: '123',
+        );
+      });
+
+      group('Write characteristic with response', () {
+        group('Given write characteristic succeeds', () {
+          setUp(() async {
+            info = WriteCharacteristicInfo(
+              characteristic: characteristic,
+              result: const Result<void,
+                  GenericFailure<WriteCharacteristicFailure>>.success(null),
+            );
+
+            when(_pluginController.writeCharacteristicWithResponse(any, any))
+                .thenAnswer(
+              (realInvocation) => Future.value(info),
+            );
+
+            _sut = ConnectedDeviceOperator(pluginController: _pluginController);
+            await _sut.writeCharacteristicWithResponse(characteristic,
+                value: value);
+          });
+
+          test('It invokes $PluginController with correct arguments', () {
+            verify(_pluginController.writeCharacteristicWithResponse(
+                    characteristic, value))
+                .called(1);
+          });
+        });
+
+        group('Given write characteristic fails', () {
+          setUp(() {
+            info = WriteCharacteristicInfo(
+              characteristic: characteristic,
+              result: const Result<void,
+                  GenericFailure<WriteCharacteristicFailure>>.failure(
+                GenericFailure<WriteCharacteristicFailure>(
+                  code: WriteCharacteristicFailure.unknown,
+                  message: 'something went wrong',
+                ),
+              ),
+            );
+
+            when(_pluginController.writeCharacteristicWithResponse(any, any))
+                .thenAnswer(
+              (realInvocation) => Future.value(info),
+            );
+
+            _sut = ConnectedDeviceOperator(pluginController: _pluginController);
+          });
+
+          test('It throws exception ', () async {
+            expect(
+              () => _sut.writeCharacteristicWithResponse(characteristic,
+                  value: value),
+              throwsException,
+            );
+          });
         });
       });
     });

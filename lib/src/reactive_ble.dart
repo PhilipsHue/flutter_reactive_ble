@@ -153,21 +153,8 @@ class FlutterReactiveBle {
     @required List<int> value,
   }) async {
     await initialize();
-
-    final args = pb.WriteCharacteristicRequest()
-      ..characteristic = (pb.CharacteristicAddress()
-        ..deviceId = characteristic.deviceId
-        ..serviceUuid = (pb.Uuid()..data = characteristic.serviceId.data)
-        ..characteristicUuid =
-            (pb.Uuid()..data = characteristic.characteristicId.data))
-      ..value = value;
-
-    return _methodChannel
-        .invokeMethod<List<int>>(
-            "writeCharacteristicWithResponse", args.writeToBuffer())
-        .then((data) => pb.WriteCharacteristicInfo.fromBuffer(data))
-        .then(const ProtobufConverter().writeCharacteristicInfoFrom)
-        .then((info) => info.result.dematerialize());
+    return _connectedDeviceOperator
+        .writeCharacteristicWithResponse(characteristic, value: value);
   }
 
   /// Writes a value to the specified characteristic without waiting for an acknowledgement.
@@ -184,20 +171,20 @@ class FlutterReactiveBle {
   }) async {
     await initialize();
 
-    final args = pb.WriteCharacteristicRequest()
-      ..characteristic = (pb.CharacteristicAddress()
-        ..deviceId = characteristic.deviceId
-        ..serviceUuid = (pb.Uuid()..data = characteristic.serviceId.data)
-        ..characteristicUuid =
-            (pb.Uuid()..data = characteristic.characteristicId.data))
-      ..value = value;
+    // final args = pb.WriteCharacteristicRequest()
+    //   ..characteristic = (pb.CharacteristicAddress()
+    //     ..deviceId = characteristic.deviceId
+    //     ..serviceUuid = (pb.Uuid()..data = characteristic.serviceId.data)
+    //     ..characteristicUuid =
+    //         (pb.Uuid()..data = characteristic.characteristicId.data))
+    //   ..value = value;
 
-    return _methodChannel
-        .invokeMethod<List<int>>(
-            "writeCharacteristicWithoutResponse", args.writeToBuffer())
-        .then((data) => pb.WriteCharacteristicInfo.fromBuffer(data))
-        .then(const ProtobufConverter().writeCharacteristicInfoFrom)
-        .then((info) => info.result.dematerialize());
+    // return _methodChannel
+    //     .invokeMethod<List<int>>(
+    //         "writeCharacteristicWithoutResponse", args.writeToBuffer())
+    //     .then((data) => pb.WriteCharacteristicInfo.fromBuffer(data))
+    //     .then(const ProtobufConverter().writeCharacteristicInfoFrom)
+    //     .then((info) => info.result.dematerialize());
   }
 
   /// Request a specific MTU for a connected device.

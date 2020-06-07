@@ -23,6 +23,14 @@ class ConnectedDeviceOperator {
         .firstWhere((_) => true,
             orElse: () => throw NoBleCharacteristicDataReceived());
   }
+
+  Future<void> writeCharacteristicWithResponse(
+    QualifiedCharacteristic characteristic, {
+    @required List<int> value,
+  }) async =>
+      pluginController
+          .writeCharacteristicWithResponse(characteristic, value)
+          .then((info) => info.result.dematerialize());
 }
 
 @visibleForTesting

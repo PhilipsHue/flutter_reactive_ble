@@ -350,33 +350,37 @@ void main() {
     group("Converts writecharacteristic info", () {
       const id = 'id';
 
-      pb.WriteCharacteristicInfo message;
+      List<int> data;
+      pb.CharacteristicAddress characteristic;
 
       setUp(() {
-        final characteristic = pb.CharacteristicAddress()
+        characteristic = pb.CharacteristicAddress()
           ..deviceId = id
           ..serviceUuid = (pb.Uuid()..data = [0])
           ..characteristicUuid = (pb.Uuid()..data = [1]);
 
-        message = pb.WriteCharacteristicInfo()..characteristic = characteristic;
+        final message = pb.WriteCharacteristicInfo()
+          ..characteristic = characteristic;
+
+        data = message.writeToBuffer();
       });
 
       test('It converts device id', () {
-        final result = sut.writeCharacteristicInfoFrom(message);
+        final result = sut.writeCharacteristicInfoFrom(data);
         expect(result.characteristic.deviceId, id);
       });
       test('It converts service uuid', () {
-        final result = sut.writeCharacteristicInfoFrom(message);
+        final result = sut.writeCharacteristicInfoFrom(data);
         expect(result.characteristic.serviceId, Uuid([00]));
       });
 
       test('It converts characteristic uuid', () {
-        final result = sut.writeCharacteristicInfoFrom(message);
+        final result = sut.writeCharacteristicInfoFrom(data);
         expect(result.characteristic.characteristicId, Uuid([01]));
       });
 
       test('it converts value', () {
-        final result = sut.writeCharacteristicInfoFrom(message);
+        final result = sut.writeCharacteristicInfoFrom(data);
 
         expect(
             result.result.iif(
@@ -386,9 +390,11 @@ void main() {
       });
 
       test('it converts failure', () {
+        final message = pb.WriteCharacteristicInfo()
+          ..characteristic = characteristic;
         final failureMessage = message..failure = pb.GenericFailure();
         final result = sut
-            .writeCharacteristicInfoFrom(failureMessage)
+            .writeCharacteristicInfoFrom(failureMessage.writeToBuffer())
             .result
             .iif(
                 success: (_) => throw AssertionError("Not expected to succeed"),

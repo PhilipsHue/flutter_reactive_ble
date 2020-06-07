@@ -114,5 +114,41 @@ void main() {
         expect(result.characteristic.characteristicUuid.data, [254, 239]);
       });
     });
+
+    group('Create WriteRequest', () {
+      pb.WriteCharacteristicRequest result;
+      const deviceId = '123';
+      final serviceUuid = Uuid.parse('FEFF');
+      final charUuid = Uuid.parse('FEEF');
+      QualifiedCharacteristic characteristic;
+
+      const value = [0, 1];
+
+      setUp(() {
+        characteristic = QualifiedCharacteristic(
+          characteristicId: charUuid,
+          serviceId: serviceUuid,
+          deviceId: deviceId,
+        );
+
+        result = _sut.createWriteChacracteristicRequest(characteristic, value);
+      });
+
+      test('It converts device Id ', () {
+        expect(result.characteristic.deviceId, deviceId);
+      });
+
+      test('It converts service Uuid', () {
+        expect(result.characteristic.serviceUuid.data, [254, 255]);
+      });
+
+      test('It converts char Uuid', () {
+        expect(result.characteristic.characteristicUuid.data, [254, 239]);
+      });
+
+      test('It converts value', () {
+        expect(result.value, value);
+      });
+    });
   });
 }

@@ -49,4 +49,17 @@ class ArgsToProtobufConverter {
 
     return args;
   }
+
+  pb.WriteCharacteristicRequest createWriteChacracteristicRequest(
+      QualifiedCharacteristic characteristic, List<int> value) {
+    final args = pb.WriteCharacteristicRequest()
+      ..characteristic = (pb.CharacteristicAddress()
+        ..deviceId = characteristic.deviceId
+        ..serviceUuid = (pb.Uuid()..data = characteristic.serviceId.data)
+        ..characteristicUuid =
+            (pb.Uuid()..data = characteristic.characteristicId.data))
+      ..value = value;
+
+    return args;
+  }
 }

@@ -94,20 +94,22 @@ class ProtobufConverter {
     );
   }
 
-  WriteCharacteristicInfo writeCharacteristicInfoFrom(
-          pb.WriteCharacteristicInfo message) =>
-      WriteCharacteristicInfo(
-        characteristic: qualifiedCharacteristicFrom(message.characteristic),
-        result: resultFrom(
-          getValue: () {},
-          failure: genericFailureFrom(
-            hasFailure: message.hasFailure(),
-            getFailure: () => message.failure,
-            codes: WriteCharacteristicFailure.values,
-            fallback: (rawOrNull) => WriteCharacteristicFailure.unknown,
-          ),
+  WriteCharacteristicInfo writeCharacteristicInfoFrom(List<int> data) {
+    final message = pb.WriteCharacteristicInfo.fromBuffer(data);
+
+    return WriteCharacteristicInfo(
+      characteristic: qualifiedCharacteristicFrom(message.characteristic),
+      result: resultFrom(
+        getValue: () {},
+        failure: genericFailureFrom(
+          hasFailure: message.hasFailure(),
+          getFailure: () => message.failure,
+          codes: WriteCharacteristicFailure.values,
+          fallback: (rawOrNull) => WriteCharacteristicFailure.unknown,
         ),
-      );
+      ),
+    );
+  }
 
   ConnectionPriorityInfo connectionPriorityInfoFrom(
           pb.ChangeConnectionPriorityInfo message) =>

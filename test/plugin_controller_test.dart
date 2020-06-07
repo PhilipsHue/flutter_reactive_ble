@@ -119,7 +119,7 @@ void main() {
           result: const Result.success([1]),
         );
 
-        when(_sut.charUpdateChannel.receiveBroadcastStream()).thenAnswer(
+        when(_argsChannel.receiveBroadcastStream()).thenAnswer(
           (realInvocation) => Stream<List<int>>.fromIterable([
             [0, 1]
           ]),
@@ -164,6 +164,41 @@ void main() {
       test('It invokes method channel with correct arguments', () {
         verify(_methodChannel.invokeMethod<void>(
                 'readCharacteristic', request.writeToBuffer()))
+            .called(1);
+      });
+    });
+
+    group('Write characteristic with response', () {
+      QualifiedCharacteristic characteristic;
+      const value = [0, 1];
+      pb.WriteCharacteristicRequest request;
+
+      setUp(() async {
+        request = pb.WriteCharacteristicRequest();
+        characteristic = QualifiedCharacteristic(
+          characteristicId: Uuid.parse('FEFF'),
+          serviceId: Uuid.parse('FEFF'),
+          deviceId: '123',
+        );
+
+        when(_argsConverter.createWriteChacracteristicRequest(any, any))
+            .thenReturn(request);
+        when(_methodChannel.invokeMethod<List<int>>(
+                'writeCharacteristicWithResponse', any))
+            .thenAnswer((_) => Future.value(const [1, 0]));
+
+        await _sut.writeCharacteristicWithResponse(characteristic, value);
+      });
+
+      test('It calls args to protobuf converter with correct arguments', () {
+        verify(_argsConverter.createWriteChacracteristicRequest(
+                characteristic, value))
+            .called(1);
+      });
+
+      test('It invokes method channel with correct arguments', () {
+        verify(_methodChannel.invokeMethod<void>(
+                'writeCharacteristicWithResponse', request.writeToBuffer()))
             .called(1);
       });
     });
