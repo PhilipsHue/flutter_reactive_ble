@@ -51,6 +51,16 @@ class PluginController {
             .writeToBuffer(),
       );
 
+  Stream<Object> readCharacteristic(QualifiedCharacteristic characteristic) =>
+      bleMethodChannel
+          .invokeMethod<void>(
+            "readCharacteristic",
+            argsToProtobufConverter
+                .createReadCharacteristicRequest(characteristic)
+                .writeToBuffer(),
+          )
+          .asStream();
+
   Stream<ConnectionStateUpdate> get connectionUpdateStream =>
       connectedDeviceChannel
           .receiveBroadcastStream()

@@ -135,6 +135,38 @@ void main() {
         expect(result, emitsInOrder(<CharacteristicValue>[valueUpdate]));
       });
     });
+
+    group('Read characteristic', () {
+      QualifiedCharacteristic characteristic;
+      pb.ReadCharacteristicRequest request;
+
+      setUp(() async {
+        request = pb.ReadCharacteristicRequest();
+        characteristic = QualifiedCharacteristic(
+          characteristicId: Uuid.parse('FEFF'),
+          serviceId: Uuid.parse('FEFF'),
+          deviceId: '123',
+        );
+
+        when(_argsConverter.createReadCharacteristicRequest(any))
+            .thenReturn(request);
+        when(_methodChannel.invokeMethod<void>('readCharacteristic', any))
+            .thenAnswer((_) => Future.value());
+
+        _sut.readCharacteristic(characteristic);
+      });
+
+      test('It calls args to protobuf converter with correct arguments', () {
+        verify(_argsConverter.createReadCharacteristicRequest(characteristic))
+            .called(1);
+      });
+
+      test('It invokes method channel with correct arguments', () {
+        verify(_methodChannel.invokeMethod<void>(
+                'readCharacteristic', request.writeToBuffer()))
+            .called(1);
+      });
+    });
   });
 }
 

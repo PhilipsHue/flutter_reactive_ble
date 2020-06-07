@@ -142,24 +142,7 @@ class FlutterReactiveBle {
   Future<List<int>> readCharacteristic(
       QualifiedCharacteristic characteristic) async {
     await initialize();
-
-    final specificCharacteristicValueStream = characteristicValueStream
-        .where((update) => update.characteristic == characteristic)
-        .map((update) => update.result.dematerialize());
-
-    final args = pb.ReadCharacteristicRequest()
-      ..characteristic = (pb.CharacteristicAddress()
-        ..deviceId = characteristic.deviceId
-        ..serviceUuid = (pb.Uuid()..data = characteristic.serviceId.data)
-        ..characteristicUuid =
-            (pb.Uuid()..data = characteristic.characteristicId.data));
-
-    return _methodChannel
-        .invokeMethod<void>("readCharacteristic", args.writeToBuffer())
-        .asStream()
-        .asyncExpand((Object _) => specificCharacteristicValueStream)
-        .firstWhere((_) => true,
-            orElse: () => throw _NoBleCharacteristicDataReceived());
+    return _connectedDeviceOperator.readCharacteristic(characteristic);
   }
 
   /// Writes a value to the specified characteristic awaiting for an acknowledgement.
@@ -447,7 +430,5 @@ class FlutterReactiveBle {
         .asyncExpand((_) => autosubscribingRepeater.stream);
   }
 }
-
-class _NoBleCharacteristicDataReceived implements Exception {}
 
 class _NoBleDeviceConnectionStateReceived implements Exception {}

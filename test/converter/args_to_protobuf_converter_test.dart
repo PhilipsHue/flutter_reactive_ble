@@ -1,3 +1,4 @@
+import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
 import 'package:flutter_reactive_ble/src/converter/args_to_protubuf_converter.dart';
 import 'package:flutter_reactive_ble/src/generated/bledata.pbserver.dart' as pb;
 import 'package:flutter_reactive_ble/src/model/uuid.dart';
@@ -81,6 +82,36 @@ void main() {
 
       test('It sets correct device id', () {
         expect(result.deviceId, deviceId);
+      });
+    });
+
+    group('Create ReadCharacteristicRequest', () {
+      pb.ReadCharacteristicRequest result;
+      const deviceId = '123';
+      final serviceUuid = Uuid.parse('FEFF');
+      final charUuid = Uuid.parse('FEEF');
+      QualifiedCharacteristic characteristic;
+
+      setUp(() {
+        characteristic = QualifiedCharacteristic(
+          characteristicId: charUuid,
+          serviceId: serviceUuid,
+          deviceId: deviceId,
+        );
+
+        result = _sut.createReadCharacteristicRequest(characteristic);
+      });
+
+      test('It converts device Id ', () {
+        expect(result.characteristic.deviceId, deviceId);
+      });
+
+      test('It converts service Uuid', () {
+        expect(result.characteristic.serviceUuid.data, [254, 255]);
+      });
+
+      test('It converts char Uuid', () {
+        expect(result.characteristic.characteristicUuid.data, [254, 239]);
       });
     });
   });
