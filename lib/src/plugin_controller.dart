@@ -1,4 +1,5 @@
 import 'package:flutter/services.dart';
+import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
 import 'package:flutter_reactive_ble/src/converter/args_to_protubuf_converter.dart';
 import 'package:flutter_reactive_ble/src/model/uuid.dart';
 import 'package:flutter_reactive_ble/src/model/write_characteristic_info.dart';
@@ -133,6 +134,17 @@ class PluginController {
                 .writeToBuffer(),
           )
           .then(_protobufConverter.mtuSizeFrom);
+
+  Future<ConnectionPriorityInfo> requestConnectionPriority(
+          String deviceId, ConnectionPriority priority) =>
+      _bleMethodChannel
+          .invokeMethod<List<int>>(
+            "requestConnectionPriority",
+            _argsToProtobufConverter
+                .createChangeConnectionPrioRequest(deviceId, priority)
+                .writeToBuffer(),
+          )
+          .then(_protobufConverter.connectionPriorityInfoFrom);
 }
 
 class PluginControllerFactory {

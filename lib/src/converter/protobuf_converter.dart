@@ -111,19 +111,20 @@ class ProtobufConverter {
     );
   }
 
-  ConnectionPriorityInfo connectionPriorityInfoFrom(
-          pb.ChangeConnectionPriorityInfo message) =>
-      ConnectionPriorityInfo(
-        result: resultFrom(
-          getValue: () {},
-          failure: genericFailureFrom(
-            hasFailure: message.hasFailure(),
-            getFailure: () => message.failure,
-            codes: ConnectionPriorityFailure.values,
-            fallback: (rawOrNull) => ConnectionPriorityFailure.unknown,
-          ),
+  ConnectionPriorityInfo connectionPriorityInfoFrom(List<int> data) {
+    final message = pb.ChangeConnectionPriorityInfo.fromBuffer(data);
+    return ConnectionPriorityInfo(
+      result: resultFrom(
+        getValue: () {},
+        failure: genericFailureFrom(
+          hasFailure: message.hasFailure(),
+          getFailure: () => message.failure,
+          codes: ConnectionPriorityFailure.values,
+          fallback: (rawOrNull) => ConnectionPriorityFailure.unknown,
         ),
-      );
+      ),
+    );
+  }
 
   int mtuSizeFrom(List<int> data) =>
       pb.NegotiateMtuInfo.fromBuffer(data).mtuSize;

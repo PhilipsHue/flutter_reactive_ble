@@ -413,7 +413,8 @@ void main() {
       });
 
       test('Succeeds', () {
-        final result = sut.connectionPriorityInfoFrom(message).result;
+        final result =
+            sut.connectionPriorityInfoFrom(message.writeToBuffer()).result;
         expect(
             result.iif(
                 success: (_) => "success",
@@ -424,7 +425,7 @@ void main() {
       test('Fails', () {
         final failureMessage = message..failure = pb.GenericFailure();
         final result = sut
-            .connectionPriorityInfoFrom(failureMessage)
+            .connectionPriorityInfoFrom(failureMessage.writeToBuffer())
             .result
             .iif(
                 success: (_) => throw AssertionError("Not expected to succeed"),

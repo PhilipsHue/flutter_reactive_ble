@@ -198,5 +198,24 @@ void main() {
         expect(result.mtuSize, mtuSize);
       });
     });
+
+    group('Change connection prio request', () {
+      const deviceId = '123';
+      ConnectionPriority priority;
+      pb.ChangeConnectionPriorityRequest result;
+
+      setUp(() {
+        priority = ConnectionPriority.highPerformance;
+        result = _sut.createChangeConnectionPrioRequest(deviceId, priority);
+      });
+
+      test('It converts device id', () {
+        expect(result.deviceId, deviceId);
+      });
+
+      test('It converts priority', () {
+        expect(result.priority, 1);
+      });
+    });
   });
 }

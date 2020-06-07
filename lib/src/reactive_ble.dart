@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/services.dart';
-import 'package:flutter_reactive_ble/src/connected_device_operator.dart';
+import 'package:flutter_reactive_ble/src/connected_device_operation.dart';
 import 'package:flutter_reactive_ble/src/converter/protobuf_converter.dart';
 import 'package:flutter_reactive_ble/src/device_connector.dart';
 import 'package:flutter_reactive_ble/src/discovered_devices_registry.dart';
@@ -97,7 +97,7 @@ class FlutterReactiveBle {
 
   ScanSession _currentScan;
   DeviceConnector _deviceConnector;
-  ConnectedDeviceOperator _connectedDeviceOperator;
+  ConnectedDeviceOperation _connectedDeviceOperator;
 
   /// Initializes this [FlutterReactiveBle] instance and its platform-specific
   /// counterparts.
@@ -109,8 +109,9 @@ class FlutterReactiveBle {
 
     _initialization ??= _methodChannel.invokeMethod("initialize");
 
-    _connectedDeviceOperator ??=
-        ConnectedDeviceOperator(pluginController: _pluginController);
+    _connectedDeviceOperator ??= ConnectedDeviceOperation(
+      pluginController: _pluginController,
+    );
 
     _deviceConnector ??= DeviceConnector(
       pluginController: _pluginController,
@@ -188,8 +189,10 @@ class FlutterReactiveBle {
   ///
   /// * BLE 4.0–4.1 max ATT MTU is 23 bytes
   /// * BLE 4.2–5.1 max ATT MTU is 247 bytes
-  Future<int> requestMtu({@required String deviceId, int mtu}) async =>
-      _connectedDeviceOperator.requestMtu(deviceId, mtu);
+  Future<int> requestMtu({@required String deviceId, int mtu}) async {
+    await initialize();
+    return _connectedDeviceOperator.requestMtu(deviceId, mtu);
+  }
 
   /// Requests for a connection parameter update on the connected device.
   ///
@@ -199,16 +202,8 @@ class FlutterReactiveBle {
       @required ConnectionPriority priority}) async {
     await initialize();
 
-    final args = pb.ChangeConnectionPriorityRequest()
-      ..deviceId = deviceId
-      ..priority = convertPriorityToInt(priority);
-
-    return _methodChannel
-        .invokeMethod<List<int>>(
-            "requestConnectionPriority", args.writeToBuffer())
-        .then((data) => pb.ChangeConnectionPriorityInfo.fromBuffer(data))
-        .then(const ProtobufConverter().connectionPriorityInfoFrom)
-        .then((message) => message.result.dematerialize());
+    return _connectedDeviceOperator.requestConnectionPriority(
+        deviceId, priority);
   }
 
   /// Scan for BLE peripherals advertising the services specified in [withServices]

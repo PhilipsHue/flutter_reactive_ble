@@ -2,8 +2,8 @@ import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
 import 'package:flutter_reactive_ble/src/plugin_controller.dart';
 import 'package:meta/meta.dart';
 
-class ConnectedDeviceOperator {
-  ConnectedDeviceOperator({
+class ConnectedDeviceOperation {
+  ConnectedDeviceOperation({
     @required PluginController pluginController,
   })  : assert(pluginController != null),
         _pluginController = pluginController;
@@ -66,6 +66,12 @@ class ConnectedDeviceOperator {
 
   Future<int> requestMtu(String deviceId, int mtu) async =>
       _pluginController.requestMtuSize(deviceId, mtu);
+
+  Future<void> requestConnectionPriority(
+          String deviceId, ConnectionPriority priority) async =>
+      _pluginController
+          .requestConnectionPriority(deviceId, priority)
+          .then((message) => message.result.dematerialize());
 }
 
 @visibleForTesting

@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
-import 'package:flutter_reactive_ble/src/connected_device_operator.dart';
+import 'package:flutter_reactive_ble/src/connected_device_operation.dart';
 import 'package:flutter_reactive_ble/src/model/characteristic_value.dart';
 import 'package:flutter_reactive_ble/src/model/qualified_characteristic.dart';
 import 'package:flutter_reactive_ble/src/model/result.dart';
@@ -13,12 +13,12 @@ import 'package:mockito/mockito.dart';
 
 void main() {
   _PluginControllerMock _pluginController;
-  ConnectedDeviceOperator _sut;
+  ConnectedDeviceOperation _sut;
 
-  group('$ConnectedDeviceOperator', () {
+  group('$ConnectedDeviceOperation', () {
     setUp(() {
       _pluginController = _PluginControllerMock();
-      _sut = ConnectedDeviceOperator(
+      _sut = ConnectedDeviceOperation(
         pluginController: _pluginController,
       );
     });
@@ -394,6 +394,56 @@ void main() {
 
       test('It calls plugin controller with correct arguments', () {
         verify(_pluginController.requestMtuSize(deviceId, mtuSize)).called(1);
+      });
+    });
+
+    group('Change connection priority', () {
+      const deviceId = '123';
+      ConnectionPriority priority;
+
+      setUp(() {
+        priority = ConnectionPriority.highPerformance;
+      });
+
+      group('Given request priority succeeds', () {
+        setUp(() async {
+          when(_pluginController.requestConnectionPriority(any, any))
+              .thenAnswer(
+            (_) => Future.value(
+              const ConnectionPriorityInfo(result: Result.success(null)),
+            ),
+          );
+
+          await _sut.requestConnectionPriority(deviceId, priority);
+        });
+
+        test('It calls plugin controller with correct arguments', () {
+          verify(_pluginController.requestConnectionPriority(
+                  deviceId, priority))
+              .called(1);
+        });
+      });
+
+      group('Given request priority fails', () {
+        setUp(() async {
+          when(_pluginController.requestConnectionPriority(any, any))
+              .thenAnswer(
+            (_) => Future.value(
+              const ConnectionPriorityInfo(
+                result: Result.failure(
+                  GenericFailure<ConnectionPriorityFailure>(
+                      code: ConnectionPriorityFailure.unknown,
+                      message: 'whoops'),
+                ),
+              ),
+            ),
+          );
+        });
+
+        test('It throws failure', () async {
+          expect(() async => _sut.requestConnectionPriority(deviceId, priority),
+              throwsException);
+        });
       });
     });
   });

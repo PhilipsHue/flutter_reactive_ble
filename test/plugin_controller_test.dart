@@ -345,6 +345,49 @@ void main() {
         ).called(1);
       });
     });
+
+    group('Request connection priority', () {
+      const deviceId = '123';
+      ConnectionPriority priority;
+      pb.ChangeConnectionPriorityRequest request;
+      ConnectionPriorityInfo info;
+
+      setUp(() async {
+        request = pb.ChangeConnectionPriorityRequest();
+        priority = ConnectionPriority.highPerformance;
+        info = const ConnectionPriorityInfo(result: Result.success(null));
+
+        when(_argsConverter.createChangeConnectionPrioRequest(any, any))
+            .thenReturn(request);
+        when(_protobufConverter.connectionPriorityInfoFrom(any))
+            .thenReturn(info);
+        when(
+          _methodChannel.invokeMethod<List<int>>(
+              'requestConnectionPriority', any),
+        ).thenAnswer((_) => Future.value([1]));
+
+        await _sut.requestConnectionPriority(deviceId, priority);
+      });
+
+      test('It calls args to protobuf converter with correct arguments', () {
+        verify(_argsConverter.createChangeConnectionPrioRequest(
+                deviceId, priority))
+            .called(1);
+      });
+
+      test('It calls protobuf converter wit correct arguments', () {
+        verify(_protobufConverter.connectionPriorityInfoFrom([1])).called(1);
+      });
+
+      test('It invokes method channel with correct arguments', () {
+        verify(
+          _methodChannel.invokeMethod<void>(
+            'requestConnectionPriority',
+            request.writeToBuffer(),
+          ),
+        ).called(1);
+      });
+    });
   });
 }
 
