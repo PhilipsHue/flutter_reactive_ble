@@ -180,5 +180,23 @@ void main() {
         expect(result.characteristic.characteristicUuid.data, [254, 239]);
       });
     });
+
+    group('Create negotiate mtu request', () {
+      const deviceId = '123';
+      const mtuSize = 30;
+      pb.NegotiateMtuRequest result;
+
+      setUp(() {
+        result = _sut.createNegotiateMtuRequest(deviceId, mtuSize);
+      });
+
+      test('It converts device id', () {
+        expect(result.deviceId, deviceId);
+      });
+
+      test('It converts mtusize', () {
+        expect(result.mtuSize, mtuSize);
+      });
+    });
   });
 }

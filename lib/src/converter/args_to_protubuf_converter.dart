@@ -86,4 +86,12 @@ class ArgsToProtobufConverter {
 
     return args;
   }
+
+  pb.NegotiateMtuRequest createNegotiateMtuRequest(String deviceId, int mtu) {
+    final args = pb.NegotiateMtuRequest()
+      ..deviceId = deviceId
+      ..mtuSize = mtu;
+
+    return args;
+  }
 }

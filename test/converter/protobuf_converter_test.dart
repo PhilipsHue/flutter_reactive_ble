@@ -444,6 +444,21 @@ void main() {
         expect(sut.bleStatusFrom(message), BleStatus.unknown);
       });
     });
+
+    group('Coverts mtu size', () {
+      const size = 20;
+      int result;
+
+      setUp(() {
+        final message = pb.NegotiateMtuInfo()..mtuSize = size;
+
+        result = sut.mtuSizeFrom(message.writeToBuffer());
+      });
+
+      test('It convert mtu size size', () {
+        expect(result, 20);
+      });
+    });
   });
 }
 

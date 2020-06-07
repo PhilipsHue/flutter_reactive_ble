@@ -33,6 +33,17 @@ class PluginController {
   final EventChannel _connectedDeviceChannel;
   final EventChannel _charUpdateChannel;
 
+  Stream<ConnectionStateUpdate> get connectionUpdateStream =>
+      _connectedDeviceChannel
+          .receiveBroadcastStream()
+          .cast<List<int>>()
+          .map(_protobufConverter.connectionStateUpdateFrom);
+
+  Stream<CharacteristicValue> get charValueUpdateStream => _charUpdateChannel
+      .receiveBroadcastStream()
+      .cast<List<int>>()
+      .map(_protobufConverter.characteristicValueFrom);
+
   Stream<Object> connectToDevice(
     String id,
     Map<Uuid, List<Uuid>> servicesWithCharacteristicsToDiscover,
@@ -113,16 +124,15 @@ class PluginController {
           .catchError((Object e) =>
               print("Error unsubscribing from notifications: $e"));
 
-  Stream<ConnectionStateUpdate> get connectionUpdateStream =>
-      _connectedDeviceChannel
-          .receiveBroadcastStream()
-          .cast<List<int>>()
-          .map(_protobufConverter.connectionStateUpdateFrom);
-
-  Stream<CharacteristicValue> get charValueUpdateStream => _charUpdateChannel
-      .receiveBroadcastStream()
-      .cast<List<int>>()
-      .map(_protobufConverter.characteristicValueFrom);
+  Future<int> requestMtuSize(String deviceId, int mtu) async =>
+      _bleMethodChannel
+          .invokeMethod<List<int>>(
+            "negotiateMtuSize",
+            _argsToProtobufConverter
+                .createNegotiateMtuRequest(deviceId, mtu)
+                .writeToBuffer(),
+          )
+          .then(_protobufConverter.mtuSizeFrom);
 }
 
 class PluginControllerFactory {

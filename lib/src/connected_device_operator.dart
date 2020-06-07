@@ -63,6 +63,9 @@ class ConnectedDeviceOperator {
 
     return autosubscribingRepeater.stream;
   }
+
+  Future<int> requestMtu(String deviceId, int mtu) async =>
+      _pluginController.requestMtuSize(deviceId, mtu);
 }
 
 @visibleForTesting

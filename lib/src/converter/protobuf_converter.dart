@@ -125,6 +125,9 @@ class ProtobufConverter {
         ),
       );
 
+  int mtuSizeFrom(List<int> data) =>
+      pb.NegotiateMtuInfo.fromBuffer(data).mtuSize;
+
   QualifiedCharacteristic qualifiedCharacteristicFrom(
           pb.CharacteristicAddress message) =>
       QualifiedCharacteristic(

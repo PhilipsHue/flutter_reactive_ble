@@ -18,6 +18,9 @@ void main() {
   group('$ConnectedDeviceOperator', () {
     setUp(() {
       _pluginController = _PluginControllerMock();
+      _sut = ConnectedDeviceOperator(
+        pluginController: _pluginController,
+      );
     });
     group('Listen to char value updates', () {
       CharacteristicValue valueUpdate;
@@ -34,8 +37,6 @@ void main() {
 
         when(_pluginController.charValueUpdateStream)
             .thenAnswer((_) => Stream.fromIterable([valueUpdate]));
-
-        _sut = ConnectedDeviceOperator(pluginController: _pluginController);
       });
 
       test('It emits value updates received from plugincontroller', () {
@@ -101,9 +102,6 @@ void main() {
 
           when(_pluginController.readCharacteristic(any))
               .thenAnswer((_) => Stream.fromIterable([0]));
-          _sut = ConnectedDeviceOperator(
-            pluginController: _pluginController,
-          );
           result = await _sut.readCharacteristic(charDevice);
         });
 
@@ -128,9 +126,6 @@ void main() {
 
           when(_pluginController.readCharacteristic(any))
               .thenAnswer((_) => Stream.fromIterable([0]));
-          _sut = ConnectedDeviceOperator(
-            pluginController: _pluginController,
-          );
         });
 
         test('It emits first value that matches', () async {
@@ -169,7 +164,6 @@ void main() {
               (realInvocation) => Future.value(info),
             );
 
-            _sut = ConnectedDeviceOperator(pluginController: _pluginController);
             await _sut.writeCharacteristicWithResponse(characteristic,
                 value: value);
           });
@@ -198,8 +192,6 @@ void main() {
                 .thenAnswer(
               (realInvocation) => Future.value(info),
             );
-
-            _sut = ConnectedDeviceOperator(pluginController: _pluginController);
           });
 
           test('It throws exception ', () async {
@@ -226,7 +218,6 @@ void main() {
               (realInvocation) => Future.value(info),
             );
 
-            _sut = ConnectedDeviceOperator(pluginController: _pluginController);
             await _sut.writeCharacteristicWithoutResponse(characteristic,
                 value: value);
           });
@@ -255,8 +246,6 @@ void main() {
                 .thenAnswer(
               (realInvocation) => Future.value(info),
             );
-
-            _sut = ConnectedDeviceOperator(pluginController: _pluginController);
           });
 
           test('It throws exception ', () async {
@@ -340,9 +329,6 @@ void main() {
 
         group('And device remains connected', () {
           setUp(() {
-            _sut = ConnectedDeviceOperator(
-              pluginController: _pluginController,
-            );
             result = _sut.subscribeToCharacteristic(
                 charDevice, terminateCompleter.future);
           });
@@ -386,6 +372,28 @@ void main() {
                 ]));
           });
         });
+      });
+    });
+
+    group('Negotiate mtusize', () {
+      const deviceId = '123';
+      const mtuSize = 50;
+      int result;
+
+      setUp(() async {
+        when(_pluginController.requestMtuSize(any, any)).thenAnswer(
+          (_) => Future.value(mtuSize),
+        );
+
+        result = await _sut.requestMtu(deviceId, mtuSize);
+      });
+
+      test('It provides result retrieved from plugin', () {
+        expect(result, mtuSize);
+      });
+
+      test('It calls plugin controller with correct arguments', () {
+        verify(_pluginController.requestMtuSize(deviceId, mtuSize)).called(1);
       });
     });
   });

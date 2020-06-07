@@ -188,18 +188,8 @@ class FlutterReactiveBle {
   ///
   /// * BLE 4.0–4.1 max ATT MTU is 23 bytes
   /// * BLE 4.2–5.1 max ATT MTU is 247 bytes
-  Future<int> requestMtu({@required String deviceId, int mtu}) async {
-    await initialize();
-
-    final args = pb.NegotiateMtuRequest()
-      ..deviceId = deviceId
-      ..mtuSize = mtu;
-
-    return _methodChannel
-        .invokeMethod<List<int>>("negotiateMtuSize", args.writeToBuffer())
-        .then((data) => pb.NegotiateMtuInfo.fromBuffer(data))
-        .then((message) => message.mtuSize);
-  }
+  Future<int> requestMtu({@required String deviceId, int mtu}) async =>
+      _connectedDeviceOperator.requestMtu(deviceId, mtu);
 
   /// Requests for a connection parameter update on the connected device.
   ///

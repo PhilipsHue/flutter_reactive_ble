@@ -310,6 +310,41 @@ void main() {
         ).called(1);
       });
     });
+    group('Request mtu size', () {
+      const deviceId = '123';
+      const mtuSize = 40;
+      pb.NegotiateMtuRequest request;
+
+      setUp(() async {
+        request = pb.NegotiateMtuRequest();
+
+        when(_argsConverter.createNegotiateMtuRequest(any, any))
+            .thenReturn(request);
+        when(
+          _methodChannel.invokeMethod<List<int>>('negotiateMtuSize', any),
+        ).thenAnswer((_) => Future.value([1]));
+
+        await _sut.requestMtuSize(deviceId, mtuSize);
+      });
+
+      test('It calls args to protobuf converter with correct arguments', () {
+        verify(_argsConverter.createNegotiateMtuRequest(deviceId, mtuSize))
+            .called(1);
+      });
+
+      test('It calls protobuf converter wit correct arguments', () {
+        verify(_protobufConverter.mtuSizeFrom([1])).called(1);
+      });
+
+      test('It invokes method channel with correct arguments', () {
+        verify(
+          _methodChannel.invokeMethod<void>(
+            'negotiateMtuSize',
+            request.writeToBuffer(),
+          ),
+        ).called(1);
+      });
+    });
   });
 }
 
