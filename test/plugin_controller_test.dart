@@ -202,6 +202,41 @@ void main() {
             .called(1);
       });
     });
+
+    group('Write characteristic without response', () {
+      QualifiedCharacteristic characteristic;
+      const value = [0, 1];
+      pb.WriteCharacteristicRequest request;
+
+      setUp(() async {
+        request = pb.WriteCharacteristicRequest();
+        characteristic = QualifiedCharacteristic(
+          characteristicId: Uuid.parse('FEFF'),
+          serviceId: Uuid.parse('FEFF'),
+          deviceId: '123',
+        );
+
+        when(_argsConverter.createWriteChacracteristicRequest(any, any))
+            .thenReturn(request);
+        when(_methodChannel.invokeMethod<List<int>>(
+                'writeCharacteristicWithoutResponse', any))
+            .thenAnswer((_) => Future.value(const [1, 0]));
+
+        await _sut.writeCharacteristicWithoutResponse(characteristic, value);
+      });
+
+      test('It calls args to protobuf converter with correct arguments', () {
+        verify(_argsConverter.createWriteChacracteristicRequest(
+                characteristic, value))
+            .called(1);
+      });
+
+      test('It invokes method channel with correct arguments', () {
+        verify(_methodChannel.invokeMethod<void>(
+                'writeCharacteristicWithoutResponse', request.writeToBuffer()))
+            .called(1);
+      });
+    });
   });
 }
 

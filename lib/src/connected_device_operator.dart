@@ -31,6 +31,14 @@ class ConnectedDeviceOperator {
       pluginController
           .writeCharacteristicWithResponse(characteristic, value)
           .then((info) => info.result.dematerialize());
+
+  Future<void> writeCharacteristicWithoutResponse(
+    QualifiedCharacteristic characteristic, {
+    @required List<int> value,
+  }) async =>
+      pluginController
+          .writeCharacteristicWithoutResponse(characteristic, value)
+          .then((info) => info.result.dematerialize());
 }
 
 @visibleForTesting

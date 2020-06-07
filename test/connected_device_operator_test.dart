@@ -209,6 +209,63 @@ void main() {
           });
         });
       });
+
+      group('Write characteristic without response', () {
+        group('Given write characteristic succeeds', () {
+          setUp(() async {
+            info = WriteCharacteristicInfo(
+              characteristic: characteristic,
+              result: const Result<void,
+                  GenericFailure<WriteCharacteristicFailure>>.success(null),
+            );
+
+            when(_pluginController.writeCharacteristicWithoutResponse(any, any))
+                .thenAnswer(
+              (realInvocation) => Future.value(info),
+            );
+
+            _sut = ConnectedDeviceOperator(pluginController: _pluginController);
+            await _sut.writeCharacteristicWithoutResponse(characteristic,
+                value: value);
+          });
+
+          test('It invokes $PluginController with correct arguments', () {
+            verify(_pluginController.writeCharacteristicWithoutResponse(
+                    characteristic, value))
+                .called(1);
+          });
+        });
+
+        group('Given write characteristic fails', () {
+          setUp(() {
+            info = WriteCharacteristicInfo(
+              characteristic: characteristic,
+              result: const Result<void,
+                  GenericFailure<WriteCharacteristicFailure>>.failure(
+                GenericFailure<WriteCharacteristicFailure>(
+                  code: WriteCharacteristicFailure.unknown,
+                  message: 'something went wrong',
+                ),
+              ),
+            );
+
+            when(_pluginController.writeCharacteristicWithoutResponse(any, any))
+                .thenAnswer(
+              (realInvocation) => Future.value(info),
+            );
+
+            _sut = ConnectedDeviceOperator(pluginController: _pluginController);
+          });
+
+          test('It throws exception ', () async {
+            expect(
+              () => _sut.writeCharacteristicWithoutResponse(characteristic,
+                  value: value),
+              throwsException,
+            );
+          });
+        });
+      });
     });
   });
 }

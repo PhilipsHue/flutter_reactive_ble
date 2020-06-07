@@ -79,6 +79,17 @@ class PluginController {
                   .writeToBuffer())
           .then(_protobufConverter.writeCharacteristicInfoFrom);
 
+  Future<WriteCharacteristicInfo> writeCharacteristicWithoutResponse(
+          QualifiedCharacteristic characteristic, List<int> value) async =>
+      _bleMethodChannel
+          .invokeMethod<List<int>>(
+            "writeCharacteristicWithoutResponse",
+            _argsToProtobufConverter
+                .createWriteChacracteristicRequest(characteristic, value)
+                .writeToBuffer(),
+          )
+          .then(_protobufConverter.writeCharacteristicInfoFrom);
+
   Stream<ConnectionStateUpdate> get connectionUpdateStream =>
       _connectedDeviceChannel
           .receiveBroadcastStream()
