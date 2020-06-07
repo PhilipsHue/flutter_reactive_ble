@@ -4,20 +4,21 @@ import 'package:meta/meta.dart';
 
 class ConnectedDeviceOperator {
   ConnectedDeviceOperator({
-    @required this.pluginController,
-  });
+    @required PluginController pluginController,
+  })  : assert(pluginController != null),
+        _pluginController = pluginController;
 
-  final PluginController pluginController;
+  final PluginController _pluginController;
 
   Stream<CharacteristicValue> get characteristicValueStream =>
-      pluginController.charValueUpdateStream;
+      _pluginController.charValueUpdateStream;
 
   Future<List<int>> readCharacteristic(QualifiedCharacteristic characteristic) {
     final specificCharacteristicValueStream = characteristicValueStream
         .where((update) => update.characteristic == characteristic)
         .map((update) => update.result.dematerialize());
 
-    return pluginController
+    return _pluginController
         .readCharacteristic(characteristic)
         .asyncExpand((Object _) => specificCharacteristicValueStream)
         .firstWhere((_) => true,
@@ -28,7 +29,7 @@ class ConnectedDeviceOperator {
     QualifiedCharacteristic characteristic, {
     @required List<int> value,
   }) async =>
-      pluginController
+      _pluginController
           .writeCharacteristicWithResponse(characteristic, value)
           .then((info) => info.result.dematerialize());
 
@@ -36,13 +37,45 @@ class ConnectedDeviceOperator {
     QualifiedCharacteristic characteristic, {
     @required List<int> value,
   }) async =>
-      pluginController
+      _pluginController
           .writeCharacteristicWithoutResponse(characteristic, value)
           .then((info) => info.result.dematerialize());
+
+  Stream<List<int>> subscribeToCharacteristic(
+    QualifiedCharacteristic characteristic,
+    Future<ConnectionStateUpdate> shouldTerminate,
+  ) {
+    final specificCharacteristicValueStream = characteristicValueStream
+        .where((update) => update.characteristic == characteristic)
+        .map((update) => update.result.dematerialize());
+
+    final autosubscribingRepeater = Repeater<List<int>>.broadcast(
+      onListenEmitFrom: () => _pluginController
+          .subscribeToNotifications(characteristic)
+          .asyncExpand((Object _) => specificCharacteristicValueStream),
+      onCancel: () => _pluginController
+          .stopSubscribingToNotifications(characteristic)
+          .catchError((Object e) =>
+              print("Error unsubscribing from notifications: $e")),
+    );
+
+    shouldTerminate.then<void>((_) => autosubscribingRepeater.dispose());
+
+    return autosubscribingRepeater.stream;
+  }
 }
 
 @visibleForTesting
 class NoBleCharacteristicDataReceived implements Exception {
+  @override
+  bool operator ==(Object other) => runtimeType == other.runtimeType;
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+}
+
+@visibleForTesting
+class NoBleDeviceConnectionStateReceived implements Exception {
   @override
   bool operator ==(Object other) => runtimeType == other.runtimeType;
 

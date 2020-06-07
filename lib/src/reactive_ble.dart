@@ -358,57 +358,21 @@ class FlutterReactiveBle {
         .then((info) => info.dematerialize());
   }
 
-  /// Subscribes to notifications for a characteristic.
-  ///
-  /// The current implementation unsubscribes from notifications when the returned stream is not listened to,
-  /// which also affects other notification streams created for the same characteristic.
   Stream<List<int>> subscribeToCharacteristic(
       QualifiedCharacteristic characteristic) {
-    final specificCharacteristicValueStream = characteristicValueStream
-        .where((update) => update.characteristic == characteristic)
-        .map((update) => update.result.dematerialize());
-
-    final autosubscribingRepeater = Repeater<List<int>>.broadcast(
-      onListenEmitFrom: () {
-        final args = pb.NotifyCharacteristicRequest()
-          ..characteristic = (pb.CharacteristicAddress()
-            ..deviceId = characteristic.deviceId
-            ..serviceUuid = (pb.Uuid()..data = characteristic.serviceId.data)
-            ..characteristicUuid =
-                (pb.Uuid()..data = characteristic.characteristicId.data));
-
-        return _methodChannel
-            .invokeMethod<void>("readNotifications", args.writeToBuffer())
-            .asStream()
-            .asyncExpand((Object _) => specificCharacteristicValueStream);
-      },
-      onCancel: () {
-        final args = pb.NotifyNoMoreCharacteristicRequest()
-          ..characteristic = (pb.CharacteristicAddress()
-            ..deviceId = characteristic.deviceId
-            ..serviceUuid = (pb.Uuid()..data = characteristic.serviceId.data)
-            ..characteristicUuid =
-                (pb.Uuid()..data = characteristic.characteristicId.data));
-        return _methodChannel
-            .invokeMethod<void>("stopNotifications", args.writeToBuffer())
-            .catchError((Object e) =>
-                print("Error unsubscribing from notifications: $e"));
-      },
-    );
-
-    connectedDeviceStream
+    final terminateFuture = connectedDeviceStream
         .where((update) =>
             update.deviceId == characteristic.deviceId &&
             (update.connectionState == DeviceConnectionState.disconnecting ||
                 update.connectionState == DeviceConnectionState.disconnected))
         .firstWhere((_) => true,
-            orElse: () => throw _NoBleDeviceConnectionStateReceived())
-        .then<void>((_) => autosubscribingRepeater.dispose());
+            orElse: () => throw NoBleCharacteristicDataReceived());
 
-    return initialize()
-        .asStream()
-        .asyncExpand((_) => autosubscribingRepeater.stream);
+    return initialize().asStream().asyncExpand(
+          (_) => _connectedDeviceOperator.subscribeToCharacteristic(
+            characteristic,
+            terminateFuture,
+          ),
+        );
   }
 }
-
-class _NoBleDeviceConnectionStateReceived implements Exception {}

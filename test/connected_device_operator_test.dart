@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
 import 'package:flutter_reactive_ble/src/connected_device_operator.dart';
 import 'package:flutter_reactive_ble/src/model/characteristic_value.dart';
@@ -263,6 +265,125 @@ void main() {
                   value: value),
               throwsException,
             );
+          });
+        });
+      });
+    });
+    group('Subscribe to characteristic', () {
+      QualifiedCharacteristic charDevice;
+      QualifiedCharacteristic charOtherSameDevice;
+      QualifiedCharacteristic charOtherDevice;
+      CharacteristicValue valueUpdate1;
+      CharacteristicValue valueUpdate2;
+      CharacteristicValue valueUpdateOtherDevice;
+      CharacteristicValue valueUpdateSameDeviceOtherChar;
+      Stream<List<int>> result;
+      Completer<ConnectionStateUpdate> terminateCompleter;
+
+      setUp(() {
+        terminateCompleter = Completer();
+
+        charDevice = QualifiedCharacteristic(
+          characteristicId: Uuid.parse('FEFF'),
+          serviceId: Uuid.parse('FEFF'),
+          deviceId: '123',
+        );
+
+        charOtherSameDevice = QualifiedCharacteristic(
+          characteristicId: Uuid.parse('FEFF'),
+          serviceId: Uuid.parse('FAFF'),
+          deviceId: '123',
+        );
+
+        charOtherDevice = QualifiedCharacteristic(
+          characteristicId: Uuid.parse('FEFF'),
+          serviceId: Uuid.parse('FEFF'),
+          deviceId: '456',
+        );
+
+        valueUpdate1 = CharacteristicValue(
+          characteristic: charDevice,
+          result: const Result.success([1]),
+        );
+
+        valueUpdate2 = CharacteristicValue(
+          characteristic: charDevice,
+          result: const Result.success([2]),
+        );
+
+        valueUpdateSameDeviceOtherChar = CharacteristicValue(
+          characteristic: charOtherSameDevice,
+          result: const Result.success([3]),
+        );
+
+        valueUpdateOtherDevice = CharacteristicValue(
+          characteristic: charOtherDevice,
+          result: const Result.success([4]),
+        );
+      });
+
+      group('Given multiple updates are received for specific device', () {
+        setUp(() async {
+          when(_pluginController.charValueUpdateStream)
+              .thenAnswer((_) => Stream.fromIterable([
+                    valueUpdate1,
+                    valueUpdateOtherDevice,
+                    valueUpdate2,
+                    valueUpdateSameDeviceOtherChar,
+                  ]));
+
+          when(_pluginController.subscribeToNotifications(any))
+              .thenAnswer((_) => Stream.fromIterable([0]));
+          when(_pluginController.stopSubscribingToNotifications(any))
+              .thenAnswer((_) => Future.value());
+        });
+
+        group('And device remains connected', () {
+          setUp(() {
+            _sut = ConnectedDeviceOperator(
+              pluginController: _pluginController,
+            );
+            result = _sut.subscribeToCharacteristic(
+                charDevice, terminateCompleter.future);
+          });
+
+          group('And the stream is listened to', () {
+            StreamSubscription<List<int>> subscription;
+
+            setUp(() {
+              subscription = result.listen((event) {});
+            });
+
+            tearDown(() async {
+              await subscription.cancel();
+            });
+
+            test('It calls plugin controller with correct arguments', () async {
+              verify(_pluginController.subscribeToNotifications(charDevice))
+                  .called(1);
+            });
+
+            test('It calls plugin controller in case steam is cancelled',
+                () async {
+              await subscription.cancel();
+              verify(_pluginController
+                      .stopSubscribingToNotifications(charDevice))
+                  .called(1);
+            });
+          });
+
+          test('It does not stop notifications', () {
+            verifyNever(
+                _pluginController.stopSubscribingToNotifications(charDevice));
+          });
+
+          test('It emits all values that matches', () {
+            expect(
+                result,
+                emitsInOrder(<List<int>>[
+                  [1],
+                  [2],
+                ]));
           });
         });
       });

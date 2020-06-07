@@ -237,6 +237,79 @@ void main() {
             .called(1);
       });
     });
+
+    group('Subscribe to notifications', () {
+      QualifiedCharacteristic characteristic;
+      pb.NotifyCharacteristicRequest request;
+
+      setUp(() async {
+        request = pb.NotifyCharacteristicRequest();
+        characteristic = QualifiedCharacteristic(
+          characteristicId: Uuid.parse('FEFF'),
+          serviceId: Uuid.parse('FEFF'),
+          deviceId: '123',
+        );
+
+        when(_argsConverter.createNotifyCharacteristicRequest(any))
+            .thenReturn(request);
+        when(
+          _methodChannel.invokeMethod<void>('readNotifications', any),
+        ).thenAnswer((_) => Future.value());
+
+        _sut.subscribeToNotifications(characteristic);
+      });
+
+      test('It calls args to protobuf converter with correct arguments', () {
+        verify(_argsConverter.createNotifyCharacteristicRequest(characteristic))
+            .called(1);
+      });
+
+      test('It invokes method channel with correct arguments', () {
+        verify(
+          _methodChannel.invokeMethod<void>(
+            'readNotifications',
+            request.writeToBuffer(),
+          ),
+        ).called(1);
+      });
+    });
+
+    group('Stop subscribe to notifications', () {
+      QualifiedCharacteristic characteristic;
+      pb.NotifyNoMoreCharacteristicRequest request;
+
+      setUp(() async {
+        request = pb.NotifyNoMoreCharacteristicRequest();
+        characteristic = QualifiedCharacteristic(
+          characteristicId: Uuid.parse('FEFF'),
+          serviceId: Uuid.parse('FEFF'),
+          deviceId: '123',
+        );
+
+        when(_argsConverter.createNotifyNoMoreCharacteristicRequest(any))
+            .thenReturn(request);
+        when(
+          _methodChannel.invokeMethod<void>('stopNotifications', any),
+        ).thenAnswer((_) => Future.value());
+
+        await _sut.stopSubscribingToNotifications(characteristic);
+      });
+
+      test('It calls args to protobuf converter with correct arguments', () {
+        verify(_argsConverter
+                .createNotifyNoMoreCharacteristicRequest(characteristic))
+            .called(1);
+      });
+
+      test('It invokes method channel with correct arguments', () {
+        verify(
+          _methodChannel.invokeMethod<void>(
+            'stopNotifications',
+            request.writeToBuffer(),
+          ),
+        ).called(1);
+      });
+    });
   });
 }
 

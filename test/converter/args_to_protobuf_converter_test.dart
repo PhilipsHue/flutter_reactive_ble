@@ -150,5 +150,35 @@ void main() {
         expect(result.value, value);
       });
     });
+
+    group('Create NotifyCharacteristic request', () {
+      pb.NotifyCharacteristicRequest result;
+      const deviceId = '123';
+      final serviceUuid = Uuid.parse('FEFF');
+      final charUuid = Uuid.parse('FEEF');
+      QualifiedCharacteristic characteristic;
+
+      setUp(() {
+        characteristic = QualifiedCharacteristic(
+          characteristicId: charUuid,
+          serviceId: serviceUuid,
+          deviceId: deviceId,
+        );
+
+        result = _sut.createNotifyCharacteristicRequest(characteristic);
+      });
+
+      test('It converts device Id ', () {
+        expect(result.characteristic.deviceId, deviceId);
+      });
+
+      test('It converts service Uuid', () {
+        expect(result.characteristic.serviceUuid.data, [254, 255]);
+      });
+
+      test('It converts char Uuid', () {
+        expect(result.characteristic.characteristicUuid.data, [254, 239]);
+      });
+    });
   });
 }

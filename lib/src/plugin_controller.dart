@@ -90,6 +90,29 @@ class PluginController {
           )
           .then(_protobufConverter.writeCharacteristicInfoFrom);
 
+  Stream<Object> subscribeToNotifications(
+          QualifiedCharacteristic characteristic) =>
+      _bleMethodChannel
+          .invokeMethod<void>(
+            "readNotifications",
+            _argsToProtobufConverter
+                .createNotifyCharacteristicRequest(characteristic)
+                .writeToBuffer(),
+          )
+          .asStream();
+
+  Future<void> stopSubscribingToNotifications(
+          QualifiedCharacteristic characteristic) =>
+      _bleMethodChannel
+          .invokeMethod<void>(
+            "stopNotifications",
+            _argsToProtobufConverter
+                .createNotifyNoMoreCharacteristicRequest(characteristic)
+                .writeToBuffer(),
+          )
+          .catchError((Object e) =>
+              print("Error unsubscribing from notifications: $e"));
+
   Stream<ConnectionStateUpdate> get connectionUpdateStream =>
       _connectedDeviceChannel
           .receiveBroadcastStream()

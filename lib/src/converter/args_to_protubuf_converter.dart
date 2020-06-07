@@ -62,4 +62,28 @@ class ArgsToProtobufConverter {
 
     return args;
   }
+
+  pb.NotifyCharacteristicRequest createNotifyCharacteristicRequest(
+      QualifiedCharacteristic characteristic) {
+    final args = pb.NotifyCharacteristicRequest()
+      ..characteristic = (pb.CharacteristicAddress()
+        ..deviceId = characteristic.deviceId
+        ..serviceUuid = (pb.Uuid()..data = characteristic.serviceId.data)
+        ..characteristicUuid =
+            (pb.Uuid()..data = characteristic.characteristicId.data));
+
+    return args;
+  }
+
+  pb.NotifyNoMoreCharacteristicRequest createNotifyNoMoreCharacteristicRequest(
+      QualifiedCharacteristic characteristic) {
+    final args = pb.NotifyNoMoreCharacteristicRequest()
+      ..characteristic = (pb.CharacteristicAddress()
+        ..deviceId = characteristic.deviceId
+        ..serviceUuid = (pb.Uuid()..data = characteristic.serviceId.data)
+        ..characteristicUuid =
+            (pb.Uuid()..data = characteristic.characteristicId.data));
+
+    return args;
+  }
 }
