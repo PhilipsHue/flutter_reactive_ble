@@ -77,49 +77,57 @@ class ProtobufConverter {
         ),
       );
 
-  CharacteristicValue characteristicValueFrom(
-          pb.CharacteristicValueInfo message) =>
-      CharacteristicValue(
-        characteristic: qualifiedCharacteristicFrom(message.characteristic),
-        result: resultFrom(
-          getValue: () => message.value,
-          failure: genericFailureFrom(
-            hasFailure: message.hasFailure(),
-            getFailure: () => message.failure,
-            codes: CharacteristicValueUpdateError.values,
-            fallback: (rawOrNull) => CharacteristicValueUpdateError.unknown,
-          ),
-        ),
-      );
+  CharacteristicValue characteristicValueFrom(List<int> data) {
+    final message = pb.CharacteristicValueInfo.fromBuffer(data);
 
-  WriteCharacteristicInfo writeCharacteristicInfoFrom(
-          pb.WriteCharacteristicInfo message) =>
-      WriteCharacteristicInfo(
-        characteristic: qualifiedCharacteristicFrom(message.characteristic),
-        result: resultFrom(
-          getValue: () {},
-          failure: genericFailureFrom(
-            hasFailure: message.hasFailure(),
-            getFailure: () => message.failure,
-            codes: WriteCharacteristicFailure.values,
-            fallback: (rawOrNull) => WriteCharacteristicFailure.unknown,
-          ),
+    return CharacteristicValue(
+      characteristic: qualifiedCharacteristicFrom(message.characteristic),
+      result: resultFrom(
+        getValue: () => message.value,
+        failure: genericFailureFrom(
+          hasFailure: message.hasFailure(),
+          getFailure: () => message.failure,
+          codes: CharacteristicValueUpdateError.values,
+          fallback: (rawOrNull) => CharacteristicValueUpdateError.unknown,
         ),
-      );
+      ),
+    );
+  }
 
-  ConnectionPriorityInfo connectionPriorityInfoFrom(
-          pb.ChangeConnectionPriorityInfo message) =>
-      ConnectionPriorityInfo(
-        result: resultFrom(
-          getValue: () {},
-          failure: genericFailureFrom(
-            hasFailure: message.hasFailure(),
-            getFailure: () => message.failure,
-            codes: ConnectionPriorityFailure.values,
-            fallback: (rawOrNull) => ConnectionPriorityFailure.unknown,
-          ),
+  WriteCharacteristicInfo writeCharacteristicInfoFrom(List<int> data) {
+    final message = pb.WriteCharacteristicInfo.fromBuffer(data);
+
+    return WriteCharacteristicInfo(
+      characteristic: qualifiedCharacteristicFrom(message.characteristic),
+      result: resultFrom(
+        getValue: () {},
+        failure: genericFailureFrom(
+          hasFailure: message.hasFailure(),
+          getFailure: () => message.failure,
+          codes: WriteCharacteristicFailure.values,
+          fallback: (rawOrNull) => WriteCharacteristicFailure.unknown,
         ),
-      );
+      ),
+    );
+  }
+
+  ConnectionPriorityInfo connectionPriorityInfoFrom(List<int> data) {
+    final message = pb.ChangeConnectionPriorityInfo.fromBuffer(data);
+    return ConnectionPriorityInfo(
+      result: resultFrom(
+        getValue: () {},
+        failure: genericFailureFrom(
+          hasFailure: message.hasFailure(),
+          getFailure: () => message.failure,
+          codes: ConnectionPriorityFailure.values,
+          fallback: (rawOrNull) => ConnectionPriorityFailure.unknown,
+        ),
+      ),
+    );
+  }
+
+  int mtuSizeFrom(List<int> data) =>
+      pb.NegotiateMtuInfo.fromBuffer(data).mtuSize;
 
   QualifiedCharacteristic qualifiedCharacteristicFrom(
           pb.CharacteristicAddress message) =>

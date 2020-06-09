@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/services.dart';
+import 'package:flutter_reactive_ble/src/connected_device_operation.dart';
 import 'package:flutter_reactive_ble/src/converter/protobuf_converter.dart';
 import 'package:flutter_reactive_ble/src/device_connector.dart';
 import 'package:flutter_reactive_ble/src/discovered_devices_registry.dart';
@@ -59,13 +60,10 @@ class FlutterReactiveBle {
   /// A stream providing value updates for all the connected BLE devices.
   ///
   /// The updates include read responses as well as notifications.
-  final Stream<CharacteristicValue> characteristicValueStream =
-      const EventChannel("flutter_reactive_ble_char_update")
-          .receiveBroadcastStream()
-          .cast<List<int>>()
-          .map((data) => pb.CharacteristicValueInfo.fromBuffer(data))
-          .map(const ProtobufConverter().characteristicValueFrom)
-            ..listen((_) {});
+  Stream<CharacteristicValue> get characteristicValueStream async* {
+    await initialize();
+    yield* _connectedDeviceOperator.characteristicValueStream;
+  }
 
   final _methodChannel = const MethodChannel("flutter_reactive_ble_method");
 
@@ -99,6 +97,7 @@ class FlutterReactiveBle {
 
   ScanSession _currentScan;
   DeviceConnector _deviceConnector;
+  ConnectedDeviceOperation _connectedDeviceOperator;
 
   /// Initializes this [FlutterReactiveBle] instance and its platform-specific
   /// counterparts.
@@ -109,6 +108,11 @@ class FlutterReactiveBle {
     _pluginController ??= PluginControllerFactory(_methodChannel).create();
 
     _initialization ??= _methodChannel.invokeMethod("initialize");
+
+    _connectedDeviceOperator ??= ConnectedDeviceOperation(
+      pluginController: _pluginController,
+    );
+
     _deviceConnector ??= DeviceConnector(
       pluginController: _pluginController,
       discoveredDevicesRegistry: scanRegistry,
@@ -139,24 +143,7 @@ class FlutterReactiveBle {
   Future<List<int>> readCharacteristic(
       QualifiedCharacteristic characteristic) async {
     await initialize();
-
-    final specificCharacteristicValueStream = characteristicValueStream
-        .where((update) => update.characteristic == characteristic)
-        .map((update) => update.result.dematerialize());
-
-    final args = pb.ReadCharacteristicRequest()
-      ..characteristic = (pb.CharacteristicAddress()
-        ..deviceId = characteristic.deviceId
-        ..serviceUuid = (pb.Uuid()..data = characteristic.serviceId.data)
-        ..characteristicUuid =
-            (pb.Uuid()..data = characteristic.characteristicId.data));
-
-    return _methodChannel
-        .invokeMethod<void>("readCharacteristic", args.writeToBuffer())
-        .asStream()
-        .asyncExpand((Object _) => specificCharacteristicValueStream)
-        .firstWhere((_) => true,
-            orElse: () => throw _NoBleCharacteristicDataReceived());
+    return _connectedDeviceOperator.readCharacteristic(characteristic);
   }
 
   /// Writes a value to the specified characteristic awaiting for an acknowledgement.
@@ -167,21 +154,10 @@ class FlutterReactiveBle {
     @required List<int> value,
   }) async {
     await initialize();
-
-    final args = pb.WriteCharacteristicRequest()
-      ..characteristic = (pb.CharacteristicAddress()
-        ..deviceId = characteristic.deviceId
-        ..serviceUuid = (pb.Uuid()..data = characteristic.serviceId.data)
-        ..characteristicUuid =
-            (pb.Uuid()..data = characteristic.characteristicId.data))
-      ..value = value;
-
-    return _methodChannel
-        .invokeMethod<List<int>>(
-            "writeCharacteristicWithResponse", args.writeToBuffer())
-        .then((data) => pb.WriteCharacteristicInfo.fromBuffer(data))
-        .then(const ProtobufConverter().writeCharacteristicInfoFrom)
-        .then((info) => info.result.dematerialize());
+    return _connectedDeviceOperator.writeCharacteristicWithResponse(
+      characteristic,
+      value: value,
+    );
   }
 
   /// Writes a value to the specified characteristic without waiting for an acknowledgement.
@@ -198,20 +174,11 @@ class FlutterReactiveBle {
   }) async {
     await initialize();
 
-    final args = pb.WriteCharacteristicRequest()
-      ..characteristic = (pb.CharacteristicAddress()
-        ..deviceId = characteristic.deviceId
-        ..serviceUuid = (pb.Uuid()..data = characteristic.serviceId.data)
-        ..characteristicUuid =
-            (pb.Uuid()..data = characteristic.characteristicId.data))
-      ..value = value;
-
-    return _methodChannel
-        .invokeMethod<List<int>>(
-            "writeCharacteristicWithoutResponse", args.writeToBuffer())
-        .then((data) => pb.WriteCharacteristicInfo.fromBuffer(data))
-        .then(const ProtobufConverter().writeCharacteristicInfoFrom)
-        .then((info) => info.result.dematerialize());
+    await initialize();
+    return _connectedDeviceOperator.writeCharacteristicWithoutResponse(
+      characteristic,
+      value: value,
+    );
   }
 
   /// Request a specific MTU for a connected device.
@@ -224,15 +191,7 @@ class FlutterReactiveBle {
   /// * BLE 4.2–5.1 max ATT MTU is 247 bytes
   Future<int> requestMtu({@required String deviceId, int mtu}) async {
     await initialize();
-
-    final args = pb.NegotiateMtuRequest()
-      ..deviceId = deviceId
-      ..mtuSize = mtu;
-
-    return _methodChannel
-        .invokeMethod<List<int>>("negotiateMtuSize", args.writeToBuffer())
-        .then((data) => pb.NegotiateMtuInfo.fromBuffer(data))
-        .then((message) => message.mtuSize);
+    return _connectedDeviceOperator.requestMtu(deviceId, mtu);
   }
 
   /// Requests for a connection parameter update on the connected device.
@@ -243,16 +202,8 @@ class FlutterReactiveBle {
       @required ConnectionPriority priority}) async {
     await initialize();
 
-    final args = pb.ChangeConnectionPriorityRequest()
-      ..deviceId = deviceId
-      ..priority = convertPriorityToInt(priority);
-
-    return _methodChannel
-        .invokeMethod<List<int>>(
-            "requestConnectionPriority", args.writeToBuffer())
-        .then((data) => pb.ChangeConnectionPriorityInfo.fromBuffer(data))
-        .then(const ProtobufConverter().connectionPriorityInfoFrom)
-        .then((message) => message.result.dematerialize());
+    return _connectedDeviceOperator.requestConnectionPriority(
+        deviceId, priority);
   }
 
   /// Scan for BLE peripherals advertising the services specified in [withServices]
@@ -392,59 +343,21 @@ class FlutterReactiveBle {
         .then((info) => info.dematerialize());
   }
 
-  /// Subscribes to notifications for a characteristic.
-  ///
-  /// The current implementation unsubscribes from notifications when the returned stream is not listened to,
-  /// which also affects other notification streams created for the same characteristic.
   Stream<List<int>> subscribeToCharacteristic(
       QualifiedCharacteristic characteristic) {
-    final specificCharacteristicValueStream = characteristicValueStream
-        .where((update) => update.characteristic == characteristic)
-        .map((update) => update.result.dematerialize());
-
-    final autosubscribingRepeater = Repeater<List<int>>.broadcast(
-      onListenEmitFrom: () {
-        final args = pb.NotifyCharacteristicRequest()
-          ..characteristic = (pb.CharacteristicAddress()
-            ..deviceId = characteristic.deviceId
-            ..serviceUuid = (pb.Uuid()..data = characteristic.serviceId.data)
-            ..characteristicUuid =
-                (pb.Uuid()..data = characteristic.characteristicId.data));
-
-        return _methodChannel
-            .invokeMethod<void>("readNotifications", args.writeToBuffer())
-            .asStream()
-            .asyncExpand((Object _) => specificCharacteristicValueStream);
-      },
-      onCancel: () {
-        final args = pb.NotifyNoMoreCharacteristicRequest()
-          ..characteristic = (pb.CharacteristicAddress()
-            ..deviceId = characteristic.deviceId
-            ..serviceUuid = (pb.Uuid()..data = characteristic.serviceId.data)
-            ..characteristicUuid =
-                (pb.Uuid()..data = characteristic.characteristicId.data));
-        return _methodChannel
-            .invokeMethod<void>("stopNotifications", args.writeToBuffer())
-            .catchError((Object e) =>
-                print("Error unsubscribing from notifications: $e"));
-      },
-    );
-
-    connectedDeviceStream
+    final terminateFuture = connectedDeviceStream
         .where((update) =>
             update.deviceId == characteristic.deviceId &&
             (update.connectionState == DeviceConnectionState.disconnecting ||
                 update.connectionState == DeviceConnectionState.disconnected))
         .firstWhere((_) => true,
-            orElse: () => throw _NoBleDeviceConnectionStateReceived())
-        .then<void>((_) => autosubscribingRepeater.dispose());
+            orElse: () => throw NoBleCharacteristicDataReceived());
 
-    return initialize()
-        .asStream()
-        .asyncExpand((_) => autosubscribingRepeater.stream);
+    return initialize().asStream().asyncExpand(
+          (_) => _connectedDeviceOperator.subscribeToCharacteristic(
+            characteristic,
+            terminateFuture,
+          ),
+        );
   }
 }
-
-class _NoBleCharacteristicDataReceived implements Exception {}
-
-class _NoBleDeviceConnectionStateReceived implements Exception {}

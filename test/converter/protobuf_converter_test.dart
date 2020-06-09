@@ -287,83 +287,100 @@ void main() {
         expect(result.code, ClearGattCacheError.unknown);
       });
     });
-    group("Converts characteristic value", () {
+    group("Characteristic value", () {
       const id = 'id';
       const value = [2, 3];
       pb.CharacteristicValueInfo message;
+      pb.CharacteristicAddress characteristic;
 
       setUp(() {
-        final characteristic = pb.CharacteristicAddress()
+        characteristic = pb.CharacteristicAddress()
           ..deviceId = id
           ..serviceUuid = (pb.Uuid()..data = [0])
           ..characteristicUuid = (pb.Uuid()..data = [1]);
-
-        message = pb.CharacteristicValueInfo()
-          ..characteristic = characteristic
-          ..value = value;
       });
 
-      test('It converts device id', () {
-        final result = sut.characteristicValueFrom(message);
-        expect(result.characteristic.deviceId, id);
-      });
-      test('It converts service uuid', () {
-        final result = sut.characteristicValueFrom(message);
-        expect(result.characteristic.serviceId, Uuid([00]));
-      });
+      group('Given no error occured', () {
+        CharacteristicValue result;
 
-      test('It converts characteristic uuid', () {
-        final result = sut.characteristicValueFrom(message);
-        expect(result.characteristic.characteristicId, Uuid([01]));
-      });
+        setUp(() {
+          message = pb.CharacteristicValueInfo()
+            ..characteristic = characteristic
+            ..value = value;
 
-      test('it converts value', () {
-        final result = sut.characteristicValueFrom(message);
-        final charValue = result.result.iif(
+          result = sut.characteristicValueFrom(message.writeToBuffer());
+        });
+
+        test('It converts device id', () {
+          expect(result.characteristic.deviceId, id);
+        });
+        test('It converts service uuid', () {
+          expect(result.characteristic.serviceId, Uuid([00]));
+        });
+
+        test('It converts characteristic uuid', () {
+          expect(result.characteristic.characteristicId, Uuid([01]));
+        });
+
+        test('it converts value', () {
+          final charValue = result.result.iif(
             success: (v) => v,
-            failure: (_) => throw AssertionError("Not expected to fail"));
-        expect(charValue, value);
+            failure: (_) => throw AssertionError("Not expected to fail"),
+          );
+          expect(charValue, value);
+        });
       });
 
-      test('it converts failure', () {
-        final failureMessage = message..failure = pb.GenericFailure();
-        final result = sut.characteristicValueFrom(failureMessage).result.iif(
-            success: (_) => throw AssertionError("Not expected to succeed"),
-            failure: (_) => "failure");
-        expect(result, "failure");
+      group('Given error occured', () {
+        List<int> failureMessage;
+        String result;
+        setUp(() {
+          failureMessage =
+              (message..failure = pb.GenericFailure()).writeToBuffer();
+          result = sut.characteristicValueFrom(failureMessage).result.iif(
+              success: (_) => throw AssertionError("Not expected to succeed"),
+              failure: (_) => "failure");
+        });
+        test('it converts failure', () {
+          expect(result, "failure");
+        });
       });
     });
 
     group("Converts writecharacteristic info", () {
       const id = 'id';
 
-      pb.WriteCharacteristicInfo message;
+      List<int> data;
+      pb.CharacteristicAddress characteristic;
 
       setUp(() {
-        final characteristic = pb.CharacteristicAddress()
+        characteristic = pb.CharacteristicAddress()
           ..deviceId = id
           ..serviceUuid = (pb.Uuid()..data = [0])
           ..characteristicUuid = (pb.Uuid()..data = [1]);
 
-        message = pb.WriteCharacteristicInfo()..characteristic = characteristic;
+        final message = pb.WriteCharacteristicInfo()
+          ..characteristic = characteristic;
+
+        data = message.writeToBuffer();
       });
 
       test('It converts device id', () {
-        final result = sut.writeCharacteristicInfoFrom(message);
+        final result = sut.writeCharacteristicInfoFrom(data);
         expect(result.characteristic.deviceId, id);
       });
       test('It converts service uuid', () {
-        final result = sut.writeCharacteristicInfoFrom(message);
+        final result = sut.writeCharacteristicInfoFrom(data);
         expect(result.characteristic.serviceId, Uuid([00]));
       });
 
       test('It converts characteristic uuid', () {
-        final result = sut.writeCharacteristicInfoFrom(message);
+        final result = sut.writeCharacteristicInfoFrom(data);
         expect(result.characteristic.characteristicId, Uuid([01]));
       });
 
       test('it converts value', () {
-        final result = sut.writeCharacteristicInfoFrom(message);
+        final result = sut.writeCharacteristicInfoFrom(data);
 
         expect(
             result.result.iif(
@@ -373,9 +390,11 @@ void main() {
       });
 
       test('it converts failure', () {
+        final message = pb.WriteCharacteristicInfo()
+          ..characteristic = characteristic;
         final failureMessage = message..failure = pb.GenericFailure();
         final result = sut
-            .writeCharacteristicInfoFrom(failureMessage)
+            .writeCharacteristicInfoFrom(failureMessage.writeToBuffer())
             .result
             .iif(
                 success: (_) => throw AssertionError("Not expected to succeed"),
@@ -394,7 +413,8 @@ void main() {
       });
 
       test('Succeeds', () {
-        final result = sut.connectionPriorityInfoFrom(message).result;
+        final result =
+            sut.connectionPriorityInfoFrom(message.writeToBuffer()).result;
         expect(
             result.iif(
                 success: (_) => "success",
@@ -405,7 +425,7 @@ void main() {
       test('Fails', () {
         final failureMessage = message..failure = pb.GenericFailure();
         final result = sut
-            .connectionPriorityInfoFrom(failureMessage)
+            .connectionPriorityInfoFrom(failureMessage.writeToBuffer())
             .result
             .iif(
                 success: (_) => throw AssertionError("Not expected to succeed"),
@@ -423,6 +443,21 @@ void main() {
       test('Fallsback in case of invalid status', () {
         final message = pb.BleStatusInfo()..status = 6;
         expect(sut.bleStatusFrom(message), BleStatus.unknown);
+      });
+    });
+
+    group('Coverts mtu size', () {
+      const size = 20;
+      int result;
+
+      setUp(() {
+        final message = pb.NegotiateMtuInfo()..mtuSize = size;
+
+        result = sut.mtuSizeFrom(message.writeToBuffer());
+      });
+
+      test('It convert mtu size size', () {
+        expect(result, 20);
       });
     });
   });

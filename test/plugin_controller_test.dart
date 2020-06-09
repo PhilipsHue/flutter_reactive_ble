@@ -16,17 +16,20 @@ void main() {
     _ArgsToProtobufConverterMock _argsConverter;
     ProtobufConverter _protobufConverter;
     _EventChannelMock _connectedDeviceChannel;
+    _EventChannelMock _argsChannel;
 
     setUp(() {
       _argsConverter = _ArgsToProtobufConverterMock();
       _methodChannel = _MethodChannelMock();
       _protobufConverter = _ProtobufConverterMock();
       _connectedDeviceChannel = _EventChannelMock();
+      _argsChannel = _EventChannelMock();
       _sut = PluginController(
         argsToProtobufConverter: _argsConverter,
         bleMethodChannel: _methodChannel,
         protobufConverter: _protobufConverter,
         connectedDeviceChannel: _connectedDeviceChannel,
+        charUpdateChannel: _argsChannel,
       );
     });
 
@@ -99,6 +102,290 @@ void main() {
 
       test('It emits correct value', () {
         expect(result, emitsInOrder(<ConnectionStateUpdate>[update]));
+      });
+    });
+
+    group('Char update stream', () {
+      CharacteristicValue valueUpdate;
+      Stream<CharacteristicValue> result;
+
+      setUp(() {
+        valueUpdate = CharacteristicValue(
+          characteristic: QualifiedCharacteristic(
+            characteristicId: Uuid.parse('FEFF'),
+            serviceId: Uuid.parse('FEFF'),
+            deviceId: '123',
+          ),
+          result: const Result.success([1]),
+        );
+
+        when(_argsChannel.receiveBroadcastStream()).thenAnswer(
+          (realInvocation) => Stream<List<int>>.fromIterable([
+            [0, 1]
+          ]),
+        );
+
+        when(_protobufConverter.characteristicValueFrom(any))
+            .thenReturn(valueUpdate);
+
+        result = _sut.charValueUpdateStream;
+      });
+
+      test('It emits updates', () {
+        expect(result, emitsInOrder(<CharacteristicValue>[valueUpdate]));
+      });
+    });
+
+    group('Read characteristic', () {
+      QualifiedCharacteristic characteristic;
+      pb.ReadCharacteristicRequest request;
+
+      setUp(() async {
+        request = pb.ReadCharacteristicRequest();
+        characteristic = QualifiedCharacteristic(
+          characteristicId: Uuid.parse('FEFF'),
+          serviceId: Uuid.parse('FEFF'),
+          deviceId: '123',
+        );
+
+        when(_argsConverter.createReadCharacteristicRequest(any))
+            .thenReturn(request);
+        when(_methodChannel.invokeMethod<void>('readCharacteristic', any))
+            .thenAnswer((_) => Future.value());
+
+        _sut.readCharacteristic(characteristic);
+      });
+
+      test('It calls args to protobuf converter with correct arguments', () {
+        verify(_argsConverter.createReadCharacteristicRequest(characteristic))
+            .called(1);
+      });
+
+      test('It invokes method channel with correct arguments', () {
+        verify(_methodChannel.invokeMethod<void>(
+                'readCharacteristic', request.writeToBuffer()))
+            .called(1);
+      });
+    });
+
+    group('Write characteristic with response', () {
+      QualifiedCharacteristic characteristic;
+      const value = [0, 1];
+      pb.WriteCharacteristicRequest request;
+
+      setUp(() async {
+        request = pb.WriteCharacteristicRequest();
+        characteristic = QualifiedCharacteristic(
+          characteristicId: Uuid.parse('FEFF'),
+          serviceId: Uuid.parse('FEFF'),
+          deviceId: '123',
+        );
+
+        when(_argsConverter.createWriteChacracteristicRequest(any, any))
+            .thenReturn(request);
+        when(_methodChannel.invokeMethod<List<int>>(
+                'writeCharacteristicWithResponse', any))
+            .thenAnswer((_) => Future.value(const [1, 0]));
+
+        await _sut.writeCharacteristicWithResponse(characteristic, value);
+      });
+
+      test('It calls args to protobuf converter with correct arguments', () {
+        verify(_argsConverter.createWriteChacracteristicRequest(
+                characteristic, value))
+            .called(1);
+      });
+
+      test('It invokes method channel with correct arguments', () {
+        verify(_methodChannel.invokeMethod<void>(
+                'writeCharacteristicWithResponse', request.writeToBuffer()))
+            .called(1);
+      });
+    });
+
+    group('Write characteristic without response', () {
+      QualifiedCharacteristic characteristic;
+      const value = [0, 1];
+      pb.WriteCharacteristicRequest request;
+
+      setUp(() async {
+        request = pb.WriteCharacteristicRequest();
+        characteristic = QualifiedCharacteristic(
+          characteristicId: Uuid.parse('FEFF'),
+          serviceId: Uuid.parse('FEFF'),
+          deviceId: '123',
+        );
+
+        when(_argsConverter.createWriteChacracteristicRequest(any, any))
+            .thenReturn(request);
+        when(_methodChannel.invokeMethod<List<int>>(
+                'writeCharacteristicWithoutResponse', any))
+            .thenAnswer((_) => Future.value(const [1, 0]));
+
+        await _sut.writeCharacteristicWithoutResponse(characteristic, value);
+      });
+
+      test('It calls args to protobuf converter with correct arguments', () {
+        verify(_argsConverter.createWriteChacracteristicRequest(
+                characteristic, value))
+            .called(1);
+      });
+
+      test('It invokes method channel with correct arguments', () {
+        verify(_methodChannel.invokeMethod<void>(
+                'writeCharacteristicWithoutResponse', request.writeToBuffer()))
+            .called(1);
+      });
+    });
+
+    group('Subscribe to notifications', () {
+      QualifiedCharacteristic characteristic;
+      pb.NotifyCharacteristicRequest request;
+
+      setUp(() async {
+        request = pb.NotifyCharacteristicRequest();
+        characteristic = QualifiedCharacteristic(
+          characteristicId: Uuid.parse('FEFF'),
+          serviceId: Uuid.parse('FEFF'),
+          deviceId: '123',
+        );
+
+        when(_argsConverter.createNotifyCharacteristicRequest(any))
+            .thenReturn(request);
+        when(
+          _methodChannel.invokeMethod<void>('readNotifications', any),
+        ).thenAnswer((_) => Future.value());
+
+        _sut.subscribeToNotifications(characteristic);
+      });
+
+      test('It calls args to protobuf converter with correct arguments', () {
+        verify(_argsConverter.createNotifyCharacteristicRequest(characteristic))
+            .called(1);
+      });
+
+      test('It invokes method channel with correct arguments', () {
+        verify(
+          _methodChannel.invokeMethod<void>(
+            'readNotifications',
+            request.writeToBuffer(),
+          ),
+        ).called(1);
+      });
+    });
+
+    group('Stop subscribe to notifications', () {
+      QualifiedCharacteristic characteristic;
+      pb.NotifyNoMoreCharacteristicRequest request;
+
+      setUp(() async {
+        request = pb.NotifyNoMoreCharacteristicRequest();
+        characteristic = QualifiedCharacteristic(
+          characteristicId: Uuid.parse('FEFF'),
+          serviceId: Uuid.parse('FEFF'),
+          deviceId: '123',
+        );
+
+        when(_argsConverter.createNotifyNoMoreCharacteristicRequest(any))
+            .thenReturn(request);
+        when(
+          _methodChannel.invokeMethod<void>('stopNotifications', any),
+        ).thenAnswer((_) => Future.value());
+
+        await _sut.stopSubscribingToNotifications(characteristic);
+      });
+
+      test('It calls args to protobuf converter with correct arguments', () {
+        verify(_argsConverter
+                .createNotifyNoMoreCharacteristicRequest(characteristic))
+            .called(1);
+      });
+
+      test('It invokes method channel with correct arguments', () {
+        verify(
+          _methodChannel.invokeMethod<void>(
+            'stopNotifications',
+            request.writeToBuffer(),
+          ),
+        ).called(1);
+      });
+    });
+    group('Request mtu size', () {
+      const deviceId = '123';
+      const mtuSize = 40;
+      pb.NegotiateMtuRequest request;
+
+      setUp(() async {
+        request = pb.NegotiateMtuRequest();
+
+        when(_argsConverter.createNegotiateMtuRequest(any, any))
+            .thenReturn(request);
+        when(
+          _methodChannel.invokeMethod<List<int>>('negotiateMtuSize', any),
+        ).thenAnswer((_) => Future.value([1]));
+
+        await _sut.requestMtuSize(deviceId, mtuSize);
+      });
+
+      test('It calls args to protobuf converter with correct arguments', () {
+        verify(_argsConverter.createNegotiateMtuRequest(deviceId, mtuSize))
+            .called(1);
+      });
+
+      test('It calls protobuf converter wit correct arguments', () {
+        verify(_protobufConverter.mtuSizeFrom([1])).called(1);
+      });
+
+      test('It invokes method channel with correct arguments', () {
+        verify(
+          _methodChannel.invokeMethod<void>(
+            'negotiateMtuSize',
+            request.writeToBuffer(),
+          ),
+        ).called(1);
+      });
+    });
+
+    group('Request connection priority', () {
+      const deviceId = '123';
+      ConnectionPriority priority;
+      pb.ChangeConnectionPriorityRequest request;
+      ConnectionPriorityInfo info;
+
+      setUp(() async {
+        request = pb.ChangeConnectionPriorityRequest();
+        priority = ConnectionPriority.highPerformance;
+        info = const ConnectionPriorityInfo(result: Result.success(null));
+
+        when(_argsConverter.createChangeConnectionPrioRequest(any, any))
+            .thenReturn(request);
+        when(_protobufConverter.connectionPriorityInfoFrom(any))
+            .thenReturn(info);
+        when(
+          _methodChannel.invokeMethod<List<int>>(
+              'requestConnectionPriority', any),
+        ).thenAnswer((_) => Future.value([1]));
+
+        await _sut.requestConnectionPriority(deviceId, priority);
+      });
+
+      test('It calls args to protobuf converter with correct arguments', () {
+        verify(_argsConverter.createChangeConnectionPrioRequest(
+                deviceId, priority))
+            .called(1);
+      });
+
+      test('It calls protobuf converter wit correct arguments', () {
+        verify(_protobufConverter.connectionPriorityInfoFrom([1])).called(1);
+      });
+
+      test('It invokes method channel with correct arguments', () {
+        verify(
+          _methodChannel.invokeMethod<void>(
+            'requestConnectionPriority',
+            request.writeToBuffer(),
+          ),
+        ).called(1);
       });
     });
   });
