@@ -23,7 +23,9 @@ class ProtobufConverter {
       selectFrom(BleStatus.values,
           index: message.status, fallback: (_) => BleStatus.unknown);
 
-  ScanResult scanResultFrom(pb.DeviceScanInfo message) {
+  ScanResult scanResultFrom(List<int> data) {
+    final message = pb.DeviceScanInfo.fromBuffer(data);
+
     final serviceData = Map.fromIterables(
       message.serviceData.map((entry) => Uuid(entry.serviceUuid.data)),
       message.serviceData.map((entry) => Uint8List.fromList(entry.data)),

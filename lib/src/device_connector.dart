@@ -1,4 +1,5 @@
 import 'package:collection/collection.dart';
+import 'package:flutter_reactive_ble/src/device_scanner.dart';
 import 'package:flutter_reactive_ble/src/model/connection_state_update.dart';
 import 'package:flutter_reactive_ble/src/plugin_controller.dart';
 import 'package:flutter_reactive_ble/src/rx_ext/repeater.dart';
@@ -8,43 +9,26 @@ import 'discovered_devices_registry.dart';
 import 'model/discovered_device.dart';
 import 'model/generic_failure.dart';
 import 'model/scan_mode.dart';
-import 'model/scan_session.dart';
 import 'model/uuid.dart';
 
 class DeviceConnector {
   const DeviceConnector({
-    @required
-        PluginController pluginController,
-    @required
-        ScanSession Function() getCurrentScan,
-    @required
-        DiscoveredDevicesRegistry discoveredDevicesRegistry,
-    @required
-        Stream<DiscoveredDevice> Function({
-      List<Uuid> withServices,
-      ScanMode scanMode,
-    })
-            scanForDevices,
-    @required
-        Duration delayAfterScanFailure,
+    @required PluginController pluginController,
+    @required DiscoveredDevicesRegistry discoveredDevicesRegistry,
+    @required DeviceScanner deviceScanner,
+    @required Duration delayAfterScanFailure,
   })  : assert(pluginController != null),
-        assert(getCurrentScan != null),
-        assert(scanForDevices != null),
+        assert(deviceScanner != null),
         assert(discoveredDevicesRegistry != null),
         assert(delayAfterScanFailure != null),
-        _getCurrentScan = getCurrentScan,
         _discoveredDevicesRegistry = discoveredDevicesRegistry,
-        _scanForDevices = scanForDevices,
+        _deviceScanner = deviceScanner,
         _controller = pluginController,
         _delayAfterScanFailure = delayAfterScanFailure;
 
   final PluginController _controller;
-  final ScanSession Function() _getCurrentScan;
   final DiscoveredDevicesRegistry _discoveredDevicesRegistry;
-  final Stream<DiscoveredDevice> Function({
-    List<Uuid> withServices,
-    ScanMode scanMode,
-  }) _scanForDevices;
+  final DeviceScanner _deviceScanner;
   final Duration _delayAfterScanFailure;
 
   static const _scanRegistryCacheValidityPeriod = Duration(seconds: 25);
@@ -83,7 +67,7 @@ class DeviceConnector {
     Map<Uuid, List<Uuid>> servicesWithCharacteristicsToDiscover,
     Duration connectionTimeout,
   }) {
-    if (_getCurrentScan() != null) {
+    if (_deviceScanner.currentScan != null) {
       return _awaitCurrentScanAndConnect(
         withServices,
         prescanDuration,
@@ -118,16 +102,18 @@ class DeviceConnector {
         connectionTimeout: connectionTimeout,
       );
     } else {
-      final scanSubscription = _scanForDevices(
+      final scanSubscription = _deviceScanner
+          .scanForDevices(
               withServices: withServices, scanMode: ScanMode.lowLatency)
           .listen((DiscoveredDevice scanData) {}, onError: (Object _) {});
       Future<void>.delayed(prescanDuration).then<void>((_) {
         scanSubscription.cancel();
       });
 
-      return _getCurrentScan()
-          .future
-          .then((_) => true)
+      return _deviceScanner.currentScan.future
+          .then(
+            (_) => true,
+          )
           .catchError((Object _) => false)
           .asStream()
           .asyncExpand(
@@ -161,9 +147,8 @@ class DeviceConnector {
     Duration connectionTimeout,
   ) {
     if (const DeepCollectionEquality()
-        .equals(_getCurrentScan().withServices, withServices)) {
-      return _getCurrentScan()
-          .future
+        .equals(_deviceScanner.currentScan.withServices, withServices)) {
+      return _deviceScanner.currentScan.future
           .timeout(prescanDuration + const Duration(seconds: 1))
           .asStream()
           .asyncExpand(

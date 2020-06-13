@@ -1,6 +1,7 @@
 import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
 import 'package:flutter_reactive_ble/src/generated/bledata.pb.dart' as pb;
 import 'package:flutter_reactive_ble/src/model/uuid.dart';
+import 'package:meta/meta.dart';
 
 class ArgsToProtobufConverter {
   const ArgsToProtobufConverter();
@@ -110,6 +111,24 @@ class ArgsToProtobufConverter {
     final args = pb.ChangeConnectionPriorityRequest()
       ..deviceId = deviceId
       ..priority = convertPriorityToInt(priority);
+
+    return args;
+  }
+
+  pb.ScanForDevicesRequest createScanForDevicesRequest({
+    @required List<Uuid> withServices,
+    @required ScanMode scanMode,
+    @required bool requireLocationServicesEnabled,
+  }) {
+    final args = pb.ScanForDevicesRequest()
+      ..scanMode = convertScanModeToArgs(scanMode)
+      ..requireLocationServicesEnabled = requireLocationServicesEnabled;
+
+    if (withServices != null) {
+      for (final withService in withServices) {
+        args.serviceUuids.add((pb.Uuid()..data = withService.data));
+      }
+    }
 
     return args;
   }

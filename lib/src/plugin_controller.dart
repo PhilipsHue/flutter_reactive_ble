@@ -17,22 +17,26 @@ class PluginController {
     @required MethodChannel bleMethodChannel,
     @required EventChannel connectedDeviceChannel,
     @required EventChannel charUpdateChannel,
+    @required EventChannel bleDeviceScanChannel,
   })  : assert(argsToProtobufConverter != null),
         assert(protobufConverter != null),
         assert(bleMethodChannel != null),
         assert(connectedDeviceChannel != null),
+        assert(bleDeviceScanChannel != null),
         assert(charUpdateChannel != null),
         _argsToProtobufConverter = argsToProtobufConverter,
         _protobufConverter = protobufConverter,
         _bleMethodChannel = bleMethodChannel,
         _connectedDeviceChannel = connectedDeviceChannel,
-        _charUpdateChannel = charUpdateChannel;
+        _charUpdateChannel = charUpdateChannel,
+        _bleDeviceScanChannel = bleDeviceScanChannel;
 
   final ArgsToProtobufConverter _argsToProtobufConverter;
   final ProtobufConverter _protobufConverter;
   final MethodChannel _bleMethodChannel;
   final EventChannel _connectedDeviceChannel;
   final EventChannel _charUpdateChannel;
+  final EventChannel _bleDeviceScanChannel;
 
   Stream<ConnectionStateUpdate> get connectionUpdateStream =>
       _connectedDeviceChannel
@@ -44,6 +48,30 @@ class PluginController {
       .receiveBroadcastStream()
       .cast<List<int>>()
       .map(_protobufConverter.characteristicValueFrom);
+
+  Stream<ScanResult> get scanStream =>
+      _bleDeviceScanChannel.receiveBroadcastStream().cast<List<int>>().map(
+            _protobufConverter.scanResultFrom,
+          );
+
+  Stream<Object> scanForDevices({
+    @required List<Uuid> withServices,
+    @required ScanMode scanMode,
+    @required bool requireLocationServicesEnabled,
+  }) =>
+      _bleMethodChannel
+          .invokeMethod<void>(
+            "scanForDevices",
+            _argsToProtobufConverter
+                .createScanForDevicesRequest(
+                  withServices: withServices,
+                  scanMode: scanMode,
+                  requireLocationServicesEnabled:
+                      requireLocationServicesEnabled,
+                )
+                .writeToBuffer(),
+          )
+          .asStream();
 
   Stream<Object> connectToDevice(
     String id,
@@ -157,6 +185,7 @@ class PluginControllerFactory {
     const connectedDeviceChannel =
         EventChannel("flutter_reactive_ble_connected_device");
     const charEventChannel = EventChannel("flutter_reactive_ble_char_update");
+    const scanEventChannel = EventChannel("flutter_reactive_ble_scan");
 
     return PluginController(
       protobufConverter: const ProtobufConverter(),
@@ -164,6 +193,7 @@ class PluginControllerFactory {
       bleMethodChannel: _bleMethodChannel,
       connectedDeviceChannel: connectedDeviceChannel,
       charUpdateChannel: charEventChannel,
+      bleDeviceScanChannel: scanEventChannel,
     );
   }
 }
