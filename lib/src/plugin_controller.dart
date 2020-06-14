@@ -7,8 +7,10 @@ import 'package:meta/meta.dart';
 
 import 'converter/protobuf_converter.dart';
 import 'model/characteristic_value.dart';
+import 'model/clear_gatt_cache_error.dart';
 import 'model/connection_state_update.dart';
 import 'model/qualified_characteristic.dart';
+import 'model/unit.dart';
 
 class PluginController {
   const PluginController({
@@ -53,6 +55,10 @@ class PluginController {
       _bleDeviceScanChannel.receiveBroadcastStream().cast<List<int>>().map(
             _protobufConverter.scanResultFrom,
           );
+
+  Future<void> initialize() => _bleMethodChannel.invokeMethod("initialize");
+  Future<void> deInitialize() =>
+      _bleMethodChannel.invokeMethod<void>("deinitialize");
 
   Stream<Object> scanForDevices({
     @required List<Uuid> withServices,
@@ -173,23 +179,34 @@ class PluginController {
                 .writeToBuffer(),
           )
           .then(_protobufConverter.connectionPriorityInfoFrom);
+
+  Future<Result<Unit, GenericFailure<ClearGattCacheError>>> clearGattCache(
+          String deviceId) =>
+      _bleMethodChannel
+          .invokeMethod<List<int>>(
+            "clearGattCache",
+            _argsToProtobufConverter
+                .createClearGattCacheRequest(deviceId)
+                .writeToBuffer(),
+          )
+          .then(_protobufConverter.clearGattCacheResultFrom);
 }
 
 class PluginControllerFactory {
   // this injection is temporarily until we moved everythin out
-  const PluginControllerFactory(this._bleMethodChannel);
-
-  final MethodChannel _bleMethodChannel;
+  const PluginControllerFactory();
 
   PluginController create() {
+    const _bleMethodChannel = MethodChannel("flutter_reactive_ble_method");
+
     const connectedDeviceChannel =
         EventChannel("flutter_reactive_ble_connected_device");
     const charEventChannel = EventChannel("flutter_reactive_ble_char_update");
     const scanEventChannel = EventChannel("flutter_reactive_ble_scan");
 
-    return PluginController(
-      protobufConverter: const ProtobufConverter(),
-      argsToProtobufConverter: const ArgsToProtobufConverter(),
+    return const PluginController(
+      protobufConverter: ProtobufConverter(),
+      argsToProtobufConverter: ArgsToProtobufConverter(),
       bleMethodChannel: _bleMethodChannel,
       connectedDeviceChannel: connectedDeviceChannel,
       charUpdateChannel: charEventChannel,

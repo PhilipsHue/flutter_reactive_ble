@@ -68,16 +68,18 @@ class ProtobufConverter {
   }
 
   Result<Unit, GenericFailure<ClearGattCacheError>> clearGattCacheResultFrom(
-          pb.ClearGattCacheInfo message) =>
-      resultFrom(
-        getValue: () => const Unit(),
-        failure: genericFailureFrom(
-          hasFailure: message.hasFailure(),
-          getFailure: () => message.failure,
-          codes: ClearGattCacheError.values,
-          fallback: (rawOrNull) => ClearGattCacheError.unknown,
-        ),
-      );
+      List<int> data) {
+    final message = pb.ClearGattCacheInfo.fromBuffer(data);
+    return resultFrom(
+      getValue: () => const Unit(),
+      failure: genericFailureFrom(
+        hasFailure: message.hasFailure(),
+        getFailure: () => message.failure,
+        codes: ClearGattCacheError.values,
+        fallback: (rawOrNull) => ClearGattCacheError.unknown,
+      ),
+    );
+  }
 
   CharacteristicValue characteristicValueFrom(List<int> data) {
     final message = pb.CharacteristicValueInfo.fromBuffer(data);

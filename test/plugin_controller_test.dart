@@ -6,6 +6,8 @@ import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
 import 'package:flutter_reactive_ble/src/converter/args_to_protubuf_converter.dart';
 import 'package:flutter_reactive_ble/src/converter/protobuf_converter.dart';
 import 'package:flutter_reactive_ble/src/generated/bledata.pbserver.dart' as pb;
+import 'package:flutter_reactive_ble/src/model/clear_gatt_cache_error.dart';
+import 'package:flutter_reactive_ble/src/model/unit.dart';
 import 'package:flutter_reactive_ble/src/plugin_controller.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
@@ -467,6 +469,77 @@ void main() {
 
       test('It emits correct values', () {
         expect(result, emitsInOrder(<ScanResult>[scanResult]));
+      });
+    });
+
+    group('initialize', () {
+      setUp(() async {
+        when(_methodChannel.invokeMethod<void>('initialize')).thenAnswer(
+          (realInvocation) => Future.value(),
+        );
+
+        await _sut.initialize();
+      });
+
+      test('It invokes correct method in method channel', () {
+        verify(_methodChannel.invokeMethod<void>('initialize')).called(1);
+      });
+    });
+
+    group('deInitialize', () {
+      setUp(() async {
+        when(_methodChannel.invokeMethod<void>('deinitialize')).thenAnswer(
+          (realInvocation) => Future.value(),
+        );
+
+        await _sut.deInitialize();
+      });
+
+      test('It invokes correct method in method channel', () {
+        verify(_methodChannel.invokeMethod<void>('deinitialize')).called(1);
+      });
+    });
+
+    group('Clear gatt cache', () {
+      const deviceId = '123';
+
+      pb.ClearGattCacheRequest request;
+      Result<Unit, GenericFailure<ClearGattCacheError>> result;
+      Result<Unit, GenericFailure<ClearGattCacheError>> convertedResult;
+
+      setUp(() async {
+        request = pb.ClearGattCacheRequest();
+        convertedResult =
+            const Result<Unit, GenericFailure<ClearGattCacheError>>.success(
+                Unit());
+        when(_methodChannel.invokeMethod<List<int>>('clearGattCache', any))
+            .thenAnswer(
+          (realInvocation) => Future.value([1]),
+        );
+        when(_argsConverter.createClearGattCacheRequest(any))
+            .thenReturn(request);
+        when(_protobufConverter.clearGattCacheResultFrom(any))
+            .thenReturn(convertedResult);
+        result = await _sut.clearGattCache(deviceId);
+      });
+
+      test('It calls method channel with correct arguments', () {
+        verify(_methodChannel.invokeMethod<List<int>>(
+          'clearGattCache',
+          request.writeToBuffer(),
+        )).called(1);
+      });
+
+      test('It calls args to protobufconverter with correct arguments', () {
+        verify(_argsConverter.createClearGattCacheRequest(deviceId)).called(1);
+      });
+
+      test('It calls protobuf converter with correct arguments', () {
+        verify(_protobufConverter.clearGattCacheResultFrom([1])).called(1);
+      });
+
+      test('It returns correct value', () {
+        expect(result, convertedResult);
       });
     });
   });

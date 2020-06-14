@@ -272,7 +272,8 @@ void main() {
 
     group('Converts clear gatt cache result', () {
       test('Succeeds', () {
-        final result = sut.clearGattCacheResultFrom(pb.ClearGattCacheInfo());
+        final result = sut
+            .clearGattCacheResultFrom(pb.ClearGattCacheInfo().writeToBuffer());
 
         expect(
             result,
@@ -281,7 +282,8 @@ void main() {
       });
 
       test('Fails', () {
-        final message = pb.ClearGattCacheInfo()..failure = pb.GenericFailure();
+        final message = (pb.ClearGattCacheInfo()..failure = pb.GenericFailure())
+            .writeToBuffer();
         final result = sut.clearGattCacheResultFrom(message).iif(
             success: (_) => throw AssertionError("Not expected to succeed"),
             failure: (f) => f);

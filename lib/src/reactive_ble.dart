@@ -64,8 +64,6 @@ class FlutterReactiveBle {
     yield* _connectedDeviceOperator.characteristicValueStream;
   }
 
-  final _methodChannel = const MethodChannel("flutter_reactive_ble_method");
-
   PluginController _pluginController;
 
   BleStatus _status = BleStatus.unknown;
@@ -94,9 +92,9 @@ class FlutterReactiveBle {
   /// The initialization is performed automatically the first time any BLE
   /// operation is triggered.
   Future<void> initialize() async {
-    _pluginController ??= PluginControllerFactory(_methodChannel).create();
+    _pluginController ??= const PluginControllerFactory().create();
 
-    _initialization ??= _methodChannel.invokeMethod("initialize");
+    _initialization ??= _pluginController.initialize();
 
     _connectedDeviceOperator ??= ConnectedDeviceOperation(
       pluginController: _pluginController,
@@ -125,8 +123,10 @@ class FlutterReactiveBle {
   ///
   /// The deinitialization is automatically performed on Flutter Hot Restart.
   Future<void> deinitialize() async {
-    _initialization = null;
-    await _methodChannel.invokeMethod<void>("deinitialize");
+    if (_initialization != null) {
+      _initialization = null;
+      await _pluginController.deInitialize();
+    }
   }
 
   /// Reads the value of the specified characteristic.
@@ -282,14 +282,9 @@ class FlutterReactiveBle {
   /// Always completes with an error on iOS, as there is no way (and no need) to perform this operation on iOS.
   ///
   /// The connection may need to be reestablished after successful GATT attribute cache clearing.
-  Future<void> clearGattCache(String deviceId) {
-    final args = pb.ClearGattCacheRequest()..deviceId = deviceId;
-    return _methodChannel
-        .invokeMethod<List<int>>("clearGattCache", args.writeToBuffer())
-        .then((data) => pb.ClearGattCacheInfo.fromBuffer(data))
-        .then(const ProtobufConverter().clearGattCacheResultFrom)
-        .then((info) => info.dematerialize());
-  }
+  Future<void> clearGattCache(String deviceId) => _pluginController
+      .clearGattCache(deviceId)
+      .then((info) => info.dematerialize());
 
   Stream<List<int>> subscribeToCharacteristic(
       QualifiedCharacteristic characteristic) {

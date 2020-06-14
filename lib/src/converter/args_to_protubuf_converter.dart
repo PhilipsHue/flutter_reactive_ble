@@ -132,4 +132,9 @@ class ArgsToProtobufConverter {
 
     return args;
   }
+
+  pb.ClearGattCacheRequest createClearGattCacheRequest(String deviceId) {
+    final args = pb.ClearGattCacheRequest()..deviceId = deviceId;
+    return args;
+  }
 }

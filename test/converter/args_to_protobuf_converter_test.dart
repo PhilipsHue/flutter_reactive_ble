@@ -298,5 +298,17 @@ void main() {
         });
       });
     });
+
+    group('Create clear gatt request', () {
+      const deviceId = '123';
+      pb.ClearGattCacheRequest result;
+      setUp(() {
+        result = _sut.createClearGattCacheRequest(deviceId);
+      });
+
+      test('It converts deviceId', () {
+        expect(result.deviceId, deviceId);
+      });
+    });
   });
 }
