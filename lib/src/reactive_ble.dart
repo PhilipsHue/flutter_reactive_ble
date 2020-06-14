@@ -24,8 +24,29 @@ class FlutterReactiveBle {
 
   factory FlutterReactiveBle() => _sharedInstance;
 
-  FlutterReactiveBle._() {
-    _trackStatus();
+  ///Create a testinstance that will not directly initialize the flutter bindings
+  ///but use mock objects instead
+  @visibleForTesting
+  factory FlutterReactiveBle.testInstance({
+    @required PluginController pluginController,
+    @required DeviceScanner deviceScanner,
+    @required DeviceConnector deviceConnector,
+    @required ConnectedDeviceOperation connectedDeviceOperation,
+  }) {
+    final _ble = FlutterReactiveBle._(initializeForTesting: true)
+      .._initializeForTesting(
+        pluginController: pluginController,
+        deviceScanner: deviceScanner,
+        deviceConnector: deviceConnector,
+        connectedDeviceOperation: connectedDeviceOperation,
+      );
+    return _ble;
+  }
+
+  FlutterReactiveBle._({bool initializeForTesting = false}) {
+    if (!initializeForTesting) {
+      _trackStatus();
+    }
   }
 
   /// Registry that keeps track of all BLE devices found during a BLE scan.
@@ -119,6 +140,20 @@ class FlutterReactiveBle {
       _initialization = null;
       await _pluginController.deInitialize();
     }
+  }
+
+  /// This is a test method that will inilitialize backend objects with objects supplied
+  /// in this method.
+  void _initializeForTesting({
+    @required PluginController pluginController,
+    @required DeviceScanner deviceScanner,
+    @required DeviceConnector deviceConnector,
+    @required ConnectedDeviceOperation connectedDeviceOperation,
+  }) {
+    _pluginController = pluginController;
+    _deviceScanner = deviceScanner;
+    _deviceConnector = deviceConnector;
+    _connectedDeviceOperator = connectedDeviceOperation;
   }
 
   /// Reads the value of the specified characteristic.
