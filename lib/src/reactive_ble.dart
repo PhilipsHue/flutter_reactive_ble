@@ -24,6 +24,22 @@ class FlutterReactiveBle {
 
   factory FlutterReactiveBle() => _sharedInstance;
 
+  ///Create a new instance where injected depedencies are used.
+  @visibleForTesting
+  FlutterReactiveBle.witDependencies({
+    @required PluginController pluginController,
+    @required DeviceScanner deviceScanner,
+    @required DeviceConnector deviceConnector,
+    @required ConnectedDeviceOperation connectedDeviceOperation,
+  }) {
+    _pluginController = pluginController;
+    _deviceScanner = deviceScanner;
+    _deviceConnector = deviceConnector;
+    _connectedDeviceOperator = connectedDeviceOperation;
+
+    _trackStatus();
+  }
+
   FlutterReactiveBle._() {
     _trackStatus();
   }
@@ -50,7 +66,7 @@ class FlutterReactiveBle {
       Repeater(onListenEmitFrom: () async* {
         await initialize();
         yield* _deviceConnector.deviceConnectionStateUpdateStream;
-      }).stream
+      }).stream.asBroadcastStream()
         ..listen((_) {});
 
   /// A stream providing value updates for all the connected BLE devices.
@@ -210,7 +226,11 @@ class FlutterReactiveBle {
   }) async* {
     await initialize();
 
-    yield* _deviceScanner.scanForDevices(withServices: withServices);
+    yield* _deviceScanner.scanForDevices(
+      withServices: withServices,
+      scanMode: scanMode,
+      requireLocationServicesEnabled: requireLocationServicesEnabled,
+    );
   }
 
   /// Establishes a connection to a BLE device.
