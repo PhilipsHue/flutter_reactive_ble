@@ -441,12 +441,12 @@ void main() {
     group('Converts Blestatus', () {
       test('Converts valid status', () {
         final message = pb.BleStatusInfo()..status = 5;
-        expect(sut.bleStatusFrom(message), BleStatus.ready);
+        expect(sut.bleStatusFrom(message.writeToBuffer()), BleStatus.ready);
       });
 
       test('Fallsback in case of invalid status', () {
         final message = pb.BleStatusInfo()..status = 6;
-        expect(sut.bleStatusFrom(message), BleStatus.unknown);
+        expect(sut.bleStatusFrom(message.writeToBuffer()), BleStatus.unknown);
       });
     });
 

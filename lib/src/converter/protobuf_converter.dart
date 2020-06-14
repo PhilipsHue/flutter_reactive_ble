@@ -19,9 +19,14 @@ import 'package:meta/meta.dart';
 class ProtobufConverter {
   const ProtobufConverter();
 
-  BleStatus bleStatusFrom(pb.BleStatusInfo message) =>
-      selectFrom(BleStatus.values,
-          index: message.status, fallback: (_) => BleStatus.unknown);
+  BleStatus bleStatusFrom(List<int> data) {
+    final message = pb.BleStatusInfo.fromBuffer(data);
+    return selectFrom(
+      BleStatus.values,
+      index: message.status,
+      fallback: (_) => BleStatus.unknown,
+    );
+  }
 
   ScanResult scanResultFrom(List<int> data) {
     final message = pb.DeviceScanInfo.fromBuffer(data);

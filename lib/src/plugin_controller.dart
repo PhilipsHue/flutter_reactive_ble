@@ -20,17 +20,20 @@ class PluginController {
     @required EventChannel connectedDeviceChannel,
     @required EventChannel charUpdateChannel,
     @required EventChannel bleDeviceScanChannel,
+    @required EventChannel bleStatusChannel,
   })  : assert(argsToProtobufConverter != null),
         assert(protobufConverter != null),
         assert(bleMethodChannel != null),
         assert(connectedDeviceChannel != null),
         assert(bleDeviceScanChannel != null),
+        assert(bleStatusChannel != null),
         assert(charUpdateChannel != null),
         _argsToProtobufConverter = argsToProtobufConverter,
         _protobufConverter = protobufConverter,
         _bleMethodChannel = bleMethodChannel,
         _connectedDeviceChannel = connectedDeviceChannel,
         _charUpdateChannel = charUpdateChannel,
+        _bleStatusChannel = bleStatusChannel,
         _bleDeviceScanChannel = bleDeviceScanChannel;
 
   final ArgsToProtobufConverter _argsToProtobufConverter;
@@ -39,6 +42,7 @@ class PluginController {
   final EventChannel _connectedDeviceChannel;
   final EventChannel _charUpdateChannel;
   final EventChannel _bleDeviceScanChannel;
+  final EventChannel _bleStatusChannel;
 
   Stream<ConnectionStateUpdate> get connectionUpdateStream =>
       _connectedDeviceChannel
@@ -54,6 +58,11 @@ class PluginController {
   Stream<ScanResult> get scanStream =>
       _bleDeviceScanChannel.receiveBroadcastStream().cast<List<int>>().map(
             _protobufConverter.scanResultFrom,
+          );
+
+  Stream<BleStatus> get bleStatusStream =>
+      _bleStatusChannel.receiveBroadcastStream().cast<List<int>>().map(
+            _protobufConverter.bleStatusFrom,
           );
 
   Future<void> initialize() => _bleMethodChannel.invokeMethod("initialize");
@@ -203,6 +212,7 @@ class PluginControllerFactory {
         EventChannel("flutter_reactive_ble_connected_device");
     const charEventChannel = EventChannel("flutter_reactive_ble_char_update");
     const scanEventChannel = EventChannel("flutter_reactive_ble_scan");
+    const bleStatusChannel = EventChannel("flutter_reactive_ble_status");
 
     return const PluginController(
       protobufConverter: ProtobufConverter(),
@@ -211,6 +221,7 @@ class PluginControllerFactory {
       connectedDeviceChannel: connectedDeviceChannel,
       charUpdateChannel: charEventChannel,
       bleDeviceScanChannel: scanEventChannel,
+      bleStatusChannel: bleStatusChannel,
     );
   }
 }

@@ -1,13 +1,10 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:flutter/services.dart';
 import 'package:flutter_reactive_ble/src/connected_device_operation.dart';
-import 'package:flutter_reactive_ble/src/converter/protobuf_converter.dart';
 import 'package:flutter_reactive_ble/src/device_connector.dart';
 import 'package:flutter_reactive_ble/src/device_scanner.dart';
 import 'package:flutter_reactive_ble/src/discovered_devices_registry.dart';
-import 'package:flutter_reactive_ble/src/generated/bledata.pb.dart' as pb;
 import 'package:flutter_reactive_ble/src/model/ble_status.dart';
 import 'package:flutter_reactive_ble/src/model/characteristic_value.dart';
 import 'package:flutter_reactive_ble/src/model/connection_priority.dart';
@@ -68,12 +65,7 @@ class FlutterReactiveBle {
 
   BleStatus _status = BleStatus.unknown;
 
-  final Stream<BleStatus> _statusStream =
-      const EventChannel("flutter_reactive_ble_status")
-          .receiveBroadcastStream()
-          .cast<List<int>>()
-          .map((data) => pb.BleStatusInfo.fromBuffer(data))
-          .map(const ProtobufConverter().bleStatusFrom);
+  Stream<BleStatus> get _statusStream => _pluginController.bleStatusStream;
 
   Future<void> _trackStatus() async {
     await initialize();

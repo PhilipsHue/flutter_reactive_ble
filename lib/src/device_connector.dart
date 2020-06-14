@@ -111,9 +111,7 @@ class DeviceConnector {
       });
 
       return _deviceScanner.currentScan.future
-          .then(
-            (_) => true,
-          )
+          .then((_) => true)
           .catchError((Object _) => false)
           .asStream()
           .asyncExpand(

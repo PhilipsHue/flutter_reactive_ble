@@ -21,6 +21,7 @@ void main() {
     _EventChannelMock _connectedDeviceChannel;
     _EventChannelMock _argsChannel;
     _EventChannelMock _scanChannel;
+    _EventChannelMock _statusChannel;
 
     setUp(() {
       _argsConverter = _ArgsToProtobufConverterMock();
@@ -29,6 +30,7 @@ void main() {
       _connectedDeviceChannel = _EventChannelMock();
       _argsChannel = _EventChannelMock();
       _scanChannel = _EventChannelMock();
+      _statusChannel = _EventChannelMock();
 
       _sut = PluginController(
         argsToProtobufConverter: _argsConverter,
@@ -37,6 +39,7 @@ void main() {
         connectedDeviceChannel: _connectedDeviceChannel,
         charUpdateChannel: _argsChannel,
         bleDeviceScanChannel: _scanChannel,
+        bleStatusChannel: _statusChannel,
       );
     });
 
@@ -540,6 +543,31 @@ void main() {
 
       test('It returns correct value', () {
         expect(result, convertedResult);
+      });
+    });
+
+    group('Ble status', () {
+      const status1 = BleStatus.poweredOff;
+      const status2 = BleStatus.ready;
+
+      Stream<BleStatus> _bleStatusStream;
+
+      setUp(() {
+        when(_statusChannel.receiveBroadcastStream()).thenAnswer(
+          (_) => Stream<List<int>>.fromIterable([
+            [1],
+            [0]
+          ]),
+        );
+
+        when(_protobufConverter.bleStatusFrom([1])).thenReturn(status1);
+        when(_protobufConverter.bleStatusFrom([0])).thenReturn(status2);
+
+        _bleStatusStream = _sut.bleStatusStream;
+      });
+
+      test('It emits correct values', () {
+        expect(_bleStatusStream, emitsInOrder(<BleStatus>[status1, status2]));
       });
     });
   });
