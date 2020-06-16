@@ -7,8 +7,10 @@ import 'package:meta/meta.dart';
 
 import 'converter/protobuf_converter.dart';
 import 'model/characteristic_value.dart';
+import 'model/clear_gatt_cache_error.dart';
 import 'model/connection_state_update.dart';
 import 'model/qualified_characteristic.dart';
+import 'model/unit.dart';
 
 class PluginController {
   const PluginController({
@@ -17,22 +19,30 @@ class PluginController {
     @required MethodChannel bleMethodChannel,
     @required EventChannel connectedDeviceChannel,
     @required EventChannel charUpdateChannel,
+    @required EventChannel bleDeviceScanChannel,
+    @required EventChannel bleStatusChannel,
   })  : assert(argsToProtobufConverter != null),
         assert(protobufConverter != null),
         assert(bleMethodChannel != null),
         assert(connectedDeviceChannel != null),
+        assert(bleDeviceScanChannel != null),
+        assert(bleStatusChannel != null),
         assert(charUpdateChannel != null),
         _argsToProtobufConverter = argsToProtobufConverter,
         _protobufConverter = protobufConverter,
         _bleMethodChannel = bleMethodChannel,
         _connectedDeviceChannel = connectedDeviceChannel,
-        _charUpdateChannel = charUpdateChannel;
+        _charUpdateChannel = charUpdateChannel,
+        _bleStatusChannel = bleStatusChannel,
+        _bleDeviceScanChannel = bleDeviceScanChannel;
 
   final ArgsToProtobufConverter _argsToProtobufConverter;
   final ProtobufConverter _protobufConverter;
   final MethodChannel _bleMethodChannel;
   final EventChannel _connectedDeviceChannel;
   final EventChannel _charUpdateChannel;
+  final EventChannel _bleDeviceScanChannel;
+  final EventChannel _bleStatusChannel;
 
   Stream<ConnectionStateUpdate> get connectionUpdateStream =>
       _connectedDeviceChannel
@@ -44,6 +54,39 @@ class PluginController {
       .receiveBroadcastStream()
       .cast<List<int>>()
       .map(_protobufConverter.characteristicValueFrom);
+
+  Stream<ScanResult> get scanStream =>
+      _bleDeviceScanChannel.receiveBroadcastStream().cast<List<int>>().map(
+            _protobufConverter.scanResultFrom,
+          );
+
+  Stream<BleStatus> get bleStatusStream =>
+      _bleStatusChannel.receiveBroadcastStream().cast<List<int>>().map(
+            _protobufConverter.bleStatusFrom,
+          );
+
+  Future<void> initialize() => _bleMethodChannel.invokeMethod("initialize");
+  Future<void> deInitialize() =>
+      _bleMethodChannel.invokeMethod<void>("deinitialize");
+
+  Stream<Object> scanForDevices({
+    @required List<Uuid> withServices,
+    @required ScanMode scanMode,
+    @required bool requireLocationServicesEnabled,
+  }) =>
+      _bleMethodChannel
+          .invokeMethod<void>(
+            "scanForDevices",
+            _argsToProtobufConverter
+                .createScanForDevicesRequest(
+                  withServices: withServices,
+                  scanMode: scanMode,
+                  requireLocationServicesEnabled:
+                      requireLocationServicesEnabled,
+                )
+                .writeToBuffer(),
+          )
+          .asStream();
 
   Stream<Object> connectToDevice(
     String id,
@@ -145,25 +188,40 @@ class PluginController {
                 .writeToBuffer(),
           )
           .then(_protobufConverter.connectionPriorityInfoFrom);
+
+  Future<Result<Unit, GenericFailure<ClearGattCacheError>>> clearGattCache(
+          String deviceId) =>
+      _bleMethodChannel
+          .invokeMethod<List<int>>(
+            "clearGattCache",
+            _argsToProtobufConverter
+                .createClearGattCacheRequest(deviceId)
+                .writeToBuffer(),
+          )
+          .then(_protobufConverter.clearGattCacheResultFrom);
 }
 
 class PluginControllerFactory {
   // this injection is temporarily until we moved everythin out
-  const PluginControllerFactory(this._bleMethodChannel);
-
-  final MethodChannel _bleMethodChannel;
+  const PluginControllerFactory();
 
   PluginController create() {
+    const _bleMethodChannel = MethodChannel("flutter_reactive_ble_method");
+
     const connectedDeviceChannel =
         EventChannel("flutter_reactive_ble_connected_device");
     const charEventChannel = EventChannel("flutter_reactive_ble_char_update");
+    const scanEventChannel = EventChannel("flutter_reactive_ble_scan");
+    const bleStatusChannel = EventChannel("flutter_reactive_ble_status");
 
-    return PluginController(
-      protobufConverter: const ProtobufConverter(),
-      argsToProtobufConverter: const ArgsToProtobufConverter(),
+    return const PluginController(
+      protobufConverter: ProtobufConverter(),
+      argsToProtobufConverter: ArgsToProtobufConverter(),
       bleMethodChannel: _bleMethodChannel,
       connectedDeviceChannel: connectedDeviceChannel,
       charUpdateChannel: charEventChannel,
+      bleDeviceScanChannel: scanEventChannel,
+      bleStatusChannel: bleStatusChannel,
     );
   }
 }

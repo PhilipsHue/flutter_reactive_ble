@@ -1,5 +1,6 @@
 import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
 import 'package:flutter_reactive_ble/src/device_connector.dart';
+import 'package:flutter_reactive_ble/src/device_scanner.dart';
 import 'package:flutter_reactive_ble/src/discovered_devices_registry.dart';
 import 'package:flutter_reactive_ble/src/model/scan_session.dart';
 import 'package:flutter_reactive_ble/src/plugin_controller.dart';
@@ -44,6 +45,12 @@ void main() {
         connectionState: DeviceConnectionState.connecting,
         failure: null,
       );
+      _sut = DeviceConnector(
+        pluginController: _pluginController,
+        discoveredDevicesRegistry: _registry,
+        deviceScanner: _scanner,
+        delayAfterScanFailure: _delayAfterFailure,
+      );
     });
 
     group('Connect to device', () {
@@ -59,14 +66,6 @@ void main() {
           setUp(() async {
             when(_pluginController.connectToDevice(any, any, any)).thenAnswer(
               (_) => Stream.fromIterable([1]),
-            );
-
-            _sut = DeviceConnector(
-              pluginController: _pluginController,
-              discoveredDevicesRegistry: _registry,
-              scanForDevices: _scanner.scanForDevices,
-              getCurrentScan: _scanner.getCurrentScan,
-              delayAfterScanFailure: _delayAfterFailure,
             );
             _result = _sut.connect(
               id: _deviceId,
@@ -120,19 +119,11 @@ void main() {
       });
       group('Given a scan is running for another device', () {
         setUp(() {
-          when(_scanner.getCurrentScan()).thenReturn(
+          when(_scanner.currentScan).thenReturn(
             ScanSession(
               future: Future.value(),
               withServices: [uuidCurrentScan],
             ),
-          );
-
-          _sut = DeviceConnector(
-            pluginController: _pluginController,
-            discoveredDevicesRegistry: _registry,
-            scanForDevices: _scanner.scanForDevices,
-            getCurrentScan: _scanner.getCurrentScan,
-            delayAfterScanFailure: _delayAfterFailure,
           );
 
           _result = _sut.connectToAdvertisingDevice(
@@ -161,7 +152,7 @@ void main() {
         final uuidDeviceToScan = Uuid.parse('FEFF');
 
         setUp(() {
-          when(_scanner.getCurrentScan()).thenReturn(
+          when(_scanner.currentScan).thenReturn(
             ScanSession(
               future: Future.value(),
               withServices: [uuidDeviceToScan],
@@ -177,13 +168,7 @@ void main() {
                 .thenReturn(true);
             when(_pluginController.connectToDevice(any, any, any))
                 .thenAnswer((_) => Stream.fromIterable([1]));
-            _sut = DeviceConnector(
-              pluginController: _pluginController,
-              discoveredDevicesRegistry: _registry,
-              scanForDevices: _scanner.scanForDevices,
-              getCurrentScan: _scanner.getCurrentScan,
-              delayAfterScanFailure: _delayAfterFailure,
-            );
+
             _result = _sut.connectToAdvertisingDevice(
               id: deviceId,
               withServices: [uuidDeviceToScan],
@@ -204,13 +189,6 @@ void main() {
                     cacheValidity: anyNamed('cacheValidity')))
                 .thenReturn(false);
 
-            _sut = DeviceConnector(
-              pluginController: _pluginController,
-              discoveredDevicesRegistry: _registry,
-              scanForDevices: _scanner.scanForDevices,
-              getCurrentScan: _scanner.getCurrentScan,
-              delayAfterScanFailure: _delayAfterFailure,
-            );
             _result = _sut.connectToAdvertisingDevice(
               id: deviceId,
               withServices: [uuidDeviceToScan],
@@ -240,8 +218,7 @@ void main() {
 
           final responses = [null, session, session];
 
-          when(_scanner.getCurrentScan())
-              .thenAnswer((_) => responses.removeAt(0));
+          when(_scanner.currentScan).thenAnswer((_) => responses.removeAt(0));
         });
 
         group('And device is discovered in a previous scan', () {
@@ -252,13 +229,7 @@ void main() {
                 .thenReturn(true);
             when(_pluginController.connectToDevice(any, any, any))
                 .thenAnswer((_) => Stream.fromIterable([1]));
-            _sut = DeviceConnector(
-              pluginController: _pluginController,
-              discoveredDevicesRegistry: _registry,
-              scanForDevices: _scanner.scanForDevices,
-              getCurrentScan: _scanner.getCurrentScan,
-              delayAfterScanFailure: _delayAfterFailure,
-            );
+
             _result = _sut.connectToAdvertisingDevice(
               id: deviceId,
               withServices: [uuidDeviceToScan],
@@ -296,13 +267,6 @@ void main() {
                       cacheValidity: anyNamed('cacheValidity')))
                   .thenReturn(false);
 
-              _sut = DeviceConnector(
-                pluginController: _pluginController,
-                discoveredDevicesRegistry: _registry,
-                scanForDevices: _scanner.scanForDevices,
-                getCurrentScan: _scanner.getCurrentScan,
-                delayAfterScanFailure: _delayAfterFailure,
-              );
               _result = _sut.connectToAdvertisingDevice(
                 id: deviceId,
                 withServices: [uuidDeviceToScan],
@@ -344,13 +308,6 @@ void main() {
               when(_pluginController.connectToDevice(any, any, any))
                   .thenAnswer((_) => Stream.fromIterable([1]));
 
-              _sut = DeviceConnector(
-                pluginController: _pluginController,
-                discoveredDevicesRegistry: _registry,
-                scanForDevices: _scanner.scanForDevices,
-                getCurrentScan: _scanner.getCurrentScan,
-                delayAfterScanFailure: _delayAfterFailure,
-              );
               _result = _sut.connectToAdvertisingDevice(
                 id: deviceId,
                 withServices: [uuidDeviceToScan],
@@ -383,8 +340,4 @@ class _PluginControllerMock extends Mock implements PluginController {}
 class _DiscoveredDevicesRegistryMock extends Mock
     implements DiscoveredDevicesRegistry {}
 
-class _DeviceScannerMock extends Mock {
-  Stream<DiscoveredDevice> scanForDevices(
-      {List<Uuid> withServices, ScanMode scanMode});
-  ScanSession getCurrentScan();
-}
+class _DeviceScannerMock extends Mock implements DeviceScanner {}

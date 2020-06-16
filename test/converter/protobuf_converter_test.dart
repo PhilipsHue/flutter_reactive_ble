@@ -22,6 +22,7 @@ void main() {
       pb.ServiceDataEntry serviceDataEntry2;
       pb.DeviceScanInfo message;
       Uint8List manufacturerData;
+      ScanResult scanresult;
 
       setUp(() {
         serviceDataEntry1 = pb.ServiceDataEntry()
@@ -38,34 +39,33 @@ void main() {
           ..serviceData.add(serviceDataEntry1)
           ..serviceData.add(serviceDataEntry2)
           ..manufacturerData = manufacturerData;
+
+        scanresult = sut.scanResultFrom(message.writeToBuffer());
       });
 
       test('converts id', () {
-        final scanresult = sut.scanResultFrom(message).result;
         expect(
-            scanresult.iif(
-                success: (d) => d.id, failure: (_) => throw Exception()),
+            scanresult.result
+                .iif(success: (d) => d.id, failure: (_) => throw Exception()),
             id);
       });
 
       test('converts name', () {
-        final scanresult = sut.scanResultFrom(message).result;
         expect(
-            scanresult.iif(
-                success: (d) => d.name, failure: (_) => throw Exception()),
+            scanresult.result
+                .iif(success: (d) => d.name, failure: (_) => throw Exception()),
             name);
       });
 
       test('converts service data', () {
-        final scanresult = sut.scanResultFrom(message).result;
         expect(
-            scanresult.iif(
+            scanresult.result.iif(
                 success: (d) =>
                     d.serviceData[Uuid(serviceDataEntry1.serviceUuid.data)],
                 failure: (_) => throw Exception()),
             serviceDataEntry1.data);
         expect(
-            scanresult.iif(
+            scanresult.result.iif(
                 success: (d) =>
                     d.serviceData[Uuid(serviceDataEntry2.serviceUuid.data)],
                 failure: (_) => throw Exception()),
@@ -73,27 +73,29 @@ void main() {
       });
 
       test('converts manufacturer data', () {
-        final scanresult = sut.scanResultFrom(message).result;
         expect(
-            scanresult.iif(
+            scanresult.result.iif(
                 success: (d) => d.manufacturerData,
                 failure: (_) => throw Exception()),
             manufacturerData);
       });
 
-      test('converts failure', () {
-        final failure = pb.GenericFailure()
-          ..code = 0
-          ..message = "";
-        final failedScan = pb.DeviceScanInfo()..failure = failure;
-
-        final scanresult = sut.scanResultFrom(failedScan).result;
-        expect(
-            scanresult.iif(
-                success: (d) =>
-                    d.serviceData[Uuid(serviceDataEntry1.serviceUuid.data)],
-                failure: (_) => "Failed"),
-            "Failed");
+      group('Given Scan fails', () {
+        setUp(() {
+          final failure = pb.GenericFailure()
+            ..code = 0
+            ..message = "";
+          final failedScan = pb.DeviceScanInfo()..failure = failure;
+          scanresult = sut.scanResultFrom(failedScan.writeToBuffer());
+        });
+        test('converts failure', () {
+          expect(
+              scanresult.result.iif(
+                  success: (d) =>
+                      d.serviceData[Uuid(serviceDataEntry1.serviceUuid.data)],
+                  failure: (_) => "Failed"),
+              "Failed");
+        });
       });
     });
 
@@ -270,7 +272,8 @@ void main() {
 
     group('Converts clear gatt cache result', () {
       test('Succeeds', () {
-        final result = sut.clearGattCacheResultFrom(pb.ClearGattCacheInfo());
+        final result = sut
+            .clearGattCacheResultFrom(pb.ClearGattCacheInfo().writeToBuffer());
 
         expect(
             result,
@@ -279,7 +282,8 @@ void main() {
       });
 
       test('Fails', () {
-        final message = pb.ClearGattCacheInfo()..failure = pb.GenericFailure();
+        final message = (pb.ClearGattCacheInfo()..failure = pb.GenericFailure())
+            .writeToBuffer();
         final result = sut.clearGattCacheResultFrom(message).iif(
             success: (_) => throw AssertionError("Not expected to succeed"),
             failure: (f) => f);
@@ -437,12 +441,12 @@ void main() {
     group('Converts Blestatus', () {
       test('Converts valid status', () {
         final message = pb.BleStatusInfo()..status = 5;
-        expect(sut.bleStatusFrom(message), BleStatus.ready);
+        expect(sut.bleStatusFrom(message.writeToBuffer()), BleStatus.ready);
       });
 
       test('Fallsback in case of invalid status', () {
         final message = pb.BleStatusInfo()..status = 6;
-        expect(sut.bleStatusFrom(message), BleStatus.unknown);
+        expect(sut.bleStatusFrom(message.writeToBuffer()), BleStatus.unknown);
       });
     });
 

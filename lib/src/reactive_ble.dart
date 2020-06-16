@@ -1,12 +1,10 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:flutter/services.dart';
 import 'package:flutter_reactive_ble/src/connected_device_operation.dart';
-import 'package:flutter_reactive_ble/src/converter/protobuf_converter.dart';
 import 'package:flutter_reactive_ble/src/device_connector.dart';
+import 'package:flutter_reactive_ble/src/device_scanner.dart';
 import 'package:flutter_reactive_ble/src/discovered_devices_registry.dart';
-import 'package:flutter_reactive_ble/src/generated/bledata.pb.dart' as pb;
 import 'package:flutter_reactive_ble/src/model/ble_status.dart';
 import 'package:flutter_reactive_ble/src/model/characteristic_value.dart';
 import 'package:flutter_reactive_ble/src/model/connection_priority.dart';
@@ -14,11 +12,9 @@ import 'package:flutter_reactive_ble/src/model/connection_state_update.dart';
 import 'package:flutter_reactive_ble/src/model/discovered_device.dart';
 import 'package:flutter_reactive_ble/src/model/qualified_characteristic.dart';
 import 'package:flutter_reactive_ble/src/model/scan_mode.dart';
-import 'package:flutter_reactive_ble/src/model/scan_session.dart';
 import 'package:flutter_reactive_ble/src/model/uuid.dart';
 import 'package:flutter_reactive_ble/src/plugin_controller.dart';
 import 'package:flutter_reactive_ble/src/rx_ext/repeater.dart';
-import 'package:flutter_reactive_ble/src/rx_ext/serial_disposable.dart';
 import 'package:meta/meta.dart';
 
 /// [FlutterReactiveBle] is the facade of the library. Its interface allows to
@@ -65,39 +61,22 @@ class FlutterReactiveBle {
     yield* _connectedDeviceOperator.characteristicValueStream;
   }
 
-  final _methodChannel = const MethodChannel("flutter_reactive_ble_method");
-
   PluginController _pluginController;
 
   BleStatus _status = BleStatus.unknown;
 
-  final Stream<BleStatus> _statusStream =
-      const EventChannel("flutter_reactive_ble_status")
-          .receiveBroadcastStream()
-          .cast<List<int>>()
-          .map((data) => pb.BleStatusInfo.fromBuffer(data))
-          .map(const ProtobufConverter().bleStatusFrom);
+  Stream<BleStatus> get _statusStream => _pluginController.bleStatusStream;
 
   Future<void> _trackStatus() async {
     await initialize();
     _statusStream.listen((status) => _status = status);
   }
 
-  final Stream<ScanResult> _scanStream =
-      const EventChannel("flutter_reactive_ble_scan")
-          .receiveBroadcastStream()
-          .cast<List<int>>()
-          .map((data) => pb.DeviceScanInfo.fromBuffer(data))
-          .map(const ProtobufConverter().scanResultFrom);
-
-  final SerialDisposable<Repeater<DiscoveredDevice>> _scanStreamDisposable =
-      SerialDisposable((repeater) => repeater.dispose());
-
   Future<void> _initialization;
 
-  ScanSession _currentScan;
   DeviceConnector _deviceConnector;
   ConnectedDeviceOperation _connectedDeviceOperator;
+  DeviceScanner _deviceScanner;
 
   /// Initializes this [FlutterReactiveBle] instance and its platform-specific
   /// counterparts.
@@ -105,19 +84,26 @@ class FlutterReactiveBle {
   /// The initialization is performed automatically the first time any BLE
   /// operation is triggered.
   Future<void> initialize() async {
-    _pluginController ??= PluginControllerFactory(_methodChannel).create();
+    _pluginController ??= const PluginControllerFactory().create();
 
-    _initialization ??= _methodChannel.invokeMethod("initialize");
+    _initialization ??= _pluginController.initialize();
 
     _connectedDeviceOperator ??= ConnectedDeviceOperation(
       pluginController: _pluginController,
+    );
+    _deviceScanner ??= DeviceScanner(
+      pluginController: _pluginController,
+      platformIsAndroid: () => Platform.isAndroid,
+      delayAfterScanCompletion: Future<void>.delayed(
+        const Duration(milliseconds: 300),
+      ),
+      scanRegistry: scanRegistry,
     );
 
     _deviceConnector ??= DeviceConnector(
       pluginController: _pluginController,
       discoveredDevicesRegistry: scanRegistry,
-      scanForDevices: scanForDevices,
-      getCurrentScan: () => _currentScan,
+      deviceScanner: _deviceScanner,
       delayAfterScanFailure: const Duration(seconds: 10),
     );
 
@@ -129,8 +115,10 @@ class FlutterReactiveBle {
   ///
   /// The deinitialization is automatically performed on Flutter Hot Restart.
   Future<void> deinitialize() async {
-    _initialization = null;
-    await _methodChannel.invokeMethod<void>("deinitialize");
+    if (_initialization != null) {
+      _initialization = null;
+      await _pluginController.deInitialize();
+    }
   }
 
   /// Reads the value of the specified characteristic.
@@ -219,58 +207,10 @@ class FlutterReactiveBle {
     @required List<Uuid> withServices,
     ScanMode scanMode = ScanMode.balanced,
     bool requireLocationServicesEnabled = true,
-  }) {
-    final completer = Completer<void>();
-    _currentScan =
-        ScanSession(withServices: withServices, future: completer.future);
+  }) async* {
+    await initialize();
 
-    final scanRepeater = Repeater(
-      onListenEmitFrom: () =>
-          _scanStream.map((scan) => scan.result.dematerialize()).handleError(
-        (Object e, StackTrace s) {
-          if (!completer.isCompleted) {
-            completer.completeError(e, s);
-          }
-        },
-      ),
-      onCancel: () async {
-        if (Platform.isAndroid) {
-          // Some devices have issues with establishing connection directly after scan is stopped so we should wait here.
-          // See https://github.com/googlesamples/android-BluetoothLeGatt/issues/44
-          await Future<void>.delayed(const Duration(milliseconds: 300));
-        }
-        _currentScan = null;
-        if (!completer.isCompleted) {
-          completer.complete();
-        }
-      },
-    );
-
-    _scanStreamDisposable.set(scanRepeater);
-
-    final scanRequest = pb.ScanForDevicesRequest()
-      ..scanMode = convertScanModeToArgs(scanMode)
-      ..requireLocationServicesEnabled = requireLocationServicesEnabled;
-
-    if (withServices != null) {
-      for (final withService in withServices) {
-        scanRequest.serviceUuids.add((pb.Uuid()..data = withService.data));
-      }
-    }
-
-    return initialize()
-        .then((_) {
-          _methodChannel.invokeMethod<void>(
-            "scanForDevices",
-            scanRequest.writeToBuffer(),
-          );
-        })
-        .asStream()
-        .asyncExpand((Object _) => scanRepeater.stream)
-        .map((d) {
-          scanRegistry.add(d.id);
-          return d;
-        });
+    yield* _deviceScanner.scanForDevices(withServices: withServices);
   }
 
   /// Establishes a connection to a BLE device.
@@ -334,14 +274,9 @@ class FlutterReactiveBle {
   /// Always completes with an error on iOS, as there is no way (and no need) to perform this operation on iOS.
   ///
   /// The connection may need to be reestablished after successful GATT attribute cache clearing.
-  Future<void> clearGattCache(String deviceId) {
-    final args = pb.ClearGattCacheRequest()..deviceId = deviceId;
-    return _methodChannel
-        .invokeMethod<List<int>>("clearGattCache", args.writeToBuffer())
-        .then((data) => pb.ClearGattCacheInfo.fromBuffer(data))
-        .then(const ProtobufConverter().clearGattCacheResultFrom)
-        .then((info) => info.dematerialize());
-  }
+  Future<void> clearGattCache(String deviceId) => _pluginController
+      .clearGattCache(deviceId)
+      .then((info) => info.dematerialize());
 
   Stream<List<int>> subscribeToCharacteristic(
       QualifiedCharacteristic characteristic) {

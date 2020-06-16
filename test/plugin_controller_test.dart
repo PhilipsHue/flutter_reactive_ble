@@ -1,10 +1,13 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:flutter/services.dart';
 import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
 import 'package:flutter_reactive_ble/src/converter/args_to_protubuf_converter.dart';
 import 'package:flutter_reactive_ble/src/converter/protobuf_converter.dart';
 import 'package:flutter_reactive_ble/src/generated/bledata.pbserver.dart' as pb;
+import 'package:flutter_reactive_ble/src/model/clear_gatt_cache_error.dart';
+import 'package:flutter_reactive_ble/src/model/unit.dart';
 import 'package:flutter_reactive_ble/src/plugin_controller.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
@@ -17,6 +20,8 @@ void main() {
     ProtobufConverter _protobufConverter;
     _EventChannelMock _connectedDeviceChannel;
     _EventChannelMock _argsChannel;
+    _EventChannelMock _scanChannel;
+    _EventChannelMock _statusChannel;
 
     setUp(() {
       _argsConverter = _ArgsToProtobufConverterMock();
@@ -24,12 +29,17 @@ void main() {
       _protobufConverter = _ProtobufConverterMock();
       _connectedDeviceChannel = _EventChannelMock();
       _argsChannel = _EventChannelMock();
+      _scanChannel = _EventChannelMock();
+      _statusChannel = _EventChannelMock();
+
       _sut = PluginController(
         argsToProtobufConverter: _argsConverter,
         bleMethodChannel: _methodChannel,
         protobufConverter: _protobufConverter,
         connectedDeviceChannel: _connectedDeviceChannel,
         charUpdateChannel: _argsChannel,
+        bleDeviceScanChannel: _scanChannel,
+        bleStatusChannel: _statusChannel,
       );
     });
 
@@ -386,6 +396,178 @@ void main() {
             request.writeToBuffer(),
           ),
         ).called(1);
+      });
+    });
+
+    group('Scan for devices', () {
+      const scanMode = ScanMode.balanced;
+      const locationEnabled = true;
+      final withServices = [Uuid.parse('FEFF')];
+
+      pb.ScanForDevicesRequest request;
+
+      setUp(() {
+        request = pb.ScanForDevicesRequest();
+        when(_argsConverter.createScanForDevicesRequest(
+          withServices: anyNamed('withServices'),
+          scanMode: anyNamed('scanMode'),
+          requireLocationServicesEnabled:
+              anyNamed('requireLocationServicesEnabled'),
+        )).thenReturn(request);
+
+        when(
+          _methodChannel.invokeMethod<void>('scanForDevices', any),
+        ).thenAnswer(
+          (_) => Future.value(),
+        );
+
+        _sut.scanForDevices(
+          withServices: withServices,
+          scanMode: scanMode,
+          requireLocationServicesEnabled: locationEnabled,
+        );
+      });
+
+      test('It invokes correct method', () {
+        verify(_methodChannel.invokeMethod<void>(
+          'scanForDevices',
+          request.writeToBuffer(),
+        )).called(1);
+      });
+
+      test('It invokes argconverter with correct arguments', () {
+        verify(_argsConverter.createScanForDevicesRequest(
+          withServices: withServices,
+          scanMode: scanMode,
+          requireLocationServicesEnabled: locationEnabled,
+        )).called(1);
+      });
+    });
+
+    group('ScanFordevices stream', () {
+      final device = DiscoveredDevice(
+        id: '123',
+        name: 'Testdevice',
+        rssi: -40,
+        serviceData: const {},
+        manufacturerData: Uint8List.fromList([1]),
+      );
+      ScanResult scanResult;
+
+      Stream<ScanResult> result;
+      setUp(() {
+        scanResult = ScanResult(result: Result.success(device));
+        when(_protobufConverter.scanResultFrom(any)).thenReturn(scanResult);
+        when(_scanChannel.receiveBroadcastStream())
+            .thenAnswer((_) => Stream<List<int>>.fromIterable([
+                  [1]
+                ]));
+        result = _sut.scanStream;
+      });
+
+      test('It calls protobufconverter with correct arguments', () async {
+        await result.first;
+        verify(_protobufConverter.scanResultFrom([1])).called(1);
+      });
+
+      test('It emits correct values', () {
+        expect(result, emitsInOrder(<ScanResult>[scanResult]));
+      });
+    });
+
+    group('initialize', () {
+      setUp(() async {
+        when(_methodChannel.invokeMethod<void>('initialize')).thenAnswer(
+          (realInvocation) => Future.value(),
+        );
+
+        await _sut.initialize();
+      });
+
+      test('It invokes correct method in method channel', () {
+        verify(_methodChannel.invokeMethod<void>('initialize')).called(1);
+      });
+    });
+
+    group('deInitialize', () {
+      setUp(() async {
+        when(_methodChannel.invokeMethod<void>('deinitialize')).thenAnswer(
+          (realInvocation) => Future.value(),
+        );
+
+        await _sut.deInitialize();
+      });
+
+      test('It invokes correct method in method channel', () {
+        verify(_methodChannel.invokeMethod<void>('deinitialize')).called(1);
+      });
+    });
+
+    group('Clear gatt cache', () {
+      const deviceId = '123';
+
+      pb.ClearGattCacheRequest request;
+      Result<Unit, GenericFailure<ClearGattCacheError>> result;
+      Result<Unit, GenericFailure<ClearGattCacheError>> convertedResult;
+
+      setUp(() async {
+        request = pb.ClearGattCacheRequest();
+        convertedResult =
+            const Result<Unit, GenericFailure<ClearGattCacheError>>.success(
+                Unit());
+        when(_methodChannel.invokeMethod<List<int>>('clearGattCache', any))
+            .thenAnswer(
+          (realInvocation) => Future.value([1]),
+        );
+        when(_argsConverter.createClearGattCacheRequest(any))
+            .thenReturn(request);
+        when(_protobufConverter.clearGattCacheResultFrom(any))
+            .thenReturn(convertedResult);
+        result = await _sut.clearGattCache(deviceId);
+      });
+
+      test('It calls method channel with correct arguments', () {
+        verify(_methodChannel.invokeMethod<List<int>>(
+          'clearGattCache',
+          request.writeToBuffer(),
+        )).called(1);
+      });
+
+      test('It calls args to protobufconverter with correct arguments', () {
+        verify(_argsConverter.createClearGattCacheRequest(deviceId)).called(1);
+      });
+
+      test('It calls protobuf converter with correct arguments', () {
+        verify(_protobufConverter.clearGattCacheResultFrom([1])).called(1);
+      });
+
+      test('It returns correct value', () {
+        expect(result, convertedResult);
+      });
+    });
+
+    group('Ble status', () {
+      const status1 = BleStatus.poweredOff;
+      const status2 = BleStatus.ready;
+
+      Stream<BleStatus> _bleStatusStream;
+
+      setUp(() {
+        when(_statusChannel.receiveBroadcastStream()).thenAnswer(
+          (_) => Stream<List<int>>.fromIterable([
+            [1],
+            [0]
+          ]),
+        );
+
+        when(_protobufConverter.bleStatusFrom([1])).thenReturn(status1);
+        when(_protobufConverter.bleStatusFrom([0])).thenReturn(status2);
+
+        _bleStatusStream = _sut.bleStatusStream;
+      });
+
+      test('It emits correct values', () {
+        expect(_bleStatusStream, emitsInOrder(<BleStatus>[status1, status2]));
       });
     });
   });

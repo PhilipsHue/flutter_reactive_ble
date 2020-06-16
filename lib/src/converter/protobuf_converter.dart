@@ -19,11 +19,18 @@ import 'package:meta/meta.dart';
 class ProtobufConverter {
   const ProtobufConverter();
 
-  BleStatus bleStatusFrom(pb.BleStatusInfo message) =>
-      selectFrom(BleStatus.values,
-          index: message.status, fallback: (_) => BleStatus.unknown);
+  BleStatus bleStatusFrom(List<int> data) {
+    final message = pb.BleStatusInfo.fromBuffer(data);
+    return selectFrom(
+      BleStatus.values,
+      index: message.status,
+      fallback: (_) => BleStatus.unknown,
+    );
+  }
 
-  ScanResult scanResultFrom(pb.DeviceScanInfo message) {
+  ScanResult scanResultFrom(List<int> data) {
+    final message = pb.DeviceScanInfo.fromBuffer(data);
+
     final serviceData = Map.fromIterables(
       message.serviceData.map((entry) => Uuid(entry.serviceUuid.data)),
       message.serviceData.map((entry) => Uint8List.fromList(entry.data)),
@@ -66,16 +73,18 @@ class ProtobufConverter {
   }
 
   Result<Unit, GenericFailure<ClearGattCacheError>> clearGattCacheResultFrom(
-          pb.ClearGattCacheInfo message) =>
-      resultFrom(
-        getValue: () => const Unit(),
-        failure: genericFailureFrom(
-          hasFailure: message.hasFailure(),
-          getFailure: () => message.failure,
-          codes: ClearGattCacheError.values,
-          fallback: (rawOrNull) => ClearGattCacheError.unknown,
-        ),
-      );
+      List<int> data) {
+    final message = pb.ClearGattCacheInfo.fromBuffer(data);
+    return resultFrom(
+      getValue: () => const Unit(),
+      failure: genericFailureFrom(
+        hasFailure: message.hasFailure(),
+        getFailure: () => message.failure,
+        codes: ClearGattCacheError.values,
+        fallback: (rawOrNull) => ClearGattCacheError.unknown,
+      ),
+    );
+  }
 
   CharacteristicValue characteristicValueFrom(List<int> data) {
     final message = pb.CharacteristicValueInfo.fromBuffer(data);

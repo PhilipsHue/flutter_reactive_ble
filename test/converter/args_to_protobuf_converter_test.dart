@@ -217,5 +217,98 @@ void main() {
         expect(result.priority, 1);
       });
     });
+
+    group('Scan for devices request', () {
+      pb.ScanForDevicesRequest result;
+      const scanMode = ScanMode.lowLatency;
+      List<Uuid> withServices;
+
+      group('When creating request without services to discover', () {
+        setUp(() {
+          result = _sut.createScanForDevicesRequest(
+            withServices: null,
+            scanMode: scanMode,
+            requireLocationServicesEnabled: false,
+          );
+        });
+
+        test('It converts services', () {
+          expect(result.serviceUuids.isEmpty, true);
+        });
+
+        test('It converts scanmode', () {
+          expect(result.scanMode, 2);
+        });
+
+        test('It converts requireLocationServicesEnabled', () {
+          expect(result.requireLocationServicesEnabled, false);
+        });
+      });
+      group('When creating request without services to discover', () {
+        setUp(() {
+          withServices = [Uuid.parse('FEFF')];
+          result = _sut.createScanForDevicesRequest(
+            withServices: withServices,
+            scanMode: scanMode,
+            requireLocationServicesEnabled: false,
+          );
+        });
+
+        test('It converts services', () {
+          expect(result.serviceUuids.first.data, [254, 255]);
+        });
+
+        test('It converts scanmode', () {
+          expect(result.scanMode, 2);
+        });
+
+        test('It converts requireLocationServicesEnabled', () {
+          expect(result.requireLocationServicesEnabled, false);
+        });
+      });
+
+      group('When creating request without services to discover', () {
+        Uuid uuid1;
+        Uuid uuid2;
+
+        setUp(() {
+          uuid1 = Uuid.parse('FE1F');
+          uuid2 = Uuid.parse('FEAA');
+
+          result = _sut.createScanForDevicesRequest(
+            withServices: [uuid1, uuid2],
+            scanMode: scanMode,
+            requireLocationServicesEnabled: false,
+          );
+        });
+
+        test('It converts services', () {
+          expect(result.serviceUuids.map((e) => e.data), [
+            [254, 31],
+            [254, 170]
+          ]);
+        });
+
+        test('It converts scanmode', () {
+          expect(result.scanMode, 2);
+        });
+
+        test('It converts services', () {
+          expect(result.requireLocationServicesEnabled, false);
+        });
+      });
+    });
+
+    group('Create clear gatt request', () {
+      const deviceId = '123';
+      pb.ClearGattCacheRequest result;
+      setUp(() {
+        result = _sut.createClearGattCacheRequest(deviceId);
+      });
+
+      test('It converts deviceId', () {
+        expect(result.deviceId, deviceId);
+      });
+    });
   });
 }
