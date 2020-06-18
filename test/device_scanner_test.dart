@@ -173,20 +173,14 @@ void main() {
             GenericFailure(code: ScanFailure.unknown, message: 'Whoops');
         const resultFailure = ScanResult(result: Result.failure(failure));
 
-        StreamController<ScanResult> scanController;
-        StreamSubscription<DiscoveredDevice> subscription;
+        Stream<DiscoveredDevice> scanStream;
 
         setUp(() {
-          scanController = StreamController<ScanResult>()
-            ..add(
-              ScanResult(
-                result: Result<DiscoveredDevice,
-                    GenericFailure<ScanFailure>>.success(_device1),
-              ),
-            );
-
-          when(_pluginController.scanStream)
-              .thenAnswer((_) => scanController.stream);
+          when(_pluginController.scanStream).thenAnswer(
+            (_) => Stream.fromIterable(
+              [resultFailure],
+            ),
+          );
 
           _sut = DeviceScanner(
             pluginController: _pluginController,
@@ -195,23 +189,20 @@ void main() {
             scanRegistry: _scanRegistry,
           );
 
-          subscription = _sut
-              .scanForDevices(
-                withServices: withServices,
-                scanMode: scanmode,
-                requireLocationServicesEnabled: locationEnabled,
-              )
-              .listen((event) {});
-        });
-
-        tearDown(() async {
-          await subscription.cancel();
-          await scanController.close();
+          scanStream = _sut.scanForDevices(
+            withServices: withServices,
+            scanMode: scanmode,
+            requireLocationServicesEnabled: locationEnabled,
+          );
         });
 
         test('It throws exception', () {
-          scanController.add(resultFailure);
-          expect(() => _sut.currentScan.future, throwsA(anything));
+          expect(
+              scanStream,
+              emitsInOrder(<Object>[
+                emitsError(isInstanceOf<Exception>()),
+                emitsDone,
+              ]));
         });
       });
     });

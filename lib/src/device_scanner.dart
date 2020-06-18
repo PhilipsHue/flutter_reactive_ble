@@ -1,9 +1,11 @@
 import 'dart:async';
 
+import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
 import 'package:flutter_reactive_ble/src/plugin_controller.dart';
 import 'package:flutter_reactive_ble/src/rx_ext/repeater.dart';
 import 'package:flutter_reactive_ble/src/rx_ext/serial_disposable.dart';
 import 'package:meta/meta.dart';
+import 'package:pedantic/pedantic.dart';
 
 import 'discovered_devices_registry.dart';
 import 'model/discovered_device.dart';
@@ -48,6 +50,8 @@ class DeviceScanner {
     final completer = Completer<void>();
     _currentScanSession =
         ScanSession(withServices: withServices, future: completer.future);
+    // Make sure completing a future with an error does not lead to an unhandled exception.
+    unawaited(completer.future.catchError((Object e, StackTrace s) {}));
 
     final scanRepeater = Repeater(
       onListenEmitFrom: () =>
@@ -55,6 +59,12 @@ class DeviceScanner {
         (Object e, StackTrace s) {
           if (!completer.isCompleted) {
             completer.completeError(e, s);
+            if (e is Exception)
+              throw e;
+            else if (e is Error)
+              throw e;
+            else
+              throw Exception(e);
           }
         },
       ),
