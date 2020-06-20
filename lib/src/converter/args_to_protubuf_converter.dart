@@ -10,8 +10,6 @@ class ArgsToProtobufConverter {
     Map<Uuid, List<Uuid>> servicesWithCharacteristicsToDiscover,
     Duration connectionTimeout,
   ) {
-    assert(id != null);
-
     final args = pb.ConnectToDeviceRequest()..deviceId = id;
 
     if (connectionTimeout != null) {
