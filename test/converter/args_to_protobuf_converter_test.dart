@@ -310,5 +310,34 @@ void main() {
         expect(result.deviceId, deviceId);
       });
     });
+
+    group('Notify no more characteristic request', () {
+      const deviceId = '123';
+      final serviceUuid = Uuid.parse('FEFF');
+      final charUuid = Uuid.parse('FEEF');
+      QualifiedCharacteristic characteristic;
+      pb.NotifyNoMoreCharacteristicRequest result;
+
+      setUp(() {
+        characteristic = QualifiedCharacteristic(
+          characteristicId: charUuid,
+          serviceId: serviceUuid,
+          deviceId: deviceId,
+        );
+        result = _sut.createNotifyNoMoreCharacteristicRequest(characteristic);
+      });
+
+      test('It converts deviceId', () {
+        expect(result.characteristic.deviceId, deviceId);
+      });
+
+      test('It converts serviceUuid', () {
+        expect(result.characteristic.serviceUuid.data, [254, 255]);
+      });
+
+      test('It converts characteristicUuid', () {
+        expect(result.characteristic.characteristicUuid.data, [254, 239]);
+      });
+    });
   });
 }
