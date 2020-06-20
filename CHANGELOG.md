@@ -1,3 +1,7 @@
+## 2.3.0
+* Increase test coverage and improved architecture
+* Fix for #73 scanForDevices stream should emit error
+
 ## 2.2.0
 * Upgrade dependencies
 * Bump min Dart sdk version to 2.7
