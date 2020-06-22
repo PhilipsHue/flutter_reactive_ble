@@ -13,7 +13,7 @@ import 'model/qualified_characteristic.dart';
 import 'model/unit.dart';
 
 class PluginController {
-  const PluginController({
+  PluginController({
     @required ArgsToProtobufConverter argsToProtobufConverter,
     @required ProtobufConverter protobufConverter,
     @required MethodChannel bleMethodChannel,
@@ -44,23 +44,29 @@ class PluginController {
   final EventChannel _bleDeviceScanChannel;
   final EventChannel _bleStatusChannel;
 
+  Stream<ConnectionStateUpdate> _connectionUpdateEventChannelStream;
+  Stream<CharacteristicValue> _charValueEventChannelStream;
+  Stream<ScanResult> _scanResultEventChannelStream;
+  Stream<BleStatus> _bleStatusStream;
+
   Stream<ConnectionStateUpdate> get connectionUpdateStream =>
-      _connectedDeviceChannel
+      _connectionUpdateEventChannelStream ??= _connectedDeviceChannel
           .receiveBroadcastStream()
           .cast<List<int>>()
           .map(_protobufConverter.connectionStateUpdateFrom);
 
-  Stream<CharacteristicValue> get charValueUpdateStream => _charUpdateChannel
-      .receiveBroadcastStream()
-      .cast<List<int>>()
-      .map(_protobufConverter.characteristicValueFrom);
+  Stream<CharacteristicValue> get charValueUpdateStream =>
+      _charValueEventChannelStream ??= _charUpdateChannel
+          .receiveBroadcastStream()
+          .cast<List<int>>()
+          .map(_protobufConverter.characteristicValueFrom);
 
-  Stream<ScanResult> get scanStream =>
+  Stream<ScanResult> get scanStream => _scanResultEventChannelStream ??=
       _bleDeviceScanChannel.receiveBroadcastStream().cast<List<int>>().map(
             _protobufConverter.scanResultFrom,
           );
 
-  Stream<BleStatus> get bleStatusStream =>
+  Stream<BleStatus> get bleStatusStream => _bleStatusStream ??=
       _bleStatusChannel.receiveBroadcastStream().cast<List<int>>().map(
             _protobufConverter.bleStatusFrom,
           );
@@ -214,9 +220,9 @@ class PluginControllerFactory {
     const scanEventChannel = EventChannel("flutter_reactive_ble_scan");
     const bleStatusChannel = EventChannel("flutter_reactive_ble_status");
 
-    return const PluginController(
-      protobufConverter: ProtobufConverter(),
-      argsToProtobufConverter: ArgsToProtobufConverter(),
+    return PluginController(
+      protobufConverter: const ProtobufConverter(),
+      argsToProtobufConverter: const ArgsToProtobufConverter(),
       bleMethodChannel: _bleMethodChannel,
       connectedDeviceChannel: connectedDeviceChannel,
       charUpdateChannel: charEventChannel,
