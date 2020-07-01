@@ -117,13 +117,18 @@ class _DeviceListState extends State<_DeviceList> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(!widget.scannerState.scanIsInProgress
-                          ? 'Enter a UUID above and tap start to begin scanning'
-                          : 'Tap a device to connect to it'),
+                      Expanded(
+                        child: Text(!widget.scannerState.scanIsInProgress
+                            ? 'Enter a UUID above and tap start to begin scanning'
+                            : 'Tap a device to connect to it'),
+                      ),
                       if (widget.scannerState.scanIsInProgress ||
                           widget.scannerState.discoveredDevices.isNotEmpty)
-                        Text(
-                            'count: ${widget.scannerState.discoveredDevices.length}'),
+                        Padding(
+                          padding: const EdgeInsetsDirectional.only(start: 18.0),
+                          child: Text(
+                              'count: ${widget.scannerState.discoveredDevices.length}'),
+                        ),
                     ],
                   ),
                 ],
