@@ -177,8 +177,6 @@ class FlutterReactiveBle {
     @required List<int> value,
   }) async {
     await initialize();
-
-    await initialize();
     return _connectedDeviceOperator.writeCharacteristicWithoutResponse(
       characteristic,
       value: value,
