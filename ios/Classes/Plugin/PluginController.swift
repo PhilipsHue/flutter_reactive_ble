@@ -2,6 +2,7 @@ import class CoreBluetooth.CBUUID
 import enum CoreBluetooth.CBManagerState
 import var CoreBluetooth.CBAdvertisementDataServiceDataKey
 import var CoreBluetooth.CBAdvertisementDataManufacturerDataKey
+import var CoreBluetooth.CBAdvertisementDataLocalNameKey
 
 final class PluginController {
 
@@ -34,13 +35,14 @@ final class PluginController {
             onDiscovery: papply(weak: self) { context, _, peripheral, advertisementData, rssi in
                 guard let sink = context.scan?.sink
                 else { assert(false); return }
-                
+
                 let serviceData = advertisementData[CBAdvertisementDataServiceDataKey] as? ServiceData ?? [:]
                 let manufacturerData = advertisementData[CBAdvertisementDataManufacturerDataKey] as? Data ?? Data();
+                let name = advertisementData[CBAdvertisementDataLocalNameKey] as? String ?? peripheral.name ?? String();
 
                 let deviceDiscoveryMessage = DeviceScanInfo.with {
                     $0.id = peripheral.identifier.uuidString
-                    $0.name = peripheral.name ?? ""
+                    $0.name = name
                     $0.rssi = Int32(rssi)
                     $0.serviceData = serviceData
                         .map { entry in
