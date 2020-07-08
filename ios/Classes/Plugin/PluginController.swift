@@ -42,7 +42,7 @@ final class PluginController {
 
                 let deviceDiscoveryMessage = DeviceScanInfo.with {
                     $0.id = peripheral.identifier.uuidString
-                    $0.name = localName
+                    $0.name = name
                     $0.rssi = Int32(rssi)
                     $0.serviceData = serviceData
                         .map { entry in
