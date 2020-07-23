@@ -155,13 +155,16 @@ The Android OS maintains a table per device of the discovered service in cache. 
 await reactiveBleClient.clearGattCache(foundDeviceId);
 ```
 
-### Common issues
+### FAQ
 
-#### BLE undeliverable exception
+#### How to handle the BLE undeliverable exception
 
 On Android side we use the [RxAndroidBle](https://github.com/Polidea/RxAndroidBle) library of Polidea. After migration towards RxJava 2 some of the errors are not routed properly to their listeners and thus this will result in a BLE Undeliverable Exception. The root cause lies in the threading of the Android OS. As workaround RxJava has a hook where you can set the global errorhandler. For more info see [RxJava docs](https://github.com/ReactiveX/RxJava/wiki/What's-different-in-2.0#error-handling) .
 
-A default workaround implementation in the Flutter app (needs to be in the Java / Kotlin part e.g. mainactivity) would be:
+
+A default workaround implementation in the Flutter app (needs to be in the Java / Kotlin part e.g. mainactivity) is shown below. For an example (in Java) see Polidea RxAndroidBle [sample](https://github.com/Polidea/RxAndroidBle/tree/master/sample/src/main/java/com/polidea/rxandroidble2/sample).
+
+BleException is coming from Polidea RxAndroidBle, so make sure your application declares the following depedency: `implementation "com.polidea.rxandroidble2:rxandroidble:1.11.1"`
 
 ```kotlin
 RxJavaPlugins.setErrorHandler { throwable ->
@@ -173,3 +176,24 @@ RxJavaPlugins.setErrorHandler { throwable ->
   }
 }
 ```
+
+#### Which permissions are needed?
+**Android**
+
+For android the library uses the following permissions:
+* ACCESS_FINE_LOCATION : this permission is needed because old Nexus devices need location services in order to provide reliable scan results
+* BLUETOOTH : allows apps to connect to a paired bluetooth device
+* BLUETOOTH_ADMIN: allows apps to discover and pair bluetooth devices
+
+These permissions are already added in the manifest of the this library and thus should automatically merge
+into the manifest of your app. It is not needed to add the permissions in your manifest.
+
+**iOS**
+
+For iOS it is required you add the following entries to the `Info.plist` file of your app. It is not allowed to access Core BLuetooth without this. See [our example app](https://github.com/PhilipsHue/flutter_reactive_ble/blob/master/example/ios/Runner/Info.plist) on how to implement this. For more indepth details: [Blog post on iOS bluetooth permissions](https://medium.com/flawless-app-stories/handling-ios-13-bluetooth-permissions-26c6a8cbb816)
+
+iOS13 and higher
+* NSBluetoothAlwaysUsageDescription
+
+iOS12 and lower
+* NSBluetoothPeripheralUsageDescription
