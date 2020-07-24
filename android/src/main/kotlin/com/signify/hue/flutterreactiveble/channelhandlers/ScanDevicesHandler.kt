@@ -9,7 +9,6 @@ import com.signify.hue.flutterreactiveble.model.createScanMode
 import io.flutter.plugin.common.EventChannel
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
-import timber.log.Timber
 
 class ScanDevicesHandler(private val bleClient: com.signify.hue.flutterreactiveble.ble.BleClient) : EventChannel.StreamHandler {
 
@@ -26,7 +25,6 @@ class ScanDevicesHandler(private val bleClient: com.signify.hue.flutterreactiveb
     }
 
     override fun onCancel(objectSink: Any?) {
-        Timber.d("Scanning canceled")
         stopDeviceScan()
         scanDevicesSink = null
     }
@@ -40,7 +38,6 @@ class ScanDevicesHandler(private val bleClient: com.signify.hue.flutterreactiveb
                                 handleDeviceScanResult(converter.convertScanInfo(scanResult))
                             },
                             { throwable ->
-                                Timber.d("Error while scanning for devices: ${throwable.message}")
                                 handleDeviceScanResult(converter.convertScanErrorInfo(throwable.message))
                             }
                     )

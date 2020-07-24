@@ -24,19 +24,10 @@ import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.subjects.BehaviorSubject
-import timber.log.Timber
 import java.util.UUID
 import java.util.concurrent.TimeUnit
-import kotlin.collections.List
-import kotlin.collections.MutableMap
-import kotlin.collections.asList
 import kotlin.collections.component1
 import kotlin.collections.component2
-import kotlin.collections.forEach
-import kotlin.collections.getOrPut
-import kotlin.collections.map
-import kotlin.collections.mutableMapOf
-import kotlin.collections.toTypedArray
 
 @Suppress("TooManyFunctions")
 open class ReactiveBleClient(private val context: Context) : BleClient {
@@ -55,215 +46,209 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
     override fun initializeClient() {
         activeConnections = mutableMapOf()
         rxBleClient = RxBleClient.create(context)
-
-        Timber.d("Created bleclient")
     }
 
-/*yes spread operator is not performant but after kotlin v1.60 it is less bad and it is also the
-recommended way to call varargs in java https://kotlinlang.org/docs/reference/java-interop.html#java-varargs
-*/
-@Suppress("SpreadOperator")
-override fun scanForDevices(services: List<ParcelUuid>, scanMode: ScanMode, requireLocationServicesEnabled: Boolean): Observable<ScanInfo> {
+    /*yes spread operator is not performant but after kotlin v1.60 it is less bad and it is also the
+    recommended way to call varargs in java https://kotlinlang.org/docs/reference/java-interop.html#java-varargs
+    */
+    @Suppress("SpreadOperator")
+    override fun scanForDevices(services: List<ParcelUuid>, scanMode: ScanMode, requireLocationServicesEnabled: Boolean): Observable<ScanInfo> {
 
-    val filters = services.map { service ->
-        ScanFilter.Builder()
-                .setServiceUuid(service)
-                .build()
-    }.toTypedArray()
+        val filters = services.map { service ->
+            ScanFilter.Builder()
+                    .setServiceUuid(service)
+                    .build()
+        }.toTypedArray()
 
-    return rxBleClient.scanBleDevices(
-            ScanSettings.Builder()
-                    .setScanMode(scanMode.toScanSettings())
-                    .setCallbackType(ScanSettings.CALLBACK_TYPE_ALL_MATCHES)
-                    .setShouldCheckLocationServicesState(requireLocationServicesEnabled)
-                    .build(),
-            *filters
-    )
-            .map { result ->
-                ScanInfo(result.bleDevice.macAddress, result.bleDevice.name
-                        ?: "",
-                        result.rssi,
-                        result.scanRecord.serviceData.mapKeys { it.key.uuid },
-                        extractManufacturerData(result.scanRecord.manufacturerSpecificData))
-            }
-}
-
-override fun connectToDevice(deviceId: String, timeout: Duration) {
-    allConnections.add(getConnection(deviceId, timeout)
-            .subscribe({ result ->
-                when (result) {
-                    is EstablishedConnection -> {
-                        Timber.d("Connection established for ${result.deviceId}")
-                    }
-                    is EstablishConnectionFailure -> {
-                        Timber.d("Connect ${result.deviceId} fails: ${result.errorMessage}")
-                        connectionUpdateSubject.onNext(ConnectionUpdateError(deviceId, result.errorMessage))
-                    }
+        return rxBleClient.scanBleDevices(
+                ScanSettings.Builder()
+                        .setScanMode(scanMode.toScanSettings())
+                        .setCallbackType(ScanSettings.CALLBACK_TYPE_ALL_MATCHES)
+                        .setShouldCheckLocationServicesState(requireLocationServicesEnabled)
+                        .build(),
+                *filters
+        )
+                .map { result ->
+                    ScanInfo(result.bleDevice.macAddress, result.bleDevice.name
+                            ?: "",
+                            result.rssi,
+                            result.scanRecord.serviceData.mapKeys { it.key.uuid },
+                            extractManufacturerData(result.scanRecord.manufacturerSpecificData))
                 }
-            }, { error ->
-                connectionUpdateSubject.onNext(ConnectionUpdateError(deviceId, error?.message
-                        ?: "unknown error"))
-            }))
-}
+    }
 
-override fun disconnectDevice(deviceId: String) {
-    activeConnections[deviceId]?.disconnectDevice()
-    activeConnections.remove(deviceId)
-}
-
-override fun disconnectAllDevices() {
-    activeConnections.forEach { (_, connector) -> connector.disconnectDevice() }
-    allConnections.dispose()
-}
-
-override fun clearGattCache(deviceId: String): Completable =
-        activeConnections[deviceId]?.let(DeviceConnector::clearGattCache)
-                ?: Completable.error(IllegalStateException("Device is not connected"))
-
-override fun readCharacteristic(deviceId: String, characteristic: UUID): Single<CharOperationResult> =
-        getConnection(deviceId).flatMapSingle<CharOperationResult> { connectionResult ->
-            when (connectionResult) {
-                is EstablishedConnection ->
-                    connectionResult.rxConnection.readCharacteristic(characteristic)
-                            /*
-                            On Android7 the ble stack frequently gives incorrectly
-                            the error GAT_AUTH_FAIL(137) when reading char that will establish
-                            the bonding with the peripheral. By retrying the operation once we
-                            deviate between this flaky one time error and real auth failed cases
-                            */
-                            .retry(1) { Build.VERSION.SDK_INT < Build.VERSION_CODES.O }
-                            .map { value ->
-                                CharOperationSuccessful(deviceId, value.asList())
-                            }
-                is EstablishConnectionFailure ->
-                    Single.just(
-                            CharOperationFailed(deviceId,
-                                    "failed to connect ${connectionResult.errorMessage}"))
-            }
-        }.first(CharOperationFailed(deviceId, "read char failed"))
-
-override fun writeCharacteristicWithResponse(
-        deviceId: String,
-        characteristic: UUID,
-        value: ByteArray
-): Single<CharOperationResult> =
-        executeWriteOperation(deviceId, characteristic, value, RxBleConnection::writeCharWithResponse)
-
-override fun writeCharacteristicWithoutResponse(
-        deviceId: String,
-        characteristic: UUID,
-        value: ByteArray
-): Single<CharOperationResult> =
-
-        executeWriteOperation(deviceId, characteristic, value, RxBleConnection::writeCharWithoutResponse)
-
-override fun setupNotification(deviceId: String, characteristic: UUID): Observable<ByteArray> {
-    return getConnection(deviceId)
-            .flatMap { deviceConnection -> setupNotificationOrIndication(deviceConnection, characteristic) }
-            // now we have setup the subscription and we want the actual value
-            .doOnNext { Timber.d("subscription established") }
-            .flatMap { notificationObservable ->
-                notificationObservable
-            }
-}
-
-override fun negotiateMtuSize(deviceId: String, size: Int): Single<MtuNegotiateResult> =
-        getConnection(deviceId).flatMapSingle { connectionResult ->
-            when (connectionResult) {
-                is EstablishedConnection -> connectionResult.rxConnection.requestMtu(size)
-                        .map { value -> MtuNegotiateSuccesful(deviceId, value) }
-
-                is EstablishConnectionFailure ->
-                    Single.just(MtuNegotiateFailed(deviceId,
-                            "failed to connect ${connectionResult.errorMessage}"))
-            }
-        }.first(MtuNegotiateFailed(deviceId, "negotiate mtu timed out"))
-
-override fun observeBleStatus(): Observable<BleStatus> = rxBleClient.observeStateChanges()
-        .startWith(rxBleClient.state)
-        .map { it.toBleState() }
-
-@VisibleForTesting
-internal open fun createDeviceConnector(device: RxBleDevice, timeout: Duration) =
-        DeviceConnector(device, timeout, connectionUpdateSubject::onNext, connectionQueue)
-
-private fun getConnection(
-        deviceId: String,
-        timeout: Duration = Duration(0, TimeUnit.MILLISECONDS)
-): Observable<EstablishConnectionResult> {
-    val device = rxBleClient.getBleDevice(deviceId)
-    val connector = activeConnections.getOrPut(deviceId) { createDeviceConnector(device, timeout) }
-
-    return connector.connection
-}
-
-private fun executeWriteOperation(
-        deviceId: String,
-        characteristic: UUID,
-        value: ByteArray,
-        bleOperation: RxBleConnection.(characteristic: UUID, value: ByteArray) -> Single<ByteArray>
-): Single<CharOperationResult> {
-    return getConnection(deviceId)
-            .flatMapSingle<CharOperationResult> { connectionResult ->
-                when (connectionResult) {
-                    is EstablishedConnection -> {
-                        connectionResult.rxConnection.bleOperation(characteristic, value)
-                                .map { value -> CharOperationSuccessful(deviceId, value.asList()) }
+    override fun connectToDevice(deviceId: String, timeout: Duration) {
+        allConnections.add(getConnection(deviceId, timeout)
+                .subscribe({ result ->
+                    when (result) {
+                        is EstablishedConnection -> {
+                        }
+                        is EstablishConnectionFailure -> {
+                            connectionUpdateSubject.onNext(ConnectionUpdateError(deviceId, result.errorMessage))
+                        }
                     }
-                    is EstablishConnectionFailure -> {
-                        Timber.d("Failed conn for write ")
+                }, { error ->
+                    connectionUpdateSubject.onNext(ConnectionUpdateError(deviceId, error?.message
+                            ?: "unknown error"))
+                }))
+    }
+
+    override fun disconnectDevice(deviceId: String) {
+        activeConnections[deviceId]?.disconnectDevice()
+        activeConnections.remove(deviceId)
+    }
+
+    override fun disconnectAllDevices() {
+        activeConnections.forEach { (_, connector) -> connector.disconnectDevice() }
+        allConnections.dispose()
+    }
+
+    override fun clearGattCache(deviceId: String): Completable =
+            activeConnections[deviceId]?.let(DeviceConnector::clearGattCache)
+                    ?: Completable.error(IllegalStateException("Device is not connected"))
+
+    override fun readCharacteristic(deviceId: String, characteristic: UUID): Single<CharOperationResult> =
+            getConnection(deviceId).flatMapSingle<CharOperationResult> { connectionResult ->
+                when (connectionResult) {
+                    is EstablishedConnection ->
+                        connectionResult.rxConnection.readCharacteristic(characteristic)
+                                /*
+                                On Android7 the ble stack frequently gives incorrectly
+                                the error GAT_AUTH_FAIL(137) when reading char that will establish
+                                the bonding with the peripheral. By retrying the operation once we
+                                deviate between this flaky one time error and real auth failed cases
+                                */
+                                .retry(1) { Build.VERSION.SDK_INT < Build.VERSION_CODES.O }
+                                .map { value ->
+                                    CharOperationSuccessful(deviceId, value.asList())
+                                }
+                    is EstablishConnectionFailure ->
                         Single.just(
                                 CharOperationFailed(deviceId,
                                         "failed to connect ${connectionResult.errorMessage}"))
+                }
+            }.first(CharOperationFailed(deviceId, "read char failed"))
+
+    override fun writeCharacteristicWithResponse(
+            deviceId: String,
+            characteristic: UUID,
+            value: ByteArray
+    ): Single<CharOperationResult> =
+            executeWriteOperation(deviceId, characteristic, value, RxBleConnection::writeCharWithResponse)
+
+    override fun writeCharacteristicWithoutResponse(
+            deviceId: String,
+            characteristic: UUID,
+            value: ByteArray
+    ): Single<CharOperationResult> =
+
+            executeWriteOperation(deviceId, characteristic, value, RxBleConnection::writeCharWithoutResponse)
+
+    override fun setupNotification(deviceId: String, characteristic: UUID): Observable<ByteArray> {
+        return getConnection(deviceId)
+                .flatMap { deviceConnection -> setupNotificationOrIndication(deviceConnection, characteristic) }
+                // now we have setup the subscription and we want the actual value
+                .flatMap { notificationObservable ->
+                    notificationObservable
+                }
+    }
+
+    override fun negotiateMtuSize(deviceId: String, size: Int): Single<MtuNegotiateResult> =
+            getConnection(deviceId).flatMapSingle { connectionResult ->
+                when (connectionResult) {
+                    is EstablishedConnection -> connectionResult.rxConnection.requestMtu(size)
+                            .map { value -> MtuNegotiateSuccesful(deviceId, value) }
+
+                    is EstablishConnectionFailure ->
+                        Single.just(MtuNegotiateFailed(deviceId,
+                                "failed to connect ${connectionResult.errorMessage}"))
+                }
+            }.first(MtuNegotiateFailed(deviceId, "negotiate mtu timed out"))
+
+    override fun observeBleStatus(): Observable<BleStatus> = rxBleClient.observeStateChanges()
+            .startWith(rxBleClient.state)
+            .map { it.toBleState() }
+
+    @VisibleForTesting
+    internal open fun createDeviceConnector(device: RxBleDevice, timeout: Duration) =
+            DeviceConnector(device, timeout, connectionUpdateSubject::onNext, connectionQueue)
+
+    private fun getConnection(
+            deviceId: String,
+            timeout: Duration = Duration(0, TimeUnit.MILLISECONDS)
+    ): Observable<EstablishConnectionResult> {
+        val device = rxBleClient.getBleDevice(deviceId)
+        val connector = activeConnections.getOrPut(deviceId) { createDeviceConnector(device, timeout) }
+
+        return connector.connection
+    }
+
+    private fun executeWriteOperation(
+            deviceId: String,
+            characteristic: UUID,
+            value: ByteArray,
+            bleOperation: RxBleConnection.(characteristic: UUID, value: ByteArray) -> Single<ByteArray>
+    ): Single<CharOperationResult> {
+        return getConnection(deviceId)
+                .flatMapSingle<CharOperationResult> { connectionResult ->
+                    when (connectionResult) {
+                        is EstablishedConnection -> {
+                            connectionResult.rxConnection.bleOperation(characteristic, value)
+                                    .map { value -> CharOperationSuccessful(deviceId, value.asList()) }
+                        }
+                        is EstablishConnectionFailure -> {
+                            Single.just(
+                                    CharOperationFailed(deviceId,
+                                            "failed to connect ${connectionResult.errorMessage}"))
+                        }
+                    }
+                }.first(CharOperationFailed(deviceId, "Writechar timed-out"))
+    }
+
+    private fun setupNotificationOrIndication(
+            deviceConnection: EstablishConnectionResult,
+            characteristic: UUID
+    ): Observable<Observable<ByteArray>> =
+
+            when (deviceConnection) {
+                is EstablishedConnection -> {
+                    deviceConnection.rxConnection.discoverServices()
+                            .flatMap { deviceServices -> deviceServices.getCharacteristic(characteristic) }
+                            .flatMapObservable { char ->
+                                if ((char.properties and BluetoothGattCharacteristic.PROPERTY_NOTIFY) > 0) {
+                                    deviceConnection.rxConnection.setupNotification(characteristic)
+                                } else {
+                                    deviceConnection.rxConnection.setupIndication(characteristic)
+                                }
+                            }
+                }
+                is EstablishConnectionFailure -> {
+                    Observable.just(Observable.empty<ByteArray>())
+                }
+            }
+
+    override fun requestConnectionPriority(
+            deviceId: String,
+            priority: ConnectionPriority
+    ): Single<RequestConnectionPriorityResult> =
+            getConnection(deviceId).switchMapSingle<RequestConnectionPriorityResult> { connectionResult ->
+                when (connectionResult) {
+                    is EstablishedConnection ->
+                        connectionResult.rxConnection.requestConnectionPriority(priority.code, 2, TimeUnit.SECONDS)
+                                .toSingle {
+                                    RequestConnectionPrioritySuccess(deviceId)
+                                }
+                    is EstablishConnectionFailure -> Single.fromCallable {
+                        RequestConnectionPriorityFailed(deviceId, connectionResult.errorMessage)
                     }
                 }
-            }.first(CharOperationFailed(deviceId, "Writechar timed-out"))
-}
+            }.first(RequestConnectionPriorityFailed(deviceId, "Unknown failure"))
 
-private fun setupNotificationOrIndication(
-        deviceConnection: EstablishConnectionResult,
-        characteristic: UUID
-): Observable<Observable<ByteArray>> =
-
-        when (deviceConnection) {
-            is EstablishedConnection -> {
-                deviceConnection.rxConnection.discoverServices()
-                        .flatMap { deviceServices -> deviceServices.getCharacteristic(characteristic) }
-                        .flatMapObservable { char ->
-                            if ((char.properties and BluetoothGattCharacteristic.PROPERTY_NOTIFY) > 0) {
-                                deviceConnection.rxConnection.setupNotification(characteristic)
-                            } else {
-                                deviceConnection.rxConnection.setupIndication(characteristic)
-                            }
-                        }
-            }
-            is EstablishConnectionFailure -> {
-                Observable.just(Observable.empty<ByteArray>())
-            }
-        }
-
-override fun requestConnectionPriority(
-        deviceId: String,
-        priority: ConnectionPriority
-): Single<RequestConnectionPriorityResult> =
-        getConnection(deviceId).switchMapSingle<RequestConnectionPriorityResult> { connectionResult ->
-            when (connectionResult) {
-                is EstablishedConnection ->
-                    connectionResult.rxConnection.requestConnectionPriority(priority.code, 2, TimeUnit.SECONDS)
-                            .toSingle {
-                                RequestConnectionPrioritySuccess(deviceId)
-                            }
-                is EstablishConnectionFailure -> Single.fromCallable {
-                    RequestConnectionPriorityFailed(deviceId, connectionResult.errorMessage)
-                }
-            }
-        }.first(RequestConnectionPriorityFailed(deviceId, "Unknown failure"))
-
-// enable this for extra debug output on the android stack
-private fun enableDebugLogging() = RxBleClient
-        .updateLogOptions(LogOptions.Builder().setLogLevel(LogConstants.VERBOSE)
-                .setMacAddressLogSetting(LogConstants.MAC_ADDRESS_FULL)
-                .setUuidsLogSetting(LogConstants.UUIDS_FULL)
-                .setShouldLogAttributeValues(true)
-                .build())
+    // enable this for extra debug output on the android stack
+    private fun enableDebugLogging() = RxBleClient
+            .updateLogOptions(LogOptions.Builder().setLogLevel(LogConstants.VERBOSE)
+                    .setMacAddressLogSetting(LogConstants.MAC_ADDRESS_FULL)
+                    .setUuidsLogSetting(LogConstants.UUIDS_FULL)
+                    .setShouldLogAttributeValues(true)
+                    .build())
 }

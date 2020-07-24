@@ -13,14 +13,13 @@ import io.reactivex.Single
 import io.reactivex.disposables.Disposable
 import io.reactivex.functions.Function
 import io.reactivex.subjects.BehaviorSubject
-import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
 internal class DeviceConnector(
-    private val device: RxBleDevice,
-    private val connectionTimeout: Duration,
-    private val updateListeners: (update: ConnectionUpdate) -> Unit,
-    private val connectionQueue: ConnectionQueue
+        private val device: RxBleDevice,
+        private val connectionTimeout: Duration,
+        private val updateListeners: (update: ConnectionUpdate) -> Unit,
+        private val connectionQueue: ConnectionQueue
 ) {
 
     companion object {
@@ -58,7 +57,6 @@ internal class DeviceConnector(
                             updateListeners.invoke(it)
                         },
                         {
-                            Timber.e("Error when initializing connectionstatusupdate for device ${device.macAddress}")
                         }
                 )
     }
@@ -88,7 +86,6 @@ internal class DeviceConnector(
 
     private fun establishConnection(rxBleDevice: RxBleDevice): Disposable {
         val deviceId = rxBleDevice.macAddress
-        Timber.d("Connecting device $deviceId")
 
         val shouldNotTimeout = connectionTimeout.value <= 0L
         connectionQueue.addToQueue(deviceId)
@@ -109,7 +106,6 @@ internal class DeviceConnector(
                             error.message ?: "Unknown error")
                 }
                 .doOnNext {
-                    Timber.d("Connection established for device ${rxBleDevice.macAddress}")
                     // Trigger side effect by calling the lazy initialization of this property so
                     // listening to changes starts.
                     connectionStatusUpdates
@@ -124,12 +120,7 @@ internal class DeviceConnector(
                     updateListeners.invoke(ConnectionUpdateError(deviceId, it.message
                             ?: "Unknown error"))
                 }
-                .doOnDispose {
-                    Timber.d("Close connection for device ${rxBleDevice.macAddress}")
-                }
-                .subscribe({ connectDeviceSubject.onNext(it) }, { error ->
-                    Timber.d("Connection error for device ${rxBleDevice.macAddress}: ${error.message}")
-                })
+                .subscribe { connectDeviceSubject.onNext(it) }
     }
 
     private fun connectDevice(rxBleDevice: RxBleDevice, shouldNotTimeout: Boolean): Observable<RxBleConnection> =
@@ -139,10 +130,7 @@ internal class DeviceConnector(
                             it
                         } else {
                             it.timeout(
-                                    Observable.timer(connectionTimeout.value, connectionTimeout.unit)
-                                            .doOnNext {
-                                                Timber.d("Connection timed out for device ${rxBleDevice.macAddress}")
-                                            },
+                                    Observable.timer(connectionTimeout.value, connectionTimeout.unit),
                                     Function<RxBleConnection, Observable<Unit>> {
                                         Observable.never<Unit>()
                                     }
@@ -171,20 +159,16 @@ internal class DeviceConnector(
     private fun clearGattCache(connection: RxBleConnection): Completable {
         val operation = RxBleCustomOperation<Unit> { bluetoothGatt, _, _ ->
             try {
-                Timber.d("Clearing GATT cache")
                 val refreshMethod = bluetoothGatt.javaClass.getMethod("refresh")
                 val success = refreshMethod.invoke(bluetoothGatt) as Boolean
                 if (success) {
                     Observable.empty<Unit>()
                             .delay(DeviceConnector.Companion.delayMsAfterClearingCache, TimeUnit.MILLISECONDS)
-                            .doOnComplete { Timber.d("Clearing GATT cache completed") }
                 } else {
                     val reason = "BluetoothGatt.refresh() returned false"
-                    Timber.d("Clearing GATT cache failed, $reason")
                     Observable.error(RuntimeException(reason))
                 }
             } catch (e: ReflectiveOperationException) {
-                Timber.d("Clearing GATT cache failed with exception $e")
                 Observable.error<Unit>(e)
             }
         }
