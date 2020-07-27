@@ -104,7 +104,9 @@ class FlutterReactiveBle {
   /// The initialization is performed automatically the first time any BLE
   /// operation is triggered.
   Future<void> initialize() async {
-    _pluginController ??= const PluginControllerFactory().create();
+    _debugLogger ??= DebugLogger(print);
+
+    _pluginController ??= const PluginControllerFactory().create(_debugLogger);
 
     _initialization ??= _pluginController.initialize();
 
@@ -119,8 +121,6 @@ class FlutterReactiveBle {
       ),
       scanRegistry: scanRegistry,
     );
-
-    _debugLogger ??= DebugLogger(print);
 
     _deviceConnector ??= DeviceConnector(
       pluginController: _pluginController,
