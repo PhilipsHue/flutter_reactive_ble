@@ -104,7 +104,10 @@ class FlutterReactiveBle {
   /// The initialization is performed automatically the first time any BLE
   /// operation is triggered.
   Future<void> initialize() async {
-    _debugLogger ??= DebugLogger(print);
+    _debugLogger ??= DebugLogger(
+      'REACTIVE_BLE',
+      print,
+    );
 
     _pluginController ??= const PluginControllerFactory().create(_debugLogger);
 
@@ -302,7 +305,7 @@ class FlutterReactiveBle {
       .clearGattCache(deviceId)
       .then((info) => info.dematerialize());
 
-  /// Subscribes to a updates from a the characteristic specified.
+  /// Subscribes to updates from the characteristic specified.
   ///
   /// This stream terminates automatically when the device is disconnected.
   Stream<List<int>> subscribeToCharacteristic(
@@ -327,14 +330,5 @@ class FlutterReactiveBle {
   ///
   /// Use [LogLevel.verbose] for full debug output. Make sure to  run this only for debugging purposes.
   /// Use [LogLevel.none] to disable logging. This is also the default.
-  void setLogLevel(LogLevel logLevel) {
-    switch (logLevel) {
-      case LogLevel.none:
-        _debugLogger.disable();
-        break;
-      case LogLevel.verbose:
-        _debugLogger.enable();
-        break;
-    }
-  }
+  set logLevel(LogLevel logLevel) => _debugLogger.logLevel = logLevel;
 }

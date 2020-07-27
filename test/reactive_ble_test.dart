@@ -553,21 +553,21 @@ void main() {
     group('Logging', () {
       group('When loglevel is set to verbose', () {
         setUp(() {
-          _sut.setLogLevel(LogLevel.verbose);
+          _sut.logLevel = LogLevel.verbose;
         });
 
         test('It enables debug logging', () {
-          verify(_debugLoggerMock.enable()).called(1);
+          verify(_debugLoggerMock.logLevel = LogLevel.verbose).called(1);
         });
       });
 
       group('When loglevel is set to none', () {
         setUp(() {
-          _sut.setLogLevel(LogLevel.none);
+          _sut.logLevel = LogLevel.none;
         });
 
         test('It enables debug logging', () {
-          verify(_debugLoggerMock.disable()).called(1);
+          verify(_debugLoggerMock.logLevel = LogLevel.none).called(1);
         });
       });
     });

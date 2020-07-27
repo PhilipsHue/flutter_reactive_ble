@@ -52,13 +52,9 @@ internal class DeviceConnector(
                     ConnectionUpdateError(device.macAddress, it.message
                             ?: "Unknown error")
                 }
-                .subscribe(
-                        {
-                            updateListeners.invoke(it)
-                        },
-                        {
-                        }
-                )
+                .subscribe {
+                    updateListeners.invoke(it)
+                }
     }
 
     internal fun disconnectDevice() {
@@ -120,7 +116,8 @@ internal class DeviceConnector(
                     updateListeners.invoke(ConnectionUpdateError(deviceId, it.message
                             ?: "Unknown error"))
                 }
-                .subscribe { connectDeviceSubject.onNext(it) }
+                .subscribe({ connectDeviceSubject.onNext(it) },
+                        { throwable -> connectDeviceSubject.onError(throwable) })
     }
 
     private fun connectDevice(rxBleDevice: RxBleDevice, shouldNotTimeout: Boolean): Observable<RxBleConnection> =
