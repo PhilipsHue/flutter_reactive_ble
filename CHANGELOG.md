@@ -1,3 +1,8 @@
+## 2.4.0
+* Fix device list layout in the example app
+* Prefer `CBAdvertisementDataLocalName` over `peripheral.name` on iOS
+* Add consistent debug logging for both iOS and Android
+
 ## 2.3.0
 * Increase test coverage and improved architecture
 * Fix for #73 scanForDevices stream should emit error
