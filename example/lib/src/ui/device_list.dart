@@ -125,7 +125,8 @@ class _DeviceListState extends State<_DeviceList> {
                       if (widget.scannerState.scanIsInProgress ||
                           widget.scannerState.discoveredDevices.isNotEmpty)
                         Padding(
-                          padding: const EdgeInsetsDirectional.only(start: 18.0),
+                          padding:
+                              const EdgeInsetsDirectional.only(start: 18.0),
                           child: Text(
                               'count: ${widget.scannerState.discoveredDevices.length}'),
                         ),

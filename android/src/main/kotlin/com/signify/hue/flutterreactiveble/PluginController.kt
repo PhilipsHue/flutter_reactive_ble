@@ -17,7 +17,6 @@ import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel.Result
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
-import timber.log.Timber
 import java.util.UUID
 import com.signify.hue.flutterreactiveble.ProtobufModel as pb
 
@@ -87,7 +86,6 @@ class PluginController {
     }
 
     private fun scanForDevices(call: MethodCall, result: Result) {
-        Timber.d("start scanning")
         scandevicesHandler.prepareScan(pb.ScanForDevicesRequest.parseFrom(call.arguments as ByteArray))
         result.success(null)
     }
@@ -95,7 +93,6 @@ class PluginController {
     private fun connectToDevice(call: MethodCall, result: Result) {
         result.success(null)
         val connectDeviceMessage = pb.ConnectToDeviceRequest.parseFrom(call.arguments as ByteArray)
-        Timber.d("Start connecting for device ${connectDeviceMessage.deviceId}")
         deviceConnectionHandler.connectToDevice(connectDeviceMessage)
     }
 
@@ -122,7 +119,6 @@ class PluginController {
     private fun disconnectFromDevice(call: MethodCall, result: Result) {
         result.success(null)
         val connectDeviceMessage = pb.DisconnectFromDeviceRequest.parseFrom(call.arguments as ByteArray)
-        Timber.d("Disconnect device: ${connectDeviceMessage.deviceId}")
         deviceConnectionHandler.disconnectDevice(connectDeviceMessage.deviceId)
     }
 
@@ -132,8 +128,6 @@ class PluginController {
         val readCharMessage = pb.ReadCharacteristicRequest.parseFrom(call.arguments as ByteArray)
         val deviceId = readCharMessage.characteristic.deviceId
         val characteristic = uuidConverter.uuidFromByteArray(readCharMessage.characteristic.characteristicUuid.data.toByteArray())
-
-        Timber.d("Read req dev=$deviceId, uuid=$characteristic")
 
         bleClient.readCharacteristic(
                 readCharMessage.characteristic.deviceId, characteristic
@@ -150,7 +144,6 @@ class PluginController {
                                     charNotificationHandler.addSingleReadToStream(charInfo)
                                 }
                                 is com.signify.hue.flutterreactiveble.ble.CharOperationFailed -> {
-                                    Timber.d("read value failed} ${charResult.errorMessage}")
                                     protoConverter.convertCharacteristicError(readCharMessage.characteristic,
                                             "Failed to connect")
                                     charNotificationHandler.addSingleErrorToStream(
@@ -161,7 +154,6 @@ class PluginController {
                             }
                         },
                         { throwable ->
-                            Timber.d("whoops deviceid= $deviceId char=$characteristic  message= ${throwable.message}")
                             protoConverter.convertCharacteristicError(
                                     readCharMessage.characteristic,
                                     throwable.message)
@@ -198,19 +190,16 @@ class PluginController {
                 .subscribe({ operationResult ->
                     when (operationResult) {
                         is com.signify.hue.flutterreactiveble.ble.CharOperationSuccessful -> {
-                            Timber.d("Value succesfully written, $writeOperation")
                             result.success(protoConverter.convertWriteCharacteristicInfo(writeCharMessage,
                                     null).toByteArray())
                         }
                         is com.signify.hue.flutterreactiveble.ble.CharOperationFailed -> {
-                            Timber.d("Value write failed ${operationResult.errorMessage}")
                             result.success(protoConverter.convertWriteCharacteristicInfo(writeCharMessage,
                                     operationResult.errorMessage).toByteArray())
                         }
                     }
                 },
                         { throwable ->
-                            Timber.d("whoops: ${throwable.message}")
                             result.success(protoConverter.convertWriteCharacteristicInfo(writeCharMessage,
                                     throwable.message).toByteArray())
                         }
@@ -219,14 +208,12 @@ class PluginController {
     }
 
     private fun readNotifications(call: MethodCall, result: Result) {
-        Timber.d("read notifications")
         val request = pb.NotifyCharacteristicRequest.parseFrom(call.arguments as ByteArray)
         charNotificationHandler.subscribeToNotifications(request)
         result.success(null)
     }
 
     private fun stopNotifications(call: MethodCall, result: Result) {
-        Timber.d("stop notifications")
         val request = pb.NotifyNoMoreCharacteristicRequest.parseFrom(call.arguments as ByteArray)
         charNotificationHandler.unsubscribeFromNotifications(request)
         result.success(null)

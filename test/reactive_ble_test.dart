@@ -2,9 +2,11 @@ import 'dart:async';
 
 import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
 import 'package:flutter_reactive_ble/src/connected_device_operation.dart';
+import 'package:flutter_reactive_ble/src/debug_logger.dart';
 import 'package:flutter_reactive_ble/src/device_connector.dart';
 import 'package:flutter_reactive_ble/src/device_scanner.dart';
 import 'package:flutter_reactive_ble/src/model/clear_gatt_cache_error.dart';
+import 'package:flutter_reactive_ble/src/model/log_level.dart';
 import 'package:flutter_reactive_ble/src/model/unit.dart';
 import 'package:flutter_reactive_ble/src/plugin_controller.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -17,6 +19,7 @@ void main() {
     _DeviceConnectorMock _deviceConnector;
     _DeviceOperationMock _deviceOperation;
     StreamController<BleStatus> _bleStatusController;
+    _DebugLoggerMock _debugLoggerMock;
 
     FlutterReactiveBle _sut;
 
@@ -26,6 +29,7 @@ void main() {
       _deviceConnector = _DeviceConnectorMock();
       _deviceOperation = _DeviceOperationMock();
       _bleStatusController = StreamController();
+      _debugLoggerMock = _DebugLoggerMock();
 
       when(_pluginController.initialize()).thenAnswer(
         (_) => Future.value(),
@@ -40,6 +44,7 @@ void main() {
         deviceScanner: _deviceScanner,
         deviceConnector: _deviceConnector,
         connectedDeviceOperation: _deviceOperation,
+        debugLogger: _debugLoggerMock,
       );
     });
 
@@ -544,6 +549,28 @@ void main() {
         );
       });
     });
+
+    group('Logging', () {
+      group('When loglevel is set to verbose', () {
+        setUp(() {
+          _sut.logLevel = LogLevel.verbose;
+        });
+
+        test('It enables debug logging', () {
+          verify(_debugLoggerMock.logLevel = LogLevel.verbose).called(1);
+        });
+      });
+
+      group('When loglevel is set to none', () {
+        setUp(() {
+          _sut.logLevel = LogLevel.none;
+        });
+
+        test('It enables debug logging', () {
+          verify(_debugLoggerMock.logLevel = LogLevel.none).called(1);
+        });
+      });
+    });
   });
 }
 
@@ -560,3 +587,5 @@ class _DeviceScannerMock extends Mock implements DeviceScanner {}
 class _DeviceConnectorMock extends Mock implements DeviceConnector {}
 
 class _DeviceOperationMock extends Mock implements ConnectedDeviceOperation {}
+
+class _DebugLoggerMock extends Mock implements DebugLogger {}

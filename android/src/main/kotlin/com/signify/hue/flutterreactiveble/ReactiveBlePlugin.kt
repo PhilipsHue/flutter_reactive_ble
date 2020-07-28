@@ -7,7 +7,6 @@ import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.Result
 import io.flutter.plugin.common.PluginRegistry.Registrar
-import timber.log.Timber
 
 class ReactiveBlePlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
     override fun onAttachedToEngine(binding: FlutterPlugin.FlutterPluginBinding) {
@@ -20,6 +19,7 @@ class ReactiveBlePlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
 
     companion object {
         lateinit var pluginController: PluginController
+
         // this enables support for apps that are using the legacy implementation of the app
         @JvmStatic
         fun registerWith(registrar: Registrar) {
@@ -28,10 +28,6 @@ class ReactiveBlePlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
 
         @JvmStatic
         private fun initalizePlugin(messenger: BinaryMessenger, context: Context) {
-            if (BuildConfig.DEBUG) {
-                Timber.plant(Timber.DebugTree())
-            }
-
             val channel = MethodChannel(messenger, "flutter_reactive_ble_method")
             channel.setMethodCallHandler(ReactiveBlePlugin())
             pluginController = PluginController()

@@ -6,7 +6,6 @@ import com.signify.hue.flutterreactiveble.converters.UuidConverter
 import io.flutter.plugin.common.EventChannel
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
-import timber.log.Timber
 
 class CharNotificationHandler(private val bleClient: com.signify.hue.flutterreactiveble.ble.BleClient) : EventChannel.StreamHandler {
 
@@ -23,7 +22,6 @@ class CharNotificationHandler(private val bleClient: com.signify.hue.flutterreac
     }
 
     override fun onCancel(objectSink: Any?) {
-        Timber.d("Listening to notifications cancelled")
         unsubscribeFromAllNotifications()
     }
 
@@ -32,13 +30,9 @@ class CharNotificationHandler(private val bleClient: com.signify.hue.flutterreac
                 .uuidFromByteArray(request.characteristic.characteristicUuid.data.toByteArray())
         val subscription = bleClient.setupNotification(request.characteristic.deviceId, charUuid)
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({ value ->
+                .subscribe { value ->
                     handleNotificationValue(request.characteristic, value)
-                },
-                { throwable ->
-                    Timber.d("whoops: ${throwable.message}")
                 }
-            )
         subscriptionMap[request.characteristic] = subscription
     }
 
