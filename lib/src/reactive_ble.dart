@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter_reactive_ble/src/connected_device_operation.dart';
+import 'package:flutter_reactive_ble/src/debug_logger.dart';
 import 'package:flutter_reactive_ble/src/device_connector.dart';
 import 'package:flutter_reactive_ble/src/device_scanner.dart';
 import 'package:flutter_reactive_ble/src/discovered_devices_registry.dart';
@@ -10,6 +11,7 @@ import 'package:flutter_reactive_ble/src/model/characteristic_value.dart';
 import 'package:flutter_reactive_ble/src/model/connection_priority.dart';
 import 'package:flutter_reactive_ble/src/model/connection_state_update.dart';
 import 'package:flutter_reactive_ble/src/model/discovered_device.dart';
+import 'package:flutter_reactive_ble/src/model/log_level.dart';
 import 'package:flutter_reactive_ble/src/model/qualified_characteristic.dart';
 import 'package:flutter_reactive_ble/src/model/scan_mode.dart';
 import 'package:flutter_reactive_ble/src/model/uuid.dart';
@@ -31,12 +33,13 @@ class FlutterReactiveBle {
     @required DeviceScanner deviceScanner,
     @required DeviceConnector deviceConnector,
     @required ConnectedDeviceOperation connectedDeviceOperation,
+    @required DebugLogger debugLogger,
   }) {
     _pluginController = pluginController;
     _deviceScanner = deviceScanner;
     _deviceConnector = deviceConnector;
     _connectedDeviceOperator = connectedDeviceOperation;
-
+    _debugLogger = debugLogger;
     _trackStatus();
   }
 
@@ -93,6 +96,7 @@ class FlutterReactiveBle {
   DeviceConnector _deviceConnector;
   ConnectedDeviceOperation _connectedDeviceOperator;
   DeviceScanner _deviceScanner;
+  DebugLogger _debugLogger;
 
   /// Initializes this [FlutterReactiveBle] instance and its platform-specific
   /// counterparts.
@@ -100,7 +104,12 @@ class FlutterReactiveBle {
   /// The initialization is performed automatically the first time any BLE
   /// operation is triggered.
   Future<void> initialize() async {
-    _pluginController ??= const PluginControllerFactory().create();
+    _debugLogger ??= DebugLogger(
+      'REACTIVE_BLE',
+      print,
+    );
+
+    _pluginController ??= const PluginControllerFactory().create(_debugLogger);
 
     _initialization ??= _pluginController.initialize();
 
@@ -296,6 +305,9 @@ class FlutterReactiveBle {
       .clearGattCache(deviceId)
       .then((info) => info.dematerialize());
 
+  /// Subscribes to updates from the characteristic specified.
+  ///
+  /// This stream terminates automatically when the device is disconnected.
   Stream<List<int>> subscribeToCharacteristic(
       QualifiedCharacteristic characteristic) {
     final terminateFuture = connectedDeviceStream
@@ -313,4 +325,10 @@ class FlutterReactiveBle {
           ),
         );
   }
+
+  /// Sets the verbosity of debug output.
+  ///
+  /// Use [LogLevel.verbose] for full debug output. Make sure to  run this only for debugging purposes.
+  /// Use [LogLevel.none] to disable logging. This is also the default.
+  set logLevel(LogLevel logLevel) => _debugLogger.logLevel = logLevel;
 }

@@ -83,9 +83,8 @@ protobuf {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation 'com.polidea.rxandroidble2:rxandroidble:1.10.5'
+    implementation 'com.polidea.rxandroidble2:rxandroidble:1.11.1'
     implementation 'com.google.protobuf:protobuf-lite:3.0.1'
-    implementation 'com.jakewharton.timber:timber:4.7.1'
     implementation 'io.reactivex.rxjava2:rxkotlin:2.3.0'
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
 

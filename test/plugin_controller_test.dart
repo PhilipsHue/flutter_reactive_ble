@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
 import 'package:flutter_reactive_ble/src/converter/args_to_protubuf_converter.dart';
 import 'package:flutter_reactive_ble/src/converter/protobuf_converter.dart';
+import 'package:flutter_reactive_ble/src/debug_logger.dart';
 import 'package:flutter_reactive_ble/src/generated/bledata.pbserver.dart' as pb;
 import 'package:flutter_reactive_ble/src/model/clear_gatt_cache_error.dart';
 import 'package:flutter_reactive_ble/src/model/unit.dart';
@@ -40,6 +41,7 @@ void main() {
         charUpdateChannel: _argsChannel,
         bleDeviceScanChannel: _scanChannel,
         bleStatusChannel: _statusChannel,
+        debugLogger: _DebugLoggerMock(),
       );
     });
 
@@ -581,3 +583,5 @@ class _ArgsToProtobufConverterMock extends Mock
     implements ArgsToProtobufConverter {}
 
 class _ProtobufConverterMock extends Mock implements ProtobufConverter {}
+
+class _DebugLoggerMock extends Mock implements DebugLogger {}

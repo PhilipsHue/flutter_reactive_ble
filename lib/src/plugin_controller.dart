@@ -1,6 +1,7 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
 import 'package:flutter_reactive_ble/src/converter/args_to_protubuf_converter.dart';
+import 'package:flutter_reactive_ble/src/debug_logger.dart';
 import 'package:flutter_reactive_ble/src/model/uuid.dart';
 import 'package:flutter_reactive_ble/src/model/write_characteristic_info.dart';
 import 'package:meta/meta.dart';
@@ -21,6 +22,7 @@ class PluginController {
     @required EventChannel charUpdateChannel,
     @required EventChannel bleDeviceScanChannel,
     @required EventChannel bleStatusChannel,
+    @required DebugLogger debugLogger,
   })  : assert(argsToProtobufConverter != null),
         assert(protobufConverter != null),
         assert(bleMethodChannel != null),
@@ -28,13 +30,15 @@ class PluginController {
         assert(bleDeviceScanChannel != null),
         assert(bleStatusChannel != null),
         assert(charUpdateChannel != null),
+        assert(debugLogger != null),
         _argsToProtobufConverter = argsToProtobufConverter,
         _protobufConverter = protobufConverter,
         _bleMethodChannel = bleMethodChannel,
         _connectedDeviceChannel = connectedDeviceChannel,
         _charUpdateChannel = charUpdateChannel,
         _bleStatusChannel = bleStatusChannel,
-        _bleDeviceScanChannel = bleDeviceScanChannel;
+        _bleDeviceScanChannel = bleDeviceScanChannel,
+        _debugLogger = debugLogger;
 
   final ArgsToProtobufConverter _argsToProtobufConverter;
   final ProtobufConverter _protobufConverter;
@@ -43,6 +47,7 @@ class PluginController {
   final EventChannel _charUpdateChannel;
   final EventChannel _bleDeviceScanChannel;
   final EventChannel _bleStatusChannel;
+  final DebugLogger _debugLogger;
 
   Stream<ConnectionStateUpdate> _connectionUpdateEventChannelStream;
   Stream<CharacteristicValue> _charValueEventChannelStream;
@@ -53,165 +58,235 @@ class PluginController {
       _connectionUpdateEventChannelStream ??= _connectedDeviceChannel
           .receiveBroadcastStream()
           .cast<List<int>>()
-          .map(_protobufConverter.connectionStateUpdateFrom);
+          .map(_protobufConverter.connectionStateUpdateFrom)
+          .map(
+        (update) {
+          _debugLogger.log(
+            'Received $ConnectionStateUpdate(deviceId: ${update.deviceId}, connectionState: ${update.connectionState}, failure: ${update.failure})',
+          );
+          return update;
+        },
+      );
 
   Stream<CharacteristicValue> get charValueUpdateStream =>
       _charValueEventChannelStream ??= _charUpdateChannel
           .receiveBroadcastStream()
           .cast<List<int>>()
-          .map(_protobufConverter.characteristicValueFrom);
+          .map(_protobufConverter.characteristicValueFrom)
+          .map(
+        (update) {
+          _debugLogger.log(
+              'Received $CharacteristicValue(characteristic: ${update.characteristic}, result: ${update.runtimeType})');
+          return update;
+        },
+      );
 
-  Stream<ScanResult> get scanStream => _scanResultEventChannelStream ??=
-      _bleDeviceScanChannel.receiveBroadcastStream().cast<List<int>>().map(
+  Stream<ScanResult> get scanStream =>
+      _scanResultEventChannelStream ??= _bleDeviceScanChannel
+          .receiveBroadcastStream()
+          .cast<List<int>>()
+          .map(
             _protobufConverter.scanResultFrom,
-          );
+          )
+          .map(
+        (scanResult) {
+          _debugLogger
+              .log('Received $ScanResult(result: ${scanResult.result})');
+          return scanResult;
+        },
+      );
 
-  Stream<BleStatus> get bleStatusStream => _bleStatusStream ??=
-      _bleStatusChannel.receiveBroadcastStream().cast<List<int>>().map(
+  Stream<BleStatus> get bleStatusStream =>
+      _bleStatusStream ??= _bleStatusChannel
+          .receiveBroadcastStream()
+          .cast<List<int>>()
+          .map(
             _protobufConverter.bleStatusFrom,
-          );
+          )
+          .map((status) {
+        _debugLogger.log('Received ble status update: $status');
+        return status;
+      });
 
-  Future<void> initialize() => _bleMethodChannel.invokeMethod("initialize");
-  Future<void> deInitialize() =>
-      _bleMethodChannel.invokeMethod<void>("deinitialize");
+  Future<void> initialize() {
+    _debugLogger.log('Inititialize ble client');
+    return _bleMethodChannel.invokeMethod("initialize");
+  }
+
+  Future<void> deInitialize() {
+    _debugLogger.log('DeIititialize ble client');
+    return _bleMethodChannel.invokeMethod<void>("deinitialize");
+  }
 
   Stream<Object> scanForDevices({
     @required List<Uuid> withServices,
     @required ScanMode scanMode,
     @required bool requireLocationServicesEnabled,
-  }) =>
-      _bleMethodChannel
-          .invokeMethod<void>(
-            "scanForDevices",
-            _argsToProtobufConverter
-                .createScanForDevicesRequest(
-                  withServices: withServices,
-                  scanMode: scanMode,
-                  requireLocationServicesEnabled:
-                      requireLocationServicesEnabled,
-                )
-                .writeToBuffer(),
-          )
-          .asStream();
+  }) {
+    _debugLogger.log(
+      'Start scanning for devices with arguments (withServices:$withServices, scanMode: $scanMode, locationServiceEnabled: $requireLocationServicesEnabled)',
+    );
+    return _bleMethodChannel
+        .invokeMethod<void>(
+          "scanForDevices",
+          _argsToProtobufConverter
+              .createScanForDevicesRequest(
+                withServices: withServices,
+                scanMode: scanMode,
+                requireLocationServicesEnabled: requireLocationServicesEnabled,
+              )
+              .writeToBuffer(),
+        )
+        .asStream();
+  }
 
   Stream<Object> connectToDevice(
     String id,
     Map<Uuid, List<Uuid>> servicesWithCharacteristicsToDiscover,
     Duration connectionTimeout,
-  ) =>
-      _bleMethodChannel
-          .invokeMethod<void>(
-            "connectToDevice",
-            _argsToProtobufConverter
-                .createConnectToDeviceArgs(
-                  id,
-                  servicesWithCharacteristicsToDiscover,
-                  connectionTimeout,
-                )
-                .writeToBuffer(),
-          )
-          .asStream();
+  ) {
+    _debugLogger.log(
+      'Start connecting to device with arguments (deviceId: $id, servicesWithCharacteristicsToDiscover: $servicesWithCharacteristicsToDiscover, timeout: $connectionTimeout)',
+    );
+    return _bleMethodChannel
+        .invokeMethod<void>(
+          "connectToDevice",
+          _argsToProtobufConverter
+              .createConnectToDeviceArgs(
+                id,
+                servicesWithCharacteristicsToDiscover,
+                connectionTimeout,
+              )
+              .writeToBuffer(),
+        )
+        .asStream();
+  }
 
-  Future<void> disconnectDevice(String deviceId) =>
-      _bleMethodChannel.invokeMethod<void>(
-        "disconnectFromDevice",
-        _argsToProtobufConverter
-            .createDisconnectDeviceArgs(deviceId)
-            .writeToBuffer(),
-      );
+  Future<void> disconnectDevice(String deviceId) {
+    _debugLogger.log('Disconnect from device $deviceId');
+    return _bleMethodChannel.invokeMethod<void>(
+      "disconnectFromDevice",
+      _argsToProtobufConverter
+          .createDisconnectDeviceArgs(deviceId)
+          .writeToBuffer(),
+    );
+  }
 
-  Stream<Object> readCharacteristic(QualifiedCharacteristic characteristic) =>
-      _bleMethodChannel
-          .invokeMethod<void>(
-            "readCharacteristic",
-            _argsToProtobufConverter
-                .createReadCharacteristicRequest(characteristic)
-                .writeToBuffer(),
-          )
-          .asStream();
+  Stream<Object> readCharacteristic(QualifiedCharacteristic characteristic) {
+    _debugLogger.log('Read characteristic $characteristic');
+    return _bleMethodChannel
+        .invokeMethod<void>(
+          "readCharacteristic",
+          _argsToProtobufConverter
+              .createReadCharacteristicRequest(characteristic)
+              .writeToBuffer(),
+        )
+        .asStream();
+  }
 
   Future<WriteCharacteristicInfo> writeCharacteristicWithResponse(
-          QualifiedCharacteristic characteristic, List<int> value) async =>
-      _bleMethodChannel
-          .invokeMethod<List<int>>(
-              "writeCharacteristicWithResponse",
-              _argsToProtobufConverter
-                  .createWriteChacracteristicRequest(characteristic, value)
-                  .writeToBuffer())
-          .then(_protobufConverter.writeCharacteristicInfoFrom);
-
-  Future<WriteCharacteristicInfo> writeCharacteristicWithoutResponse(
-          QualifiedCharacteristic characteristic, List<int> value) async =>
-      _bleMethodChannel
-          .invokeMethod<List<int>>(
-            "writeCharacteristicWithoutResponse",
+      QualifiedCharacteristic characteristic, List<int> value) async {
+    _debugLogger.log(
+        'Write with response $QualifiedCharacteristic: $characteristic, value: $value');
+    return _bleMethodChannel
+        .invokeMethod<List<int>>(
+            "writeCharacteristicWithResponse",
             _argsToProtobufConverter
                 .createWriteChacracteristicRequest(characteristic, value)
-                .writeToBuffer(),
-          )
-          .then(_protobufConverter.writeCharacteristicInfoFrom);
+                .writeToBuffer())
+        .then(_protobufConverter.writeCharacteristicInfoFrom);
+  }
+
+  Future<WriteCharacteristicInfo> writeCharacteristicWithoutResponse(
+      QualifiedCharacteristic characteristic, List<int> value) async {
+    _debugLogger.log(
+        'Write without response $QualifiedCharacteristic: $characteristic, value: $value');
+    return _bleMethodChannel
+        .invokeMethod<List<int>>(
+          "writeCharacteristicWithoutResponse",
+          _argsToProtobufConverter
+              .createWriteChacracteristicRequest(characteristic, value)
+              .writeToBuffer(),
+        )
+        .then(_protobufConverter.writeCharacteristicInfoFrom);
+  }
 
   Stream<Object> subscribeToNotifications(
-          QualifiedCharacteristic characteristic) =>
-      _bleMethodChannel
-          .invokeMethod<void>(
-            "readNotifications",
-            _argsToProtobufConverter
-                .createNotifyCharacteristicRequest(characteristic)
-                .writeToBuffer(),
-          )
-          .asStream();
+      QualifiedCharacteristic characteristic) {
+    _debugLogger.log(
+        'Start subscribing to notifications for $QualifiedCharacteristic: $characteristic');
+    return _bleMethodChannel
+        .invokeMethod<void>(
+          "readNotifications",
+          _argsToProtobufConverter
+              .createNotifyCharacteristicRequest(characteristic)
+              .writeToBuffer(),
+        )
+        .asStream();
+  }
 
   Future<void> stopSubscribingToNotifications(
-          QualifiedCharacteristic characteristic) =>
-      _bleMethodChannel
-          .invokeMethod<void>(
-            "stopNotifications",
-            _argsToProtobufConverter
-                .createNotifyNoMoreCharacteristicRequest(characteristic)
-                .writeToBuffer(),
-          )
-          .catchError((Object e) =>
-              print("Error unsubscribing from notifications: $e"));
+      QualifiedCharacteristic characteristic) {
+    _debugLogger.log(
+        'Stop subscribing to notifications for $QualifiedCharacteristic: $characteristic');
 
-  Future<int> requestMtuSize(String deviceId, int mtu) async =>
-      _bleMethodChannel
-          .invokeMethod<List<int>>(
-            "negotiateMtuSize",
-            _argsToProtobufConverter
-                .createNegotiateMtuRequest(deviceId, mtu)
-                .writeToBuffer(),
-          )
-          .then(_protobufConverter.mtuSizeFrom);
+    return _bleMethodChannel
+        .invokeMethod<void>(
+          "stopNotifications",
+          _argsToProtobufConverter
+              .createNotifyNoMoreCharacteristicRequest(characteristic)
+              .writeToBuffer(),
+        )
+        .catchError(
+            (Object e) => print("Error unsubscribing from notifications: $e"));
+  }
+
+  Future<int> requestMtuSize(String deviceId, int mtu) async {
+    _debugLogger
+        .log('Request mtu size for device: $deviceId with mtuSize: $mtu');
+    return _bleMethodChannel
+        .invokeMethod<List<int>>(
+          "negotiateMtuSize",
+          _argsToProtobufConverter
+              .createNegotiateMtuRequest(deviceId, mtu)
+              .writeToBuffer(),
+        )
+        .then(_protobufConverter.mtuSizeFrom);
+  }
 
   Future<ConnectionPriorityInfo> requestConnectionPriority(
-          String deviceId, ConnectionPriority priority) =>
-      _bleMethodChannel
-          .invokeMethod<List<int>>(
-            "requestConnectionPriority",
-            _argsToProtobufConverter
-                .createChangeConnectionPrioRequest(deviceId, priority)
-                .writeToBuffer(),
-          )
-          .then(_protobufConverter.connectionPriorityInfoFrom);
+      String deviceId, ConnectionPriority priority) {
+    _debugLogger.log(
+        'Request connection priority for device: $deviceId, priority: $priority');
+    return _bleMethodChannel
+        .invokeMethod<List<int>>(
+          "requestConnectionPriority",
+          _argsToProtobufConverter
+              .createChangeConnectionPrioRequest(deviceId, priority)
+              .writeToBuffer(),
+        )
+        .then(_protobufConverter.connectionPriorityInfoFrom);
+  }
 
   Future<Result<Unit, GenericFailure<ClearGattCacheError>>> clearGattCache(
-          String deviceId) =>
-      _bleMethodChannel
-          .invokeMethod<List<int>>(
-            "clearGattCache",
-            _argsToProtobufConverter
-                .createClearGattCacheRequest(deviceId)
-                .writeToBuffer(),
-          )
-          .then(_protobufConverter.clearGattCacheResultFrom);
+      String deviceId) {
+    _debugLogger.log('Clear gatt cache for device: $deviceId');
+    return _bleMethodChannel
+        .invokeMethod<List<int>>(
+          "clearGattCache",
+          _argsToProtobufConverter
+              .createClearGattCacheRequest(deviceId)
+              .writeToBuffer(),
+        )
+        .then(_protobufConverter.clearGattCacheResultFrom);
+  }
 }
 
 class PluginControllerFactory {
   // this injection is temporarily until we moved everythin out
   const PluginControllerFactory();
 
-  PluginController create() {
+  PluginController create(DebugLogger logger) {
     const _bleMethodChannel = MethodChannel("flutter_reactive_ble_method");
 
     const connectedDeviceChannel =
@@ -228,6 +303,7 @@ class PluginControllerFactory {
       charUpdateChannel: charEventChannel,
       bleDeviceScanChannel: scanEventChannel,
       bleStatusChannel: bleStatusChannel,
+      debugLogger: logger,
     );
   }
 }
