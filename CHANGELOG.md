@@ -1,3 +1,6 @@
+## 2.4.0+1
+* Fix #97 crash on notifications when device gets disconnected on Android
+
 ## 2.4.0
 * Fix device list layout in the example app
 * Prefer `CBAdvertisementDataLocalName` over `peripheral.name` on iOS
