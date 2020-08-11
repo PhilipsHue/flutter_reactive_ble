@@ -70,7 +70,7 @@ issue use the method `connectToAdvertisingDevice` to first scan for the device a
 ```dart
 reactiveBleClient.connectToAdvertisingDevice(
     id: foundDeviceId,
-    withService: serviceUuid,
+    withServices: [serviceUuid],
     prescanDuration: const Duration(seconds: 5),
     servicesWithCharacteristicsToDiscover: {serviceId: [char1, char2]},
     connectionTimeout: const Duration(seconds:  2),
@@ -81,7 +81,7 @@ reactiveBleClient.connectToAdvertisingDevice(
   });
 ```
 
-Besides the normal connection parameters that are described above this function also has 2 additional required parameters: `withService` and  `prescanDuration`. PreScanDuration is the amount of time the ble stack will scan for the device before it attempts to connect (if the device is found)
+Besides the normal connection parameters that are described above this function also has 2 additional required parameters: `withServices` and  `prescanDuration`. PreScanDuration is the amount of time the ble stack will scan for the device before it attempts to connect (if the device is found)
 
 ### Read / write characteristics
 
