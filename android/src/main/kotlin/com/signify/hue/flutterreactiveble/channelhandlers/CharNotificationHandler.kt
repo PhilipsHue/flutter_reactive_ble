@@ -30,9 +30,11 @@ class CharNotificationHandler(private val bleClient: com.signify.hue.flutterreac
                 .uuidFromByteArray(request.characteristic.characteristicUuid.data.toByteArray())
         val subscription = bleClient.setupNotification(request.characteristic.deviceId, charUuid)
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe { value ->
+                .subscribe({ value ->
                     handleNotificationValue(request.characteristic, value)
-                }
+                }, {
+                    handleNotificationError(request.characteristic, it)
+                })
         subscriptionMap[request.characteristic] = subscription
     }
 
@@ -56,6 +58,11 @@ class CharNotificationHandler(private val bleClient: com.signify.hue.flutterreac
 
     private fun handleNotificationValue(subscriptionRequest: pb.CharacteristicAddress, value: ByteArray) {
         val convertedMsg = protobufConverter.convertCharacteristicInfo(subscriptionRequest, value)
+        charNotificationSink?.success(convertedMsg.toByteArray())
+    }
+
+    private fun handleNotificationError(subscriptionRequest: pb.CharacteristicAddress, error: Throwable) {
+        val convertedMsg = protobufConverter.convertCharacteristicError(subscriptionRequest, error.message ?: "")
         charNotificationSink?.success(convertedMsg.toByteArray())
     }
 }
