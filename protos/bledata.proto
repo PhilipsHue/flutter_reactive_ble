@@ -122,3 +122,19 @@ message GenericFailure {
     int32 code = 1;
     string message = 2;
 }
+
+message DiscoverServicesRequest{
+    string deviceId = 1;
+} 
+
+message DiscoverServicesInfo{
+    string deviceId = 1;
+    repeated DiscoveredServices services = 2;
+    GenericFailure failure = 3;
+}
+
+message DiscoveredServices{
+    Uuid serviceUuid = 1;
+    repeated Uuid characteristicUuid = 2;
+    repeated DiscoveredServices includedServices = 3;
+}
