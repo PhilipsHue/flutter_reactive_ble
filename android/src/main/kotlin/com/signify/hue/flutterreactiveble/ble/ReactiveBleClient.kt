@@ -107,6 +107,19 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
             activeConnections[deviceId]?.let(DeviceConnector::clearGattCache)
                     ?: Completable.error(IllegalStateException("Device is not connected"))
 
+    override fun discoverServices(deviceId: String): Single<DiscoverServicesResult> {
+
+        return getConnection(deviceId).flatMapSingle { connectionResult ->
+                when (connectionResult) {
+                    is EstablishedConnection ->
+                        connectionResult.rxConnection.discoverServices().map { result ->
+                           DiscoverServicesSuccess(result)
+                        }
+                    is EstablishConnectionFailure -> Single.just(DiscoverServicesFailure(deviceId, connectionResult.errorMessage))
+                }
+        }.first(DiscoverServicesFailure(deviceId, "Discovering services didn't return a result"))
+    }
+
     override fun readCharacteristic(deviceId: String, characteristic: UUID): Single<CharOperationResult> =
             getConnection(deviceId).flatMapSingle<CharOperationResult> { connectionResult ->
                 when (connectionResult) {

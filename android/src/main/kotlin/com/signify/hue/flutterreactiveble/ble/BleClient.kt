@@ -19,21 +19,22 @@ interface BleClient {
     fun connectToDevice(deviceId: String, timeout: Duration)
     fun disconnectDevice(deviceId: String)
     fun disconnectAllDevices()
+    fun discoverServices(deviceId: String): Single<DiscoverServicesResult>
     fun clearGattCache(deviceId: String): Completable
-    fun readCharacteristic(deviceId: String, characteristic: UUID): Single<com.signify.hue.flutterreactiveble.ble.CharOperationResult>
+    fun readCharacteristic(deviceId: String, characteristic: UUID): Single<CharOperationResult>
     fun setupNotification(deviceId: String, characteristic: UUID): Observable<ByteArray>
     fun writeCharacteristicWithResponse(
         deviceId: String,
         characteristic: UUID,
         value: ByteArray
-    ): Single<com.signify.hue.flutterreactiveble.ble.CharOperationResult>
+    ): Single<CharOperationResult>
     fun writeCharacteristicWithoutResponse(
         deviceId: String,
         characteristic: UUID,
         value: ByteArray
-    ): Single<com.signify.hue.flutterreactiveble.ble.CharOperationResult>
-    fun negotiateMtuSize(deviceId: String, size: Int): Single<com.signify.hue.flutterreactiveble.ble.MtuNegotiateResult>
-    fun observeBleStatus(): Observable<com.signify.hue.flutterreactiveble.ble.BleStatus>
-    fun requestConnectionPriority(deviceId: String, priority: com.signify.hue.flutterreactiveble.ble.ConnectionPriority):
-            Single<com.signify.hue.flutterreactiveble.ble.RequestConnectionPriorityResult>
+    ): Single<CharOperationResult>
+    fun negotiateMtuSize(deviceId: String, size: Int): Single<MtuNegotiateResult>
+    fun observeBleStatus(): Observable<BleStatus>
+    fun requestConnectionPriority(deviceId: String, priority: ConnectionPriority):
+            Single<RequestConnectionPriorityResult>
 }

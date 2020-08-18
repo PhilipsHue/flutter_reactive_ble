@@ -5,6 +5,7 @@ import com.google.common.truth.Truth.assertThat
 import com.polidea.rxandroidble2.RxBleClient
 import com.polidea.rxandroidble2.RxBleConnection
 import com.polidea.rxandroidble2.RxBleDevice
+import com.polidea.rxandroidble2.RxBleDeviceServices
 import com.signify.hue.flutterreactiveble.ble.extensions.writeCharWithResponse
 import com.signify.hue.flutterreactiveble.ble.extensions.writeCharWithoutResponse
 import com.signify.hue.flutterreactiveble.utils.Duration
@@ -19,24 +20,24 @@ import io.reactivex.Single
 import io.reactivex.android.plugins.RxAndroidPlugins
 import io.reactivex.schedulers.TestScheduler
 import io.reactivex.subjects.BehaviorSubject
+import org.junit.After
+import org.junit.Before
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import org.junit.After
-import org.junit.Before
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 
-private class BleClientForTesting(val bleClient: RxBleClient, appContext: Context, val deviceConnector: com.signify.hue.flutterreactiveble.ble.DeviceConnector) : com.signify.hue.flutterreactiveble.ble.ReactiveBleClient(appContext) {
+private class BleClientForTesting(val bleClient: RxBleClient, appContext: Context, val deviceConnector: DeviceConnector) : ReactiveBleClient(appContext) {
 
     override fun initializeClient() {
         rxBleClient = bleClient
         activeConnections = mutableMapOf()
     }
 
-    override fun createDeviceConnector(device: RxBleDevice, timeout: Duration): com.signify.hue.flutterreactiveble.ble.DeviceConnector = deviceConnector
+    override fun createDeviceConnector(device: RxBleDevice, timeout: Duration): DeviceConnector = deviceConnector
 }
 
 @DisplayName("BleClient unit tests")
@@ -49,7 +50,7 @@ class ReactiveBleClientTest {
     private lateinit var rxBleClient: RxBleClient
 
     @MockK
-    private lateinit var deviceConnector: com.signify.hue.flutterreactiveble.ble.DeviceConnector
+    private lateinit var deviceConnector: DeviceConnector
 
     @MockK
     private lateinit var bleDevice: RxBleDevice
@@ -57,7 +58,7 @@ class ReactiveBleClientTest {
     @MockK
     lateinit var rxConnection: RxBleConnection
 
-    private lateinit var subject: BehaviorSubject<com.signify.hue.flutterreactiveble.ble.EstablishConnectionResult>
+    private lateinit var subject: BehaviorSubject<EstablishConnectionResult>
 
     private lateinit var sut: BleClientForTesting
 
@@ -81,7 +82,7 @@ class ReactiveBleClientTest {
     fun setup() {
         MockKAnnotations.init(this)
         mockkStatic("com.signify.hue.flutterreactiveble.ble.extensions.RxBleConnectionExtensionKt")
-        subject = BehaviorSubject.create<com.signify.hue.flutterreactiveble.ble.EstablishConnectionResult>()
+        subject = BehaviorSubject.create<EstablishConnectionResult>()
 
         sut = BleClientForTesting(rxBleClient, context, deviceConnector)
         sut.initializeClient()
@@ -90,21 +91,21 @@ class ReactiveBleClientTest {
         every { rxBleClient.getBleDevice(any()) }.returns(bleDevice)
         every { deviceConnector.connection }.returns(subject)
 
-        subject.onNext(com.signify.hue.flutterreactiveble.ble.EstablishedConnection("test", rxConnection))
+        subject.onNext(EstablishedConnection("test", rxConnection))
     }
 
     @AfterEach
-    fun teardown(){
+    fun teardown() {
         subject.onComplete()
     }
 
 
     @DisplayName("Establishing a connection")
     @Nested
-    inner class EstablishConnectionTest{
+    inner class EstablishConnectionTest {
 
         @Test
-        fun `should use deviceconnector when connecting to a device` () {
+        fun `should use deviceconnector when connecting to a device`() {
             sut.connectToDevice("test", testTimeout)
 
             verify(exactly = 1) { deviceConnector.connection }
@@ -112,8 +113,8 @@ class ReactiveBleClientTest {
     }
 
     @Nested
-    @DisplayName ("Writing reading and subscribing to characteristics")
-    inner class BleOperationsTest{
+    @DisplayName("Writing reading and subscribing to characteristics")
+    inner class BleOperationsTest {
         @Test
         fun `should call readcharacteristic in case the connection is established`() {
             sut.readCharacteristic("test", UUID.randomUUID()).test()
@@ -123,7 +124,7 @@ class ReactiveBleClientTest {
 
         @Test
         fun `should not call readcharacteristic in case the connection is not established`() {
-            subject.onNext(com.signify.hue.flutterreactiveble.ble.EstablishConnectionFailure("test", "error"))
+            subject.onNext(EstablishConnectionFailure("test", "error"))
 
             sut.readCharacteristic("test", UUID.randomUUID()).test()
 
@@ -132,11 +133,11 @@ class ReactiveBleClientTest {
 
         @Test
         fun `should report failure in case reading characteristic fails`() {
-            subject.onNext(com.signify.hue.flutterreactiveble.ble.EstablishConnectionFailure("test", "error"))
+            subject.onNext(EstablishConnectionFailure("test", "error"))
 
             val observable = sut.readCharacteristic("test", UUID.randomUUID()).test()
 
-            assertThat(observable.values().first()).isInstanceOf(com.signify.hue.flutterreactiveble.ble.CharOperationFailed::class.java)
+            assertThat(observable.values().first()).isInstanceOf(CharOperationFailed::class.java)
         }
 
         @Test
@@ -146,7 +147,7 @@ class ReactiveBleClientTest {
 
             every { rxConnection.readCharacteristic(any<UUID>()) }.returns(Single.just(byteArrayOf(byteMin, byteMax)))
             val observable = sut.readCharacteristic("test", UUID.randomUUID())
-                    .map { result -> result as com.signify.hue.flutterreactiveble.ble.CharOperationSuccessful }.test()
+                    .map { result -> result as CharOperationSuccessful }.test()
 
             assertThat(observable.values().first().value).isEqualTo(listOf(byteMin, byteMax))
         }
@@ -178,7 +179,7 @@ class ReactiveBleClientTest {
             val byteMin = Byte.MIN_VALUE
             val byteMax = Byte.MAX_VALUE
             val bytes = byteArrayOf(byteMin, byteMax)
-            subject.onNext(com.signify.hue.flutterreactiveble.ble.EstablishConnectionFailure("test", "error"))
+            subject.onNext(EstablishConnectionFailure("test", "error"))
 
             sut.writeCharacteristicWithResponse("test", UUID.randomUUID(), bytes).test()
 
@@ -201,7 +202,7 @@ class ReactiveBleClientTest {
             val byteMin = Byte.MIN_VALUE
             val byteMax = Byte.MAX_VALUE
             val bytes = byteArrayOf(byteMin, byteMax)
-            subject.onNext(com.signify.hue.flutterreactiveble.ble.EstablishConnectionFailure("test", "error"))
+            subject.onNext(EstablishConnectionFailure("test", "error"))
 
 
             sut.writeCharacteristicWithoutResponse("test", UUID.randomUUID(), bytes).test()
@@ -215,11 +216,11 @@ class ReactiveBleClientTest {
             val byteMax = Byte.MAX_VALUE
             val bytes = byteArrayOf(byteMin, byteMax)
 
-            subject.onNext(com.signify.hue.flutterreactiveble.ble.EstablishConnectionFailure("test", "error"))
+            subject.onNext(EstablishConnectionFailure("test", "error"))
 
             val observable = sut.writeCharacteristicWithResponse("test", UUID.randomUUID(), bytes).test()
 
-            assertThat(observable.values().first()).isInstanceOf(com.signify.hue.flutterreactiveble.ble.CharOperationFailed::class.java)
+            assertThat(observable.values().first()).isInstanceOf(CharOperationFailed::class.java)
         }
 
         @Test
@@ -230,7 +231,7 @@ class ReactiveBleClientTest {
 
             every { rxConnection.writeCharWithResponse(any(), any()) }.returns(Single.just(byteArrayOf(byteMin, byteMax)))
             val observable = sut.writeCharacteristicWithResponse("test", UUID.randomUUID(), bytes)
-                    .map { result -> result as com.signify.hue.flutterreactiveble.ble.CharOperationSuccessful }.test()
+                    .map { result -> result as CharOperationSuccessful }.test()
 
             assertThat(observable.values().first().value).isEqualTo(bytes.toList())
         }
@@ -238,77 +239,97 @@ class ReactiveBleClientTest {
 
     @Nested
     @DisplayName("Negotiate mtu")
-    inner class NegotiateMtuTest{
+    inner class NegotiateMtuTest {
 
         @Test
-        fun `should return mtunegotiatesuccesful in case it succeeds` (){
+        fun `should return mtunegotiatesuccesful in case it succeeds`() {
             val mtuSize = 19
             every { rxConnection.requestMtu(any()) }.returns(Single.just(mtuSize))
 
             val result = sut.negotiateMtuSize("", mtuSize).test()
 
-            assertThat(result.values().first()).isInstanceOf(com.signify.hue.flutterreactiveble.ble.MtuNegotiateSuccesful::class.java)
+            assertThat(result.values().first()).isInstanceOf(MtuNegotiateSuccesful::class.java)
         }
 
         @Test
-        fun `should return mtunegotiatefailed in case it fails` (){
+        fun `should return mtunegotiatefailed in case it fails`() {
             val mtuSize = 19
-            subject.onNext(com.signify.hue.flutterreactiveble.ble.EstablishConnectionFailure("test", "error"))
+            subject.onNext(EstablishConnectionFailure("test", "error"))
 
             val result = sut.negotiateMtuSize("", mtuSize).test()
 
-            assertThat(result.values().first()).isInstanceOf(com.signify.hue.flutterreactiveble.ble.MtuNegotiateFailed::class.java)
+            assertThat(result.values().first()).isInstanceOf(MtuNegotiateFailed::class.java)
         }
     }
 
     @Nested
     @DisplayName("Observe status")
-    inner class ObserveBleStatusTest{
+    inner class ObserveBleStatusTest {
         private val currentStatus = RxBleClient.State.BLUETOOTH_NOT_ENABLED
         private val changedStatus = RxBleClient.State.READY
 
         @BeforeEach
-        fun setup(){
+        fun setup() {
             every { rxBleClient.observeStateChanges() }.returns(Observable.just(changedStatus))
             every { rxBleClient.state }.returns(currentStatus)
         }
 
         @Test
-        fun `observes status changes` (){
+        fun `observes status changes`() {
             val result = sut.observeBleStatus().test()
 
-            assertThat(result.values().last()).isEqualTo(com.signify.hue.flutterreactiveble.ble.BleStatus.READY)
+            assertThat(result.values().last()).isEqualTo(BleStatus.READY)
             assertThat(result.values().count()).isEqualTo(2)
         }
 
         @Test
-        fun `starts with current state` (){
+        fun `starts with current state`() {
 
             val result = sut.observeBleStatus().test()
             assertThat(result.values().count()).isEqualTo(2)
-            assertThat(result.values().first()).isEqualTo(com.signify.hue.flutterreactiveble.ble.BleStatus.POWERED_OFF)
+            assertThat(result.values().first()).isEqualTo(BleStatus.POWERED_OFF)
         }
     }
 
     @Nested
     @DisplayName("Change priority")
-    inner class ChangePriorityTest{
+    inner class ChangePriorityTest {
 
         @Test
-        fun `returns prioritysuccess when  completed` () {
+        fun `returns prioritysuccess when  completed`() {
             val completer = Completable.fromCallable { true }
 
-            every{rxConnection.requestConnectionPriority(any(), any(), any())}.returns(completer)
-            val result = sut.requestConnectionPriority("", com.signify.hue.flutterreactiveble.ble.ConnectionPriority.BALANCED).test()
-            assertThat(result.values().first()).isInstanceOf(com.signify.hue.flutterreactiveble.ble.RequestConnectionPrioritySuccess::class.java)
+            every { rxConnection.requestConnectionPriority(any(), any(), any()) }.returns(completer)
+            val result = sut.requestConnectionPriority("", ConnectionPriority.BALANCED).test()
+            assertThat(result.values().first()).isInstanceOf(RequestConnectionPrioritySuccess::class.java)
         }
 
         @Test
-        fun `returns false when connectionfailed` () {
-            subject.onNext(com.signify.hue.flutterreactiveble.ble.EstablishConnectionFailure("test", "error"))
-            val result = sut.requestConnectionPriority("", com.signify.hue.flutterreactiveble.ble.ConnectionPriority.BALANCED).test()
-            assertThat(result.values().first()).isInstanceOf(com.signify.hue.flutterreactiveble.ble.RequestConnectionPriorityFailed::class.java)
+        fun `returns false when connectionfailed`() {
+            subject.onNext(EstablishConnectionFailure("test", "error"))
+            val result = sut.requestConnectionPriority("", ConnectionPriority.BALANCED).test()
+            assertThat(result.values().first()).isInstanceOf(RequestConnectionPriorityFailed::class.java)
         }
     }
 
+    @Nested
+    @DisplayName("Discover services")
+    inner class DiscoverServicesTest {
+
+        @Test
+        fun `It returns success in case services can be discovered`() {
+            every { rxConnection.discoverServices() }.returns(Single.just(RxBleDeviceServices(listOf())))
+
+            val result = sut.discoverServices("test").test()
+
+            assertThat(result.values().first()).isInstanceOf(DiscoverServicesSuccess::class.java)
+        }
+
+        @Test
+        fun `It returns failure when connectionfailed`() {
+            subject.onNext(EstablishConnectionFailure("test", "error"))
+            val result = sut.discoverServices("test").test()
+            assertThat(result.values().first()).isInstanceOf(DiscoverServicesFailure::class.java)
+        }
+    }
 }
