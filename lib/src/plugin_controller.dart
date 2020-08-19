@@ -10,6 +10,7 @@ import 'converter/protobuf_converter.dart';
 import 'model/characteristic_value.dart';
 import 'model/clear_gatt_cache_error.dart';
 import 'model/connection_state_update.dart';
+import 'model/discovered_services.dart';
 import 'model/qualified_characteristic.dart';
 import 'model/unit.dart';
 
@@ -280,6 +281,16 @@ class PluginController {
         )
         .then(_protobufConverter.clearGattCacheResultFrom);
   }
+
+  Future<DiscoverServicesInfo> discoverServices(String deviceId) async =>
+      _bleMethodChannel
+          .invokeMethod<List<int>>(
+            'discoverServices',
+            _argsToProtobufConverter
+                .createDiscoverServicesRequest(deviceId)
+                .writeToBuffer(),
+          )
+          .then(_protobufConverter.discoveredServicesFrom);
 }
 
 class PluginControllerFactory {

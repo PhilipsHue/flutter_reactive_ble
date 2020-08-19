@@ -6,6 +6,7 @@ import 'package:flutter_reactive_ble/src/debug_logger.dart';
 import 'package:flutter_reactive_ble/src/device_connector.dart';
 import 'package:flutter_reactive_ble/src/device_scanner.dart';
 import 'package:flutter_reactive_ble/src/model/clear_gatt_cache_error.dart';
+import 'package:flutter_reactive_ble/src/model/discovered_services.dart';
 import 'package:flutter_reactive_ble/src/model/log_level.dart';
 import 'package:flutter_reactive_ble/src/model/unit.dart';
 import 'package:flutter_reactive_ble/src/plugin_controller.dart';
@@ -568,6 +569,40 @@ void main() {
 
         test('It enables debug logging', () {
           verify(_debugLoggerMock.logLevel = LogLevel.none).called(1);
+        });
+      });
+    });
+
+    group('Discover Services', () {
+      const deviceId = '123';
+
+      group('When operation is succesfull', () {
+        const result = DiscoverServicesInfo(
+            deviceId: deviceId, result: Result.success([]));
+        setUp(() {
+          when(_pluginController.discoverServices(deviceId)).thenAnswer(
+            (_) => Future.value(result),
+          );
+        });
+
+        test('It returns result', () async {
+          expect(await _sut.discoverServices(deviceId), <DiscoveredServices>[]);
+        });
+      });
+
+      group('When operation failed', () {
+        const failure = GenericFailure(
+            code: DiscoverServicesFailure.unknown, message: "Fail!");
+        const result = DiscoverServicesInfo(
+            deviceId: deviceId, result: Result.failure(failure));
+        setUp(() {
+          when(_pluginController.discoverServices(deviceId)).thenAnswer(
+            (_) => Future.value(result),
+          );
+        });
+
+        test('It returns result', () async {
+          expect(() async => _sut.discoverServices(deviceId), throwsException);
         });
       });
     });

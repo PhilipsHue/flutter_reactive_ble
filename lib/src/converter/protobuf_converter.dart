@@ -7,6 +7,7 @@ import 'package:flutter_reactive_ble/src/model/clear_gatt_cache_error.dart';
 import 'package:flutter_reactive_ble/src/model/connection_priority.dart';
 import 'package:flutter_reactive_ble/src/model/connection_state_update.dart';
 import 'package:flutter_reactive_ble/src/model/discovered_device.dart';
+import 'package:flutter_reactive_ble/src/model/discovered_services.dart';
 import 'package:flutter_reactive_ble/src/model/generic_failure.dart';
 import 'package:flutter_reactive_ble/src/model/qualified_characteristic.dart';
 import 'package:flutter_reactive_ble/src/model/result.dart';
@@ -38,18 +39,19 @@ class ProtobufConverter {
 
     return ScanResult(
       result: resultFrom(
-          getValue: () => DiscoveredDevice(
-                id: message.id,
-                name: message.name,
-                serviceData: serviceData,
-                manufacturerData: Uint8List.fromList(message.manufacturerData),
-                rssi: message.rssi,
-              ),
-          failure: genericFailureFrom(
-              hasFailure: message.hasFailure(),
-              getFailure: () => message.failure,
-              codes: ScanFailure.values,
-              fallback: (rawOrNull) => ScanFailure.unknown)),
+        getValue: () => DiscoveredDevice(
+          id: message.id,
+          name: message.name,
+          serviceData: serviceData,
+          manufacturerData: Uint8List.fromList(message.manufacturerData),
+          rssi: message.rssi,
+        ),
+        failure: genericFailureFrom(
+            hasFailure: message.hasFailure(),
+            getFailure: () => message.failure,
+            codes: ScanFailure.values,
+            fallback: (rawOrNull) => ScanFailure.unknown),
+      ),
     );
   }
 
@@ -163,6 +165,48 @@ class ProtobufConverter {
       );
     }
     return null;
+  }
+
+  DiscoverServicesInfo discoveredServicesFrom(List<int> data) {
+    final message = pb.DiscoverServicesInfo.fromBuffer(data);
+    return DiscoverServicesInfo(
+      deviceId: message.deviceId,
+      result: resultFrom(
+        getValue: () =>
+            message.services.map(_convertServices).toList(growable: false),
+        failure: genericFailureFrom(
+          hasFailure: message.hasFailure(),
+          getFailure: () => message.failure,
+          codes: DiscoverServicesFailure.values,
+          fallback: (rawOrNull) => DiscoverServicesFailure.unknown,
+        ),
+      ),
+    );
+  }
+
+  DiscoveredServices _convertServices(pb.DiscoveredServices service) =>
+      DiscoveredServices(
+        serviceUuid: Uuid(service.serviceUuid.data),
+        characteristics: service.characteristicUuid
+            .map((c) => Uuid(c.data))
+            .toList(growable: false),
+        includedServices: service.includedServices
+            .map(_convertInternalServices)
+            .toList(growable: false),
+      );
+
+  DiscoveredServices _convertInternalServices(pb.DiscoveredServices service) {
+    final root = DiscoveredServices(
+      serviceUuid: Uuid(service.serviceUuid.data),
+      characteristics: service.characteristicUuid
+          .map((c) => Uuid(c.data))
+          .toList(growable: false),
+    );
+
+    final children =
+        service.includedServices.map(_convertInternalServices).toList();
+
+    return root.copyWith(includedServices: children);
   }
 
   @visibleForTesting

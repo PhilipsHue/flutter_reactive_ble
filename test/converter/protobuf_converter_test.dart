@@ -4,6 +4,7 @@ import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
 import 'package:flutter_reactive_ble/src/converter/protobuf_converter.dart';
 import 'package:flutter_reactive_ble/src/generated/bledata.pb.dart' as pb;
 import 'package:flutter_reactive_ble/src/model/clear_gatt_cache_error.dart';
+import 'package:flutter_reactive_ble/src/model/discovered_services.dart';
 import 'package:flutter_reactive_ble/src/model/unit.dart';
 import 'package:flutter_reactive_ble/src/model/uuid.dart';
 import 'package:flutter_reactive_ble/src/model/write_characteristic_info.dart';
@@ -462,6 +463,86 @@ void main() {
 
       test('It convert mtu size size', () {
         expect(result, 20);
+      });
+    });
+
+    group('Converts Discover services ', () {
+      const deviceId = "testDevice";
+      pb.DiscoverServicesInfo message;
+      DiscoverServicesInfo convertedResult;
+
+      group('Given message has no failure', () {
+        setUp(() {
+          final serviceUuid = pb.Uuid()..data = [0];
+          final internalServiceUuid = pb.Uuid()..data = [1];
+          final charUuid = pb.Uuid()..data = [0, 1, 1];
+          final internalCharUuid = pb.Uuid()..data = [1, 1];
+
+          final discoveredInternalServices = pb.DiscoveredServices()
+            ..serviceUuid = internalServiceUuid
+            ..characteristicUuid.add(internalCharUuid);
+
+          final discoveredService = pb.DiscoveredServices()
+            ..serviceUuid = serviceUuid
+            ..characteristicUuid.add(charUuid)
+            ..includedServices.add(discoveredInternalServices);
+
+          message = pb.DiscoverServicesInfo()
+            ..deviceId = deviceId
+            ..services.add(discoveredService);
+
+          convertedResult = sut.discoveredServicesFrom(message.writeToBuffer());
+        });
+
+        test('It converts device id', () {
+          expect(convertedResult.deviceId, deviceId);
+        });
+
+        test('It converts services', () {
+          expect(
+            convertedResult.result.dematerialize(),
+            [
+              DiscoveredServices(
+                serviceUuid: Uuid([0]),
+                characteristics: [
+                  Uuid([0, 1, 1])
+                ],
+                includedServices: [
+                  DiscoveredServices(
+                    serviceUuid: Uuid([1]),
+                    characteristics: [
+                      Uuid([1, 1])
+                    ],
+                    includedServices: [],
+                  ),
+                ],
+              )
+            ],
+          );
+        });
+      });
+
+      group('Given message has a failure', () {
+        const failureMessage = "Discovered services failure";
+        setUp(() {
+          final failure = pb.GenericFailure()..message = failureMessage;
+
+          message = pb.DiscoverServicesInfo()
+            ..deviceId = deviceId
+            ..failure = failure;
+
+          convertedResult = sut.discoveredServicesFrom(message.writeToBuffer());
+        });
+
+        test('It converts failure', () {
+          expect(
+            convertedResult.result.iif(
+                success: (_) => throw AssertionError("should not happen"),
+                failure: (f) => f),
+            const GenericFailure<DiscoverServicesFailure>(
+                code: DiscoverServicesFailure.unknown, message: failureMessage),
+          );
+        });
       });
     });
   });

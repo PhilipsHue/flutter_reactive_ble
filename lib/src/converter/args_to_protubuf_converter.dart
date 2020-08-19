@@ -135,4 +135,9 @@ class ArgsToProtobufConverter {
     final args = pb.ClearGattCacheRequest()..deviceId = deviceId;
     return args;
   }
+
+  pb.DiscoverServicesRequest createDiscoverServicesRequest(String deviceId) {
+    final args = pb.DiscoverServicesRequest()..deviceId = deviceId;
+    return args;
+  }
 }

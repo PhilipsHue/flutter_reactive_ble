@@ -339,5 +339,18 @@ void main() {
         expect(result.characteristic.characteristicUuid.data, [254, 239]);
       });
     });
+
+    group('DiscoverDevices request', () {
+      const deviceId = "testdevice";
+      pb.DiscoverServicesRequest result;
+
+      setUp(() {
+        result = _sut.createDiscoverServicesRequest(deviceId);
+      });
+
+      test('It converts deviceId', () {
+        expect(result.deviceId, deviceId);
+      });
+    });
   });
 }
