@@ -9,13 +9,10 @@ class DeviceDetailScreen extends StatelessWidget {
   const DeviceDetailScreen({@required this.device}) : assert(device != null);
 
   @override
-  Widget build(BuildContext context) =>
-      Consumer2<BleDeviceConnector, ConnectionStateUpdate>(
-        builder: (_, deviceConnector, connectionStateUpdate, __) =>
-            _DeviceDetail(
+  Widget build(BuildContext context) => Consumer2<BleDeviceConnector, ConnectionStateUpdate>(
+        builder: (_, deviceConnector, connectionStateUpdate, __) => _DeviceDetail(
           device: device,
-          connectionUpdate: connectionStateUpdate != null &&
-                  connectionStateUpdate.deviceId == device.id
+          connectionUpdate: connectionStateUpdate != null && connectionStateUpdate.deviceId == device.id
               ? connectionStateUpdate
               : ConnectionStateUpdate(
                   deviceId: device.id,
@@ -24,6 +21,7 @@ class DeviceDetailScreen extends StatelessWidget {
                 ),
           connect: deviceConnector.connect,
           disconnect: deviceConnector.disconnect,
+          discoverServices: deviceConnector.discoverServices,
         ),
       );
 }
@@ -34,20 +32,22 @@ class _DeviceDetail extends StatelessWidget {
     @required this.connectionUpdate,
     @required this.connect,
     @required this.disconnect,
+    @required this.discoverServices,
     Key key,
   })  : assert(device != null),
         assert(connectionUpdate != null),
         assert(connect != null),
         assert(disconnect != null),
+        assert(discoverServices != null),
         super(key: key);
 
   final DiscoveredDevice device;
   final ConnectionStateUpdate connectionUpdate;
   final void Function(String deviceId) connect;
   final void Function(String deviceId) disconnect;
+  final void Function(String deviceId) discoverServices;
 
-  bool _deviceConnected() =>
-      connectionUpdate.connectionState == DeviceConnectionState.connected;
+  bool _deviceConnected() => connectionUpdate.connectionState == DeviceConnectionState.connected;
 
   @override
   Widget build(BuildContext context) => WillPopScope(
@@ -84,19 +84,22 @@ class _DeviceDetail extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: RaisedButton(
-                        onPressed: !_deviceConnected()
-                            ? () => connect(device.id)
-                            : null,
+                        onPressed: !_deviceConnected() ? () => connect(device.id) : null,
                         child: const Text("Connect"),
                       ),
                     ),
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: RaisedButton(
-                        onPressed: _deviceConnected()
-                            ? () => disconnect(device.id)
-                            : null,
+                        onPressed: _deviceConnected() ? () => disconnect(device.id) : null,
                         child: const Text("Disconnect"),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: RaisedButton(
+                        onPressed: _deviceConnected() ? () => discoverServices(device.id) : null,
+                        child: const Text("Discover Services"),
                       ),
                     ),
                   ],

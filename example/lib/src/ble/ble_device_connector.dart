@@ -43,6 +43,12 @@ class BleDeviceConnector extends ReactiveState<ConnectionStateUpdate> {
     }
   }
 
+  Future<void> discoverServices(String deviceId) async {
+    await _ble.discoverServices(deviceId).then(
+          (value) => print('Services discovered: $value'),
+        );
+  }
+
   Future<void> dispose() async {
     await _deviceConnectionController.close();
   }
