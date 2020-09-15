@@ -19,7 +19,7 @@ final class Central {
     typealias CharacteristicValueUpdateHandler = (Central, QualifiedCharacteristic, Data?, Error?) -> Void
     typealias CharacteristicWriteCompletionHandler = (Central, QualifiedCharacteristic, Error?) -> Void
 
-    private let onServicesWithCharacteristicsDiscovery: ServicesWithCharacteristicsDiscoveryHandler
+    private let onServicesWithCharacteristicsInitialDiscovery: ServicesWithCharacteristicsDiscoveryHandler
 
     private var peripheralDelegate: PeripheralDelegate!
     private var centralManagerDelegate: CentralManagerDelegate!
@@ -36,10 +36,10 @@ final class Central {
         onStateChange: @escaping StateChangeHandler,
         onDiscovery: @escaping DiscoveryHandler,
         onConnectionChange: @escaping ConnectionChangeHandler,
-        onServicesWithCharacteristicsDiscovery: @escaping ServicesWithCharacteristicsDiscoveryHandler,
+        onServicesWithCharacteristicsInitialDiscovery: @escaping ServicesWithCharacteristicsDiscoveryHandler,
         onCharacteristicValueUpdate: @escaping CharacteristicValueUpdateHandler
     ) {
-        self.onServicesWithCharacteristicsDiscovery = onServicesWithCharacteristicsDiscovery
+        self.onServicesWithCharacteristicsInitialDiscovery = onServicesWithCharacteristicsInitialDiscovery
         self.centralManagerDelegate = CentralManagerDelegate(
             onStateChange: papply(weak: self) { central, state in
                 if state != .poweredOn {
@@ -138,16 +138,10 @@ final class Central {
                 case .connected:
                     peripheral.delegate = central.peripheralDelegate
 
-                    central.servicesWithCharacteristicsDiscoveryRegistry.registerTask(
-                        key: peripheralID,
-                        params: .init(servicesWithCharacteristicsToDiscover: servicesWithCharacteristicsToDiscover),
-                        completion: papply(weak: central) { central, result in
-                            central.onServicesWithCharacteristicsDiscovery(central, peripheral, result)
-                        }
-                    )
-                    central.servicesWithCharacteristicsDiscoveryRegistry.updateTask(
-                        key: peripheralID,
-                        action: { $0.start(peripheral: peripheral) }
+                    central.discoverServicesWithCharacteristics(
+                        for: peripheral,
+                        discover: servicesWithCharacteristicsToDiscover,
+                        completion: central.onServicesWithCharacteristicsInitialDiscovery
                     )
                 case .failedToConnect(_), .disconnected(_):
                     break
@@ -172,6 +166,38 @@ final class Central {
         activePeripherals
             .values
             .forEach(centralManager.cancelPeripheralConnection)
+    }
+
+    func discoverServicesWithCharacteristics(
+        for peripheralID: PeripheralID,
+        discover servicesWithCharacteristicsToDiscover: ServicesWithCharacteristicsToDiscover,
+        completion: @escaping ServicesWithCharacteristicsDiscoveryHandler
+    ) throws -> Void {
+        let peripheral = try resolve(connected: peripheralID)
+
+        discoverServicesWithCharacteristics(
+            for: peripheral,
+            discover: servicesWithCharacteristicsToDiscover,
+            completion: completion
+        )
+    }
+
+    private func discoverServicesWithCharacteristics(
+        for peripheral: CBPeripheral,
+        discover servicesWithCharacteristicsToDiscover: ServicesWithCharacteristicsToDiscover,
+        completion: @escaping ServicesWithCharacteristicsDiscoveryHandler
+    ) -> Void {
+        servicesWithCharacteristicsDiscoveryRegistry.registerTask(
+            key: peripheral.identifier,
+            params: .init(servicesWithCharacteristicsToDiscover: servicesWithCharacteristicsToDiscover),
+            completion: papply(weak: self) { central, result in
+                completion(central, peripheral, result)
+            }
+        )
+        servicesWithCharacteristicsDiscoveryRegistry.updateTask(
+            key: peripheral.identifier,
+            action: { $0.start(peripheral: peripheral) }
+        )
     }
 
     func turnNotifications(_ state: OnOff, for qualifiedCharacteristic: QualifiedCharacteristic, completion: @escaping CharacteristicNotifyCompletionHandler) throws {

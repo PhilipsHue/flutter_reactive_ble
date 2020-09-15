@@ -1,4 +1,5 @@
 import class CoreBluetooth.CBUUID
+import class CoreBluetooth.CBService
 import enum CoreBluetooth.CBManagerState
 import var CoreBluetooth.CBAdvertisementDataServiceDataKey
 import var CoreBluetooth.CBAdvertisementDataManufacturerDataKey
@@ -61,6 +62,7 @@ final class PluginController {
 
                 switch change {
                 case .connected:
+                    // Wait for services & characteristics to be discovered
                     return
                 case .failedToConnect(let underlyingError), .disconnected(let underlyingError):
                     failure = underlyingError.map { (.failedToConnect, "\($0)") }
@@ -79,7 +81,7 @@ final class PluginController {
 
                 context.connectedDeviceSink?.add(.success(message))
             },
-            onServicesWithCharacteristicsDiscovery: papply(weak: self) { context, central, peripheral, errors in
+            onServicesWithCharacteristicsInitialDiscovery: papply(weak: self) { context, central, peripheral, errors in
                 guard let sink = context.connectedDeviceSink
                 else { assert(false); return }
 
@@ -246,6 +248,45 @@ final class PluginController {
         completion(.success(nil))
 
         central.disconnect(from: deviceID)
+    }
+
+    func discoverServices(name: String, args: DiscoverServicesRequest, completion: @escaping PlatformMethodCompletionHandler) {
+        guard let central = central
+        else {
+            completion(.failure(PluginError.notInitialized.asFlutterError))
+            return
+        }
+
+        guard let deviceID = UUID(uuidString: args.deviceID)
+        else {
+            completion(.failure(PluginError.invalidMethodCall(method: name, details: "\"deviceID\" is invalid").asFlutterError))
+            return
+        }
+
+        func makeDiscoveredService(service: CBService) -> DiscoveredServices {
+            DiscoveredServices.with {
+                $0.serviceUuid = Uuid.with { $0.data = service.uuid.data }
+                $0.characteristicUuid = (service.characteristics ?? []).map { characteristic in
+                    Uuid.with { $0.data = characteristic.uuid.data }
+                }
+                $0.includedServices = (service.includedServices ?? []).map(makeDiscoveredService)
+            }
+        }
+
+        do {
+            try central.discoverServicesWithCharacteristics(
+                for: deviceID,
+                discover: .all,
+                completion: { central, peripheral, errors in
+                    completion(.success(DiscoverServicesInfo.with {
+                        $0.deviceID = deviceID.uuidString
+                        $0.services = (peripheral.services ?? []).map(makeDiscoveredService)
+                    }))
+                }
+            )
+        } catch {
+            completion(.failure(PluginError.unknown(error).asFlutterError))
+        }
     }
 
     func enableCharacteristicNotifications(name: String, args: NotifyCharacteristicRequest, completion: @escaping PlatformMethodCompletionHandler) {
