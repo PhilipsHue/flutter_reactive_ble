@@ -191,18 +191,18 @@ class ProtobufMessageConverter {
                 .build()
     }
 
-    private fun fromBluetoothGattService(gattService: BluetoothGattService): pb.DiscoveredServices {
-        return pb.DiscoveredServices.newBuilder()
+    private fun fromBluetoothGattService(gattService: BluetoothGattService): pb.DiscoveredService {
+        return pb.DiscoveredService.newBuilder()
                 .setServiceUuid(createUuidFromParcelUuid(gattService.uuid))
-                .addAllCharacteristicUuid(gattService.characteristics.map { createUuidFromParcelUuid(it.uuid) })
+                .addAllCharacteristicUuids(gattService.characteristics.map { createUuidFromParcelUuid(it.uuid) })
                 .addAllIncludedServices(gattService.includedServices.map { convertInternalService(it) })
                 .build()
     }
 
-    private fun convertInternalService(gattService: BluetoothGattService): pb.DiscoveredServices {
-        val root = pb.DiscoveredServices.newBuilder()
+    private fun convertInternalService(gattService: BluetoothGattService): pb.DiscoveredService {
+        val root = pb.DiscoveredService.newBuilder()
                 .setServiceUuid(createUuidFromParcelUuid(gattService.uuid))
-                .addAllCharacteristicUuid(gattService.characteristics.map { createUuidFromParcelUuid(it.uuid) })
+                .addAllCharacteristicUuids(gattService.characteristics.map { createUuidFromParcelUuid(it.uuid) })
 
         val children = gattService.includedServices.map {
             convertInternalService(it)
