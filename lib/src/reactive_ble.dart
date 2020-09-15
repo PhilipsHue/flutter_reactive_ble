@@ -301,7 +301,7 @@ class FlutterReactiveBle {
   /// Performs service discovery on the peripheral and returns the discovered services.
   ///
   /// When discovery fails this method will throw an [Exception].
-  Future<List<DiscoveredServices>> discoverServices(String deviceId) =>
+  Future<List<DiscoveredService>> discoverServices(String deviceId) =>
       _pluginController.discoverServices(deviceId).then(
           (discoveredServicesInfo) =>
               discoveredServicesInfo.result.dematerialize());

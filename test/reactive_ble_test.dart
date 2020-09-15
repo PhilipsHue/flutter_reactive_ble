@@ -586,7 +586,7 @@ void main() {
         });
 
         test('It returns result', () async {
-          expect(await _sut.discoverServices(deviceId), <DiscoveredServices>[]);
+          expect(await _sut.discoverServices(deviceId), <DiscoveredService>[]);
         });
       });
 

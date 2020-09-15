@@ -355,21 +355,6 @@ const ServiceWithCharacteristics$json = const {
   ],
 };
 
-const Uuid$json = const {
-  '1': 'Uuid',
-  '2': const [
-    const {'1': 'data', '3': 1, '4': 1, '5': 12, '10': 'data'},
-  ],
-};
-
-const GenericFailure$json = const {
-  '1': 'GenericFailure',
-  '2': const [
-    const {'1': 'code', '3': 1, '4': 1, '5': 5, '10': 'code'},
-    const {'1': 'message', '3': 2, '4': 1, '5': 9, '10': 'message'},
-  ],
-};
-
 const DiscoverServicesRequest$json = const {
   '1': 'DiscoverServicesRequest',
   '2': const [
@@ -386,7 +371,7 @@ const DiscoverServicesInfo$json = const {
       '3': 2,
       '4': 3,
       '5': 11,
-      '6': '.DiscoveredServices',
+      '6': '.DiscoveredService',
       '10': 'services'
     },
     const {
@@ -400,8 +385,8 @@ const DiscoverServicesInfo$json = const {
   ],
 };
 
-const DiscoveredServices$json = const {
-  '1': 'DiscoveredServices',
+const DiscoveredService$json = const {
+  '1': 'DiscoveredService',
   '2': const [
     const {
       '1': 'serviceUuid',
@@ -412,20 +397,35 @@ const DiscoveredServices$json = const {
       '10': 'serviceUuid'
     },
     const {
-      '1': 'characteristicUuid',
+      '1': 'characteristicUuids',
       '3': 2,
       '4': 3,
       '5': 11,
       '6': '.Uuid',
-      '10': 'characteristicUuid'
+      '10': 'characteristicUuids'
     },
     const {
       '1': 'includedServices',
       '3': 3,
       '4': 3,
       '5': 11,
-      '6': '.DiscoveredServices',
+      '6': '.DiscoveredService',
       '10': 'includedServices'
     },
+  ],
+};
+
+const Uuid$json = const {
+  '1': 'Uuid',
+  '2': const [
+    const {'1': 'data', '3': 1, '4': 1, '5': 12, '10': 'data'},
+  ],
+};
+
+const GenericFailure$json = const {
+  '1': 'GenericFailure',
+  '2': const [
+    const {'1': 'code', '3': 1, '4': 1, '5': 5, '10': 'code'},
+    const {'1': 'message', '3': 2, '4': 1, '5': 9, '10': 'message'},
   ],
 };

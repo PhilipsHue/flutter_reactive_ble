@@ -13,11 +13,11 @@ part of 'discovered_services.dart';
 abstract class $DiscoverServicesInfo {
   const $DiscoverServicesInfo();
   String get deviceId;
-  Result<List<DiscoveredServices>, GenericFailure<DiscoverServicesFailure>>
+  Result<List<DiscoveredService>, GenericFailure<DiscoverServicesFailure>>
       get result;
   DiscoverServicesInfo copyWith(
           {String deviceId,
-          Result<List<DiscoveredServices>,
+          Result<List<DiscoveredService>,
                   GenericFailure<DiscoverServicesFailure>>
               result}) =>
       DiscoverServicesInfo(
@@ -44,7 +44,7 @@ class DiscoverServicesInfo$ {
       (s_) => s_.deviceId, (s_, deviceId) => s_.copyWith(deviceId: deviceId));
   static final result = Lens<
           DiscoverServicesInfo,
-          Result<List<DiscoveredServices>,
+          Result<List<DiscoveredService>,
               GenericFailure<DiscoverServicesFailure>>>(
       (s_) => s_.result, (s_, result) => s_.copyWith(result: result));
 }
@@ -57,12 +57,12 @@ abstract class $DiscoveredServices {
   const $DiscoveredServices();
   Uuid get serviceUuid;
   List<Uuid> get characteristics;
-  List<DiscoveredServices> get includedServices;
-  DiscoveredServices copyWith(
+  List<DiscoveredService> get includedServices;
+  DiscoveredService copyWith(
           {Uuid serviceUuid,
           List<Uuid> characteristics,
-          List<DiscoveredServices> includedServices}) =>
-      DiscoveredServices(
+          List<DiscoveredService> includedServices}) =>
+      DiscoveredService(
           serviceUuid: serviceUuid ?? this.serviceUuid,
           characteristics: characteristics ?? this.characteristics,
           includedServices: includedServices ?? this.includedServices);
@@ -89,14 +89,14 @@ abstract class $DiscoveredServices {
 }
 
 class DiscoveredServices$ {
-  static final serviceUuid = Lens<DiscoveredServices, Uuid>(
+  static final serviceUuid = Lens<DiscoveredService, Uuid>(
       (s_) => s_.serviceUuid,
       (s_, serviceUuid) => s_.copyWith(serviceUuid: serviceUuid));
-  static final characteristics = Lens<DiscoveredServices, List<Uuid>>(
+  static final characteristics = Lens<DiscoveredService, List<Uuid>>(
       (s_) => s_.characteristics,
       (s_, characteristics) => s_.copyWith(characteristics: characteristics));
   static final includedServices =
-      Lens<DiscoveredServices, List<DiscoveredServices>>(
+      Lens<DiscoveredService, List<DiscoveredService>>(
           (s_) => s_.includedServices,
           (s_, includedServices) =>
               s_.copyWith(includedServices: includedServices));

@@ -184,10 +184,10 @@ class ProtobufConverter {
     );
   }
 
-  DiscoveredServices _convertServices(pb.DiscoveredServices service) =>
-      DiscoveredServices(
+  DiscoveredService _convertServices(pb.DiscoveredService service) =>
+      DiscoveredService(
         serviceUuid: Uuid(service.serviceUuid.data),
-        characteristics: service.characteristicUuid
+        characteristics: service.characteristicUuids
             .map((c) => Uuid(c.data))
             .toList(growable: false),
         includedServices: service.includedServices
@@ -195,10 +195,10 @@ class ProtobufConverter {
             .toList(growable: false),
       );
 
-  DiscoveredServices _convertInternalServices(pb.DiscoveredServices service) {
-    final root = DiscoveredServices(
+  DiscoveredService _convertInternalServices(pb.DiscoveredService service) {
+    final root = DiscoveredService(
       serviceUuid: Uuid(service.serviceUuid.data),
-      characteristics: service.characteristicUuid
+      characteristics: service.characteristicUuids
           .map((c) => Uuid(c.data))
           .toList(growable: false),
     );

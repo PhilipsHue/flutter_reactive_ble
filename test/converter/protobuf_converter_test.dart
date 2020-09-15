@@ -478,13 +478,13 @@ void main() {
           final charUuid = pb.Uuid()..data = [0, 1, 1];
           final internalCharUuid = pb.Uuid()..data = [1, 1];
 
-          final discoveredInternalServices = pb.DiscoveredServices()
+          final discoveredInternalServices = pb.DiscoveredService()
             ..serviceUuid = internalServiceUuid
-            ..characteristicUuid.add(internalCharUuid);
+            ..characteristicUuids.add(internalCharUuid);
 
-          final discoveredService = pb.DiscoveredServices()
+          final discoveredService = pb.DiscoveredService()
             ..serviceUuid = serviceUuid
-            ..characteristicUuid.add(charUuid)
+            ..characteristicUuids.add(charUuid)
             ..includedServices.add(discoveredInternalServices);
 
           message = pb.DiscoverServicesInfo()
@@ -502,13 +502,13 @@ void main() {
           expect(
             convertedResult.result.dematerialize(),
             [
-              DiscoveredServices(
+              DiscoveredService(
                 serviceUuid: Uuid([0]),
                 characteristics: [
                   Uuid([0, 1, 1])
                 ],
                 includedServices: [
-                  DiscoveredServices(
+                  DiscoveredService(
                     serviceUuid: Uuid([1]),
                     characteristics: [
                       Uuid([1, 1])

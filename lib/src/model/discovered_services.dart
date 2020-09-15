@@ -18,13 +18,13 @@ class DiscoverServicesInfo extends $DiscoverServicesInfo {
 
   final String deviceId;
   @CustomEquality(DeepCollectionEquality())
-  final Result<List<DiscoveredServices>,
-      GenericFailure<DiscoverServicesFailure>> result;
+  final Result<List<DiscoveredService>, GenericFailure<DiscoverServicesFailure>>
+      result;
 }
 
 @FunctionalData()
-class DiscoveredServices extends $DiscoveredServices {
-  const DiscoveredServices({
+class DiscoveredService extends $DiscoveredServices {
+  const DiscoveredService({
     @required this.serviceUuid,
     @required this.characteristics,
     this.includedServices = const [],
@@ -36,7 +36,7 @@ class DiscoveredServices extends $DiscoveredServices {
   final List<Uuid> characteristics;
 
   @CustomEquality(DeepCollectionEquality())
-  final List<DiscoveredServices> includedServices;
+  final List<DiscoveredService> includedServices;
 }
 
 enum DiscoverServicesFailure { unknown }

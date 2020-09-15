@@ -263,10 +263,10 @@ final class PluginController {
             return
         }
 
-        func makeDiscoveredService(service: CBService) -> DiscoveredServices {
-            DiscoveredServices.with {
+        func makeDiscoveredService(service: CBService) -> DiscoveredService {
+            DiscoveredService.with {
                 $0.serviceUuid = Uuid.with { $0.data = service.uuid.data }
-                $0.characteristicUuid = (service.characteristics ?? []).map { characteristic in
+                $0.characteristicUuids = (service.characteristics ?? []).map { characteristic in
                     Uuid.with { $0.data = characteristic.uuid.data }
                 }
                 $0.includedServices = (service.includedServices ?? []).map(makeDiscoveredService)

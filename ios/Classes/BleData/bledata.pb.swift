@@ -56,7 +56,7 @@ struct DeviceScanInfo {
 
   var serviceData: [ServiceDataEntry] = []
 
-  var manufacturerData: Data = SwiftProtobuf.Internal.emptyData
+  var manufacturerData: Data = Data()
 
   var rssi: Int32 = 0
 
@@ -239,7 +239,7 @@ struct CharacteristicValueInfo {
   /// Clears the value of `characteristic`. Subsequent reads from it will return its default value.
   mutating func clearCharacteristic() {self._characteristic = nil}
 
-  var value: Data = SwiftProtobuf.Internal.emptyData
+  var value: Data = Data()
 
   var failure: GenericFailure {
     get {return _failure ?? GenericFailure()}
@@ -272,7 +272,7 @@ struct WriteCharacteristicRequest {
   /// Clears the value of `characteristic`. Subsequent reads from it will return its default value.
   mutating func clearCharacteristic() {self._characteristic = nil}
 
-  var value: Data = SwiftProtobuf.Internal.emptyData
+  var value: Data = Data()
 
   var unknownFields = SwiftProtobuf.UnknownStorage()
 
@@ -447,7 +447,7 @@ struct ServiceDataEntry {
   /// Clears the value of `serviceUuid`. Subsequent reads from it will return its default value.
   mutating func clearServiceUuid() {self._serviceUuid = nil}
 
-  var data: Data = SwiftProtobuf.Internal.emptyData
+  var data: Data = Data()
 
   var unknownFields = SwiftProtobuf.UnknownStorage()
 
@@ -491,32 +491,6 @@ struct ServiceWithCharacteristics {
   fileprivate var _serviceID: Uuid? = nil
 }
 
-struct Uuid {
-  // SwiftProtobuf.Message conformance is added in an extension below. See the
-  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
-  // methods supported on all messages.
-
-  var data: Data = SwiftProtobuf.Internal.emptyData
-
-  var unknownFields = SwiftProtobuf.UnknownStorage()
-
-  init() {}
-}
-
-struct GenericFailure {
-  // SwiftProtobuf.Message conformance is added in an extension below. See the
-  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
-  // methods supported on all messages.
-
-  var code: Int32 = 0
-
-  var message: String = String()
-
-  var unknownFields = SwiftProtobuf.UnknownStorage()
-
-  init() {}
-}
-
 struct DiscoverServicesRequest {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
@@ -536,7 +510,7 @@ struct DiscoverServicesInfo {
 
   var deviceID: String = String()
 
-  var services: [DiscoveredServices] = []
+  var services: [DiscoveredService] = []
 
   var failure: GenericFailure {
     get {return _failure ?? GenericFailure()}
@@ -554,7 +528,7 @@ struct DiscoverServicesInfo {
   fileprivate var _failure: GenericFailure? = nil
 }
 
-struct DiscoveredServices {
+struct DiscoveredService {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -568,15 +542,41 @@ struct DiscoveredServices {
   /// Clears the value of `serviceUuid`. Subsequent reads from it will return its default value.
   mutating func clearServiceUuid() {self._serviceUuid = nil}
 
-  var characteristicUuid: [Uuid] = []
+  var characteristicUuids: [Uuid] = []
 
-  var includedServices: [DiscoveredServices] = []
+  var includedServices: [DiscoveredService] = []
 
   var unknownFields = SwiftProtobuf.UnknownStorage()
 
   init() {}
 
   fileprivate var _serviceUuid: Uuid? = nil
+}
+
+struct Uuid {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  var data: Data = Data()
+
+  var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  init() {}
+}
+
+struct GenericFailure {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  var code: Int32 = 0
+
+  var message: String = String()
+
+  var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  init() {}
 }
 
 // MARK: - Code below here is support for the SwiftProtobuf runtime.
@@ -1363,70 +1363,6 @@ extension ServiceWithCharacteristics: SwiftProtobuf.Message, SwiftProtobuf._Mess
   }
 }
 
-extension Uuid: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = "Uuid"
-  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
-    1: .same(proto: "data"),
-  ]
-
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
-    while let fieldNumber = try decoder.nextFieldNumber() {
-      switch fieldNumber {
-      case 1: try decoder.decodeSingularBytesField(value: &self.data)
-      default: break
-      }
-    }
-  }
-
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if !self.data.isEmpty {
-      try visitor.visitSingularBytesField(value: self.data, fieldNumber: 1)
-    }
-    try unknownFields.traverse(visitor: &visitor)
-  }
-
-  static func ==(lhs: Uuid, rhs: Uuid) -> Bool {
-    if lhs.data != rhs.data {return false}
-    if lhs.unknownFields != rhs.unknownFields {return false}
-    return true
-  }
-}
-
-extension GenericFailure: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = "GenericFailure"
-  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
-    1: .same(proto: "code"),
-    2: .same(proto: "message"),
-  ]
-
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
-    while let fieldNumber = try decoder.nextFieldNumber() {
-      switch fieldNumber {
-      case 1: try decoder.decodeSingularInt32Field(value: &self.code)
-      case 2: try decoder.decodeSingularStringField(value: &self.message)
-      default: break
-      }
-    }
-  }
-
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if self.code != 0 {
-      try visitor.visitSingularInt32Field(value: self.code, fieldNumber: 1)
-    }
-    if !self.message.isEmpty {
-      try visitor.visitSingularStringField(value: self.message, fieldNumber: 2)
-    }
-    try unknownFields.traverse(visitor: &visitor)
-  }
-
-  static func ==(lhs: GenericFailure, rhs: GenericFailure) -> Bool {
-    if lhs.code != rhs.code {return false}
-    if lhs.message != rhs.message {return false}
-    if lhs.unknownFields != rhs.unknownFields {return false}
-    return true
-  }
-}
-
 extension DiscoverServicesRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = "DiscoverServicesRequest"
   static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
@@ -1497,11 +1433,11 @@ extension DiscoverServicesInfo: SwiftProtobuf.Message, SwiftProtobuf._MessageImp
   }
 }
 
-extension DiscoveredServices: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = "DiscoveredServices"
+extension DiscoveredService: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  static let protoMessageName: String = "DiscoveredService"
   static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "serviceUuid"),
-    2: .same(proto: "characteristicUuid"),
+    2: .same(proto: "characteristicUuids"),
     3: .same(proto: "includedServices"),
   ]
 
@@ -1509,7 +1445,7 @@ extension DiscoveredServices: SwiftProtobuf.Message, SwiftProtobuf._MessageImple
     while let fieldNumber = try decoder.nextFieldNumber() {
       switch fieldNumber {
       case 1: try decoder.decodeSingularMessageField(value: &self._serviceUuid)
-      case 2: try decoder.decodeRepeatedMessageField(value: &self.characteristicUuid)
+      case 2: try decoder.decodeRepeatedMessageField(value: &self.characteristicUuids)
       case 3: try decoder.decodeRepeatedMessageField(value: &self.includedServices)
       default: break
       }
@@ -1520,8 +1456,8 @@ extension DiscoveredServices: SwiftProtobuf.Message, SwiftProtobuf._MessageImple
     if let v = self._serviceUuid {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 1)
     }
-    if !self.characteristicUuid.isEmpty {
-      try visitor.visitRepeatedMessageField(value: self.characteristicUuid, fieldNumber: 2)
+    if !self.characteristicUuids.isEmpty {
+      try visitor.visitRepeatedMessageField(value: self.characteristicUuids, fieldNumber: 2)
     }
     if !self.includedServices.isEmpty {
       try visitor.visitRepeatedMessageField(value: self.includedServices, fieldNumber: 3)
@@ -1529,10 +1465,74 @@ extension DiscoveredServices: SwiftProtobuf.Message, SwiftProtobuf._MessageImple
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: DiscoveredServices, rhs: DiscoveredServices) -> Bool {
+  static func ==(lhs: DiscoveredService, rhs: DiscoveredService) -> Bool {
     if lhs._serviceUuid != rhs._serviceUuid {return false}
-    if lhs.characteristicUuid != rhs.characteristicUuid {return false}
+    if lhs.characteristicUuids != rhs.characteristicUuids {return false}
     if lhs.includedServices != rhs.includedServices {return false}
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+extension Uuid: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  static let protoMessageName: String = "Uuid"
+  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "data"),
+  ]
+
+  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      switch fieldNumber {
+      case 1: try decoder.decodeSingularBytesField(value: &self.data)
+      default: break
+      }
+    }
+  }
+
+  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    if !self.data.isEmpty {
+      try visitor.visitSingularBytesField(value: self.data, fieldNumber: 1)
+    }
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  static func ==(lhs: Uuid, rhs: Uuid) -> Bool {
+    if lhs.data != rhs.data {return false}
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+extension GenericFailure: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  static let protoMessageName: String = "GenericFailure"
+  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "code"),
+    2: .same(proto: "message"),
+  ]
+
+  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      switch fieldNumber {
+      case 1: try decoder.decodeSingularInt32Field(value: &self.code)
+      case 2: try decoder.decodeSingularStringField(value: &self.message)
+      default: break
+      }
+    }
+  }
+
+  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    if self.code != 0 {
+      try visitor.visitSingularInt32Field(value: self.code, fieldNumber: 1)
+    }
+    if !self.message.isEmpty {
+      try visitor.visitSingularStringField(value: self.message, fieldNumber: 2)
+    }
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  static func ==(lhs: GenericFailure, rhs: GenericFailure) -> Bool {
+    if lhs.code != rhs.code {return false}
+    if lhs.message != rhs.message {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
