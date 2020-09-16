@@ -50,10 +50,6 @@ sealed class RequestConnectionPriorityResult
 data class RequestConnectionPrioritySuccess(val deviceId: String) : RequestConnectionPriorityResult()
 data class RequestConnectionPriorityFailed(val deviceId: String, val errorMessage: String) : RequestConnectionPriorityResult()
 
-sealed class DiscoverServicesResult
-data class DiscoverServicesSuccess(val result: RxBleDeviceServices) : DiscoverServicesResult()
-data class DiscoverServicesFailure(val deviceId: String, val errorMessage: String) : DiscoverServicesResult()
-
 enum class BleStatus(val code: Int) {
     UNKNOWN(code = 0),
     UNSUPPORTED(code = 1),

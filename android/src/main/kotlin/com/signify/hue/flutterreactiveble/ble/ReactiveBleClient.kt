@@ -5,11 +5,7 @@ import android.content.Context
 import android.os.Build
 import android.os.ParcelUuid
 import androidx.annotation.VisibleForTesting
-import com.polidea.rxandroidble2.LogConstants
-import com.polidea.rxandroidble2.LogOptions
-import com.polidea.rxandroidble2.RxBleClient
-import com.polidea.rxandroidble2.RxBleConnection
-import com.polidea.rxandroidble2.RxBleDevice
+import com.polidea.rxandroidble2.*
 import com.polidea.rxandroidble2.scan.ScanFilter
 import com.polidea.rxandroidble2.scan.ScanSettings
 import com.signify.hue.flutterreactiveble.ble.extensions.writeCharWithResponse
@@ -107,17 +103,15 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
             activeConnections[deviceId]?.let(DeviceConnector::clearGattCache)
                     ?: Completable.error(IllegalStateException("Device is not connected"))
 
-    override fun discoverServices(deviceId: String): Single<DiscoverServicesResult> {
+    override fun discoverServices(deviceId: String): Single<RxBleDeviceServices> {
 
         return getConnection(deviceId).flatMapSingle { connectionResult ->
                 when (connectionResult) {
                     is EstablishedConnection ->
-                        connectionResult.rxConnection.discoverServices().map { result ->
-                           DiscoverServicesSuccess(result)
-                        }
-                    is EstablishConnectionFailure -> Single.just(DiscoverServicesFailure(deviceId, connectionResult.errorMessage))
+                        connectionResult.rxConnection.discoverServices()
+                    is EstablishConnectionFailure -> Single.error(Exception(connectionResult.errorMessage))
                 }
-        }.first(DiscoverServicesFailure(deviceId, "Discovering services didn't return a result"))
+        }.firstOrError()
     }
 
     override fun readCharacteristic(deviceId: String, characteristic: UUID): Single<CharOperationResult> =

@@ -1,6 +1,7 @@
 package com.signify.hue.flutterreactiveble.ble
 
 import android.os.ParcelUuid
+import com.polidea.rxandroidble2.RxBleDeviceServices
 import com.signify.hue.flutterreactiveble.model.ScanMode
 import com.signify.hue.flutterreactiveble.utils.Duration
 import io.reactivex.Completable
@@ -19,7 +20,7 @@ interface BleClient {
     fun connectToDevice(deviceId: String, timeout: Duration)
     fun disconnectDevice(deviceId: String)
     fun disconnectAllDevices()
-    fun discoverServices(deviceId: String): Single<DiscoverServicesResult>
+    fun discoverServices(deviceId: String): Single<RxBleDeviceServices>
     fun clearGattCache(deviceId: String): Completable
     fun readCharacteristic(deviceId: String, characteristic: UUID): Single<CharOperationResult>
     fun setupNotification(deviceId: String, characteristic: UUID): Observable<ByteArray>

@@ -2,10 +2,8 @@ package com.signify.hue.flutterreactiveble.converters
 
 import android.bluetooth.BluetoothGattService
 import com.google.protobuf.ByteString
+import com.polidea.rxandroidble2.RxBleDeviceServices
 import com.signify.hue.flutterreactiveble.ble.ConnectionUpdateSuccess
-import com.signify.hue.flutterreactiveble.ble.DiscoverServicesFailure
-import com.signify.hue.flutterreactiveble.ble.DiscoverServicesResult
-import com.signify.hue.flutterreactiveble.ble.DiscoverServicesSuccess
 import com.signify.hue.flutterreactiveble.ble.MtuNegotiateFailed
 import com.signify.hue.flutterreactiveble.ble.MtuNegotiateResult
 import com.signify.hue.flutterreactiveble.ble.MtuNegotiateSuccesful
@@ -165,30 +163,12 @@ class ProtobufMessageConverter {
 
     fun convertDiscoverServicesInfo(
             deviceId: String,
-            discoverResult: DiscoverServicesResult
+            services: RxBleDeviceServices
     ): pb.DiscoverServicesInfo {
-        return when (discoverResult) {
-            is DiscoverServicesSuccess ->
-                pb.DiscoverServicesInfo.newBuilder()
-                        .setDeviceId(deviceId)
-                        .addAllServices(discoverResult.result.bluetoothGattServices.map { fromBluetoothGattService(it) })
-                        .build()
-
-            is DiscoverServicesFailure -> {
-                convertDiscoverServicesFailure(deviceId, discoverResult.errorMessage)
-            }
-        }
-    }
-
-    fun convertDiscoverServicesFailure(deviceId: String, message: String?): pb.DiscoverServicesInfo {
-        val failure = pb.GenericFailure.newBuilder()
-                .setCode(0)
-                .setMessage(message ?: "")
-
         return pb.DiscoverServicesInfo.newBuilder()
-                .setDeviceId(deviceId)
-                .setFailure(failure)
-                .build()
+                        .setDeviceId(deviceId)
+                        .addAllServices(services.bluetoothGattServices.map { fromBluetoothGattService(it) })
+                        .build()
     }
 
     private fun fromBluetoothGattService(gattService: BluetoothGattService): pb.DiscoveredService {

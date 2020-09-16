@@ -322,14 +322,14 @@ class ReactiveBleClientTest {
 
             val result = sut.discoverServices("test").test()
 
-            assertThat(result.values().first()).isInstanceOf(DiscoverServicesSuccess::class.java)
+            assertThat(result.values().first()).isInstanceOf(RxBleDeviceServices::class.java)
         }
 
         @Test
         fun `It returns failure when connectionfailed`() {
             subject.onNext(EstablishConnectionFailure("test", "error"))
             val result = sut.discoverServices("test").test()
-            assertThat(result.values().first()).isInstanceOf(DiscoverServicesFailure::class.java)
+            result.assertError(Exception::class.java)
         }
     }
 }

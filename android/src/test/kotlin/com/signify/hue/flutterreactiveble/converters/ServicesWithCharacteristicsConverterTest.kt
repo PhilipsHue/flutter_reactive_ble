@@ -4,7 +4,6 @@ import android.bluetooth.BluetoothGattCharacteristic
 import android.bluetooth.BluetoothGattService
 import com.google.common.truth.Truth.assertThat
 import com.polidea.rxandroidble2.RxBleDeviceServices
-import com.signify.hue.flutterreactiveble.ble.DiscoverServicesSuccess
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
@@ -63,7 +62,7 @@ class ServicesWithCharacteristicsConverterTest {
         every { internalServiceLevel2.characteristics }.returns(listOf(internalCharacteristicLevel2))
 
         conversionResult = sut.convertDiscoverServicesInfo("test",
-                DiscoverServicesSuccess(RxBleDeviceServices(listOf(service))))
+                RxBleDeviceServices(listOf(service)))
     }
 
     @Test
@@ -73,7 +72,7 @@ class ServicesWithCharacteristicsConverterTest {
 
     @Test
     fun `It converts characteristic uuid`() {
-        assertThat(conversionResult.getServices(0).characteristicUuidCount).isEqualTo(1)
+        assertThat(conversionResult.getServices(0).characteristicUuidsCount).isEqualTo(1)
     }
 
 

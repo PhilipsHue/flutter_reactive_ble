@@ -259,7 +259,7 @@ class PluginController {
                 .subscribe({ discoverResult ->
                     result.success(protoConverter.convertDiscoverServicesInfo(request.deviceId, discoverResult).toByteArray())
                 }, {
-                    throwable -> result.success(protoConverter.convertDiscoverServicesFailure(request.deviceId, throwable.message))
+                    throwable -> result.error("service_discovery_failure", throwable.message, null)
                 })
                 .discard()
     }
