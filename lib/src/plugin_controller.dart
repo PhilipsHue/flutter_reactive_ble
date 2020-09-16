@@ -294,7 +294,6 @@ class PluginController {
 }
 
 class PluginControllerFactory {
-  // This injection is temporarily until we moved everything out.
   const PluginControllerFactory();
 
   PluginController create(DebugLogger logger) {
