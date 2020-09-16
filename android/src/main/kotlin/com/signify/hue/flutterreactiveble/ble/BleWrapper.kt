@@ -1,7 +1,6 @@
 package com.signify.hue.flutterreactiveble.ble
 
 import com.polidea.rxandroidble2.RxBleConnection
-import com.polidea.rxandroidble2.RxBleDeviceServices
 import java.util.UUID
 
 data class ScanInfo(val deviceId: String, val name: String, val rssi: Int, val serviceData: Map<UUID, ByteArray>, val manufacturerData: ByteArray) {

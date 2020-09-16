@@ -576,33 +576,17 @@ void main() {
     group('Discover Services', () {
       const deviceId = '123';
 
-      group('When operation is succesfull', () {
-        const result = DiscoverServicesInfo(
-            deviceId: deviceId, result: Result.success([]));
+      group('When operation is successful', () {
+        const result = <DiscoveredService>[];
+
         setUp(() {
           when(_pluginController.discoverServices(deviceId)).thenAnswer(
-            (_) => Future.value(result),
+            (_) async => result,
           );
         });
 
         test('It returns result', () async {
           expect(await _sut.discoverServices(deviceId), <DiscoveredService>[]);
-        });
-      });
-
-      group('When operation failed', () {
-        const failure = GenericFailure(
-            code: DiscoverServicesFailure.unknown, message: "Fail!");
-        const result = DiscoverServicesInfo(
-            deviceId: deviceId, result: Result.failure(failure));
-        setUp(() {
-          when(_pluginController.discoverServices(deviceId)).thenAnswer(
-            (_) => Future.value(result),
-          );
-        });
-
-        test('It returns result', () async {
-          expect(() async => _sut.discoverServices(deviceId), throwsException);
         });
       });
     });

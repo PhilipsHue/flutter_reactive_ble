@@ -5,7 +5,12 @@ import android.content.Context
 import android.os.Build
 import android.os.ParcelUuid
 import androidx.annotation.VisibleForTesting
-import com.polidea.rxandroidble2.*
+import com.polidea.rxandroidble2.LogConstants
+import com.polidea.rxandroidble2.LogOptions
+import com.polidea.rxandroidble2.RxBleClient
+import com.polidea.rxandroidble2.RxBleConnection
+import com.polidea.rxandroidble2.RxBleDevice
+import com.polidea.rxandroidble2.RxBleDeviceServices
 import com.polidea.rxandroidble2.scan.ScanFilter
 import com.polidea.rxandroidble2.scan.ScanSettings
 import com.signify.hue.flutterreactiveble.ble.extensions.writeCharWithResponse

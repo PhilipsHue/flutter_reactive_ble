@@ -577,8 +577,14 @@ void main() {
     group('Discover services', () {
       const deviceId = "testdevice";
       pb.DiscoverServicesRequest request;
-
-      DiscoverServicesInfo result;
+      final services = [
+        DiscoveredService(
+          serviceId: Uuid([0x01, 0x02]),
+          characteristicIds: const [],
+          includedServices: const [],
+        ),
+      ];
+      List<DiscoveredService> result;
 
       setUp(() async {
         request = pb.DiscoverServicesRequest();
@@ -586,9 +592,8 @@ void main() {
             .thenAnswer((_) => Future.value([1]));
         when(_argsConverter.createDiscoverServicesRequest(deviceId))
             .thenReturn(request);
-        when(_protobufConverter.discoveredServicesFrom(any)).thenReturn(
-            const DiscoverServicesInfo(
-                deviceId: deviceId, result: Result.success([])));
+        when(_protobufConverter.discoveredServicesFrom(any))
+            .thenReturn(services);
         result = await _sut.discoverServices(deviceId);
       });
 
@@ -607,8 +612,8 @@ void main() {
         verify(_protobufConverter.discoveredServicesFrom([1])).called(1);
       });
 
-      test('It returns discoverservices info as result', () {
-        expect(result.deviceId, deviceId);
+      test('It returns discovered services', () {
+        expect(result, services);
       });
     });
   });
