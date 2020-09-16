@@ -498,7 +498,7 @@ void main() {
           (realInvocation) => Future.value(),
         );
 
-        await _sut.deInitialize();
+        await _sut.deinitialize();
       });
 
       test('It invokes correct method in method channel', () {

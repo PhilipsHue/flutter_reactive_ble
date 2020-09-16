@@ -122,7 +122,7 @@ void main() {
 
     group('Deinitialize', () {
       setUp(() async {
-        when(_pluginController.deInitialize()).thenAnswer(
+        when(_pluginController.deinitialize()).thenAnswer(
           (_) => Future.value(),
         );
 
@@ -130,7 +130,7 @@ void main() {
       });
 
       test('It calls plugincontroller deinitailize method', () {
-        verify(_pluginController.deInitialize()).called(1);
+        verify(_pluginController.deinitialize()).called(1);
       });
     });
 

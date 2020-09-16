@@ -512,20 +512,9 @@ struct DiscoverServicesInfo {
 
   var services: [DiscoveredService] = []
 
-  var failure: GenericFailure {
-    get {return _failure ?? GenericFailure()}
-    set {_failure = newValue}
-  }
-  /// Returns true if `failure` has been explicitly set.
-  var hasFailure: Bool {return self._failure != nil}
-  /// Clears the value of `failure`. Subsequent reads from it will return its default value.
-  mutating func clearFailure() {self._failure = nil}
-
   var unknownFields = SwiftProtobuf.UnknownStorage()
 
   init() {}
-
-  fileprivate var _failure: GenericFailure? = nil
 }
 
 struct DiscoveredService {
@@ -1397,7 +1386,6 @@ extension DiscoverServicesInfo: SwiftProtobuf.Message, SwiftProtobuf._MessageImp
   static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "deviceId"),
     2: .same(proto: "services"),
-    3: .same(proto: "failure"),
   ]
 
   mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -1405,7 +1393,6 @@ extension DiscoverServicesInfo: SwiftProtobuf.Message, SwiftProtobuf._MessageImp
       switch fieldNumber {
       case 1: try decoder.decodeSingularStringField(value: &self.deviceID)
       case 2: try decoder.decodeRepeatedMessageField(value: &self.services)
-      case 3: try decoder.decodeSingularMessageField(value: &self._failure)
       default: break
       }
     }
@@ -1418,16 +1405,12 @@ extension DiscoverServicesInfo: SwiftProtobuf.Message, SwiftProtobuf._MessageImp
     if !self.services.isEmpty {
       try visitor.visitRepeatedMessageField(value: self.services, fieldNumber: 2)
     }
-    if let v = self._failure {
-      try visitor.visitSingularMessageField(value: v, fieldNumber: 3)
-    }
     try unknownFields.traverse(visitor: &visitor)
   }
 
   static func ==(lhs: DiscoverServicesInfo, rhs: DiscoverServicesInfo) -> Bool {
     if lhs.deviceID != rhs.deviceID {return false}
     if lhs.services != rhs.services {return false}
-    if lhs._failure != rhs._failure {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }

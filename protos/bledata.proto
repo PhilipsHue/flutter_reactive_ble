@@ -121,7 +121,6 @@ message DiscoverServicesRequest {
 message DiscoverServicesInfo {
     string deviceId = 1;
     repeated DiscoveredService services = 2;
-    GenericFailure failure = 3;
 }
 
 message DiscoveredService {

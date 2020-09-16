@@ -1347,7 +1347,6 @@ class DiscoverServicesInfo extends $pb.GeneratedMessage {
         ..aOS(1, 'deviceId', protoName: 'deviceId')
         ..pc<DiscoveredService>(2, 'services', $pb.PbFieldType.PM,
             subBuilder: DiscoveredService.create)
-        ..aOM<GenericFailure>(3, 'failure', subBuilder: GenericFailure.create)
         ..hasRequiredFields = false;
 
   DiscoverServicesInfo._() : super();
@@ -1387,20 +1386,6 @@ class DiscoverServicesInfo extends $pb.GeneratedMessage {
 
   @$pb.TagNumber(2)
   $core.List<DiscoveredService> get services => $_getList(1);
-
-  @$pb.TagNumber(3)
-  GenericFailure get failure => $_getN(2);
-  @$pb.TagNumber(3)
-  set failure(GenericFailure v) {
-    setField(3, v);
-  }
-
-  @$pb.TagNumber(3)
-  $core.bool hasFailure() => $_has(2);
-  @$pb.TagNumber(3)
-  void clearFailure() => clearField(3);
-  @$pb.TagNumber(3)
-  GenericFailure ensureFailure() => $_ensure(2);
 }
 
 class DiscoveredService extends $pb.GeneratedMessage {

@@ -12,10 +12,10 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 
 void main() {
-  group('ProtobufConverter', () {
+  group('$ProtobufConverter', () {
     const sut = ProtobufConverter();
 
-    group("DeviceScanInfo conversion", () {
+    group("decoding ${pb.DeviceScanInfo}", () {
       const id = 'id';
       const name = 'name';
 
@@ -81,7 +81,7 @@ void main() {
             manufacturerData);
       });
 
-      group('Given Scan fails', () {
+      group('given Scan fails', () {
         setUp(() {
           final failure = pb.GenericFailure()
             ..code = 0
@@ -91,16 +91,18 @@ void main() {
         });
         test('converts failure', () {
           expect(
-              scanresult.result.iif(
-                  success: (d) =>
-                      d.serviceData[Uuid(serviceDataEntry1.serviceUuid.data)],
-                  failure: (_) => "Failed"),
-              "Failed");
+            scanresult.result.iif(
+              success: (d) =>
+                  d.serviceData[Uuid(serviceDataEntry1.serviceUuid.data)],
+              failure: (_) => "Failed",
+            ),
+            "Failed",
+          );
         });
       });
     });
 
-    group("GenericError conversion", () {
+    group("decoding ${pb.GenericFailure}", () {
       test("returns null if error is absent", () {
         final error = sut.genericFailureFrom(
           hasFailure: false,
@@ -187,7 +189,7 @@ void main() {
       });
     });
 
-    group("Result conversion", () {
+    group("constructing $Result", () {
       test("converts a failure", () {
         final getter = _ResultValueGetterMock<String>();
         const failure = "failure";
@@ -213,13 +215,13 @@ void main() {
       });
     });
 
-    group("ConnectionStateUpdate conversion", () {
+    group("constructing $ConnectionStateUpdate", () {
       const id = 'id';
       const connectionState = 1;
 
       List<int> message;
 
-      group('Message without failure', () {
+      group('given a message without a failure', () {
         setUp(() {
           final info = pb.DeviceInfo()
             ..id = id
@@ -228,18 +230,18 @@ void main() {
           message = info.writeToBuffer();
         });
 
-        test('Converts id', () {
+        test('device ID is decoded', () {
           final result = sut.connectionStateUpdateFrom(message);
           expect(result.deviceId, id);
         });
 
-        test('Converts status update', () {
+        test('connection state is decoded', () {
           final result = sut.connectionStateUpdateFrom(message);
           expect(result.connectionState, DeviceConnectionState.connected);
         });
       });
 
-      group('Message with failure', () {
+      group('given message with a failure', () {
         setUp(() {
           final failure = pb.GenericFailure()
             ..code = 0
@@ -248,14 +250,14 @@ void main() {
           message = deviceInfo.writeToBuffer();
         });
 
-        test('converts failure', () {
+        test('failure is decoded', () {
           final updateResult = sut.connectionStateUpdateFrom(message).failure;
           expect(updateResult.message, "failure");
           expect(updateResult.code, ConnectionError.unknown);
         });
       });
 
-      group('Irregular statuscode ', () {
+      group('given an unknown status code', () {
         setUp(() {
           final info = pb.DeviceInfo()
             ..id = id
@@ -264,25 +266,28 @@ void main() {
           message = info.writeToBuffer();
         });
 
-        test('converts unknown code throws', () {
+        test('decoding fails', () {
           expect(
-              () => sut.connectionStateUpdateFrom(message), throwsA(anything));
+            () => sut.connectionStateUpdateFrom(message),
+            throwsA(anything),
+          );
         });
       });
     });
 
-    group('Converts clear gatt cache result', () {
-      test('Succeeds', () {
+    group('decoding clear GATT cache result', () {
+      test('succeeds', () {
         final result = sut
             .clearGattCacheResultFrom(pb.ClearGattCacheInfo().writeToBuffer());
 
         expect(
-            result,
-            const Result<Unit, GenericFailure<ClearGattCacheError>>.success(
-                Unit()));
+          result,
+          const Result<Unit, GenericFailure<ClearGattCacheError>>.success(
+              Unit()),
+        );
       });
 
-      test('Fails', () {
+      test('fails', () {
         final message = (pb.ClearGattCacheInfo()..failure = pb.GenericFailure())
             .writeToBuffer();
         final result = sut.clearGattCacheResultFrom(message).iif(
@@ -292,7 +297,8 @@ void main() {
         expect(result.code, ClearGattCacheError.unknown);
       });
     });
-    group("Characteristic value", () {
+
+    group("decoding ${pb.CharacteristicValueInfo}", () {
       const id = 'id';
       const value = [2, 3];
       pb.CharacteristicValueInfo message;
@@ -305,7 +311,7 @@ void main() {
           ..characteristicUuid = (pb.Uuid()..data = [1]);
       });
 
-      group('Given no error occured', () {
+      group('given no error occurred', () {
         CharacteristicValue result;
 
         setUp(() {
@@ -316,18 +322,18 @@ void main() {
           result = sut.characteristicValueFrom(message.writeToBuffer());
         });
 
-        test('It converts device id', () {
+        test('device ID is converted', () {
           expect(result.characteristic.deviceId, id);
         });
-        test('It converts service uuid', () {
+        test('service ID is converted', () {
           expect(result.characteristic.serviceId, Uuid([00]));
         });
 
-        test('It converts characteristic uuid', () {
+        test('characteristic ID is converted', () {
           expect(result.characteristic.characteristicId, Uuid([01]));
         });
 
-        test('it converts value', () {
+        test('value is converted', () {
           final charValue = result.result.iif(
             success: (v) => v,
             failure: (_) => throw AssertionError("Not expected to fail"),
@@ -336,9 +342,10 @@ void main() {
         });
       });
 
-      group('Given error occured', () {
+      group('given an error occurred', () {
         List<int> failureMessage;
         String result;
+
         setUp(() {
           failureMessage =
               (message..failure = pb.GenericFailure()).writeToBuffer();
@@ -346,13 +353,14 @@ void main() {
               success: (_) => throw AssertionError("Not expected to succeed"),
               failure: (_) => "failure");
         });
-        test('it converts failure', () {
+
+        test('failure is converted', () {
           expect(result, "failure");
         });
       });
     });
 
-    group("Converts writecharacteristic info", () {
+    group("Decoding ${pb.WriteCharacteristicInfo}", () {
       const id = 'id';
 
       List<int> data;
@@ -370,11 +378,12 @@ void main() {
         data = message.writeToBuffer();
       });
 
-      test('It converts device id', () {
+      test('device ID is converted', () {
         final result = sut.writeCharacteristicInfoFrom(data);
         expect(result.characteristic.deviceId, id);
       });
-      test('It converts service uuid', () {
+
+      test('service ID is converted', () {
         final result = sut.writeCharacteristicInfoFrom(data);
         expect(result.characteristic.serviceId, Uuid([00]));
       });
@@ -402,13 +411,14 @@ void main() {
             .writeCharacteristicInfoFrom(failureMessage.writeToBuffer())
             .result
             .iif(
-                success: (_) => throw AssertionError("Not expected to succeed"),
-                failure: (f) => f);
+              success: (_) => throw AssertionError("Not expected to succeed"),
+              failure: (f) => f,
+            );
         expect(result.code, WriteCharacteristicFailure.unknown);
       });
     });
 
-    group('Converts connection priority info', () {
+    group('decoding ${pb.ChangeConnectionPriorityInfo}', () {
       const id = 'id';
 
       pb.ChangeConnectionPriorityInfo message;
@@ -417,17 +427,19 @@ void main() {
         message = pb.ChangeConnectionPriorityInfo()..deviceId = id;
       });
 
-      test('Succeeds', () {
+      test('succeeds', () {
         final result =
             sut.connectionPriorityInfoFrom(message.writeToBuffer()).result;
         expect(
-            result.iif(
-                success: (_) => "success",
-                failure: (_) => throw AssertionError("Not expected to fail")),
-            "success");
+          result.iif(
+            success: (_) => "success",
+            failure: (_) => throw AssertionError("Not expected to fail"),
+          ),
+          "success",
+        );
       });
 
-      test('Fails', () {
+      test('fails', () {
         final failureMessage = message..failure = pb.GenericFailure();
         final result = sut
             .connectionPriorityInfoFrom(failureMessage.writeToBuffer())
@@ -439,19 +451,19 @@ void main() {
       });
     });
 
-    group('Converts Blestatus', () {
-      test('Converts valid status', () {
+    group('decoding ${pb.BleStatusInfo}', () {
+      test('converts valid status', () {
         final message = pb.BleStatusInfo()..status = 5;
         expect(sut.bleStatusFrom(message.writeToBuffer()), BleStatus.ready);
       });
 
-      test('Fallsback in case of invalid status', () {
+      test('falls back in case of invalid status', () {
         final message = pb.BleStatusInfo()..status = 6;
         expect(sut.bleStatusFrom(message.writeToBuffer()), BleStatus.unknown);
       });
     });
 
-    group('Coverts mtu size', () {
+    group('Coverts MTU size', () {
       const size = 20;
       int result;
 
@@ -461,17 +473,17 @@ void main() {
         result = sut.mtuSizeFrom(message.writeToBuffer());
       });
 
-      test('It convert mtu size size', () {
+      test('MTU size is decoded', () {
         expect(result, 20);
       });
     });
 
-    group('Converts Discover services ', () {
+    group('decoding ${pb.DiscoveredService} ', () {
       const deviceId = "testDevice";
       pb.DiscoverServicesInfo message;
-      DiscoverServicesInfo convertedResult;
+      List<DiscoveredService> convertedResult;
 
-      group('Given message has no failure', () {
+      group('given a message without a failure', () {
         setUp(() {
           final serviceUuid = pb.Uuid()..data = [0];
           final internalServiceUuid = pb.Uuid()..data = [1];
@@ -494,23 +506,19 @@ void main() {
           convertedResult = sut.discoveredServicesFrom(message.writeToBuffer());
         });
 
-        test('It converts device id', () {
-          expect(convertedResult.deviceId, deviceId);
-        });
-
-        test('It converts services', () {
+        test('services are decoded', () {
           expect(
-            convertedResult.result.dematerialize(),
+            convertedResult,
             [
               DiscoveredService(
-                serviceUuid: Uuid([0]),
-                characteristics: [
+                serviceId: Uuid([0]),
+                characteristicIds: [
                   Uuid([0, 1, 1])
                 ],
                 includedServices: [
                   DiscoveredService(
-                    serviceUuid: Uuid([1]),
-                    characteristics: [
+                    serviceId: Uuid([1]),
+                    characteristicIds: [
                       Uuid([1, 1])
                     ],
                     includedServices: [],
@@ -518,29 +526,6 @@ void main() {
                 ],
               )
             ],
-          );
-        });
-      });
-
-      group('Given message has a failure', () {
-        const failureMessage = "Discovered services failure";
-        setUp(() {
-          final failure = pb.GenericFailure()..message = failureMessage;
-
-          message = pb.DiscoverServicesInfo()
-            ..deviceId = deviceId
-            ..failure = failure;
-
-          convertedResult = sut.discoveredServicesFrom(message.writeToBuffer());
-        });
-
-        test('It converts failure', () {
-          expect(
-            convertedResult.result.iif(
-                success: (_) => throw AssertionError("should not happen"),
-                failure: (f) => f),
-            const GenericFailure<DiscoverServicesFailure>(
-                code: DiscoverServicesFailure.unknown, message: failureMessage),
           );
         });
       });

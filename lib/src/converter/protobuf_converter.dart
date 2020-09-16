@@ -167,47 +167,21 @@ class ProtobufConverter {
     return null;
   }
 
-  DiscoverServicesInfo discoveredServicesFrom(List<int> data) {
+  List<DiscoveredService> discoveredServicesFrom(List<int> data) {
     final message = pb.DiscoverServicesInfo.fromBuffer(data);
-    return DiscoverServicesInfo(
-      deviceId: message.deviceId,
-      result: resultFrom(
-        getValue: () =>
-            message.services.map(_convertServices).toList(growable: false),
-        failure: genericFailureFrom(
-          hasFailure: message.hasFailure(),
-          getFailure: () => message.failure,
-          codes: DiscoverServicesFailure.values,
-          fallback: (rawOrNull) => DiscoverServicesFailure.unknown,
-        ),
-      ),
-    );
+    return message.services.map(_convertService).toList(growable: false);
   }
 
-  DiscoveredService _convertServices(pb.DiscoveredService service) =>
+  DiscoveredService _convertService(pb.DiscoveredService service) =>
       DiscoveredService(
-        serviceUuid: Uuid(service.serviceUuid.data),
-        characteristics: service.characteristicUuids
+        serviceId: Uuid(service.serviceUuid.data),
+        characteristicIds: service.characteristicUuids
             .map((c) => Uuid(c.data))
             .toList(growable: false),
         includedServices: service.includedServices
-            .map(_convertInternalServices)
+            .map(_convertService)
             .toList(growable: false),
       );
-
-  DiscoveredService _convertInternalServices(pb.DiscoveredService service) {
-    final root = DiscoveredService(
-      serviceUuid: Uuid(service.serviceUuid.data),
-      characteristics: service.characteristicUuids
-          .map((c) => Uuid(c.data))
-          .toList(growable: false),
-    );
-
-    final children =
-        service.includedServices.map(_convertInternalServices).toList();
-
-    return root.copyWith(includedServices: children);
-  }
 
   @visibleForTesting
   Result<Value, Failure> resultFrom<Value, Failure>(

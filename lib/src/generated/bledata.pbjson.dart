@@ -374,14 +374,6 @@ const DiscoverServicesInfo$json = const {
       '6': '.DiscoveredService',
       '10': 'services'
     },
-    const {
-      '1': 'failure',
-      '3': 3,
-      '4': 1,
-      '5': 11,
-      '6': '.GenericFailure',
-      '10': 'failure'
-    },
   ],
 };
 

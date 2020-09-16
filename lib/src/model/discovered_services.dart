@@ -10,30 +10,17 @@ part 'discovered_services.g.dart';
 //ignore_for_file: annotate_overrides
 
 @FunctionalData()
-class DiscoverServicesInfo extends $DiscoverServicesInfo {
-  const DiscoverServicesInfo({
-    @required this.deviceId,
-    @required this.result,
-  });
-
-  final String deviceId;
-  @CustomEquality(DeepCollectionEquality())
-  final Result<List<DiscoveredService>, GenericFailure<DiscoverServicesFailure>>
-      result;
-}
-
-@FunctionalData()
-class DiscoveredService extends $DiscoveredServices {
+class DiscoveredService extends $DiscoveredService {
   const DiscoveredService({
-    @required this.serviceUuid,
-    @required this.characteristics,
+    @required this.serviceId,
+    @required this.characteristicIds,
     this.includedServices = const [],
   });
 
-  final Uuid serviceUuid;
+  final Uuid serviceId;
 
   @CustomEquality(DeepCollectionEquality())
-  final List<Uuid> characteristics;
+  final List<Uuid> characteristicIds;
 
   @CustomEquality(DeepCollectionEquality())
   final List<DiscoveredService> includedServices;

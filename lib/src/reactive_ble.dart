@@ -144,7 +144,7 @@ class FlutterReactiveBle {
   Future<void> deinitialize() async {
     if (_initialization != null) {
       _initialization = null;
-      await _pluginController.deInitialize();
+      await _pluginController.deinitialize();
     }
   }
 
@@ -302,9 +302,7 @@ class FlutterReactiveBle {
   ///
   /// When discovery fails this method throws an [Exception].
   Future<List<DiscoveredService>> discoverServices(String deviceId) =>
-      _pluginController.discoverServices(deviceId).then(
-          (discoveredServicesInfo) =>
-              discoveredServicesInfo.result.dematerialize());
+      _pluginController.discoverServices(deviceId);
 
   /// Clears GATT attribute cache on Android using undocumented API. Completes with an error in case of a failure.
   ///
