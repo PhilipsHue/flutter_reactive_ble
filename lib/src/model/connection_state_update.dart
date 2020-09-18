@@ -5,7 +5,7 @@ import 'package:meta/meta.dart';
 part 'connection_state_update.g.dart';
 //ignore_for_file: annotate_overrides
 
-///Status update for a specic BLE device.
+///Status update for a specific BLE device.
 @immutable
 @FunctionalData()
 class ConnectionStateUpdate extends $ConnectionStateUpdate {

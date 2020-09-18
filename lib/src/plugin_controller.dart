@@ -10,6 +10,7 @@ import 'converter/protobuf_converter.dart';
 import 'model/characteristic_value.dart';
 import 'model/clear_gatt_cache_error.dart';
 import 'model/connection_state_update.dart';
+import 'model/discovered_services.dart';
 import 'model/qualified_characteristic.dart';
 import 'model/unit.dart';
 
@@ -109,16 +110,16 @@ class PluginController {
       });
 
   Future<void> initialize() {
-    _debugLogger.log('Inititialize ble client');
+    _debugLogger.log('Initialize ble client');
     return _bleMethodChannel.invokeMethod("initialize");
   }
 
-  Future<void> deInitialize() {
+  Future<void> deinitialize() {
     _debugLogger.log('DeIititialize ble client');
     return _bleMethodChannel.invokeMethod<void>("deinitialize");
   }
 
-  Stream<Object> scanForDevices({
+  Stream<void> scanForDevices({
     @required List<Uuid> withServices,
     @required ScanMode scanMode,
     @required bool requireLocationServicesEnabled,
@@ -140,7 +141,7 @@ class PluginController {
         .asStream();
   }
 
-  Stream<Object> connectToDevice(
+  Stream<void> connectToDevice(
     String id,
     Map<Uuid, List<Uuid>> servicesWithCharacteristicsToDiscover,
     Duration connectionTimeout,
@@ -172,7 +173,7 @@ class PluginController {
     );
   }
 
-  Stream<Object> readCharacteristic(QualifiedCharacteristic characteristic) {
+  Stream<void> readCharacteristic(QualifiedCharacteristic characteristic) {
     _debugLogger.log('Read characteristic $characteristic');
     return _bleMethodChannel
         .invokeMethod<void>(
@@ -185,9 +186,10 @@ class PluginController {
   }
 
   Future<WriteCharacteristicInfo> writeCharacteristicWithResponse(
-      QualifiedCharacteristic characteristic, List<int> value) async {
-    _debugLogger.log(
-        'Write with response $QualifiedCharacteristic: $characteristic, value: $value');
+    QualifiedCharacteristic characteristic,
+    List<int> value,
+  ) async {
+    _debugLogger.log('Write with response to $characteristic, value: $value');
     return _bleMethodChannel
         .invokeMethod<List<int>>(
             "writeCharacteristicWithResponse",
@@ -198,9 +200,11 @@ class PluginController {
   }
 
   Future<WriteCharacteristicInfo> writeCharacteristicWithoutResponse(
-      QualifiedCharacteristic characteristic, List<int> value) async {
-    _debugLogger.log(
-        'Write without response $QualifiedCharacteristic: $characteristic, value: $value');
+    QualifiedCharacteristic characteristic,
+    List<int> value,
+  ) async {
+    _debugLogger
+        .log('Write without response to $characteristic, value: $value');
     return _bleMethodChannel
         .invokeMethod<List<int>>(
           "writeCharacteristicWithoutResponse",
@@ -211,10 +215,10 @@ class PluginController {
         .then(_protobufConverter.writeCharacteristicInfoFrom);
   }
 
-  Stream<Object> subscribeToNotifications(
-      QualifiedCharacteristic characteristic) {
-    _debugLogger.log(
-        'Start subscribing to notifications for $QualifiedCharacteristic: $characteristic');
+  Stream<void> subscribeToNotifications(
+    QualifiedCharacteristic characteristic,
+  ) {
+    _debugLogger.log('Start subscribing to notifications for $characteristic');
     return _bleMethodChannel
         .invokeMethod<void>(
           "readNotifications",
@@ -226,9 +230,9 @@ class PluginController {
   }
 
   Future<void> stopSubscribingToNotifications(
-      QualifiedCharacteristic characteristic) {
-    _debugLogger.log(
-        'Stop subscribing to notifications for $QualifiedCharacteristic: $characteristic');
+    QualifiedCharacteristic characteristic,
+  ) {
+    _debugLogger.log('Stop subscribing to notifications for $characteristic');
 
     return _bleMethodChannel
         .invokeMethod<void>(
@@ -238,7 +242,8 @@ class PluginController {
               .writeToBuffer(),
         )
         .catchError(
-            (Object e) => print("Error unsubscribing from notifications: $e"));
+          (Object e) => print("Error unsubscribing from notifications: $e"),
+        );
   }
 
   Future<int> requestMtuSize(String deviceId, int mtu) async {
@@ -280,10 +285,19 @@ class PluginController {
         )
         .then(_protobufConverter.clearGattCacheResultFrom);
   }
+
+  Future<List<DiscoveredService>> discoverServices(String deviceId) async =>
+      _bleMethodChannel
+          .invokeMethod<List<int>>(
+            'discoverServices',
+            _argsToProtobufConverter
+                .createDiscoverServicesRequest(deviceId)
+                .writeToBuffer(),
+          )
+          .then(_protobufConverter.discoveredServicesFrom);
 }
 
 class PluginControllerFactory {
-  // this injection is temporarily until we moved everythin out
   const PluginControllerFactory();
 
   PluginController create(DebugLogger logger) {

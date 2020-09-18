@@ -1,15 +1,25 @@
 package com.signify.hue.flutterreactiveble.converters
 
+import android.bluetooth.BluetoothGattService
 import com.google.protobuf.ByteString
-import com.signify.hue.flutterreactiveble.ProtobufModel as pb
-import com.signify.hue.flutterreactiveble.model.ScanErrorType
-import com.signify.hue.flutterreactiveble.model.ConnectionState
-import com.signify.hue.flutterreactiveble.model.ClearGattCacheErrorType
+import com.polidea.rxandroidble2.RxBleDeviceServices
+import com.signify.hue.flutterreactiveble.ble.ConnectionUpdateSuccess
+import com.signify.hue.flutterreactiveble.ble.MtuNegotiateFailed
+import com.signify.hue.flutterreactiveble.ble.MtuNegotiateResult
+import com.signify.hue.flutterreactiveble.ble.MtuNegotiateSuccesful
+import com.signify.hue.flutterreactiveble.ble.RequestConnectionPriorityFailed
+import com.signify.hue.flutterreactiveble.ble.RequestConnectionPriorityResult
+import com.signify.hue.flutterreactiveble.ble.RequestConnectionPrioritySuccess
+import com.signify.hue.flutterreactiveble.ble.ScanInfo
 import com.signify.hue.flutterreactiveble.model.CharacteristicErrorType
-import com.signify.hue.flutterreactiveble.model.NegotiateMtuErrorType
+import com.signify.hue.flutterreactiveble.model.ClearGattCacheErrorType
 import com.signify.hue.flutterreactiveble.model.ConnectionErrorType
-
+import com.signify.hue.flutterreactiveble.model.ConnectionState
+import com.signify.hue.flutterreactiveble.model.NegotiateMtuErrorType
+import com.signify.hue.flutterreactiveble.model.ScanErrorType
 import java.util.UUID
+import com.signify.hue.flutterreactiveble.ProtobufModel as pb
+
 @Suppress("TooManyFunctions")
 class ProtobufMessageConverter {
 
@@ -20,7 +30,7 @@ class ProtobufMessageConverter {
 
     private val uuidConverter = UuidConverter()
 
-    fun convertScanInfo(scanInfo: com.signify.hue.flutterreactiveble.ble.ScanInfo): pb.DeviceScanInfo =
+    fun convertScanInfo(scanInfo: ScanInfo): pb.DeviceScanInfo =
             pb.DeviceScanInfo.newBuilder()
                     .setId(scanInfo.deviceId)
                     .setName(scanInfo.name)
@@ -37,15 +47,15 @@ class ProtobufMessageConverter {
                             .build())
                     .build()
 
-    fun convertToDeviceInfo(connection: com.signify.hue.flutterreactiveble.ble.ConnectionUpdateSuccess): pb.DeviceInfo =
+    fun convertToDeviceInfo(connection: ConnectionUpdateSuccess): pb.DeviceInfo =
             pb.DeviceInfo.newBuilder()
                     .setId(connection.deviceId)
                     .setConnectionState(connection.connectionState)
                     .build()
 
     fun convertConnectionErrorToDeviceInfo(
-        deviceId: String,
-        errorMessage: String?
+            deviceId: String,
+            errorMessage: String?
     ): pb.DeviceInfo {
 
         return pb.DeviceInfo.newBuilder()
@@ -65,8 +75,8 @@ class ProtobufMessageConverter {
     }
 
     fun convertCharacteristicInfo(
-        request: pb.CharacteristicAddress,
-        value: ByteArray
+            request: pb.CharacteristicAddress,
+            value: ByteArray
     ): pb.CharacteristicValueInfo {
 
         val characteristicAddress = createCharacteristicAddress(request)
@@ -78,8 +88,8 @@ class ProtobufMessageConverter {
     }
 
     fun convertCharacteristicError(
-        request: pb.CharacteristicAddress,
-        error: String?
+            request: pb.CharacteristicAddress,
+            error: String?
     ): pb.CharacteristicValueInfo {
         val characteristicAdress = createCharacteristicAddress(request)
         val failure = pb.GenericFailure.newBuilder()
@@ -93,8 +103,8 @@ class ProtobufMessageConverter {
     }
 
     fun convertWriteCharacteristicInfo(
-        request: pb.WriteCharacteristicRequest,
-        error: String?
+            request: pb.WriteCharacteristicRequest,
+            error: String?
     ): pb.WriteCharacteristicInfo {
         val builder = pb.WriteCharacteristicInfo.newBuilder()
                 .setCharacteristic(request.characteristic)
@@ -110,13 +120,13 @@ class ProtobufMessageConverter {
         return builder.build()
     }
 
-    fun convertNegotiateMtuInfo(result: com.signify.hue.flutterreactiveble.ble.MtuNegotiateResult): pb.NegotiateMtuInfo =
+    fun convertNegotiateMtuInfo(result: MtuNegotiateResult): pb.NegotiateMtuInfo =
             when (result) {
-                is com.signify.hue.flutterreactiveble.ble.MtuNegotiateSuccesful -> pb.NegotiateMtuInfo.newBuilder()
+                is MtuNegotiateSuccesful -> pb.NegotiateMtuInfo.newBuilder()
                         .setDeviceId(result.deviceId)
                         .setMtuSize(result.size)
                         .build()
-                is com.signify.hue.flutterreactiveble.ble.MtuNegotiateFailed -> {
+                is MtuNegotiateFailed -> {
 
                     val failure = pb.GenericFailure.newBuilder()
                             .setCode(NegotiateMtuErrorType.UNKNOWN.code)
@@ -131,13 +141,13 @@ class ProtobufMessageConverter {
             }
 
     fun convertRequestConnectionPriorityInfo(
-        result: com.signify.hue.flutterreactiveble.ble.RequestConnectionPriorityResult
+            result: RequestConnectionPriorityResult
     ): pb.ChangeConnectionPriorityInfo {
         return when (result) {
-            is com.signify.hue.flutterreactiveble.ble.RequestConnectionPrioritySuccess -> pb.ChangeConnectionPriorityInfo.newBuilder()
+            is RequestConnectionPrioritySuccess -> pb.ChangeConnectionPriorityInfo.newBuilder()
                     .setDeviceId(result.deviceId)
                     .build()
-            is com.signify.hue.flutterreactiveble.ble.RequestConnectionPriorityFailed -> {
+            is RequestConnectionPriorityFailed -> {
                 val failure = pb.GenericFailure.newBuilder()
                         .setCode(0)
                         .setMessage(result.errorMessage)
@@ -149,6 +159,35 @@ class ProtobufMessageConverter {
                         .build()
             }
         }
+    }
+
+    fun convertDiscoverServicesInfo(
+            deviceId: String,
+            services: RxBleDeviceServices
+    ): pb.DiscoverServicesInfo {
+        return pb.DiscoverServicesInfo.newBuilder()
+                        .setDeviceId(deviceId)
+                        .addAllServices(services.bluetoothGattServices.map { fromBluetoothGattService(it) })
+                        .build()
+    }
+
+    private fun fromBluetoothGattService(gattService: BluetoothGattService): pb.DiscoveredService {
+        return pb.DiscoveredService.newBuilder()
+                .setServiceUuid(createUuidFromParcelUuid(gattService.uuid))
+                .addAllCharacteristicUuids(gattService.characteristics.map { createUuidFromParcelUuid(it.uuid) })
+                .addAllIncludedServices(gattService.includedServices.map { convertInternalService(it) })
+                .build()
+    }
+
+    private fun convertInternalService(gattService: BluetoothGattService): pb.DiscoveredService {
+        val root = pb.DiscoveredService.newBuilder()
+                .setServiceUuid(createUuidFromParcelUuid(gattService.uuid))
+                .addAllCharacteristicUuids(gattService.characteristics.map { createUuidFromParcelUuid(it.uuid) })
+
+        val children = gattService.includedServices.map {
+            convertInternalService(it)
+        }
+        return root.addAllIncludedServices(children).build()
     }
 
     private fun createCharacteristicAddress(request: pb.CharacteristicAddress):

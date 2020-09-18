@@ -7,6 +7,7 @@ import 'package:flutter_reactive_ble/src/model/clear_gatt_cache_error.dart';
 import 'package:flutter_reactive_ble/src/model/connection_priority.dart';
 import 'package:flutter_reactive_ble/src/model/connection_state_update.dart';
 import 'package:flutter_reactive_ble/src/model/discovered_device.dart';
+import 'package:flutter_reactive_ble/src/model/discovered_services.dart';
 import 'package:flutter_reactive_ble/src/model/generic_failure.dart';
 import 'package:flutter_reactive_ble/src/model/qualified_characteristic.dart';
 import 'package:flutter_reactive_ble/src/model/result.dart';
@@ -38,18 +39,19 @@ class ProtobufConverter {
 
     return ScanResult(
       result: resultFrom(
-          getValue: () => DiscoveredDevice(
-                id: message.id,
-                name: message.name,
-                serviceData: serviceData,
-                manufacturerData: Uint8List.fromList(message.manufacturerData),
-                rssi: message.rssi,
-              ),
-          failure: genericFailureFrom(
-              hasFailure: message.hasFailure(),
-              getFailure: () => message.failure,
-              codes: ScanFailure.values,
-              fallback: (rawOrNull) => ScanFailure.unknown)),
+        getValue: () => DiscoveredDevice(
+          id: message.id,
+          name: message.name,
+          serviceData: serviceData,
+          manufacturerData: Uint8List.fromList(message.manufacturerData),
+          rssi: message.rssi,
+        ),
+        failure: genericFailureFrom(
+            hasFailure: message.hasFailure(),
+            getFailure: () => message.failure,
+            codes: ScanFailure.values,
+            fallback: (rawOrNull) => ScanFailure.unknown),
+      ),
     );
   }
 
@@ -164,6 +166,22 @@ class ProtobufConverter {
     }
     return null;
   }
+
+  List<DiscoveredService> discoveredServicesFrom(List<int> data) {
+    final message = pb.DiscoverServicesInfo.fromBuffer(data);
+    return message.services.map(_convertService).toList(growable: false);
+  }
+
+  DiscoveredService _convertService(pb.DiscoveredService service) =>
+      DiscoveredService(
+        serviceId: Uuid(service.serviceUuid.data),
+        characteristicIds: service.characteristicUuids
+            .map((c) => Uuid(c.data))
+            .toList(growable: false),
+        includedServices: service.includedServices
+            .map(_convertService)
+            .toList(growable: false),
+      );
 
   @visibleForTesting
   Result<Value, Failure> resultFrom<Value, Failure>(

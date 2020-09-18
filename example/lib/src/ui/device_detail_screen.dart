@@ -24,6 +24,7 @@ class DeviceDetailScreen extends StatelessWidget {
                 ),
           connect: deviceConnector.connect,
           disconnect: deviceConnector.disconnect,
+          discoverServices: deviceConnector.discoverServices,
         ),
       );
 }
@@ -34,17 +35,20 @@ class _DeviceDetail extends StatelessWidget {
     @required this.connectionUpdate,
     @required this.connect,
     @required this.disconnect,
+    @required this.discoverServices,
     Key key,
   })  : assert(device != null),
         assert(connectionUpdate != null),
         assert(connect != null),
         assert(disconnect != null),
+        assert(discoverServices != null),
         super(key: key);
 
   final DiscoveredDevice device;
   final ConnectionStateUpdate connectionUpdate;
   final void Function(String deviceId) connect;
   final void Function(String deviceId) disconnect;
+  final void Function(String deviceId) discoverServices;
 
   bool _deviceConnected() =>
       connectionUpdate.connectionState == DeviceConnectionState.connected;
@@ -97,6 +101,15 @@ class _DeviceDetail extends StatelessWidget {
                             ? () => disconnect(device.id)
                             : null,
                         child: const Text("Disconnect"),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: RaisedButton(
+                        onPressed: _deviceConnected()
+                            ? () => discoverServices(device.id)
+                            : null,
+                        child: const Text("Discover Services"),
                       ),
                     ),
                   ],

@@ -8,6 +8,7 @@ import 'package:flutter_reactive_ble/src/converter/protobuf_converter.dart';
 import 'package:flutter_reactive_ble/src/debug_logger.dart';
 import 'package:flutter_reactive_ble/src/generated/bledata.pbserver.dart' as pb;
 import 'package:flutter_reactive_ble/src/model/clear_gatt_cache_error.dart';
+import 'package:flutter_reactive_ble/src/model/discovered_services.dart';
 import 'package:flutter_reactive_ble/src/model/unit.dart';
 import 'package:flutter_reactive_ble/src/plugin_controller.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -497,7 +498,7 @@ void main() {
           (realInvocation) => Future.value(),
         );
 
-        await _sut.deInitialize();
+        await _sut.deinitialize();
       });
 
       test('It invokes correct method in method channel', () {
@@ -570,6 +571,49 @@ void main() {
 
       test('It emits correct values', () {
         expect(_bleStatusStream, emitsInOrder(<BleStatus>[status1, status2]));
+      });
+    });
+
+    group('Discover services', () {
+      const deviceId = "testdevice";
+      pb.DiscoverServicesRequest request;
+      final services = [
+        DiscoveredService(
+          serviceId: Uuid([0x01, 0x02]),
+          characteristicIds: const [],
+          includedServices: const [],
+        ),
+      ];
+      List<DiscoveredService> result;
+
+      setUp(() async {
+        request = pb.DiscoverServicesRequest();
+        when(_methodChannel.invokeMethod<List<int>>('discoverServices', any))
+            .thenAnswer((_) => Future.value([1]));
+        when(_argsConverter.createDiscoverServicesRequest(deviceId))
+            .thenReturn(request);
+        when(_protobufConverter.discoveredServicesFrom(any))
+            .thenReturn(services);
+        result = await _sut.discoverServices(deviceId);
+      });
+
+      test('It calls args to protobuf converted with correct arguments', () {
+        verify(_argsConverter.createDiscoverServicesRequest(deviceId))
+            .called(1);
+      });
+
+      test('It invokes methodchannel with correct arguments', () {
+        verify(_methodChannel.invokeMethod<List<int>>(
+                'discoverServices', request.writeToBuffer()))
+            .called(1);
+      });
+
+      test('It invokes protobuf converter with correct arguments', () {
+        verify(_protobufConverter.discoveredServicesFrom([1])).called(1);
+      });
+
+      test('It returns discovered services', () {
+        expect(result, services);
       });
     });
   });

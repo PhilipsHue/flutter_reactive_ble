@@ -10,6 +10,7 @@ import com.polidea.rxandroidble2.LogOptions
 import com.polidea.rxandroidble2.RxBleClient
 import com.polidea.rxandroidble2.RxBleConnection
 import com.polidea.rxandroidble2.RxBleDevice
+import com.polidea.rxandroidble2.RxBleDeviceServices
 import com.polidea.rxandroidble2.scan.ScanFilter
 import com.polidea.rxandroidble2.scan.ScanSettings
 import com.signify.hue.flutterreactiveble.ble.extensions.writeCharWithResponse
@@ -106,6 +107,17 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
     override fun clearGattCache(deviceId: String): Completable =
             activeConnections[deviceId]?.let(DeviceConnector::clearGattCache)
                     ?: Completable.error(IllegalStateException("Device is not connected"))
+
+    override fun discoverServices(deviceId: String): Single<RxBleDeviceServices> {
+
+        return getConnection(deviceId).flatMapSingle { connectionResult ->
+                when (connectionResult) {
+                    is EstablishedConnection ->
+                        connectionResult.rxConnection.discoverServices()
+                    is EstablishConnectionFailure -> Single.error(Exception(connectionResult.errorMessage))
+                }
+        }.firstOrError()
+    }
 
     override fun readCharacteristic(deviceId: String, characteristic: UUID): Single<CharOperationResult> =
             getConnection(deviceId).flatMapSingle<CharOperationResult> { connectionResult ->

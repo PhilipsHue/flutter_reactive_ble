@@ -2,12 +2,16 @@ package com.signify.hue.flutterreactiveble.converters
 
 import com.google.common.truth.Truth.assertThat
 import com.google.protobuf.ByteString
-import com.signify.hue.flutterreactiveble.ProtobufModel as pb
+import com.signify.hue.flutterreactiveble.ble.ConnectionUpdateSuccess
+import com.signify.hue.flutterreactiveble.ble.MtuNegotiateFailed
+import com.signify.hue.flutterreactiveble.ble.MtuNegotiateSuccesful
+import com.signify.hue.flutterreactiveble.ble.ScanInfo
 import com.signify.hue.flutterreactiveble.model.NegotiateMtuErrorType
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import java.util.UUID
+import com.signify.hue.flutterreactiveble.ProtobufModel as pb
 
 class ProtobufMessageConverterTest {
     val protobufConverter = ProtobufMessageConverter()
@@ -89,14 +93,14 @@ class ProtobufMessageConverterTest {
         @Test
         fun `converts device id as parameter in device connection message`() {
             val deviceId = "2"
-            val connection = com.signify.hue.flutterreactiveble.ble.ConnectionUpdateSuccess(deviceId, 2)
+            val connection = ConnectionUpdateSuccess(deviceId, 2)
             assertThat(protobufConverter.convertToDeviceInfo(connection).id).isEqualTo(deviceId)
         }
 
         @Test
         fun `converts result as parameter in device connection message`() {
             val result = 0
-            val connection = com.signify.hue.flutterreactiveble.ble.ConnectionUpdateSuccess("", result)
+            val connection = ConnectionUpdateSuccess("", result)
             assertThat(protobufConverter.convertToDeviceInfo(connection).connectionState).isEqualTo(result)
         }
     }
@@ -129,47 +133,46 @@ class ProtobufMessageConverterTest {
 
         @Test
         fun `converts to negotiatemtuinfo object`() {
-            val result = com.signify.hue.flutterreactiveble.ble.MtuNegotiateSuccesful("", 3)
+            val result = MtuNegotiateSuccesful("", 3)
 
             assertThat(protobufConverter.convertNegotiateMtuInfo(result)).isInstanceOf(pb.NegotiateMtuInfo::class.java)
         }
 
         @Test
         fun `converts deviceId`() {
-            val result = com.signify.hue.flutterreactiveble.ble.MtuNegotiateSuccesful("id", 3)
+            val result = MtuNegotiateSuccesful("id", 3)
             assertThat(protobufConverter.convertNegotiateMtuInfo(result).deviceId).isEqualTo(result.deviceId)
         }
 
         @Test
         fun `converts mtusize`() {
-            val result = com.signify.hue.flutterreactiveble.ble.MtuNegotiateSuccesful("id", 3)
+            val result = MtuNegotiateSuccesful("id", 3)
             assertThat(protobufConverter.convertNegotiateMtuInfo(result).mtuSize).isEqualTo(result.size)
         }
 
         @Test
         fun `sets default value for error in case no error occurred`() {
-            val result = com.signify.hue.flutterreactiveble.ble.MtuNegotiateSuccesful("id", 3)
+            val result = MtuNegotiateSuccesful("id", 3)
             assertThat(protobufConverter.convertNegotiateMtuInfo(result).failure.message).isEqualTo("")
         }
 
         @Test
         fun `converts error message properly`() {
             val errorMessage = "whoops"
-            val result = com.signify.hue.flutterreactiveble.ble.MtuNegotiateFailed("id", errorMessage)
+            val result = MtuNegotiateFailed("id", errorMessage)
             assertThat(protobufConverter.convertNegotiateMtuInfo(result).failure.message)
                     .isEqualTo(errorMessage)
         }
 
         @Test
         fun `converts error code`() {
-            val result = com.signify.hue.flutterreactiveble.ble.MtuNegotiateFailed("id", "")
+            val result = MtuNegotiateFailed("id", "")
             assertThat(protobufConverter.convertNegotiateMtuInfo(result).failure.code)
                     .isEqualTo(NegotiateMtuErrorType.UNKNOWN.code)
         }
     }
 
-
-    private fun createScanInfo(): com.signify.hue.flutterreactiveble.ble.ScanInfo {
+    private fun createScanInfo(): ScanInfo {
         val macAdress = "123"
         val deviceName = "Testdevice"
         val rssi = 200
@@ -181,7 +184,7 @@ class ProtobufMessageConverterTest {
 
         val manufacturerData = "123".toByteArray()
 
-        return com.signify.hue.flutterreactiveble.ble.ScanInfo(deviceId = macAdress, name = deviceName,
+        return ScanInfo(deviceId = macAdress, name = deviceName,
                 rssi = rssi, serviceData = serviceData, manufacturerData = manufacturerData)
     }
 

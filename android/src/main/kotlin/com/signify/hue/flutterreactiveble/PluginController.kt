@@ -35,7 +35,8 @@ class PluginController {
             "readNotifications" to this::readNotifications,
             "stopNotifications" to this::stopNotifications,
             "negotiateMtuSize" to this::negotiateMtuSize,
-            "requestConnectionPriority" to this::requestConnectionPriority
+            "requestConnectionPriority" to this::requestConnectionPriority,
+            "discoverServices" to this::discoverServices
     )
 
     lateinit var bleClient: com.signify.hue.flutterreactiveble.ble.BleClient
@@ -174,13 +175,13 @@ class PluginController {
     }
 
     private fun executeWriteAndPropagateResultToChannel(
-        call: MethodCall,
-        result: Result,
-        writeOperation: com.signify.hue.flutterreactiveble.ble.BleClient.(
-            deviceId: String,
-            characteristic: UUID,
-            value: ByteArray
-        ) -> Single<com.signify.hue.flutterreactiveble.ble.CharOperationResult>
+            call: MethodCall,
+            result: Result,
+            writeOperation: com.signify.hue.flutterreactiveble.ble.BleClient.(
+                    deviceId: String,
+                    characteristic: UUID,
+                    value: ByteArray
+            ) -> Single<com.signify.hue.flutterreactiveble.ble.CharOperationResult>
     ) {
         val writeCharMessage = pb.WriteCharacteristicRequest.parseFrom(call.arguments as ByteArray)
         bleClient.writeOperation(writeCharMessage.characteristic.deviceId,
@@ -247,6 +248,19 @@ class PluginController {
                                     RequestConnectionPriorityFailed(request.deviceId, throwable?.message
                                             ?: "Unknown error")).toByteArray())
                         })
+                .discard()
+    }
+
+    private fun discoverServices(call: MethodCall, result: Result) {
+        val request = pb.DiscoverServicesRequest.parseFrom(call.arguments as ByteArray)
+
+        bleClient.discoverServices(request.deviceId)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({ discoverResult ->
+                    result.success(protoConverter.convertDiscoverServicesInfo(request.deviceId, discoverResult).toByteArray())
+                }, {
+                    throwable -> result.error("service_discovery_failure", throwable.message, null)
+                })
                 .discard()
     }
 }

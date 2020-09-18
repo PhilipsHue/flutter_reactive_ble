@@ -7,10 +7,10 @@ void main() {
     DiscoveredDevicesRegistry sut;
     const device = "Testdevice";
     final timestamp = DateTime(2019);
-    TimestampProviderMock timestampMock;
+    _TimestampProviderMock timestampMock;
 
     setUp(() {
-      timestampMock = TimestampProviderMock();
+      timestampMock = _TimestampProviderMock();
       when(timestampMock.getTimestamp()).thenReturn(timestamp);
       sut = DiscoveredDevicesRegistry(getTimestamp: timestampMock.getTimestamp);
     });
@@ -64,8 +64,6 @@ void main() {
   });
 }
 
-abstract class TimestampProvider {
+class _TimestampProviderMock extends Mock {
   DateTime getTimestamp();
 }
-
-class TimestampProviderMock extends Mock implements TimestampProvider {}

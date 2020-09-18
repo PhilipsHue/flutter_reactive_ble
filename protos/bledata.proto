@@ -5,7 +5,7 @@ option java_outer_classname = "ProtobufModel";
 message ScanForDevicesRequest {
     repeated Uuid serviceUuids = 1;
     int32 scanMode = 2;
-    bool requireLocationServicesEnabled=3; 
+    bool requireLocationServicesEnabled = 3;
 }
 
 message DeviceScanInfo {
@@ -84,12 +84,12 @@ message BleStatusInfo {
     int32 status = 1;
 }
 
-message ChangeConnectionPriorityRequest{
+message ChangeConnectionPriorityRequest {
     string deviceId = 1;
     int32 priority = 2;
 }
 
-message ChangeConnectionPriorityInfo{
+message ChangeConnectionPriorityInfo {
     string deviceId = 1;
     GenericFailure failure = 2;
 }
@@ -112,6 +112,21 @@ message ServicesWithCharacteristics {
 message ServiceWithCharacteristics {
     Uuid serviceId = 1;
     repeated Uuid characteristics = 2;
+}
+
+message DiscoverServicesRequest {
+    string deviceId = 1;
+}
+
+message DiscoverServicesInfo {
+    string deviceId = 1;
+    repeated DiscoveredService services = 2;
+}
+
+message DiscoveredService {
+    Uuid serviceUuid = 1;
+    repeated Uuid characteristicUuids = 2;
+    repeated DiscoveredService includedServices = 3;
 }
 
 message Uuid {

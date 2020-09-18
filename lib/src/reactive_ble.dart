@@ -19,6 +19,8 @@ import 'package:flutter_reactive_ble/src/plugin_controller.dart';
 import 'package:flutter_reactive_ble/src/rx_ext/repeater.dart';
 import 'package:meta/meta.dart';
 
+import 'model/discovered_services.dart';
+
 /// [FlutterReactiveBle] is the facade of the library. Its interface allows to
 /// perform all the supported BLE operations.
 class FlutterReactiveBle {
@@ -142,7 +144,7 @@ class FlutterReactiveBle {
   Future<void> deinitialize() async {
     if (_initialization != null) {
       _initialization = null;
-      await _pluginController.deInitialize();
+      await _pluginController.deinitialize();
     }
   }
 
@@ -295,6 +297,12 @@ class FlutterReactiveBle {
               connectionTimeout: connectionTimeout,
             ),
           );
+
+  /// Performs service discovery on the peripheral and returns the discovered services.
+  ///
+  /// When discovery fails this method throws an [Exception].
+  Future<List<DiscoveredService>> discoverServices(String deviceId) =>
+      _pluginController.discoverServices(deviceId);
 
   /// Clears GATT attribute cache on Android using undocumented API. Completes with an error in case of a failure.
   ///

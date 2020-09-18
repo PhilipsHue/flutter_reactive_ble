@@ -1298,6 +1298,150 @@ class ServiceWithCharacteristics extends $pb.GeneratedMessage {
   $core.List<Uuid> get characteristics => $_getList(1);
 }
 
+class DiscoverServicesRequest extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i =
+      $pb.BuilderInfo('DiscoverServicesRequest', createEmptyInstance: create)
+        ..aOS(1, 'deviceId', protoName: 'deviceId')
+        ..hasRequiredFields = false;
+
+  DiscoverServicesRequest._() : super();
+  factory DiscoverServicesRequest() => create();
+  factory DiscoverServicesRequest.fromBuffer($core.List<$core.int> i,
+          [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromBuffer(i, r);
+  factory DiscoverServicesRequest.fromJson($core.String i,
+          [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromJson(i, r);
+  DiscoverServicesRequest clone() =>
+      DiscoverServicesRequest()..mergeFromMessage(this);
+  DiscoverServicesRequest copyWith(
+          void Function(DiscoverServicesRequest) updates) =>
+      super.copyWith((message) => updates(message as DiscoverServicesRequest));
+  $pb.BuilderInfo get info_ => _i;
+  @$core.pragma('dart2js:noInline')
+  static DiscoverServicesRequest create() => DiscoverServicesRequest._();
+  DiscoverServicesRequest createEmptyInstance() => create();
+  static $pb.PbList<DiscoverServicesRequest> createRepeated() =>
+      $pb.PbList<DiscoverServicesRequest>();
+  @$core.pragma('dart2js:noInline')
+  static DiscoverServicesRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<DiscoverServicesRequest>(create);
+  static DiscoverServicesRequest _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get deviceId => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set deviceId($core.String v) {
+    $_setString(0, v);
+  }
+
+  @$pb.TagNumber(1)
+  $core.bool hasDeviceId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearDeviceId() => clearField(1);
+}
+
+class DiscoverServicesInfo extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i =
+      $pb.BuilderInfo('DiscoverServicesInfo', createEmptyInstance: create)
+        ..aOS(1, 'deviceId', protoName: 'deviceId')
+        ..pc<DiscoveredService>(2, 'services', $pb.PbFieldType.PM,
+            subBuilder: DiscoveredService.create)
+        ..hasRequiredFields = false;
+
+  DiscoverServicesInfo._() : super();
+  factory DiscoverServicesInfo() => create();
+  factory DiscoverServicesInfo.fromBuffer($core.List<$core.int> i,
+          [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromBuffer(i, r);
+  factory DiscoverServicesInfo.fromJson($core.String i,
+          [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromJson(i, r);
+  DiscoverServicesInfo clone() =>
+      DiscoverServicesInfo()..mergeFromMessage(this);
+  DiscoverServicesInfo copyWith(void Function(DiscoverServicesInfo) updates) =>
+      super.copyWith((message) => updates(message as DiscoverServicesInfo));
+  $pb.BuilderInfo get info_ => _i;
+  @$core.pragma('dart2js:noInline')
+  static DiscoverServicesInfo create() => DiscoverServicesInfo._();
+  DiscoverServicesInfo createEmptyInstance() => create();
+  static $pb.PbList<DiscoverServicesInfo> createRepeated() =>
+      $pb.PbList<DiscoverServicesInfo>();
+  @$core.pragma('dart2js:noInline')
+  static DiscoverServicesInfo getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<DiscoverServicesInfo>(create);
+  static DiscoverServicesInfo _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get deviceId => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set deviceId($core.String v) {
+    $_setString(0, v);
+  }
+
+  @$pb.TagNumber(1)
+  $core.bool hasDeviceId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearDeviceId() => clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.List<DiscoveredService> get services => $_getList(1);
+}
+
+class DiscoveredService extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i =
+      $pb.BuilderInfo('DiscoveredService', createEmptyInstance: create)
+        ..aOM<Uuid>(1, 'serviceUuid',
+            protoName: 'serviceUuid', subBuilder: Uuid.create)
+        ..pc<Uuid>(2, 'characteristicUuids', $pb.PbFieldType.PM,
+            protoName: 'characteristicUuids', subBuilder: Uuid.create)
+        ..pc<DiscoveredService>(3, 'includedServices', $pb.PbFieldType.PM,
+            protoName: 'includedServices', subBuilder: DiscoveredService.create)
+        ..hasRequiredFields = false;
+
+  DiscoveredService._() : super();
+  factory DiscoveredService() => create();
+  factory DiscoveredService.fromBuffer($core.List<$core.int> i,
+          [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromBuffer(i, r);
+  factory DiscoveredService.fromJson($core.String i,
+          [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromJson(i, r);
+  DiscoveredService clone() => DiscoveredService()..mergeFromMessage(this);
+  DiscoveredService copyWith(void Function(DiscoveredService) updates) =>
+      super.copyWith((message) => updates(message as DiscoveredService));
+  $pb.BuilderInfo get info_ => _i;
+  @$core.pragma('dart2js:noInline')
+  static DiscoveredService create() => DiscoveredService._();
+  DiscoveredService createEmptyInstance() => create();
+  static $pb.PbList<DiscoveredService> createRepeated() =>
+      $pb.PbList<DiscoveredService>();
+  @$core.pragma('dart2js:noInline')
+  static DiscoveredService getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<DiscoveredService>(create);
+  static DiscoveredService _defaultInstance;
+
+  @$pb.TagNumber(1)
+  Uuid get serviceUuid => $_getN(0);
+  @$pb.TagNumber(1)
+  set serviceUuid(Uuid v) {
+    setField(1, v);
+  }
+
+  @$pb.TagNumber(1)
+  $core.bool hasServiceUuid() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearServiceUuid() => clearField(1);
+  @$pb.TagNumber(1)
+  Uuid ensureServiceUuid() => $_ensure(0);
+
+  @$pb.TagNumber(2)
+  $core.List<Uuid> get characteristicUuids => $_getList(1);
+
+  @$pb.TagNumber(3)
+  $core.List<DiscoveredService> get includedServices => $_getList(2);
+}
+
 class Uuid extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i =
       $pb.BuilderInfo('Uuid', createEmptyInstance: create)

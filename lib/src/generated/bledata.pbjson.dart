@@ -355,6 +355,58 @@ const ServiceWithCharacteristics$json = const {
   ],
 };
 
+const DiscoverServicesRequest$json = const {
+  '1': 'DiscoverServicesRequest',
+  '2': const [
+    const {'1': 'deviceId', '3': 1, '4': 1, '5': 9, '10': 'deviceId'},
+  ],
+};
+
+const DiscoverServicesInfo$json = const {
+  '1': 'DiscoverServicesInfo',
+  '2': const [
+    const {'1': 'deviceId', '3': 1, '4': 1, '5': 9, '10': 'deviceId'},
+    const {
+      '1': 'services',
+      '3': 2,
+      '4': 3,
+      '5': 11,
+      '6': '.DiscoveredService',
+      '10': 'services'
+    },
+  ],
+};
+
+const DiscoveredService$json = const {
+  '1': 'DiscoveredService',
+  '2': const [
+    const {
+      '1': 'serviceUuid',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.Uuid',
+      '10': 'serviceUuid'
+    },
+    const {
+      '1': 'characteristicUuids',
+      '3': 2,
+      '4': 3,
+      '5': 11,
+      '6': '.Uuid',
+      '10': 'characteristicUuids'
+    },
+    const {
+      '1': 'includedServices',
+      '3': 3,
+      '4': 3,
+      '5': 11,
+      '6': '.DiscoveredService',
+      '10': 'includedServices'
+    },
+  ],
+};
+
 const Uuid$json = const {
   '1': 'Uuid',
   '2': const [
