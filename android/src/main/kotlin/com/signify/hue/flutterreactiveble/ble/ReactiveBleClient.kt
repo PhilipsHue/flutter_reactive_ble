@@ -70,8 +70,8 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
                 *filters
         )
                 .map { result ->
-                    ScanInfo(result.bleDevice.macAddress, result.bleDevice.name
-                            ?: "",
+                    ScanInfo(result.bleDevice.macAddress, result.scanRecord.deviceName
+                            ?: result.bleDevice.name ?: "",
                             result.rssi,
                             result.scanRecord.serviceData.mapKeys { it.key.uuid },
                             extractManufacturerData(result.scanRecord.manufacturerSpecificData))
