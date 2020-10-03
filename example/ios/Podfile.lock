@@ -4,15 +4,15 @@ PODS:
     - Flutter
     - Protobuf (~> 3.5)
     - SwiftProtobuf (~> 1.0)
-  - Protobuf (3.10.0)
-  - SwiftProtobuf (1.7.0)
+  - Protobuf (3.13.0)
+  - SwiftProtobuf (1.12.0)
 
 DEPENDENCIES:
   - Flutter (from `Flutter`)
   - flutter_reactive_ble (from `.symlinks/plugins/flutter_reactive_ble/ios`)
 
 SPEC REPOS:
-  https://github.com/CocoaPods/Specs.git:
+  trunk:
     - Protobuf
     - SwiftProtobuf
 
@@ -24,10 +24,10 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   Flutter: 0e3d915762c693b495b44d77113d4970485de6ec
-  flutter_reactive_ble: c94c6cc709a808656e1963c828663b2536c72010
-  Protobuf: a4dc852ad69c027ca2166ed287b856697814375b
-  SwiftProtobuf: 4fd9645e69b72cbae6ec8da5be0cdd20ca6565dd
+  flutter_reactive_ble: 118af63a7cda4e26ae1791bd1ddf659e2ae0a76d
+  Protobuf: 3dac39b34a08151c6d949560efe3f86134a3f748
+  SwiftProtobuf: 4ef85479c18ca85b5482b343df9c319c62bda699
 
-PODFILE CHECKSUM: 1b66dae606f75376c5f2135a8290850eeb09ae83
+PODFILE CHECKSUM: fe0e1ee7f3d1f7d00b11b474b62dd62134535aea
 
-COCOAPODS: 1.8.4
+COCOAPODS: 1.9.3
