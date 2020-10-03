@@ -1,3 +1,7 @@
+## 2.5.1
+
+* Update Podfile to support latest Flutter version
+
 ## 2.5.0
 
 * Add service discovery operation
