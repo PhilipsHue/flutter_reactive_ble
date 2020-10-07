@@ -1,3 +1,8 @@
+## 2.5.2
+
+* Update Android protobuf and depedencies to support new Android sdk.
+* Fix #114 Throwing faulty error when executing hot restart during scanning on Android.
+
 ## 2.5.1
 
 * Update Podfile to support latest Flutter version
