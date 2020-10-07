@@ -46,15 +46,19 @@ class ScanDevicesHandler(private val bleClient: com.signify.hue.flutterreactiveb
     }
 
     fun stopDeviceScan() {
-        scanForDevicesDisposable.dispose()
-        scanParameters = null
+        if (this::scanForDevicesDisposable.isInitialized) scanForDevicesDisposable.let {
+            if (!it.isDisposed) {
+                it.dispose()
+                scanParameters = null
+            }
+       }
     }
 
     fun prepareScan(scanMessage: pb.ScanForDevicesRequest) {
+        stopDeviceScan()
         val filter = scanMessage.serviceUuidsList
                 .map { ParcelUuid(UuidConverter().uuidFromByteArray(it.data.toByteArray())) }
         val scanMode = createScanMode(scanMessage.scanMode)
-
         scanParameters = ScanParameters(filter, scanMode, scanMessage.requireLocationServicesEnabled)
     }
 
