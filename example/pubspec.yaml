@@ -10,19 +10,15 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-
   flutter_reactive_ble:
     path: ../
-  provider: ^4.0.4  
-
+  provider: ^4.0.4
 
 dev_dependencies:
+  dependency_validator:
   flutter_test:
     sdk: flutter
-
-  dependency_validator:
   mockito: ^4.1.1
-
 
 flutter:
   uses-material-design: true
