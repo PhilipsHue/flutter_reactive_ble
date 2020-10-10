@@ -95,12 +95,12 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
     }
 
     override fun disconnectDevice(deviceId: String) {
-        activeConnections[deviceId]?.disconnectDevice()
+        activeConnections[deviceId]?.disconnectDevice(deviceId)
         activeConnections.remove(deviceId)
     }
 
     override fun disconnectAllDevices() {
-        activeConnections.forEach { (_, connector) -> connector.disconnectDevice() }
+        activeConnections.forEach { (device, connector) -> connector.disconnectDevice(device) }
         allConnections.dispose()
     }
 

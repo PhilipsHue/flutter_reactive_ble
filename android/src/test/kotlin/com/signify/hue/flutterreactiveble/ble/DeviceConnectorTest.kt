@@ -9,6 +9,7 @@ import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.verify
+import io.mockk.verifySequence
 import io.reactivex.Observable
 import io.reactivex.subjects.BehaviorSubject
 import org.junit.jupiter.api.AfterEach
@@ -31,12 +32,12 @@ class DeviceConnectorTest {
     private lateinit var device: RxBleDevice
 
     @MockK
-    private lateinit var connectionQueue: com.signify.hue.flutterreactiveble.ble.ConnectionQueue
+    private lateinit var connectionQueue: ConnectionQueue
 
     @MockK
-    private  lateinit var updateListener: (update: com.signify.hue.flutterreactiveble.ble.ConnectionUpdate) -> Unit
+    private  lateinit var updateListener: (update: ConnectionUpdate) -> Unit
 
-    private lateinit var sut: com.signify.hue.flutterreactiveble.ble.DeviceConnector
+    private lateinit var sut: DeviceConnector
     private lateinit var subject: BehaviorSubject<List<String>>
     private val deviceId = "123"
 
@@ -54,13 +55,13 @@ class DeviceConnectorTest {
         every {connectionQueue.removeFromQueue(any())}.returns(Unit)
 
         subject.onNext(listOf(device.macAddress))
-        sut = com.signify.hue.flutterreactiveble.ble.DeviceConnector(device, Duration(0L, TimeUnit.MILLISECONDS), updateListener, connectionQueue)
+        sut = DeviceConnector(device, Duration(0L, TimeUnit.MILLISECONDS), updateListener, connectionQueue)
 
     }
 
     @AfterEach
     fun teardown(){
-        sut.disconnectDevice()
+        sut.disconnectDevice(deviceId)
     }
 
     @Nested
@@ -102,7 +103,8 @@ class DeviceConnectorTest {
         fun updatesWhenSuccess() {
             sut.connection.test()
 
-            verify(exactly = 1) { updateListener.invoke(com.signify.hue.flutterreactiveble.ble.ConnectionUpdateSuccess(deviceId, ConnectionState.CONNECTED.code)) }
+            verify(exactly = 1) { updateListener.invoke(ConnectionUpdateSuccess(deviceId, ConnectionState.CONNECTED.code)) }
+
         }
 
         @Test
@@ -140,7 +142,7 @@ class DeviceConnectorTest {
         fun failedToConnect() {
             val observer = sut.connection.test()
 
-            assertThat(observer.values().first()).isInstanceOf(com.signify.hue.flutterreactiveble.ble.EstablishConnectionFailure::class.java)
+            assertThat(observer.values().first()).isInstanceOf(EstablishConnectionFailure::class.java)
         }
 
         @Test
@@ -148,7 +150,7 @@ class DeviceConnectorTest {
         fun updatesWhenFailed() {
             sut.connection.test()
 
-            verify(exactly = 1) { updateListener.invoke(com.signify.hue.flutterreactiveble.ble.ConnectionUpdateError(deviceId, errorMessage)) }
+            verify(exactly = 1) { updateListener.invoke(ConnectionUpdateError(deviceId, errorMessage)) }
         }
 
         @Test
@@ -166,9 +168,11 @@ class DeviceConnectorTest {
 
         sut.connection.test()
 
-        sut.disconnectDevice()
+        sut.disconnectDevice(deviceId)
 
         assertThat(sut.connectionDisposable?.isDisposed).isTrue()
+
+        verify(exactly = 1) { updateListener.invoke(ConnectionUpdateSuccess(deviceId, ConnectionState.DISCONNECTED.code)) }
     }
 }
 
