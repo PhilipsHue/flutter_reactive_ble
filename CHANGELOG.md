@@ -1,3 +1,8 @@
+## 2.5.3
+
+* Fix #118 not sending disconnect update when device is disconnected on Android
+* Fix pubspec sorting
+
 ## 2.5.2
 
 * Update Android protobuf and depedencies to support new Android sdk.

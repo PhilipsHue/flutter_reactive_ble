@@ -57,7 +57,7 @@ internal class DeviceConnector(
                 }
     }
 
-    internal fun disconnectDevice() {
+    internal fun disconnectDevice(deviceId: String) {
         val diff = System.currentTimeMillis() - timestampEstablishConnection
 
         /*
@@ -67,11 +67,17 @@ internal class DeviceConnector(
         if (diff < DeviceConnector.Companion.minTimeMsBeforeDisconnectingIsAllowed) {
             Single.timer(DeviceConnector.Companion.minTimeMsBeforeDisconnectingIsAllowed - diff, TimeUnit.MILLISECONDS)
                     .doFinally {
+                        sendDisconnectedUpdate(deviceId)
                         disposeSubscriptions()
                     }.subscribe()
         } else {
+            sendDisconnectedUpdate(deviceId)
             disposeSubscriptions()
         }
+    }
+
+    private fun sendDisconnectedUpdate(deviceId: String) {
+        updateListeners(ConnectionUpdateSuccess(deviceId, ConnectionState.DISCONNECTED.code))
     }
 
     private fun disposeSubscriptions() {
