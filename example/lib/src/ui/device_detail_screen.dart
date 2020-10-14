@@ -87,7 +87,7 @@ class _DeviceDetail extends StatelessWidget {
                   children: <Widget>[
                     Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: RaisedButton(
+                      child: ElevatedButton(
                         onPressed: !_deviceConnected()
                             ? () => connect(device.id)
                             : null,
@@ -96,7 +96,7 @@ class _DeviceDetail extends StatelessWidget {
                     ),
                     Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: RaisedButton(
+                      child: ElevatedButton(
                         onPressed: _deviceConnected()
                             ? () => disconnect(device.id)
                             : null,
@@ -105,7 +105,7 @@ class _DeviceDetail extends StatelessWidget {
                     ),
                     Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: RaisedButton(
+                      child: ElevatedButton(
                         onPressed: _deviceConnected()
                             ? () => discoverServices(device.id)
                             : null,
