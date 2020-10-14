@@ -98,14 +98,14 @@ class _DeviceListState extends State<_DeviceList> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      RaisedButton(
+                      ElevatedButton(
                         child: const Text('Scan'),
                         onPressed: !widget.scannerState.scanIsInProgress &&
                                 _isValidUuidInput()
                             ? _startScanning
                             : null,
                       ),
-                      RaisedButton(
+                      ElevatedButton(
                         child: const Text('Stop'),
                         onPressed: widget.scannerState.scanIsInProgress
                             ? widget.stopScan
