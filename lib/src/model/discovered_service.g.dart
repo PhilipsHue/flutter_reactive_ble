@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'discovered_services.dart';
+part of 'discovered_service.dart';
 
 // **************************************************************************
 // FunctionalDataGenerator
