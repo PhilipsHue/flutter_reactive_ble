@@ -10,7 +10,7 @@ import 'converter/protobuf_converter.dart';
 import 'model/characteristic_value.dart';
 import 'model/clear_gatt_cache_error.dart';
 import 'model/connection_state_update.dart';
-import 'model/discovered_services.dart';
+import 'model/discovered_service.dart';
 import 'model/qualified_characteristic.dart';
 import 'model/unit.dart';
 

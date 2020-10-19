@@ -6,7 +6,7 @@ import 'package:flutter_reactive_ble/src/debug_logger.dart';
 import 'package:flutter_reactive_ble/src/device_connector.dart';
 import 'package:flutter_reactive_ble/src/device_scanner.dart';
 import 'package:flutter_reactive_ble/src/model/clear_gatt_cache_error.dart';
-import 'package:flutter_reactive_ble/src/model/discovered_services.dart';
+import 'package:flutter_reactive_ble/src/model/discovered_service.dart';
 import 'package:flutter_reactive_ble/src/model/log_level.dart';
 import 'package:flutter_reactive_ble/src/model/unit.dart';
 import 'package:flutter_reactive_ble/src/plugin_controller.dart';

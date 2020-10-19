@@ -3,7 +3,7 @@ import 'package:flutter_reactive_ble/src/model/uuid.dart';
 import 'package:functional_data/functional_data.dart';
 import 'package:meta/meta.dart';
 
-part 'discovered_services.g.dart';
+part 'discovered_service.g.dart';
 //ignore_for_file: annotate_overrides
 
 @FunctionalData()
@@ -22,5 +22,3 @@ class DiscoveredService extends $DiscoveredService {
   @CustomEquality(DeepCollectionEquality())
   final List<DiscoveredService> includedServices;
 }
-
-enum DiscoverServicesFailure { unknown }
