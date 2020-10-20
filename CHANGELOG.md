@@ -1,3 +1,9 @@
+## 2.6.0
+
+* Fix #125 Class `DiscoveredService` isn't exported.
+* Set min supported iOS version to 11.
+* Replace `RaisedButton` with `ElevatedButton` in Example app
+
 ## 2.5.3
 
 * Fix #118 not sending disconnect update when device is disconnected on Android
