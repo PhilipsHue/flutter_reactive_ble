@@ -29,7 +29,7 @@ class BleStatusHandler(private val bleClient: BleClient) : EventChannel.StreamHa
             Observable.timer(delayListenBleStatus, TimeUnit.MILLISECONDS)
                     .switchMap { bleClient.observeBleStatus() }
                     .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe ({ bleStatus ->
+                    .subscribe({ bleStatus ->
                         val message = pb.BleStatusInfo.newBuilder()
                                 .setStatus(bleStatus.code)
                                 .build()
