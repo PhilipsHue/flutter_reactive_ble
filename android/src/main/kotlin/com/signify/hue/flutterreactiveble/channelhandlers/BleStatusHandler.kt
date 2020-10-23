@@ -1,14 +1,15 @@
 package com.signify.hue.flutterreactiveble.channelhandlers
 
-import com.signify.hue.flutterreactiveble.ProtobufModel as pb
+import com.signify.hue.flutterreactiveble.ble.BleClient
 import io.flutter.plugin.common.EventChannel
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.disposables.SerialDisposable
 import java.util.concurrent.TimeUnit
+import com.signify.hue.flutterreactiveble.ProtobufModel as pb
 
-class BleStatusHandler(private val bleClient: com.signify.hue.flutterreactiveble.ble.BleClient) : EventChannel.StreamHandler {
+class BleStatusHandler(private val bleClient: BleClient) : EventChannel.StreamHandler {
 
     companion object {
         private const val delayListenBleStatus = 500L
@@ -28,10 +29,12 @@ class BleStatusHandler(private val bleClient: com.signify.hue.flutterreactiveble
             Observable.timer(delayListenBleStatus, TimeUnit.MILLISECONDS)
                     .switchMap { bleClient.observeBleStatus() }
                     .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe { bleStatus ->
+                    .subscribe({ bleStatus ->
                         val message = pb.BleStatusInfo.newBuilder()
                                 .setStatus(bleStatus.code)
                                 .build()
                         eventSink.success(message.toByteArray())
-                    }
+                    }, { throwable ->
+                        eventSink.error("ObserveBleStatusFailure", throwable.message, throwable.stackTrace)
+                    })
 }
