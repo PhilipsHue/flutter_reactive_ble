@@ -1,3 +1,7 @@
+## 2.6.1+1
+
+* Revert protobuf upgrade on Android.
+
 ## 2.6.1
 
 * Prevent incrorrect propagation of error in case observing BLE status fails.
