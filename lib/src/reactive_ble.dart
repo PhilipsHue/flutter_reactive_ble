@@ -317,19 +317,20 @@ class FlutterReactiveBle {
   ///
   /// This stream terminates automatically when the device is disconnected.
   Stream<List<int>> subscribeToCharacteristic(
-      QualifiedCharacteristic characteristic) {
-    final terminateFuture = connectedDeviceStream
+    QualifiedCharacteristic characteristic,
+  ) {
+    final isDisconnected = connectedDeviceStream
         .where((update) =>
             update.deviceId == characteristic.deviceId &&
             (update.connectionState == DeviceConnectionState.disconnecting ||
                 update.connectionState == DeviceConnectionState.disconnected))
-        .firstWhere((_) => true,
-            orElse: () => throw NoBleCharacteristicDataReceived());
+        .cast<void>()
+        .firstWhere((_) => true, orElse: () {});
 
     return initialize().asStream().asyncExpand(
           (_) => _connectedDeviceOperator.subscribeToCharacteristic(
             characteristic,
-            terminateFuture,
+            isDisconnected,
           ),
         );
   }
