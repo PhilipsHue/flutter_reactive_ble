@@ -337,7 +337,7 @@ final class Central {
                 return "A peripheral \(peripheralID.uuidString) is unknown (make sure it has been discovered)"
             case .peripheralIsNotConnected(let peripheralID):
                 return "The peripheral \(peripheralID.uuidString) is not connected"
-            case .serviceNotFound(let peripheralID, let serviceID):
+            case .serviceNotFound(let serviceID, let peripheralID):
                 return "A service \(serviceID) is not found in the peripheral \(peripheralID) (make sure it has been discovered)"
             case .characteristicNotFound(let qualifiedCharacteristic):
                 return "A characteristic \(qualifiedCharacteristic.id) is not found in the service \(qualifiedCharacteristic.serviceID) of the peripheral \(qualifiedCharacteristic.peripheralID) (make sure it has been discovered)"

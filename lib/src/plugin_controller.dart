@@ -19,10 +19,10 @@ class PluginController {
     @required ArgsToProtobufConverter argsToProtobufConverter,
     @required ProtobufConverter protobufConverter,
     @required MethodChannel bleMethodChannel,
-    @required EventChannel connectedDeviceChannel,
-    @required EventChannel charUpdateChannel,
-    @required EventChannel bleDeviceScanChannel,
-    @required EventChannel bleStatusChannel,
+    @required Stream<List<int>> connectedDeviceChannel,
+    @required Stream<List<int>> charUpdateChannel,
+    @required Stream<List<int>> bleDeviceScanChannel,
+    @required Stream<List<int>> bleStatusChannel,
     @required DebugLogger debugLogger,
   })  : assert(argsToProtobufConverter != null),
         assert(protobufConverter != null),
@@ -35,30 +35,28 @@ class PluginController {
         _argsToProtobufConverter = argsToProtobufConverter,
         _protobufConverter = protobufConverter,
         _bleMethodChannel = bleMethodChannel,
-        _connectedDeviceChannel = connectedDeviceChannel,
-        _charUpdateChannel = charUpdateChannel,
-        _bleStatusChannel = bleStatusChannel,
-        _bleDeviceScanChannel = bleDeviceScanChannel,
+        _connectedDeviceRawStream = connectedDeviceChannel,
+        _charUpdateRawStream = charUpdateChannel,
+        _bleStatusRawChannel = bleStatusChannel,
+        _bleDeviceScanRawStream = bleDeviceScanChannel,
         _debugLogger = debugLogger;
 
   final ArgsToProtobufConverter _argsToProtobufConverter;
   final ProtobufConverter _protobufConverter;
   final MethodChannel _bleMethodChannel;
-  final EventChannel _connectedDeviceChannel;
-  final EventChannel _charUpdateChannel;
-  final EventChannel _bleDeviceScanChannel;
-  final EventChannel _bleStatusChannel;
+  final Stream<List<int>> _connectedDeviceRawStream;
+  final Stream<List<int>> _charUpdateRawStream;
+  final Stream<List<int>> _bleDeviceScanRawStream;
+  final Stream<List<int>> _bleStatusRawChannel;
   final DebugLogger _debugLogger;
 
-  Stream<ConnectionStateUpdate> _connectionUpdateEventChannelStream;
-  Stream<CharacteristicValue> _charValueEventChannelStream;
-  Stream<ScanResult> _scanResultEventChannelStream;
+  Stream<ConnectionStateUpdate> _connectionUpdateStream;
+  Stream<CharacteristicValue> _charValueStream;
+  Stream<ScanResult> _scanResultStream;
   Stream<BleStatus> _bleStatusStream;
 
   Stream<ConnectionStateUpdate> get connectionUpdateStream =>
-      _connectionUpdateEventChannelStream ??= _connectedDeviceChannel
-          .receiveBroadcastStream()
-          .cast<List<int>>()
+      _connectionUpdateStream ??= _connectedDeviceRawStream
           .map(_protobufConverter.connectionStateUpdateFrom)
           .map(
         (update) {
@@ -70,9 +68,7 @@ class PluginController {
       );
 
   Stream<CharacteristicValue> get charValueUpdateStream =>
-      _charValueEventChannelStream ??= _charUpdateChannel
-          .receiveBroadcastStream()
-          .cast<List<int>>()
+      _charValueStream ??= _charUpdateRawStream
           .map(_protobufConverter.characteristicValueFrom)
           .map(
         (update) {
@@ -82,14 +78,8 @@ class PluginController {
         },
       );
 
-  Stream<ScanResult> get scanStream =>
-      _scanResultEventChannelStream ??= _bleDeviceScanChannel
-          .receiveBroadcastStream()
-          .cast<List<int>>()
-          .map(
-            _protobufConverter.scanResultFrom,
-          )
-          .map(
+  Stream<ScanResult> get scanStream => _scanResultStream ??=
+          _bleDeviceScanRawStream.map(_protobufConverter.scanResultFrom).map(
         (scanResult) {
           _debugLogger
               .log('Received $ScanResult(result: ${scanResult.result})');
@@ -98,12 +88,8 @@ class PluginController {
       );
 
   Stream<BleStatus> get bleStatusStream =>
-      _bleStatusStream ??= _bleStatusChannel
-          .receiveBroadcastStream()
-          .cast<List<int>>()
-          .map(
-            _protobufConverter.bleStatusFrom,
-          )
+      _bleStatusStream ??= _bleStatusRawChannel
+          .map(_protobufConverter.bleStatusFrom)
           .map((status) {
         _debugLogger.log('Received ble status update: $status');
         return status;
@@ -313,10 +299,14 @@ class PluginControllerFactory {
       protobufConverter: const ProtobufConverter(),
       argsToProtobufConverter: const ArgsToProtobufConverter(),
       bleMethodChannel: _bleMethodChannel,
-      connectedDeviceChannel: connectedDeviceChannel,
-      charUpdateChannel: charEventChannel,
-      bleDeviceScanChannel: scanEventChannel,
-      bleStatusChannel: bleStatusChannel,
+      connectedDeviceChannel:
+          connectedDeviceChannel.receiveBroadcastStream().cast<List<int>>(),
+      charUpdateChannel:
+          charEventChannel.receiveBroadcastStream().cast<List<int>>(),
+      bleDeviceScanChannel:
+          scanEventChannel.receiveBroadcastStream().cast<List<int>>(),
+      bleStatusChannel:
+          bleStatusChannel.receiveBroadcastStream().cast<List<int>>(),
       debugLogger: logger,
     );
   }

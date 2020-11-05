@@ -20,28 +20,28 @@ void main() {
     _MethodChannelMock _methodChannel;
     _ArgsToProtobufConverterMock _argsConverter;
     ProtobufConverter _protobufConverter;
-    _EventChannelMock _connectedDeviceChannel;
-    _EventChannelMock _argsChannel;
-    _EventChannelMock _scanChannel;
-    _EventChannelMock _statusChannel;
+    StreamController<List<int>> _connectedDeviceStreamController;
+    StreamController<List<int>> _argsStreamController;
+    StreamController<List<int>> _scanStreamController;
+    StreamController<List<int>> _statusStreamController;
 
     setUp(() {
       _argsConverter = _ArgsToProtobufConverterMock();
       _methodChannel = _MethodChannelMock();
       _protobufConverter = _ProtobufConverterMock();
-      _connectedDeviceChannel = _EventChannelMock();
-      _argsChannel = _EventChannelMock();
-      _scanChannel = _EventChannelMock();
-      _statusChannel = _EventChannelMock();
+      _connectedDeviceStreamController = StreamController();
+      _argsStreamController = StreamController();
+      _scanStreamController = StreamController();
+      _statusStreamController = StreamController();
 
       _sut = PluginController(
         argsToProtobufConverter: _argsConverter,
         bleMethodChannel: _methodChannel,
         protobufConverter: _protobufConverter,
-        connectedDeviceChannel: _connectedDeviceChannel,
-        charUpdateChannel: _argsChannel,
-        bleDeviceScanChannel: _scanChannel,
-        bleStatusChannel: _statusChannel,
+        connectedDeviceChannel: _connectedDeviceStreamController.stream,
+        charUpdateChannel: _argsStreamController.stream,
+        bleDeviceScanChannel: _scanStreamController.stream,
+        bleStatusChannel: _statusStreamController.stream,
         debugLogger: _DebugLoggerMock(),
       );
     });
@@ -102,8 +102,8 @@ void main() {
       Stream<ConnectionStateUpdate> result;
 
       setUp(() {
-        when(_connectedDeviceChannel.receiveBroadcastStream()).thenAnswer(
-          (_) => Stream<dynamic>.fromIterable(<dynamic>[
+        _connectedDeviceStreamController.addStream(
+          Stream.fromIterable([
             [1, 2, 3],
           ]),
         );
@@ -132,8 +132,8 @@ void main() {
           result: const Result.success([1]),
         );
 
-        when(_argsChannel.receiveBroadcastStream()).thenAnswer(
-          (realInvocation) => Stream<List<int>>.fromIterable([
+        _argsStreamController.addStream(
+          Stream<List<int>>.fromIterable([
             [0, 1]
           ]),
         );
@@ -461,10 +461,11 @@ void main() {
       setUp(() {
         scanResult = ScanResult(result: Result.success(device));
         when(_protobufConverter.scanResultFrom(any)).thenReturn(scanResult);
-        when(_scanChannel.receiveBroadcastStream())
-            .thenAnswer((_) => Stream<List<int>>.fromIterable([
-                  [1]
-                ]));
+        _scanStreamController.addStream(
+          Stream<List<int>>.fromIterable([
+            [1],
+          ]),
+        );
         result = _sut.scanStream;
       });
 
@@ -556,8 +557,8 @@ void main() {
       Stream<BleStatus> _bleStatusStream;
 
       setUp(() {
-        when(_statusChannel.receiveBroadcastStream()).thenAnswer(
-          (_) => Stream<List<int>>.fromIterable([
+        _statusStreamController.addStream(
+          Stream<List<int>>.fromIterable([
             [1],
             [0]
           ]),
@@ -620,8 +621,6 @@ void main() {
 }
 
 class _MethodChannelMock extends Mock implements MethodChannel {}
-
-class _EventChannelMock extends Mock implements EventChannel {}
 
 class _ArgsToProtobufConverterMock extends Mock
     implements ArgsToProtobufConverter {}

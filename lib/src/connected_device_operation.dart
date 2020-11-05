@@ -43,7 +43,7 @@ class ConnectedDeviceOperation {
 
   Stream<List<int>> subscribeToCharacteristic(
     QualifiedCharacteristic characteristic,
-    Future<ConnectionStateUpdate> shouldTerminate,
+    Future<void> isDisconnected,
   ) {
     final specificCharacteristicValueStream = characteristicValueStream
         .where((update) => update.characteristic == characteristic)
@@ -59,7 +59,7 @@ class ConnectedDeviceOperation {
               print("Error unsubscribing from notifications: $e")),
     );
 
-    shouldTerminate.then<void>((_) => autosubscribingRepeater.dispose());
+    isDisconnected.then<void>((_) => autosubscribingRepeater.dispose());
 
     return autosubscribingRepeater.stream;
   }
