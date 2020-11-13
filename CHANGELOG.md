@@ -1,3 +1,8 @@
+## 2.7.0
+
+* Fix #137 by making sure event channels are initialized early.
+* Add support for Android 5 and 6.
+
 ## 2.6.1+1
 
 * Revert protobuf upgrade on Android.
