@@ -1,7 +1,7 @@
 ## 2.7.1
 
 * Fix #115 by updating to new protobuf lite on Android.
-* Regenerate dart protobuf code.
+* Regenerate Dart and Swift protobuf code.
 
 ## 2.7.0
 
