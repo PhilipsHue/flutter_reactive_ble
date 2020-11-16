@@ -1,3 +1,8 @@
+## 2.7.1
+
+* Fix #115 by updating to new protobuf lite on Android.
+* Regenerate Dart and Swift protobuf code.
+
 ## 2.7.0
 
 * Fix #137 by making sure event channels are initialized early.
