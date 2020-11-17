@@ -197,3 +197,13 @@ iOS13 and higher
 
 iOS12 and lower
 * NSBluetoothPeripheralUsageDescription
+
+#### How to adjust ProGuard (Android)
+
+In case you are using ProGuard add the following snippet to your `proguard-rules.pro` file:
+
+```
+-keep class com.signify.hue.** { *; }
+```
+
+This will prevent issues like [#131](https://github.com/PhilipsHue/flutter_reactive_ble/issues/131) .
