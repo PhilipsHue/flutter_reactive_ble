@@ -46,6 +46,13 @@ void main() {
       );
     });
 
+    tearDown(() {
+      _connectedDeviceStreamController.close();
+      _argsStreamController.close();
+      _scanStreamController.close();
+      _statusStreamController.close();
+    });
+
     group('connect to device', () {
       pb.ConnectToDeviceRequest request;
       StreamSubscription subscription;
