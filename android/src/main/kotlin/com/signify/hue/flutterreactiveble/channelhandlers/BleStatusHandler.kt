@@ -35,6 +35,6 @@ class BleStatusHandler(private val bleClient: BleClient) : EventChannel.StreamHa
                                 .build()
                         eventSink.success(message.toByteArray())
                     }, { throwable ->
-                        eventSink.error("ObserveBleStatusFailure", throwable.message, throwable.stackTrace)
+                        eventSink.error("ObserveBleStatusFailure", throwable.message, null)
                     })
 }
