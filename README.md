@@ -18,12 +18,20 @@ The reactive BLE lib supports the following:
 - Clear GATT cache
 - Negotiate MTU size
 
+### Initialization
+
+Initializing the library should be done the following:
+
+```dart
+final flutterReactiveBle = FlutterReactiveBle();
+```
+
 ### Device discovery
 
 Discovering BLE devices should be done like this:
 
 ```dart
-reactivebleclient.scanForDevices(withServices: [serviceId], scanMode: ScanMode.lowLatency).listen((device) {
+flutterReactiveBle.scanForDevices(withServices: [serviceId], scanMode: ScanMode.lowLatency).listen((device) {
       //code for handling results
     }, onError: () {
       //code for handling error
@@ -51,7 +59,7 @@ Use ` _ble.status` to get the current status of the host device.
 To interact with a device you first need to establish a connection:
 
 ```dart
-reactiveBleClient.connectToDevice(
+flutterReactiveBle.connectToDevice(
       id: foundDeviceId,
       servicesWithCharacteristicsToDiscover: {serviceId: [char1, char2]},
       connectionTimeout: const Duration(seconds: 2),
@@ -68,7 +76,7 @@ There are numerous issues on the Android BLE stack that leave it hanging when yo
 issue use the method `connectToAdvertisingDevice` to first scan for the device and only if it is found connect to it.
 
 ```dart
-reactiveBleClient.connectToAdvertisingDevice(
+flutterReactiveBle.connectToAdvertisingDevice(
     id: foundDeviceId,
     withServices: [serviceUuid],
     prescanDuration: const Duration(seconds: 5),
@@ -89,16 +97,18 @@ Besides the normal connection parameters that are described above this function 
 
 ```dart
 final characteristic = QualifiedCharacteristic(serviceId: serviceUuid, characteristicId: characteristicUuid, deviceId: foundDeviceId);
-final response = await reactiveBleClient.readCharacteristic(characteristic);
+final response = await flutterReactiveBle.readCharacteristic(characteristic);
 ```
 
 #### Write with response
 
-Write a value to characteristic and await the response. The return value is a list of bytes (`List<int>`).
+Write a value to characteristic and await the response. The "response" in "write characteristic with response" means "an acknowledgement of reception". The write can either be acknowledged (success) or failed (an exception is thrown), thus the return type is `void` and there is nothing to print (though you can `print("Write successful")` and in a catch-clause `print("Write failed: $e")`).
+
+BLE does not provide a request-response mechanism like you may know from HTTP out of the box. If you need to perform request-response calls, you will need to implement a custom mechanism on top of the basic BLE functionality. A typical approach is to implement a "control point": a characteristic that is writable and delivers [notifications or indications](https://duckduckgo.com/?q=BLE+"indications"+vs+"notifications"), so that a request is written to it and a response is delivered back as a notification or an indication.
 
 ```dart
-final characteristic = QualifiedCharacteristic(serviceId: serviceUuid, characteristicId: characteristicUuid, deviceId: foundDeviceId);
-final response = await reactiveBleClient.writeCharacteristicWithResponse(characteristic, value: [0x00]);
+final characteristic = QualifiedCharacteristic(serviceId: serviceUuid, characteristicId: characteristicUuid, deviceId: foundDeviceId); 
+await flutterReactiveBle.writeCharacteristicWithResponse(characteristic, value: [0x00]);
 ```
 
 #### Write without response
@@ -107,7 +117,7 @@ Use this operation if you want to execute multiple consecutive write operations 
 
 ```dart
 final characteristic = QualifiedCharacteristic(serviceId: serviceUuid, characteristicId: characteristicUuid, deviceId: foundDeviceId);
-reactiveBleClient.writeCharacteristicWithoutResponse(characteristic, value: [0x00]);
+flutterReactiveBle.writeCharacteristicWithoutResponse(characteristic, value: [0x00]);
 ```
 
 ### Subscribe to characteristic
@@ -116,7 +126,7 @@ Instead of periodically reading the characteristic you can also listen to the no
 
 ```dart
 final characteristic = QualifiedCharacteristic(serviceId: serviceUuid, characteristicId: characteristicUuid, deviceId: foundDeviceId);
-   reactiveBleClient.subscribeToCharacteristic(characteristic).listen((data) {
+   flutterReactiveBle.subscribeToCharacteristic(characteristic).listen((data) {
       // code to handle incoming data
     }, onError: (dynamic error) {
       // code to handle errors
@@ -128,7 +138,7 @@ final characteristic = QualifiedCharacteristic(serviceId: serviceUuid, character
 You can increase or decrease the MTU size to reach a higher throughput. This operation will return the actual negotiated MTU size, but it is no guarantee that the requested size will be successfully negotiated. iOS has a default MTU size which cannot be negotiated, however you can still use this operation to get the current MTU.
 
 ```dart
-final mtu = await reactiveBleClient.requestMtu(deviceId: foundDeviceId, mtu: 250);
+final mtu = await flutterReactiveBle.requestMtu(deviceId: foundDeviceId, mtu: 250);
 ```
 
 ### Android specific operations
@@ -142,7 +152,7 @@ On Android you can send a connection priority update to the BLE device. The para
  Using `highPerformance` will increase battery usage but will speed up GATT operations. Be cautious when setting the priority when communicating with multiple devices because if you set highperformance for all devices the effect of increasing the priority will be lower.
 
 ```dart
-await reactiveBleClient.requestConnectionPriority(deviceId: foundDeviceId, priority:  ConnectionPriority.highPerformance);
+await flutterReactiveBle.requestConnectionPriority(deviceId: foundDeviceId, priority:  ConnectionPriority.highPerformance);
 ```
 
 #### Clear GATT cache
@@ -152,7 +162,7 @@ The Android OS maintains a table per device of the discovered service in cache. 
 **This is a hidden BLE operation and should be used with extreme caution since this operation is on the [greylist](https://developer.android.com/distribute/best-practices/develop/restrictions-non-sdk-interfaces).**  
 
 ```dart
-await reactiveBleClient.clearGattCache(foundDeviceId);
+await flutterReactiveBle.clearGattCache(foundDeviceId);
 ```
 
 ### FAQ
