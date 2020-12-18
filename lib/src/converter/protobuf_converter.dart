@@ -17,9 +17,33 @@ import 'package:flutter_reactive_ble/src/model/write_characteristic_info.dart';
 import 'package:flutter_reactive_ble/src/select_from.dart';
 import 'package:meta/meta.dart';
 
-class ProtobufConverter {
-  const ProtobufConverter();
+abstract class ProtobufConverter {
+  BleStatus bleStatusFrom(List<int> data);
 
+  ScanResult scanResultFrom(List<int> data);
+
+  ConnectionStateUpdate connectionStateUpdateFrom(List<int> data);
+
+  Result<Unit, GenericFailure<ClearGattCacheError>> clearGattCacheResultFrom(
+      List<int> data);
+
+  CharacteristicValue characteristicValueFrom(List<int> data);
+
+  WriteCharacteristicInfo writeCharacteristicInfoFrom(List<int> data);
+
+  ConnectionPriorityInfo connectionPriorityInfoFrom(List<int> data);
+
+  int mtuSizeFrom(List<int> data) =>
+      pb.NegotiateMtuInfo.fromBuffer(data).mtuSize;
+
+
+  List<DiscoveredService> discoveredServicesFrom(List<int> data);
+}
+
+class ProtobufConverterImpl implements ProtobufConverter {
+  const ProtobufConverterImpl();
+
+  @override
   BleStatus bleStatusFrom(List<int> data) {
     final message = pb.BleStatusInfo.fromBuffer(data);
     return selectFrom(
@@ -29,6 +53,7 @@ class ProtobufConverter {
     );
   }
 
+  @override
   ScanResult scanResultFrom(List<int> data) {
     final message = pb.DeviceScanInfo.fromBuffer(data);
 
@@ -55,6 +80,7 @@ class ProtobufConverter {
     );
   }
 
+  @override
   ConnectionStateUpdate connectionStateUpdateFrom(List<int> data) {
     final deviceInfo = pb.DeviceInfo.fromBuffer(data);
     return ConnectionStateUpdate(
@@ -74,6 +100,7 @@ class ProtobufConverter {
     );
   }
 
+  @override
   Result<Unit, GenericFailure<ClearGattCacheError>> clearGattCacheResultFrom(
       List<int> data) {
     final message = pb.ClearGattCacheInfo.fromBuffer(data);
@@ -88,6 +115,7 @@ class ProtobufConverter {
     );
   }
 
+  @override
   CharacteristicValue characteristicValueFrom(List<int> data) {
     final message = pb.CharacteristicValueInfo.fromBuffer(data);
 
@@ -105,6 +133,7 @@ class ProtobufConverter {
     );
   }
 
+  @override
   WriteCharacteristicInfo writeCharacteristicInfoFrom(List<int> data) {
     final message = pb.WriteCharacteristicInfo.fromBuffer(data);
 
@@ -122,6 +151,7 @@ class ProtobufConverter {
     );
   }
 
+  @override
   ConnectionPriorityInfo connectionPriorityInfoFrom(List<int> data) {
     final message = pb.ChangeConnectionPriorityInfo.fromBuffer(data);
     return ConnectionPriorityInfo(
@@ -137,6 +167,7 @@ class ProtobufConverter {
     );
   }
 
+  @override
   int mtuSizeFrom(List<int> data) =>
       pb.NegotiateMtuInfo.fromBuffer(data).mtuSize;
 
@@ -167,6 +198,7 @@ class ProtobufConverter {
     return null;
   }
 
+  @override
   List<DiscoveredService> discoveredServicesFrom(List<int> data) {
     final message = pb.DiscoverServicesInfo.fromBuffer(data);
     return message.services.map(_convertService).toList(growable: false);

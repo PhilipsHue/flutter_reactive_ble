@@ -3,8 +3,57 @@ import 'package:flutter_reactive_ble/src/generated/bledata.pb.dart' as pb;
 import 'package:flutter_reactive_ble/src/model/uuid.dart';
 import 'package:meta/meta.dart';
 
-class ArgsToProtobufConverter {
-  const ArgsToProtobufConverter();
+abstract class ArgsToProtobufConverter {
+  pb.ConnectToDeviceRequest createConnectToDeviceArgs(
+    String id,
+    Map<Uuid, List<Uuid>> servicesWithCharacteristicsToDiscover,
+    Duration connectionTimeout,
+  );
+
+  pb.DisconnectFromDeviceRequest createDisconnectDeviceArgs(String deviceId);
+
+  pb.ReadCharacteristicRequest createReadCharacteristicRequest(
+    QualifiedCharacteristic characteristic,
+  );
+
+  pb.WriteCharacteristicRequest createWriteChacracteristicRequest(
+    QualifiedCharacteristic characteristic,
+    List<int> value,
+  );
+
+  pb.NotifyCharacteristicRequest createNotifyCharacteristicRequest(
+    QualifiedCharacteristic characteristic,
+  );
+
+  pb.NotifyNoMoreCharacteristicRequest createNotifyNoMoreCharacteristicRequest(
+    QualifiedCharacteristic characteristic,
+  );
+
+  pb.NegotiateMtuRequest createNegotiateMtuRequest(
+    String deviceId,
+    int mtu,
+  );
+
+  pb.ChangeConnectionPriorityRequest createChangeConnectionPrioRequest(
+    String deviceId,
+    ConnectionPriority priority,
+  );
+
+  pb.ScanForDevicesRequest createScanForDevicesRequest({
+    @required List<Uuid> withServices,
+    @required ScanMode scanMode,
+    @required bool requireLocationServicesEnabled,
+  });
+
+  pb.ClearGattCacheRequest createClearGattCacheRequest(String deviceId);
+
+  pb.DiscoverServicesRequest createDiscoverServicesRequest(String deviceId);
+}
+
+class ArgsToProtobufConverterImpl implements ArgsToProtobufConverter {
+  const ArgsToProtobufConverterImpl();
+
+  @override
   pb.ConnectToDeviceRequest createConnectToDeviceArgs(
     String id,
     Map<Uuid, List<Uuid>> servicesWithCharacteristicsToDiscover,
@@ -34,9 +83,11 @@ class ArgsToProtobufConverter {
     return args;
   }
 
+  @override
   pb.DisconnectFromDeviceRequest createDisconnectDeviceArgs(String deviceId) =>
       pb.DisconnectFromDeviceRequest()..deviceId = deviceId;
 
+  @override
   pb.ReadCharacteristicRequest createReadCharacteristicRequest(
     QualifiedCharacteristic characteristic,
   ) {
@@ -50,6 +101,7 @@ class ArgsToProtobufConverter {
     return args;
   }
 
+  @override
   pb.WriteCharacteristicRequest createWriteChacracteristicRequest(
     QualifiedCharacteristic characteristic,
     List<int> value,
@@ -65,6 +117,7 @@ class ArgsToProtobufConverter {
     return args;
   }
 
+  @override
   pb.NotifyCharacteristicRequest createNotifyCharacteristicRequest(
     QualifiedCharacteristic characteristic,
   ) {
@@ -78,6 +131,7 @@ class ArgsToProtobufConverter {
     return args;
   }
 
+  @override
   pb.NotifyNoMoreCharacteristicRequest createNotifyNoMoreCharacteristicRequest(
     QualifiedCharacteristic characteristic,
   ) {
@@ -91,6 +145,7 @@ class ArgsToProtobufConverter {
     return args;
   }
 
+  @override
   pb.NegotiateMtuRequest createNegotiateMtuRequest(
     String deviceId,
     int mtu,
@@ -102,6 +157,7 @@ class ArgsToProtobufConverter {
     return args;
   }
 
+  @override
   pb.ChangeConnectionPriorityRequest createChangeConnectionPrioRequest(
     String deviceId,
     ConnectionPriority priority,
@@ -113,6 +169,7 @@ class ArgsToProtobufConverter {
     return args;
   }
 
+  @override
   pb.ScanForDevicesRequest createScanForDevicesRequest({
     @required List<Uuid> withServices,
     @required ScanMode scanMode,
@@ -131,11 +188,13 @@ class ArgsToProtobufConverter {
     return args;
   }
 
+  @override
   pb.ClearGattCacheRequest createClearGattCacheRequest(String deviceId) {
     final args = pb.ClearGattCacheRequest()..deviceId = deviceId;
     return args;
   }
 
+  @override
   pb.DiscoverServicesRequest createDiscoverServicesRequest(String deviceId) {
     final args = pb.DiscoverServicesRequest()..deviceId = deviceId;
     return args;
