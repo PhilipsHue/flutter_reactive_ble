@@ -14,7 +14,66 @@ import 'model/discovered_service.dart';
 import 'model/qualified_characteristic.dart';
 import 'model/unit.dart';
 
-class PluginController {
+abstract class DeviceOperationController {
+  Stream<CharacteristicValue> get charValueUpdateStream;
+
+  Stream<void> readCharacteristic(QualifiedCharacteristic characteristic);
+
+  Future<WriteCharacteristicInfo> writeCharacteristicWithResponse(
+    QualifiedCharacteristic characteristic,
+    List<int> value,
+  );
+
+  Future<WriteCharacteristicInfo> writeCharacteristicWithoutResponse(
+    QualifiedCharacteristic characteristic,
+    List<int> value,
+  );
+
+  Stream<void> subscribeToNotifications(
+    QualifiedCharacteristic characteristic,
+  );
+
+  Future<void> stopSubscribingToNotifications(
+    QualifiedCharacteristic characteristic,
+  );
+
+  Future<int> requestMtuSize(String deviceId, int mtu);
+
+  Future<ConnectionPriorityInfo> requestConnectionPriority(
+      String deviceId, ConnectionPriority priority);
+}
+
+abstract class Blaat {
+  Stream<ConnectionStateUpdate> get connectionUpdateStream;
+
+  Stream<ScanResult> get scanStream;
+
+  Stream<BleStatus> get bleStatusStream;
+
+  Future<void> initialize();
+
+  Future<void> deinitialize();
+  Stream<void> scanForDevices({
+    @required List<Uuid> withServices,
+    @required ScanMode scanMode,
+    @required bool requireLocationServicesEnabled,
+  });
+
+  Stream<void> connectToDevice(
+    String id,
+    Map<Uuid, List<Uuid>> servicesWithCharacteristicsToDiscover,
+    Duration connectionTimeout,
+  );
+
+  Future<void> disconnectDevice(String deviceId);
+
+  Future<Result<Unit, GenericFailure<ClearGattCacheError>>> clearGattCache(
+      String deviceId);
+
+  Future<List<DiscoveredService>> discoverServices(String deviceId);
+}
+
+class PluginController implements DeviceOperationController {
   PluginController({
     @required ArgsToProtobufConverter argsToProtobufConverter,
     @required ProtobufConverter protobufConverter,
@@ -67,6 +126,7 @@ class PluginController {
         },
       );
 
+  @override
   Stream<CharacteristicValue> get charValueUpdateStream =>
       _charValueStream ??= _charUpdateRawStream
           .map(_protobufConverter.characteristicValueFrom)
@@ -159,6 +219,7 @@ class PluginController {
     );
   }
 
+  @override
   Stream<void> readCharacteristic(QualifiedCharacteristic characteristic) {
     _debugLogger.log('Read characteristic $characteristic');
     return _bleMethodChannel
@@ -171,6 +232,7 @@ class PluginController {
         .asStream();
   }
 
+  @override
   Future<WriteCharacteristicInfo> writeCharacteristicWithResponse(
     QualifiedCharacteristic characteristic,
     List<int> value,
@@ -185,6 +247,7 @@ class PluginController {
         .then(_protobufConverter.writeCharacteristicInfoFrom);
   }
 
+  @override
   Future<WriteCharacteristicInfo> writeCharacteristicWithoutResponse(
     QualifiedCharacteristic characteristic,
     List<int> value,
@@ -201,6 +264,7 @@ class PluginController {
         .then(_protobufConverter.writeCharacteristicInfoFrom);
   }
 
+  @override
   Stream<void> subscribeToNotifications(
     QualifiedCharacteristic characteristic,
   ) {
@@ -215,6 +279,7 @@ class PluginController {
         .asStream();
   }
 
+  @override
   Future<void> stopSubscribingToNotifications(
     QualifiedCharacteristic characteristic,
   ) {
@@ -232,6 +297,7 @@ class PluginController {
         );
   }
 
+  @override
   Future<int> requestMtuSize(String deviceId, int mtu) async {
     _debugLogger
         .log('Request mtu size for device: $deviceId with mtuSize: $mtu');
@@ -245,6 +311,7 @@ class PluginController {
         .then(_protobufConverter.mtuSizeFrom);
   }
 
+  @override
   Future<ConnectionPriorityInfo> requestConnectionPriority(
       String deviceId, ConnectionPriority priority) {
     _debugLogger.log(

@@ -4,21 +4,21 @@ import 'package:meta/meta.dart';
 
 class ConnectedDeviceOperation {
   ConnectedDeviceOperation({
-    @required PluginController pluginController,
-  })  : assert(pluginController != null),
-        _pluginController = pluginController;
+    @required DeviceOperationController controller,
+  })  : assert(controller != null),
+        _controller = controller;
 
-  final PluginController _pluginController;
+  final DeviceOperationController _controller;
 
   Stream<CharacteristicValue> get characteristicValueStream =>
-      _pluginController.charValueUpdateStream;
+      _controller.charValueUpdateStream;
 
   Future<List<int>> readCharacteristic(QualifiedCharacteristic characteristic) {
     final specificCharacteristicValueStream = characteristicValueStream
         .where((update) => update.characteristic == characteristic)
         .map((update) => update.result.dematerialize());
 
-    return _pluginController
+    return _controller
         .readCharacteristic(characteristic)
         .asyncExpand((Object _) => specificCharacteristicValueStream)
         .firstWhere((_) => true,
@@ -29,7 +29,7 @@ class ConnectedDeviceOperation {
     QualifiedCharacteristic characteristic, {
     @required List<int> value,
   }) async =>
-      _pluginController
+      _controller
           .writeCharacteristicWithResponse(characteristic, value)
           .then((info) => info.result.dematerialize());
 
@@ -37,7 +37,7 @@ class ConnectedDeviceOperation {
     QualifiedCharacteristic characteristic, {
     @required List<int> value,
   }) async =>
-      _pluginController
+      _controller
           .writeCharacteristicWithoutResponse(characteristic, value)
           .then((info) => info.result.dematerialize());
 
@@ -50,10 +50,10 @@ class ConnectedDeviceOperation {
         .map((update) => update.result.dematerialize());
 
     final autosubscribingRepeater = Repeater<List<int>>.broadcast(
-      onListenEmitFrom: () => _pluginController
+      onListenEmitFrom: () => _controller
           .subscribeToNotifications(characteristic)
           .asyncExpand((Object _) => specificCharacteristicValueStream),
-      onCancel: () => _pluginController
+      onCancel: () => _controller
           .stopSubscribingToNotifications(characteristic)
           .catchError((Object e) =>
               print("Error unsubscribing from notifications: $e")),
@@ -65,11 +65,11 @@ class ConnectedDeviceOperation {
   }
 
   Future<int> requestMtu(String deviceId, int mtu) async =>
-      _pluginController.requestMtuSize(deviceId, mtu);
+      _controller.requestMtuSize(deviceId, mtu);
 
   Future<void> requestConnectionPriority(
           String deviceId, ConnectionPriority priority) async =>
-      _pluginController
+      _controller
           .requestConnectionPriority(deviceId, priority)
           .then((message) => message.result.dematerialize());
 }
