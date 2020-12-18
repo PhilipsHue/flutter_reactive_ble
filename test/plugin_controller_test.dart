@@ -8,31 +8,40 @@ import 'package:flutter_reactive_ble/src/converter/protobuf_converter.dart';
 import 'package:flutter_reactive_ble/src/debug_logger.dart';
 import 'package:flutter_reactive_ble/src/generated/bledata.pbserver.dart' as pb;
 import 'package:flutter_reactive_ble/src/model/clear_gatt_cache_error.dart';
-import 'package:flutter_reactive_ble/src/model/discovered_service.dart';
 import 'package:flutter_reactive_ble/src/model/unit.dart';
+import 'package:flutter_reactive_ble/src/model/write_characteristic_info.dart';
 import 'package:flutter_reactive_ble/src/plugin_controller.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 
+import 'plugin_controller_test.mocks.dart';
+
+@GenerateMocks([Logger, ArgsToProtobufConverter, ProtobufConverter])
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
   group('$PluginController', () {
     PluginController _sut;
-    _MethodChannelMock _methodChannel;
-    _ArgsToProtobufConverterMock _argsConverter;
-    ProtobufConverter _protobufConverter;
+    MethodChannel _methodChannel;
+    MockArgsToProtobufConverter _argsConverter;
+    MockProtobufConverter _protobufConverter;
     StreamController<List<int>> _connectedDeviceStreamController;
     StreamController<List<int>> _argsStreamController;
     StreamController<List<int>> _scanStreamController;
     StreamController<List<int>> _statusStreamController;
 
     setUp(() {
-      _argsConverter = _ArgsToProtobufConverterMock();
-      _methodChannel = _MethodChannelMock();
-      _protobufConverter = _ProtobufConverterMock();
+      _argsConverter = MockArgsToProtobufConverter();
+      _methodChannel = const MethodChannel('test');
+      _protobufConverter = MockProtobufConverter();
       _connectedDeviceStreamController = StreamController();
       _argsStreamController = StreamController();
       _scanStreamController = StreamController();
       _statusStreamController = StreamController();
+
+      _methodChannel.setMockMethodCallHandler((call) async {});
+      final logger = MockLogger();
+      when(logger.log(any)).thenReturn(null);
 
       _sut = PluginController(
         argsToProtobufConverter: _argsConverter,
@@ -42,7 +51,7 @@ void main() {
         charUpdateChannel: _argsStreamController.stream,
         bleDeviceScanChannel: _scanStreamController.stream,
         bleStatusChannel: _statusStreamController.stream,
-        debugLogger: _DebugLoggerMock(),
+        debugLogger: logger,
       );
     });
 
@@ -60,17 +69,11 @@ void main() {
         request = pb.ConnectToDeviceRequest();
         when(_argsConverter.createConnectToDeviceArgs(any, any, any))
             .thenReturn(request);
-        when(_methodChannel.invokeMethod<void>(any, any)).thenAnswer(
-          (_) => Future<void>.value(),
-        );
-
-        subscription = _sut.connectToDevice('id', {}, null).listen((event) {});
       });
 
-      test('It invokes methodchannel with correct method and arguments', () {
-        verify(_methodChannel.invokeMethod<void>(
-                'connectToDevice', request.writeToBuffer()))
-            .called(1);
+      test('It emits 1 item', () async {
+        final length = await _sut.connectToDevice('id', {}, null).length;
+        expect(length, 1);
       });
 
       tearDown(() async {
@@ -84,18 +87,11 @@ void main() {
         request = pb.DisconnectFromDeviceRequest();
         when(_argsConverter.createDisconnectDeviceArgs(any))
             .thenReturn(request);
-        when(_methodChannel.invokeMethod<void>(any, any)).thenAnswer(
-          (_) => Future<void>.value(),
-        );
-
-        await _sut.disconnectDevice('id');
       });
 
-      test('It invokes methodchannel with correct method and arguments', () {
-        verify(_methodChannel.invokeMethod<void>(
-          'disconnectFromDevice',
-          request.writeToBuffer(),
-        )).called(1);
+      test('It executes the request succesfully', () async {
+        await _sut.disconnectDevice('id');
+        expect(true, true);
       });
     });
 
@@ -115,8 +111,9 @@ void main() {
           ]),
         );
 
-        when(_protobufConverter.connectionStateUpdateFrom(any))
-            .thenReturn(update);
+        when(
+          _protobufConverter.connectionStateUpdateFrom(any),
+        ).thenReturn(update);
         result = _sut.connectionUpdateStream;
       });
 
@@ -160,31 +157,20 @@ void main() {
       QualifiedCharacteristic characteristic;
       pb.ReadCharacteristicRequest request;
 
-      setUp(() async {
+      setUp(() {
         request = pb.ReadCharacteristicRequest();
         characteristic = QualifiedCharacteristic(
           characteristicId: Uuid.parse('FEFF'),
           serviceId: Uuid.parse('FEFF'),
           deviceId: '123',
         );
-
         when(_argsConverter.createReadCharacteristicRequest(any))
             .thenReturn(request);
-        when(_methodChannel.invokeMethod<void>('readCharacteristic', any))
-            .thenAnswer((_) => Future.value());
-
-        _sut.readCharacteristic(characteristic);
       });
 
-      test('It calls args to protobuf converter with correct arguments', () {
-        verify(_argsConverter.createReadCharacteristicRequest(characteristic))
-            .called(1);
-      });
-
-      test('It invokes method channel with correct arguments', () {
-        verify(_methodChannel.invokeMethod<void>(
-                'readCharacteristic', request.writeToBuffer()))
-            .called(1);
+      test('It emits 1 item', () async {
+        final length = await _sut.readCharacteristic(characteristic).length;
+        expect(length, 1);
       });
     });
 
@@ -192,34 +178,31 @@ void main() {
       QualifiedCharacteristic characteristic;
       const value = [0, 1];
       pb.WriteCharacteristicRequest request;
+      WriteCharacteristicInfo expectedResult;
 
       setUp(() async {
         request = pb.WriteCharacteristicRequest();
+
         characteristic = QualifiedCharacteristic(
           characteristicId: Uuid.parse('FEFF'),
           serviceId: Uuid.parse('FEFF'),
           deviceId: '123',
         );
 
+        expectedResult = WriteCharacteristicInfo(
+            characteristic: characteristic, result: const Result.success(null));
+
         when(_argsConverter.createWriteChacracteristicRequest(any, any))
             .thenReturn(request);
-        when(_methodChannel.invokeMethod<List<int>>(
-                'writeCharacteristicWithResponse', any))
-            .thenAnswer((_) => Future.value(const [1, 0]));
-
-        await _sut.writeCharacteristicWithResponse(characteristic, value);
+        when(_protobufConverter.writeCharacteristicInfoFrom(any))
+            .thenReturn(expectedResult);
       });
 
-      test('It calls args to protobuf converter with correct arguments', () {
-        verify(_argsConverter.createWriteChacracteristicRequest(
-                characteristic, value))
-            .called(1);
-      });
+      test('It returns correct value', () async {
+        final result =
+            await _sut.writeCharacteristicWithResponse(characteristic, value);
 
-      test('It invokes method channel with correct arguments', () {
-        verify(_methodChannel.invokeMethod<void>(
-                'writeCharacteristicWithResponse', request.writeToBuffer()))
-            .called(1);
+        expect(result, expectedResult);
       });
     });
 
@@ -227,6 +210,7 @@ void main() {
       QualifiedCharacteristic characteristic;
       const value = [0, 1];
       pb.WriteCharacteristicRequest request;
+      WriteCharacteristicInfo expectedResult;
 
       setUp(() async {
         request = pb.WriteCharacteristicRequest();
@@ -236,25 +220,20 @@ void main() {
           deviceId: '123',
         );
 
+        expectedResult = WriteCharacteristicInfo(
+            characteristic: characteristic, result: const Result.success(null));
+
         when(_argsConverter.createWriteChacracteristicRequest(any, any))
             .thenReturn(request);
-        when(_methodChannel.invokeMethod<List<int>>(
-                'writeCharacteristicWithoutResponse', any))
-            .thenAnswer((_) => Future.value(const [1, 0]));
-
-        await _sut.writeCharacteristicWithoutResponse(characteristic, value);
+        when(_protobufConverter.writeCharacteristicInfoFrom(any))
+            .thenReturn(expectedResult);
       });
 
-      test('It calls args to protobuf converter with correct arguments', () {
-        verify(_argsConverter.createWriteChacracteristicRequest(
-                characteristic, value))
-            .called(1);
-      });
+      test('It returns correct value', () async {
+        final result = await _sut.writeCharacteristicWithoutResponse(
+            characteristic, value);
 
-      test('It invokes method channel with correct arguments', () {
-        verify(_methodChannel.invokeMethod<void>(
-                'writeCharacteristicWithoutResponse', request.writeToBuffer()))
-            .called(1);
+        expect(result, expectedResult);
       });
     });
 
@@ -262,7 +241,7 @@ void main() {
       QualifiedCharacteristic characteristic;
       pb.NotifyCharacteristicRequest request;
 
-      setUp(() async {
+      setUp(() {
         request = pb.NotifyCharacteristicRequest();
         characteristic = QualifiedCharacteristic(
           characteristicId: Uuid.parse('FEFF'),
@@ -272,25 +251,12 @@ void main() {
 
         when(_argsConverter.createNotifyCharacteristicRequest(any))
             .thenReturn(request);
-        when(
-          _methodChannel.invokeMethod<void>('readNotifications', any),
-        ).thenAnswer((_) => Future.value());
-
-        _sut.subscribeToNotifications(characteristic);
       });
 
-      test('It calls args to protobuf converter with correct arguments', () {
-        verify(_argsConverter.createNotifyCharacteristicRequest(characteristic))
-            .called(1);
-      });
-
-      test('It invokes method channel with correct arguments', () {
-        verify(
-          _methodChannel.invokeMethod<void>(
-            'readNotifications',
-            request.writeToBuffer(),
-          ),
-        ).called(1);
+      test('It emits one item', () async {
+        final length =
+            await _sut.subscribeToNotifications(characteristic).length;
+        expect(length, 1);
       });
     });
 
@@ -308,61 +274,29 @@ void main() {
 
         when(_argsConverter.createNotifyNoMoreCharacteristicRequest(any))
             .thenReturn(request);
-        when(
-          _methodChannel.invokeMethod<void>('stopNotifications', any),
-        ).thenAnswer((_) => Future.value());
+      });
 
+      test('It completes without error', () async {
         await _sut.stopSubscribingToNotifications(characteristic);
-      });
-
-      test('It calls args to protobuf converter with correct arguments', () {
-        verify(_argsConverter
-                .createNotifyNoMoreCharacteristicRequest(characteristic))
-            .called(1);
-      });
-
-      test('It invokes method channel with correct arguments', () {
-        verify(
-          _methodChannel.invokeMethod<void>(
-            'stopNotifications',
-            request.writeToBuffer(),
-          ),
-        ).called(1);
+        expect(true, true);
       });
     });
+
     group('Request mtu size', () {
       const deviceId = '123';
       const mtuSize = 40;
       pb.NegotiateMtuRequest request;
 
-      setUp(() async {
+      setUp(() {
         request = pb.NegotiateMtuRequest();
-
         when(_argsConverter.createNegotiateMtuRequest(any, any))
             .thenReturn(request);
-        when(
-          _methodChannel.invokeMethod<List<int>>('negotiateMtuSize', any),
-        ).thenAnswer((_) => Future.value([1]));
 
-        await _sut.requestMtuSize(deviceId, mtuSize);
+        when(_protobufConverter.mtuSizeFrom(any)).thenReturn(mtuSize);
       });
 
-      test('It calls args to protobuf converter with correct arguments', () {
-        verify(_argsConverter.createNegotiateMtuRequest(deviceId, mtuSize))
-            .called(1);
-      });
-
-      test('It calls protobuf converter wit correct arguments', () {
-        verify(_protobufConverter.mtuSizeFrom([1])).called(1);
-      });
-
-      test('It invokes method channel with correct arguments', () {
-        verify(
-          _methodChannel.invokeMethod<void>(
-            'negotiateMtuSize',
-            request.writeToBuffer(),
-          ),
-        ).called(1);
+      test('It returns requested mtu size', () async {
+        expect(await _sut.requestMtuSize(deviceId, mtuSize), mtuSize);
       });
     });
 
@@ -379,33 +313,13 @@ void main() {
 
         when(_argsConverter.createChangeConnectionPrioRequest(any, any))
             .thenReturn(request);
+
         when(_protobufConverter.connectionPriorityInfoFrom(any))
             .thenReturn(info);
-        when(
-          _methodChannel.invokeMethod<List<int>>(
-              'requestConnectionPriority', any),
-        ).thenAnswer((_) => Future.value([1]));
-
-        await _sut.requestConnectionPriority(deviceId, priority);
       });
 
-      test('It calls args to protobuf converter with correct arguments', () {
-        verify(_argsConverter.createChangeConnectionPrioRequest(
-                deviceId, priority))
-            .called(1);
-      });
-
-      test('It calls protobuf converter wit correct arguments', () {
-        verify(_protobufConverter.connectionPriorityInfoFrom([1])).called(1);
-      });
-
-      test('It invokes method channel with correct arguments', () {
-        verify(
-          _methodChannel.invokeMethod<void>(
-            'requestConnectionPriority',
-            request.writeToBuffer(),
-          ),
-        ).called(1);
+      test('It returns correct value', () async {
+        expect(await _sut.requestConnectionPriority(deviceId, priority), info);
       });
     });
 
@@ -424,33 +338,18 @@ void main() {
           requireLocationServicesEnabled:
               anyNamed('requireLocationServicesEnabled'),
         )).thenReturn(request);
-
-        when(
-          _methodChannel.invokeMethod<void>('scanForDevices', any),
-        ).thenAnswer(
-          (_) => Future.value(),
-        );
-
-        _sut.scanForDevices(
-          withServices: withServices,
-          scanMode: scanMode,
-          requireLocationServicesEnabled: locationEnabled,
-        );
       });
 
-      test('It invokes correct method', () {
-        verify(_methodChannel.invokeMethod<void>(
-          'scanForDevices',
-          request.writeToBuffer(),
-        )).called(1);
-      });
+      test('It emits 1 item', () async {
+        final length = await _sut
+            .scanForDevices(
+              withServices: withServices,
+              scanMode: scanMode,
+              requireLocationServicesEnabled: locationEnabled,
+            )
+            .length;
 
-      test('It invokes argconverter with correct arguments', () {
-        verify(_argsConverter.createScanForDevicesRequest(
-          withServices: withServices,
-          scanMode: scanMode,
-          requireLocationServicesEnabled: locationEnabled,
-        )).called(1);
+        expect(length, 1);
       });
     });
 
@@ -467,7 +366,9 @@ void main() {
       Stream<ScanResult> result;
       setUp(() {
         scanResult = ScanResult(result: Result.success(device));
+
         when(_protobufConverter.scanResultFrom(any)).thenReturn(scanResult);
+
         _scanStreamController.addStream(
           Stream<List<int>>.fromIterable([
             [1],
@@ -476,41 +377,22 @@ void main() {
         result = _sut.scanStream;
       });
 
-      test('It calls protobufconverter with correct arguments', () async {
-        await result.first;
-        verify(_protobufConverter.scanResultFrom([1])).called(1);
-      });
-
       test('It emits correct values', () {
         expect(result, emitsInOrder(<ScanResult>[scanResult]));
       });
     });
 
     group('initialize', () {
-      setUp(() async {
-        when(_methodChannel.invokeMethod<void>('initialize')).thenAnswer(
-          (realInvocation) => Future.value(),
-        );
-
+      test('It completes without error', () async {
         await _sut.initialize();
-      });
-
-      test('It invokes correct method in method channel', () {
-        verify(_methodChannel.invokeMethod<void>('initialize')).called(1);
+        expect(true, true);
       });
     });
 
     group('deInitialize', () {
-      setUp(() async {
-        when(_methodChannel.invokeMethod<void>('deinitialize')).thenAnswer(
-          (realInvocation) => Future.value(),
-        );
-
+      test('It completes without error', () async {
         await _sut.deinitialize();
-      });
-
-      test('It invokes correct method in method channel', () {
-        verify(_methodChannel.invokeMethod<void>('deinitialize')).called(1);
+        expect(true, true);
       });
     });
 
@@ -518,41 +400,23 @@ void main() {
       const deviceId = '123';
 
       pb.ClearGattCacheRequest request;
-      Result<Unit, GenericFailure<ClearGattCacheError>> result;
       Result<Unit, GenericFailure<ClearGattCacheError>> convertedResult;
 
-      setUp(() async {
+      setUp(() {
         request = pb.ClearGattCacheRequest();
         convertedResult =
             const Result<Unit, GenericFailure<ClearGattCacheError>>.success(
                 Unit());
-        when(_methodChannel.invokeMethod<List<int>>('clearGattCache', any))
-            .thenAnswer(
-          (realInvocation) => Future.value([1]),
-        );
+
         when(_argsConverter.createClearGattCacheRequest(any))
             .thenReturn(request);
+
         when(_protobufConverter.clearGattCacheResultFrom(any))
             .thenReturn(convertedResult);
-        result = await _sut.clearGattCache(deviceId);
       });
 
-      test('It calls method channel with correct arguments', () {
-        verify(_methodChannel.invokeMethod<List<int>>(
-          'clearGattCache',
-          request.writeToBuffer(),
-        )).called(1);
-      });
-
-      test('It calls args to protobufconverter with correct arguments', () {
-        verify(_argsConverter.createClearGattCacheRequest(deviceId)).called(1);
-      });
-
-      test('It calls protobuf converter with correct arguments', () {
-        verify(_protobufConverter.clearGattCacheResultFrom([1])).called(1);
-      });
-
-      test('It returns correct value', () {
+      test('It returns correct value', () async {
+        final result = await _sut.clearGattCache(deviceId);
         expect(result, convertedResult);
       });
     });
@@ -596,28 +460,13 @@ void main() {
 
       setUp(() async {
         request = pb.DiscoverServicesRequest();
-        when(_methodChannel.invokeMethod<List<int>>('discoverServices', any))
-            .thenAnswer((_) => Future.value([1]));
-        when(_argsConverter.createDiscoverServicesRequest(deviceId))
+
+        when(_argsConverter.createDiscoverServicesRequest(any))
             .thenReturn(request);
         when(_protobufConverter.discoveredServicesFrom(any))
             .thenReturn(services);
+
         result = await _sut.discoverServices(deviceId);
-      });
-
-      test('It calls args to protobuf converted with correct arguments', () {
-        verify(_argsConverter.createDiscoverServicesRequest(deviceId))
-            .called(1);
-      });
-
-      test('It invokes methodchannel with correct arguments', () {
-        verify(_methodChannel.invokeMethod<List<int>>(
-                'discoverServices', request.writeToBuffer()))
-            .called(1);
-      });
-
-      test('It invokes protobuf converter with correct arguments', () {
-        verify(_protobufConverter.discoveredServicesFrom([1])).called(1);
       });
 
       test('It returns discovered services', () {
@@ -626,12 +475,3 @@ void main() {
     });
   });
 }
-
-class _MethodChannelMock extends Mock implements MethodChannel {}
-
-class _ArgsToProtobufConverterMock extends Mock
-    implements ArgsToProtobufConverter {}
-
-class _ProtobufConverterMock extends Mock implements ProtobufConverter {}
-
-class _DebugLoggerMock extends Mock implements DebugLogger {}

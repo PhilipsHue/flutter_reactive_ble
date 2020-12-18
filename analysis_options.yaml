@@ -19,7 +19,7 @@ linter:
     - avoid_types_as_parameter_names
     - cancel_subscriptions
     - close_sinks
-    - comment_references
+    # - comment_references -- DISABLED: collision with mockito generation
     - control_flow_in_finally
     # - diagnostic_describe_all_properties -- DISABLED: experimental feature
     - empty_statements

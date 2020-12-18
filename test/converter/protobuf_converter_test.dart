@@ -13,7 +13,7 @@ import 'package:mockito/mockito.dart';
 
 void main() {
   group('$ProtobufConverter', () {
-    const sut = ProtobufConverter();
+    const sut = ProtobufConverterImpl();
 
     group("decoding ${pb.DeviceScanInfo}", () {
       const id = 'id';

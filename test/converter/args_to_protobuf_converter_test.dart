@@ -6,7 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('$ArgsToProtobufConverter', () {
-    const _sut = ArgsToProtobufConverter();
+    const _sut = ArgsToProtobufConverterImpl();
 
     group('Connect to device args', () {
       const deviceId = '123';

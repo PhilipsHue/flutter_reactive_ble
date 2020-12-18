@@ -23,7 +23,7 @@ class PluginController {
     @required Stream<List<int>> charUpdateChannel,
     @required Stream<List<int>> bleDeviceScanChannel,
     @required Stream<List<int>> bleStatusChannel,
-    @required DebugLogger debugLogger,
+    @required Logger debugLogger,
   })  : assert(argsToProtobufConverter != null),
         assert(protobufConverter != null),
         assert(bleMethodChannel != null),
@@ -48,7 +48,7 @@ class PluginController {
   final Stream<List<int>> _charUpdateRawStream;
   final Stream<List<int>> _bleDeviceScanRawStream;
   final Stream<List<int>> _bleStatusRawChannel;
-  final DebugLogger _debugLogger;
+  final Logger _debugLogger;
 
   Stream<ConnectionStateUpdate> _connectionUpdateStream;
   Stream<CharacteristicValue> _charValueStream;
@@ -296,8 +296,8 @@ class PluginControllerFactory {
     const bleStatusChannel = EventChannel("flutter_reactive_ble_status");
 
     return PluginController(
-      protobufConverter: const ProtobufConverter(),
-      argsToProtobufConverter: const ArgsToProtobufConverter(),
+      protobufConverter: const ProtobufConverterImpl(),
+      argsToProtobufConverter: const ArgsToProtobufConverterImpl(),
       bleMethodChannel: _bleMethodChannel,
       connectedDeviceChannel:
           connectedDeviceChannel.receiveBroadcastStream().cast<List<int>>(),
