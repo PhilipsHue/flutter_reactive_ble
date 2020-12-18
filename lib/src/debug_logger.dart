@@ -1,7 +1,6 @@
 import 'package:flutter_reactive_ble/src/model/log_level.dart';
 
 abstract class Logger {
-  
   set logLevel(LogLevel logLevel);
 
   void log(Object message);

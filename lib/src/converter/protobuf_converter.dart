@@ -36,7 +36,6 @@ abstract class ProtobufConverter {
   int mtuSizeFrom(List<int> data) =>
       pb.NegotiateMtuInfo.fromBuffer(data).mtuSize;
 
-
   List<DiscoveredService> discoveredServicesFrom(List<int> data);
 }
 

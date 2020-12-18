@@ -2,16 +2,15 @@ import 'dart:async';
 
 import 'package:flutter_reactive_ble/src/rx_ext/repeater.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mockito/mockito.dart';
 
 void main() {
   group("Repeater", () {
     StreamController<int> underlyingStreamController;
-    _RepeaterHandlerMock<int> handler;
+    _RepeaterHandler<int> handler;
 
     setUp(() {
       underlyingStreamController = StreamController(sync: true);
-      handler = _RepeaterHandlerMock();
+      handler = _RepeaterHandler(underlyingStreamController.stream);
     });
 
     tearDown(() {
@@ -27,8 +26,6 @@ void main() {
           onCancel: handler.onCancel,
           isSync: true,
         );
-        when(handler.onListenEmitFrom())
-            .thenAnswer((_) => underlyingStreamController.stream);
       });
       group('Has subscription', () {
         StreamSubscription<int> subscription;
@@ -39,7 +36,6 @@ void main() {
 
         test("subscribes to the underlying stream when a listener connects",
             () {
-          verify(handler.onListenEmitFrom()).called(1);
           expect(underlyingStreamController.hasListener, true);
         });
         test(
@@ -47,34 +43,23 @@ void main() {
             () async {
           await subscription.cancel();
 
-          verify(handler.onCancel()).called(1);
           expect(underlyingStreamController.hasListener, false);
         });
 
         test("unsubscribes from the underlying stream when detached", () async {
           await sut.detach();
 
-          verify(handler.onCancel()).called(1);
           expect(underlyingStreamController.hasListener, false);
         });
 
         test("unsubscribes from the underlying stream when disposed", () async {
           await sut.dispose();
 
-          verify(handler.onCancel()).called(1);
           expect(underlyingStreamController.hasListener, false);
         });
 
         test("safely disposes when has not been listened to", () {
           expect(() async => sut.dispose(), returnsNormally);
-        });
-      });
-
-      group('No subscription', () {
-        test(
-            "does not subscribe to the underlying stream in absence of listeners",
-            () {
-          verifyNever(handler.onListenEmitFrom());
         });
       });
     });
@@ -129,10 +114,10 @@ void main() {
   });
 }
 
-class _RepeaterHandlerMock<T> extends Mock implements _RepeaterHandler<T> {}
+class _RepeaterHandler<T> {
+  const _RepeaterHandler(Stream<T> stream) : _stream = stream;
+  final Stream<T> _stream;
+  Stream<T> onListenEmitFrom() => _stream;
 
-abstract class _RepeaterHandler<T> {
-  Stream<T> onListenEmitFrom();
-
-  Future<dynamic> onCancel();
+  Future<dynamic> onCancel() async {}
 }
