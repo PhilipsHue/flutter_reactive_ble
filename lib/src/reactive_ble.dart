@@ -116,7 +116,7 @@ class FlutterReactiveBle {
     _initialization ??= _pluginController.initialize();
 
     _connectedDeviceOperator ??= ConnectedDeviceOperation(
-      pluginController: _pluginController,
+      controller: _pluginController,
     );
     _deviceScanner ??= DeviceScanner(
       pluginController: _pluginController,

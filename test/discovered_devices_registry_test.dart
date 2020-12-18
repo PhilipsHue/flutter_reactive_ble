@@ -1,18 +1,14 @@
 import 'package:flutter_reactive_ble/src/discovered_devices_registry.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mockito/mockito.dart';
 
 void main() {
   group("$DiscoveredDevicesRegistry", () {
     DiscoveredDevicesRegistry sut;
     const device = "Testdevice";
     final timestamp = DateTime(2019);
-    _TimestampProviderMock timestampMock;
 
     setUp(() {
-      timestampMock = _TimestampProviderMock();
-      when(timestampMock.getTimestamp()).thenReturn(timestamp);
-      sut = DiscoveredDevicesRegistry(getTimestamp: timestampMock.getTimestamp);
+      sut = DiscoveredDevicesRegistry(getTimestamp: () => timestamp);
     });
     group('Given device is added', () {
       setUp(() {
@@ -44,10 +40,9 @@ void main() {
         final dateTime = DateTime(2018, 1, 1);
 
         final responses = [dateTime, timestamp];
-        when(timestampMock.getTimestamp())
-            .thenAnswer((_) => responses.removeAt(0));
+
         sut = DiscoveredDevicesRegistry(
-          getTimestamp: timestampMock.getTimestamp,
+          getTimestamp: () => responses.removeAt(0),
         )..add(device);
 
         expect(
@@ -62,8 +57,4 @@ void main() {
       });
     });
   });
-}
-
-class _TimestampProviderMock extends Mock {
-  DateTime getTimestamp();
 }
