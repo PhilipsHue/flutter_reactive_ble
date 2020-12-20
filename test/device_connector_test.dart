@@ -1,9 +1,10 @@
 import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
 import 'package:flutter_reactive_ble/src/device_connector.dart';
-import 'package:flutter_reactive_ble/src/device_scanner.dart';
 import 'package:flutter_reactive_ble/src/model/scan_session.dart';
 import 'package:flutter_reactive_ble/src/plugin_controller.dart';
 import 'package:flutter_test/flutter_test.dart';
+
+import 'stubs/device_scanner_stub.dart';
 
 void main() {
   group('$DeviceConnector', () {
@@ -12,7 +13,7 @@ void main() {
     Stream<ConnectionStateUpdate> _connectionStateUpdateStream;
     Stream<ConnectionStateUpdate> _result;
     _DiscoverDevicesStub _discoverDevicesStub;
-    _DeviceScannerStub _scanner;
+    DeviceScannerStub _scanner;
 
     Map<Uuid, List<Uuid>> _servicesToDiscover;
     ConnectionStateUpdate updateForDevice;
@@ -25,7 +26,7 @@ void main() {
     setUp(() {
       _controller = _DeviceConnectionControllerStub();
       _discoverDevicesStub = _DiscoverDevicesStub();
-      _scanner = _DeviceScannerStub();
+      _scanner = DeviceScannerStub();
       _servicesToDiscover = {
         Uuid.parse('FEFE'): [Uuid.parse('FEFE')]
       };
@@ -46,7 +47,7 @@ void main() {
 
       _controller.connectionUpdateStub = _connectionStateUpdateStream;
 
-      _sut = DeviceConnector(
+      _sut = DeviceConnectorImpl(
         controller: _controller,
         deviceIsDiscoveredRecently:
             _discoverDevicesStub.deviceIsDiscoveredRecently,
@@ -286,24 +287,4 @@ class _DiscoverDevicesStub {
       _results.removeAt(0);
 
   set expectedResult(List<bool> results) => _results = results;
-}
-
-class _DeviceScannerStub implements DeviceScanner {
-  List<ScanSession> _scanSessions;
-  List<DiscoveredDevice> _discoveredDevices;
-
-  @override
-  ScanSession get currentScan => _scanSessions.removeAt(0);
-
-  @override
-  Stream<DiscoveredDevice> scanForDevices(
-          {List<Uuid> withServices,
-          ScanMode scanMode = ScanMode.balanced,
-          bool requireLocationServicesEnabled = true}) =>
-      Stream.fromIterable(_discoveredDevices);
-
-  set scanSessionsStub(List<ScanSession> sessions) => _scanSessions = sessions;
-
-  set discoveredDevicesStub(List<DiscoveredDevice> devices) =>
-      _discoveredDevices = devices;
 }

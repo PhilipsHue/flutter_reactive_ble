@@ -22,7 +22,6 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   functional_data_generator: ^0.3.0
-  mockito: ^4.1.1
 
 flutter:
   plugin:

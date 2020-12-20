@@ -12,12 +12,12 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   _DeviceOperationControllerStub _controller;
-  ConnectedDeviceOperation _sut;
+  ConnectedDeviceOperationImpl _sut;
 
   group('$ConnectedDeviceOperation', () {
     setUp(() {
       _controller = _DeviceOperationControllerStub();
-      _sut = ConnectedDeviceOperation(
+      _sut = ConnectedDeviceOperationImpl(
         controller: _controller,
       );
     });
@@ -407,4 +407,7 @@ class _DeviceOperationControllerStub implements DeviceOperationController {
 
   set connectionPrioInfoStub(ConnectionPriorityInfo info) =>
       _priorityInfo = info;
+
+  @override
+  Future<List<DiscoveredService>> discoverServices(String deviceId) async => [];
 }

@@ -17,6 +17,8 @@ import 'model/unit.dart';
 abstract class DeviceOperationController {
   Stream<CharacteristicValue> get charValueUpdateStream;
 
+  Future<List<DiscoveredService>> discoverServices(String deviceId);
+
   Stream<void> readCharacteristic(QualifiedCharacteristic characteristic);
 
   Future<WriteCharacteristicInfo> writeCharacteristicWithResponse(
@@ -65,7 +67,7 @@ abstract class DeviceConnectionController {
   Future<void> disconnectDevice(String deviceId);
 }
 
-abstract class Blaat {
+abstract class BleOperationController {
   Stream<BleStatus> get bleStatusStream;
 
   Future<void> initialize();
@@ -74,15 +76,14 @@ abstract class Blaat {
 
   Future<Result<Unit, GenericFailure<ClearGattCacheError>>> clearGattCache(
       String deviceId);
-
-  Future<List<DiscoveredService>> discoverServices(String deviceId);
 }
 
 class PluginController
     implements
         DeviceOperationController,
         ScanOperationController,
-        DeviceConnectionController {
+        DeviceConnectionController,
+        BleOperationController {
   PluginController({
     @required ArgsToProtobufConverter argsToProtobufConverter,
     @required ProtobufConverter protobufConverter,
@@ -158,6 +159,7 @@ class PluginController
         },
       );
 
+  @override
   Stream<BleStatus> get bleStatusStream =>
       _bleStatusStream ??= _bleStatusRawChannel
           .map(_protobufConverter.bleStatusFrom)
@@ -166,11 +168,13 @@ class PluginController
         return status;
       });
 
+  @override
   Future<void> initialize() {
     _debugLogger.log('Initialize ble client');
     return _bleMethodChannel.invokeMethod("initialize");
   }
 
+  @override
   Future<void> deinitialize() {
     _debugLogger.log('DeIititialize ble client');
     return _bleMethodChannel.invokeMethod<void>("deinitialize");
@@ -340,6 +344,7 @@ class PluginController
         .then(_protobufConverter.connectionPriorityInfoFrom);
   }
 
+  @override
   Future<Result<Unit, GenericFailure<ClearGattCacheError>>> clearGattCache(
       String deviceId) {
     _debugLogger.log('Clear gatt cache for device: $deviceId');
@@ -353,6 +358,7 @@ class PluginController
         .then(_protobufConverter.clearGattCacheResultFrom);
   }
 
+  @override
   Future<List<DiscoveredService>> discoverServices(String deviceId) async =>
       _bleMethodChannel
           .invokeMethod<List<int>>(
@@ -367,7 +373,7 @@ class PluginController
 class PluginControllerFactory {
   const PluginControllerFactory();
 
-  PluginController create(DebugLogger logger) {
+  PluginController create(Logger logger) {
     const _bleMethodChannel = MethodChannel("flutter_reactive_ble_method");
 
     const connectedDeviceChannel =

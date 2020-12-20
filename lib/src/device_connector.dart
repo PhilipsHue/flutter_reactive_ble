@@ -10,8 +10,26 @@ import 'model/generic_failure.dart';
 import 'model/scan_mode.dart';
 import 'model/uuid.dart';
 
-class DeviceConnector {
-  const DeviceConnector({
+abstract class DeviceConnector {
+  Stream<ConnectionStateUpdate> get deviceConnectionStateUpdateStream;
+
+  Stream<ConnectionStateUpdate> connect({
+    @required String id,
+    Map<Uuid, List<Uuid>> servicesWithCharacteristicsToDiscover,
+    Duration connectionTimeout,
+  });
+
+  Stream<ConnectionStateUpdate> connectToAdvertisingDevice({
+    @required String id,
+    @required List<Uuid> withServices,
+    @required Duration prescanDuration,
+    Map<Uuid, List<Uuid>> servicesWithCharacteristicsToDiscover,
+    Duration connectionTimeout,
+  });
+}
+
+class DeviceConnectorImpl implements DeviceConnector {
+  const DeviceConnectorImpl({
     @required DeviceConnectionController controller,
     @required
         bool Function({String deviceId, Duration cacheValidity})
@@ -35,9 +53,11 @@ class DeviceConnector {
 
   static const _scanRegistryCacheValidityPeriod = Duration(seconds: 25);
 
+  @override
   Stream<ConnectionStateUpdate> get deviceConnectionStateUpdateStream =>
       _controller.connectionUpdateStream;
 
+  @override
   Stream<ConnectionStateUpdate> connect({
     @required String id,
     Map<Uuid, List<Uuid>> servicesWithCharacteristicsToDiscover,
@@ -62,6 +82,7 @@ class DeviceConnector {
     return autoconnectingRepeater.stream;
   }
 
+  @override
   Stream<ConnectionStateUpdate> connectToAdvertisingDevice({
     @required String id,
     @required List<Uuid> withServices,
