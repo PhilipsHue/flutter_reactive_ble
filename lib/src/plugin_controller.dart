@@ -43,21 +43,18 @@ abstract class DeviceOperationController {
       String deviceId, ConnectionPriority priority);
 }
 
-abstract class Blaat {
-  Stream<ConnectionStateUpdate> get connectionUpdateStream;
-
+abstract class ScanOperationController {
   Stream<ScanResult> get scanStream;
 
-  Stream<BleStatus> get bleStatusStream;
-
-  Future<void> initialize();
-
-  Future<void> deinitialize();
   Stream<void> scanForDevices({
     @required List<Uuid> withServices,
     @required ScanMode scanMode,
     @required bool requireLocationServicesEnabled,
   });
+}
+
+abstract class DeviceConnectionController {
+  Stream<ConnectionStateUpdate> get connectionUpdateStream;
 
   Stream<void> connectToDevice(
     String id,
@@ -66,6 +63,14 @@ abstract class Blaat {
   );
 
   Future<void> disconnectDevice(String deviceId);
+}
+
+abstract class Blaat {
+  Stream<BleStatus> get bleStatusStream;
+
+  Future<void> initialize();
+
+  Future<void> deinitialize();
 
   Future<Result<Unit, GenericFailure<ClearGattCacheError>>> clearGattCache(
       String deviceId);
@@ -73,7 +78,11 @@ abstract class Blaat {
   Future<List<DiscoveredService>> discoverServices(String deviceId);
 }
 
-class PluginController implements DeviceOperationController {
+class PluginController
+    implements
+        DeviceOperationController,
+        ScanOperationController,
+        DeviceConnectionController {
   PluginController({
     @required ArgsToProtobufConverter argsToProtobufConverter,
     @required ProtobufConverter protobufConverter,
@@ -114,6 +123,7 @@ class PluginController implements DeviceOperationController {
   Stream<ScanResult> _scanResultStream;
   Stream<BleStatus> _bleStatusStream;
 
+  @override
   Stream<ConnectionStateUpdate> get connectionUpdateStream =>
       _connectionUpdateStream ??= _connectedDeviceRawStream
           .map(_protobufConverter.connectionStateUpdateFrom)
@@ -138,6 +148,7 @@ class PluginController implements DeviceOperationController {
         },
       );
 
+  @override
   Stream<ScanResult> get scanStream => _scanResultStream ??=
           _bleDeviceScanRawStream.map(_protobufConverter.scanResultFrom).map(
         (scanResult) {
@@ -165,6 +176,7 @@ class PluginController implements DeviceOperationController {
     return _bleMethodChannel.invokeMethod<void>("deinitialize");
   }
 
+  @override
   Stream<void> scanForDevices({
     @required List<Uuid> withServices,
     @required ScanMode scanMode,
@@ -187,6 +199,7 @@ class PluginController implements DeviceOperationController {
         .asStream();
   }
 
+  @override
   Stream<void> connectToDevice(
     String id,
     Map<Uuid, List<Uuid>> servicesWithCharacteristicsToDiscover,
@@ -209,6 +222,7 @@ class PluginController implements DeviceOperationController {
         .asStream();
   }
 
+  @override
   Future<void> disconnectDevice(String deviceId) {
     _debugLogger.log('Disconnect from device $deviceId');
     return _bleMethodChannel.invokeMethod<void>(

@@ -50,7 +50,7 @@ class FlutterReactiveBle {
   }
 
   /// Registry that keeps track of all BLE devices found during a BLE scan.
-  final scanRegistry = DiscoveredDevicesRegistry.standard();
+  final scanRegistry = DiscoveredDevicesRegistryImpl.standard();
 
   /// A stream providing the host device BLE subsystem status updates.
   ///
@@ -118,18 +118,18 @@ class FlutterReactiveBle {
     _connectedDeviceOperator ??= ConnectedDeviceOperation(
       controller: _pluginController,
     );
-    _deviceScanner ??= DeviceScanner(
-      pluginController: _pluginController,
+    _deviceScanner ??= DeviceScannerImpl(
+      controller: _pluginController,
       platformIsAndroid: () => Platform.isAndroid,
       delayAfterScanCompletion: Future<void>.delayed(
         const Duration(milliseconds: 300),
       ),
-      scanRegistry: scanRegistry,
+      addToScanRegistry: scanRegistry.add,
     );
 
     _deviceConnector ??= DeviceConnector(
-      pluginController: _pluginController,
-      discoveredDevicesRegistry: scanRegistry,
+      controller: _pluginController,
+      deviceIsDiscoveredRecently: scanRegistry.deviceIsDiscoveredRecently,
       deviceScanner: _deviceScanner,
       delayAfterScanFailure: const Duration(seconds: 10),
     );

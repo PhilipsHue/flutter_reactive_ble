@@ -3,23 +3,25 @@ import 'dart:typed_data';
 
 import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
 import 'package:flutter_reactive_ble/src/device_scanner.dart';
-import 'package:flutter_reactive_ble/src/discovered_devices_registry.dart';
 import 'package:flutter_reactive_ble/src/model/discovered_device.dart';
 import 'package:flutter_reactive_ble/src/model/result.dart';
 import 'package:flutter_reactive_ble/src/model/scan_session.dart';
 import 'package:flutter_reactive_ble/src/plugin_controller.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 
+import 'device_scanner_test.mocks.dart';
+
+@GenerateMocks([ScanOperationController])
 void main() {
   group('$DeviceScanner', () {
     DiscoveredDevice _device1;
     DiscoveredDevice _device2;
-    _ScanRegistryMock _scanRegistry;
-    _PluginControllerMock _pluginController;
+    MockScanOperationController _controller;
     Completer<void> _delayAfterScanCompletion;
 
-    DeviceScanner _sut;
+    DeviceScannerImpl _sut;
 
     setUp(() {
       _device1 = DiscoveredDevice(
@@ -38,8 +40,7 @@ void main() {
       );
 
       _delayAfterScanCompletion = Completer();
-      _scanRegistry = _ScanRegistryMock();
-      _pluginController = _PluginControllerMock();
+      _controller = MockScanOperationController();
     });
 
     group('Scan for devices', () {
@@ -54,7 +55,7 @@ void main() {
         locationEnabled = false;
         scanmode = ScanMode.lowLatency;
 
-        when(_pluginController.scanForDevices(
+        when(_controller.scanForDevices(
           withServices: anyNamed('withServices'),
           scanMode: anyNamed('scanMode'),
           requireLocationServicesEnabled:
@@ -75,20 +76,17 @@ void main() {
                     _device2),
           );
 
-          when(_pluginController.scanStream).thenAnswer(
-            (_) => Stream.fromIterable(
-              [result1, result2],
-            ),
-          );
+          when(_controller.scanStream)
+              .thenAnswer((_) => Stream.fromIterable([result1, result2]));
         });
 
         group('And platform is not Android', () {
           setUp(() {
-            _sut = DeviceScanner(
-              pluginController: _pluginController,
+            _sut = DeviceScannerImpl(
+              controller: _controller,
               platformIsAndroid: () => false,
               delayAfterScanCompletion: _delayAfterScanCompletion.future,
-              scanRegistry: _scanRegistry,
+              addToScanRegistry: (deviceId) {},
             );
             scanStream = _sut.scanForDevices(
               withServices: withServices,
@@ -99,14 +97,6 @@ void main() {
           test('It emits discovered devices ', () {
             expect(scanStream,
                 emitsInOrder(<DiscoveredDevice>[_device1, _device2]));
-          });
-
-          test('It calls plugin controller with correct arguments', () {
-            verify(_pluginController.scanForDevices(
-              withServices: withServices,
-              scanMode: scanmode,
-              requireLocationServicesEnabled: locationEnabled,
-            )).called(1);
           });
 
           test('It keeps instance of current scan session', () {
@@ -128,11 +118,11 @@ void main() {
 
         group('And platform is android', () {
           setUp(() {
-            _sut = DeviceScanner(
-              pluginController: _pluginController,
+            _sut = DeviceScannerImpl(
+              controller: _controller,
               platformIsAndroid: () => true,
               delayAfterScanCompletion: _delayAfterScanCompletion.future,
-              scanRegistry: _scanRegistry,
+              addToScanRegistry: (deviceId) {},
             );
             scanStream = _sut.scanForDevices(
               withServices: withServices,
@@ -176,17 +166,14 @@ void main() {
         Stream<DiscoveredDevice> scanStream;
 
         setUp(() {
-          when(_pluginController.scanStream).thenAnswer(
-            (_) => Stream.fromIterable(
-              [resultFailure],
-            ),
-          );
+          when(_controller.scanStream)
+              .thenAnswer((_) => Stream.fromIterable([resultFailure]));
 
-          _sut = DeviceScanner(
-            pluginController: _pluginController,
+          _sut = DeviceScannerImpl(
+            controller: _controller,
             platformIsAndroid: () => false,
             delayAfterScanCompletion: _delayAfterScanCompletion.future,
-            scanRegistry: _scanRegistry,
+            addToScanRegistry: (deviceId) {},
           );
 
           scanStream = _sut.scanForDevices(
@@ -208,7 +195,3 @@ void main() {
     });
   });
 }
-
-class _PluginControllerMock extends Mock implements PluginController {}
-
-class _ScanRegistryMock extends Mock implements DiscoveredDevicesRegistry {}
