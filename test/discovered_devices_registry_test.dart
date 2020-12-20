@@ -3,12 +3,12 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group("$DiscoveredDevicesRegistry", () {
-    DiscoveredDevicesRegistry sut;
+    DiscoveredDevicesRegistryImpl sut;
     const device = "Testdevice";
     final timestamp = DateTime(2019);
 
     setUp(() {
-      sut = DiscoveredDevicesRegistry(getTimestamp: () => timestamp);
+      sut = DiscoveredDevicesRegistryImpl(getTimestamp: () => timestamp);
     });
     group('Given device is added', () {
       setUp(() {
@@ -41,7 +41,7 @@ void main() {
 
         final responses = [dateTime, timestamp];
 
-        sut = DiscoveredDevicesRegistry(
+        sut = DiscoveredDevicesRegistryImpl(
           getTimestamp: () => responses.removeAt(0),
         )..add(device);
 

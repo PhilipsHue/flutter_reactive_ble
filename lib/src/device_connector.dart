@@ -5,7 +5,6 @@ import 'package:flutter_reactive_ble/src/plugin_controller.dart';
 import 'package:flutter_reactive_ble/src/rx_ext/repeater.dart';
 import 'package:meta/meta.dart';
 
-import 'discovered_devices_registry.dart';
 import 'model/discovered_device.dart';
 import 'model/generic_failure.dart';
 import 'model/scan_mode.dart';
@@ -13,21 +12,24 @@ import 'model/uuid.dart';
 
 class DeviceConnector {
   const DeviceConnector({
-    @required PluginController pluginController,
-    @required DiscoveredDevicesRegistry discoveredDevicesRegistry,
+    @required DeviceConnectionController controller,
+    @required
+        bool Function({String deviceId, Duration cacheValidity})
+            deviceIsDiscoveredRecently,
     @required DeviceScanner deviceScanner,
     @required Duration delayAfterScanFailure,
-  })  : assert(pluginController != null),
+  })  : assert(controller != null),
         assert(deviceScanner != null),
-        assert(discoveredDevicesRegistry != null),
+        assert(deviceIsDiscoveredRecently != null),
         assert(delayAfterScanFailure != null),
-        _discoveredDevicesRegistry = discoveredDevicesRegistry,
+        _deviceIsDiscoveredRecently = deviceIsDiscoveredRecently,
         _deviceScanner = deviceScanner,
-        _controller = pluginController,
+        _controller = controller,
         _delayAfterScanFailure = delayAfterScanFailure;
 
-  final PluginController _controller;
-  final DiscoveredDevicesRegistry _discoveredDevicesRegistry;
+  final DeviceConnectionController _controller;
+  final bool Function({String deviceId, Duration cacheValidity})
+      _deviceIsDiscoveredRecently;
   final DeviceScanner _deviceScanner;
   final Duration _delayAfterScanFailure;
 
@@ -93,7 +95,7 @@ class DeviceConnector {
     List<Uuid> withServices,
     Duration prescanDuration,
   ) {
-    if (_discoveredDevicesRegistry.deviceIsDiscoveredRecently(
+    if (_deviceIsDiscoveredRecently(
         deviceId: id, cacheValidity: _scanRegistryCacheValidityPeriod)) {
       return connect(
         id: id,
@@ -177,7 +179,7 @@ class DeviceConnector {
     Map<Uuid, List<Uuid>> servicesWithCharacteristicsToDiscover,
     Duration connectionTimeout,
   ) {
-    if (_discoveredDevicesRegistry.deviceIsDiscoveredRecently(
+    if (_deviceIsDiscoveredRecently(
       deviceId: id,
       cacheValidity: _scanRegistryCacheValidityPeriod,
     )) {
