@@ -22,7 +22,7 @@ void main() {
   group('$ConnectedDeviceOperation', () {
     setUp(() {
       _controller = MockDeviceOperationController();
-      _sut = ConnectedDeviceOperation(
+      _sut = ConnectedDeviceOperationImpl(
         controller: _controller,
       );
     });

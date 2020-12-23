@@ -52,7 +52,7 @@ void main() {
         connectionState: DeviceConnectionState.connecting,
         failure: null,
       );
-      _sut = DeviceConnector(
+      _sut = DeviceConnectorImpl(
         controller: _controller,
         deviceIsDiscoveredRecently: _registry.deviceIsDiscoveredRecently,
         deviceScanner: _scanner,
