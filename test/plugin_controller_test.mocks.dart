@@ -4,6 +4,7 @@ import 'package:flutter_reactive_ble/src/converter/args_to_protubuf_converter.da
     as _i3;
 import 'package:flutter_reactive_ble/src/converter/protobuf_converter.dart'
     as _i4;
+import 'package:flutter/src/services/platform_channel.dart' as _i5;
 
 /// A class which mocks [Logger].
 ///
@@ -29,6 +30,15 @@ class MockArgsToProtobufConverter extends _i1.Mock
 /// See the documentation for Mockito's code generation for more information.
 class MockProtobufConverter extends _i1.Mock implements _i4.ProtobufConverter {
   MockProtobufConverter() {
+    _i1.throwOnMissingStub(this);
+  }
+}
+
+/// A class which mocks [MethodChannel].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockMethodChannel extends _i1.Mock implements _i5.MethodChannel {
+  MockMethodChannel() {
     _i1.throwOnMissingStub(this);
   }
 }

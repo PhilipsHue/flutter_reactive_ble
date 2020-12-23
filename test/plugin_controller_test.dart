@@ -17,12 +17,17 @@ import 'package:mockito/mockito.dart';
 
 import 'plugin_controller_test.mocks.dart';
 
-@GenerateMocks([Logger, ArgsToProtobufConverter, ProtobufConverter])
+@GenerateMocks([
+  Logger,
+  ArgsToProtobufConverter,
+  ProtobufConverter,
+  MethodChannel,
+])
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   group('$PluginController', () {
     PluginController _sut;
-    MethodChannel _methodChannel;
+    MockMethodChannel _methodChannel;
     MockArgsToProtobufConverter _argsConverter;
     MockProtobufConverter _protobufConverter;
     StreamController<List<int>> _connectedDeviceStreamController;
@@ -32,16 +37,18 @@ void main() {
 
     setUp(() {
       _argsConverter = MockArgsToProtobufConverter();
-      _methodChannel = const MethodChannel('test');
+      _methodChannel = MockMethodChannel();
       _protobufConverter = MockProtobufConverter();
       _connectedDeviceStreamController = StreamController();
       _argsStreamController = StreamController();
       _scanStreamController = StreamController();
       _statusStreamController = StreamController();
 
-      _methodChannel.setMockMethodCallHandler((call) async {});
       final logger = MockLogger();
       when(logger.log(any)).thenReturn(null);
+      when(_methodChannel.invokeMethod<void>(any, any)).thenAnswer(
+        (_) async => 0,
+      );
 
       _sut = PluginController(
         argsToProtobufConverter: _argsConverter,
@@ -71,6 +78,15 @@ void main() {
             .thenReturn(request);
       });
 
+      test('It invokes methodchannel with correct method and arguments',
+          () async {
+        await _sut.connectToDevice('id', {}, null).first;
+        verify(_methodChannel.invokeMethod<void>(
+          'connectToDevice',
+          request.writeToBuffer(),
+        )).called(1);
+      });
+
       test('It emits 1 item', () async {
         final length = await _sut.connectToDevice('id', {}, null).length;
         expect(length, 1);
@@ -87,10 +103,17 @@ void main() {
         request = pb.DisconnectFromDeviceRequest();
         when(_argsConverter.createDisconnectDeviceArgs(any))
             .thenReturn(request);
+        await _sut.disconnectDevice('id');
+      });
+
+      test('It invokes methodchannel with correct method and arguments', () {
+        verify(_methodChannel.invokeMethod<void>(
+          'disconnectFromDevice',
+          request.writeToBuffer(),
+        )).called(1);
       });
 
       test('It executes the request succesfully', () async {
-        await _sut.disconnectDevice('id');
         expect(true, true);
       });
     });
@@ -168,6 +191,13 @@ void main() {
             .thenReturn(request);
       });
 
+      test('It invokes method channel with correct arguments', () async {
+        await _sut.readCharacteristic(characteristic).first;
+        verify(_methodChannel.invokeMethod<void>(
+                'readCharacteristic', request.writeToBuffer()))
+            .called(1);
+      });
+
       test('It emits 1 item', () async {
         final length = await _sut.readCharacteristic(characteristic).length;
         expect(length, 1);
@@ -179,6 +209,7 @@ void main() {
       const value = [0, 1];
       pb.WriteCharacteristicRequest request;
       WriteCharacteristicInfo expectedResult;
+      WriteCharacteristicInfo result;
 
       setUp(() async {
         request = pb.WriteCharacteristicRequest();
@@ -192,16 +223,25 @@ void main() {
         expectedResult = WriteCharacteristicInfo(
             characteristic: characteristic, result: const Result.success(null));
 
+        when(_methodChannel.invokeMethod<void>(any, any)).thenAnswer(
+          (_) async => [1],
+        );
         when(_argsConverter.createWriteChacracteristicRequest(any, any))
             .thenReturn(request);
         when(_protobufConverter.writeCharacteristicInfoFrom(any))
             .thenReturn(expectedResult);
+
+        result =
+            await _sut.writeCharacteristicWithResponse(characteristic, value);
+      });
+
+      test('It invokes method channel with correct arguments', () {
+        verify(_methodChannel.invokeMethod<void>(
+                'writeCharacteristicWithResponse', request.writeToBuffer()))
+            .called(1);
       });
 
       test('It returns correct value', () async {
-        final result =
-            await _sut.writeCharacteristicWithResponse(characteristic, value);
-
         expect(result, expectedResult);
       });
     });
@@ -211,6 +251,7 @@ void main() {
       const value = [0, 1];
       pb.WriteCharacteristicRequest request;
       WriteCharacteristicInfo expectedResult;
+      WriteCharacteristicInfo result;
 
       setUp(() async {
         request = pb.WriteCharacteristicRequest();
@@ -223,17 +264,25 @@ void main() {
         expectedResult = WriteCharacteristicInfo(
             characteristic: characteristic, result: const Result.success(null));
 
+        when(_methodChannel.invokeMethod<void>(any, any)).thenAnswer(
+          (_) async => [1],
+        );
         when(_argsConverter.createWriteChacracteristicRequest(any, any))
             .thenReturn(request);
         when(_protobufConverter.writeCharacteristicInfoFrom(any))
             .thenReturn(expectedResult);
+        result = await _sut.writeCharacteristicWithoutResponse(
+            characteristic, value);
       });
 
       test('It returns correct value', () async {
-        final result = await _sut.writeCharacteristicWithoutResponse(
-            characteristic, value);
-
         expect(result, expectedResult);
+      });
+
+      test('It invokes method channel with correct arguments', () {
+        verify(_methodChannel.invokeMethod<void>(
+                'writeCharacteristicWithoutResponse', request.writeToBuffer()))
+            .called(1);
       });
     });
 
@@ -258,6 +307,16 @@ void main() {
             await _sut.subscribeToNotifications(characteristic).length;
         expect(length, 1);
       });
+
+      test('It invokes method channel with correct arguments', () async {
+        await _sut.subscribeToNotifications(characteristic).first;
+        verify(
+          _methodChannel.invokeMethod<void>(
+            'readNotifications',
+            request.writeToBuffer(),
+          ),
+        ).called(1);
+      });
     });
 
     group('Stop subscribe to notifications', () {
@@ -274,11 +333,16 @@ void main() {
 
         when(_argsConverter.createNotifyNoMoreCharacteristicRequest(any))
             .thenReturn(request);
+        await _sut.stopSubscribingToNotifications(characteristic);
       });
 
-      test('It completes without error', () async {
-        await _sut.stopSubscribingToNotifications(characteristic);
-        expect(true, true);
+      test('It invokes method channel with correct arguments', () {
+        verify(
+          _methodChannel.invokeMethod<void>(
+            'stopNotifications',
+            request.writeToBuffer(),
+          ),
+        ).called(1);
       });
     });
 
@@ -286,17 +350,31 @@ void main() {
       const deviceId = '123';
       const mtuSize = 40;
       pb.NegotiateMtuRequest request;
+      int result;
 
-      setUp(() {
+      setUp(() async {
         request = pb.NegotiateMtuRequest();
         when(_argsConverter.createNegotiateMtuRequest(any, any))
             .thenReturn(request);
+        when(_methodChannel.invokeMethod<void>(any, any)).thenAnswer(
+          (_) async => [1],
+        );
 
         when(_protobufConverter.mtuSizeFrom(any)).thenReturn(mtuSize);
+        result = await _sut.requestMtuSize(deviceId, mtuSize);
       });
 
       test('It returns requested mtu size', () async {
-        expect(await _sut.requestMtuSize(deviceId, mtuSize), mtuSize);
+        expect(result, mtuSize);
+      });
+
+      test('It invokes method channel with correct arguments', () {
+        verify(
+          _methodChannel.invokeMethod<void>(
+            'negotiateMtuSize',
+            request.writeToBuffer(),
+          ),
+        ).called(1);
       });
     });
 
@@ -305,21 +383,34 @@ void main() {
       ConnectionPriority priority;
       pb.ChangeConnectionPriorityRequest request;
       ConnectionPriorityInfo info;
+      ConnectionPriorityInfo result;
 
       setUp(() async {
         request = pb.ChangeConnectionPriorityRequest();
         priority = ConnectionPriority.highPerformance;
         info = const ConnectionPriorityInfo(result: Result.success(null));
-
+        when(_methodChannel.invokeMethod<void>(any, any)).thenAnswer(
+          (_) async => [1],
+        );
         when(_argsConverter.createChangeConnectionPrioRequest(any, any))
             .thenReturn(request);
 
         when(_protobufConverter.connectionPriorityInfoFrom(any))
             .thenReturn(info);
+        result = await _sut.requestConnectionPriority(deviceId, priority);
       });
 
       test('It returns correct value', () async {
-        expect(await _sut.requestConnectionPriority(deviceId, priority), info);
+        expect(result, info);
+      });
+
+      test('It invokes method channel with correct arguments', () {
+        verify(
+          _methodChannel.invokeMethod<void>(
+            'requestConnectionPriority',
+            request.writeToBuffer(),
+          ),
+        ).called(1);
       });
     });
 
@@ -350,6 +441,20 @@ void main() {
             .length;
 
         expect(length, 1);
+      });
+
+      test('It invokes correct method', () async {
+        await _sut
+            .scanForDevices(
+              withServices: withServices,
+              scanMode: scanMode,
+              requireLocationServicesEnabled: locationEnabled,
+            )
+            .first;
+        verify(_methodChannel.invokeMethod<void>(
+          'scanForDevices',
+          request.writeToBuffer(),
+        )).called(1);
       });
     });
 
@@ -383,16 +488,21 @@ void main() {
     });
 
     group('initialize', () {
-      test('It completes without error', () async {
+      setUp(() async {
         await _sut.initialize();
+      });
+      test('It invokes correct method in method channel', () {
+        verify(_methodChannel.invokeMethod<void>('initialize')).called(1);
         expect(true, true);
       });
     });
 
     group('deInitialize', () {
-      test('It completes without error', () async {
+      setUp(() async {
         await _sut.deinitialize();
-        expect(true, true);
+      });
+      test('It invokes correct method in method channel', () {
+        verify(_methodChannel.invokeMethod<void>('deinitialize')).called(1);
       });
     });
 
@@ -400,23 +510,35 @@ void main() {
       const deviceId = '123';
 
       pb.ClearGattCacheRequest request;
+      Result<Unit, GenericFailure<ClearGattCacheError>> result;
+
       Result<Unit, GenericFailure<ClearGattCacheError>> convertedResult;
 
-      setUp(() {
+      setUp(() async {
         request = pb.ClearGattCacheRequest();
         convertedResult =
             const Result<Unit, GenericFailure<ClearGattCacheError>>.success(
                 Unit());
+        when(_methodChannel.invokeMethod<void>(any, any)).thenAnswer(
+          (_) async => [1],
+        );
 
         when(_argsConverter.createClearGattCacheRequest(any))
             .thenReturn(request);
 
         when(_protobufConverter.clearGattCacheResultFrom(any))
             .thenReturn(convertedResult);
+        result = await _sut.clearGattCache(deviceId);
+      });
+
+      test('It calls method channel with correct arguments', () {
+        verify(_methodChannel.invokeMethod<List<int>>(
+          'clearGattCache',
+          request.writeToBuffer(),
+        )).called(1);
       });
 
       test('It returns correct value', () async {
-        final result = await _sut.clearGattCache(deviceId);
         expect(result, convertedResult);
       });
     });
@@ -461,6 +583,9 @@ void main() {
       setUp(() async {
         request = pb.DiscoverServicesRequest();
 
+        when(_methodChannel.invokeMethod<void>(any, any)).thenAnswer(
+          (_) async => [1],
+        );
         when(_argsConverter.createDiscoverServicesRequest(any))
             .thenReturn(request);
         when(_protobufConverter.discoveredServicesFrom(any))
@@ -471,6 +596,12 @@ void main() {
 
       test('It returns discovered services', () {
         expect(result, services);
+      });
+
+      test('It invokes methodchannel with correct arguments', () {
+        verify(_methodChannel.invokeMethod<List<int>>(
+                'discoverServices', request.writeToBuffer()))
+            .called(1);
       });
     });
   });
