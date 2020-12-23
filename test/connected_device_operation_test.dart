@@ -9,17 +9,21 @@ import 'package:flutter_reactive_ble/src/model/uuid.dart';
 import 'package:flutter_reactive_ble/src/model/write_characteristic_info.dart';
 import 'package:flutter_reactive_ble/src/plugin_controller.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 
+import 'connected_device_operation_test.mocks.dart';
+
+@GenerateMocks([DeviceOperationController])
 void main() {
-  _PluginControllerMock _pluginController;
+  MockDeviceOperationController _controller;
   ConnectedDeviceOperation _sut;
 
   group('$ConnectedDeviceOperation', () {
     setUp(() {
-      _pluginController = _PluginControllerMock();
-      _sut = ConnectedDeviceOperation(
-        pluginController: _pluginController,
+      _controller = MockDeviceOperationController();
+      _sut = ConnectedDeviceOperationImpl(
+        controller: _controller,
       );
     });
     group('Listen to char value updates', () {
@@ -35,7 +39,7 @@ void main() {
           result: const Result.success([1]),
         );
 
-        when(_pluginController.charValueUpdateStream)
+        when(_controller.charValueUpdateStream)
             .thenAnswer((_) => Stream.fromIterable([valueUpdate]));
       });
 
@@ -89,24 +93,22 @@ void main() {
           characteristic: charOtherDevice,
           result: const Result.success([4]),
         );
+
+        when(_controller.readCharacteristic(any)).thenAnswer(
+          (_) => Stream.fromIterable([0]),
+        );
       });
 
       group('Given multiple updates are received for specific device', () {
         setUp(() async {
-          when(_pluginController.charValueUpdateStream)
+          when(_controller.charValueUpdateStream)
               .thenAnswer((_) => Stream.fromIterable([
                     valueUpdate,
                     valueUpdateOtherDevice,
                     valueUpdateSameDeviceOtherChar,
                   ]));
 
-          when(_pluginController.readCharacteristic(any))
-              .thenAnswer((_) => Stream.fromIterable([0]));
           result = await _sut.readCharacteristic(charDevice);
-        });
-
-        test('It calls plugin controller with correct arguments', () {
-          verify(_pluginController.readCharacteristic(charDevice)).called(1);
         });
 
         test('It emits first value that matches', () {
@@ -118,14 +120,11 @@ void main() {
           'Given no updates are provide for characteristic of specific device',
           () {
         setUp(() async {
-          when(_pluginController.charValueUpdateStream)
+          when(_controller.charValueUpdateStream)
               .thenAnswer((_) => Stream.fromIterable([
                     valueUpdateOtherDevice,
                     valueUpdateSameDeviceOtherChar,
                   ]));
-
-          when(_pluginController.readCharacteristic(any))
-              .thenAnswer((_) => Stream.fromIterable([0]));
         });
 
         test('It emits first value that matches', () async {
@@ -152,217 +151,171 @@ void main() {
 
       group('Write characteristic with response', () {
         group('Given write characteristic succeeds', () {
-          setUp(() async {
+          setUp(() {
             info = WriteCharacteristicInfo(
               characteristic: characteristic,
               result: const Result<void,
                   GenericFailure<WriteCharacteristicFailure>>.success(null),
             );
 
-            when(_pluginController.writeCharacteristicWithResponse(any, any))
-                .thenAnswer(
-              (realInvocation) => Future.value(info),
-            );
+            when(_controller.writeCharacteristicWithResponse(any, any))
+                .thenAnswer((_) async => info);
+          });
 
+          test('It completes without error', () async {
             await _sut.writeCharacteristicWithResponse(characteristic,
                 value: value);
+            expect(true, true);
           });
 
-          test('It invokes $PluginController with correct arguments', () {
-            verify(_pluginController.writeCharacteristicWithResponse(
-                    characteristic, value))
-                .called(1);
-          });
-        });
-
-        group('Given write characteristic fails', () {
-          setUp(() {
-            info = WriteCharacteristicInfo(
-              characteristic: characteristic,
-              result: const Result<void,
-                  GenericFailure<WriteCharacteristicFailure>>.failure(
-                GenericFailure<WriteCharacteristicFailure>(
-                  code: WriteCharacteristicFailure.unknown,
-                  message: 'something went wrong',
+          group('Given write characteristic fails', () {
+            setUp(() {
+              info = WriteCharacteristicInfo(
+                characteristic: characteristic,
+                result: const Result<void,
+                    GenericFailure<WriteCharacteristicFailure>>.failure(
+                  GenericFailure<WriteCharacteristicFailure>(
+                    code: WriteCharacteristicFailure.unknown,
+                    message: 'something went wrong',
+                  ),
                 ),
-              ),
-            );
+              );
 
-            when(_pluginController.writeCharacteristicWithResponse(any, any))
-                .thenAnswer(
-              (realInvocation) => Future.value(info),
-            );
-          });
+              when(_controller.writeCharacteristicWithResponse(any, any))
+                  .thenAnswer((_) async => info);
+            });
 
-          test('It throws exception ', () async {
-            expect(
-              () => _sut.writeCharacteristicWithResponse(characteristic,
-                  value: value),
-              throwsException,
-            );
-          });
-        });
-      });
-
-      group('Write characteristic without response', () {
-        group('Given write characteristic succeeds', () {
-          setUp(() async {
-            info = WriteCharacteristicInfo(
-              characteristic: characteristic,
-              result: const Result<void,
-                  GenericFailure<WriteCharacteristicFailure>>.success(null),
-            );
-
-            when(_pluginController.writeCharacteristicWithoutResponse(any, any))
-                .thenAnswer(
-              (realInvocation) => Future.value(info),
-            );
-
-            await _sut.writeCharacteristicWithoutResponse(characteristic,
-                value: value);
-          });
-
-          test('It invokes $PluginController with correct arguments', () {
-            verify(_pluginController.writeCharacteristicWithoutResponse(
-                    characteristic, value))
-                .called(1);
+            test('It throws exception ', () async {
+              expect(
+                () => _sut.writeCharacteristicWithResponse(characteristic,
+                    value: value),
+                throwsException,
+              );
+            });
           });
         });
 
-        group('Given write characteristic fails', () {
-          setUp(() {
-            info = WriteCharacteristicInfo(
-              characteristic: characteristic,
-              result: const Result<void,
-                  GenericFailure<WriteCharacteristicFailure>>.failure(
-                GenericFailure<WriteCharacteristicFailure>(
-                  code: WriteCharacteristicFailure.unknown,
-                  message: 'something went wrong',
+        group('Write characteristic without response', () {
+          group('Given write characteristic succeeds', () {
+            setUp(() {
+              info = WriteCharacteristicInfo(
+                characteristic: characteristic,
+                result: const Result<void,
+                    GenericFailure<WriteCharacteristicFailure>>.success(null),
+              );
+
+              when(_controller.writeCharacteristicWithoutResponse(any, any))
+                  .thenAnswer((_) async => info);
+            });
+
+            test('It executes successfully', () async {
+              await _sut.writeCharacteristicWithoutResponse(characteristic,
+                  value: value);
+
+              expect(true, true);
+            });
+          });
+
+          group('Given write characteristic fails', () {
+            setUp(() {
+              info = WriteCharacteristicInfo(
+                characteristic: characteristic,
+                result: const Result<void,
+                    GenericFailure<WriteCharacteristicFailure>>.failure(
+                  GenericFailure<WriteCharacteristicFailure>(
+                    code: WriteCharacteristicFailure.unknown,
+                    message: 'something went wrong',
+                  ),
                 ),
-              ),
-            );
+              );
 
-            when(_pluginController.writeCharacteristicWithoutResponse(any, any))
-                .thenAnswer(
-              (realInvocation) => Future.value(info),
-            );
-          });
+              when(_controller.writeCharacteristicWithoutResponse(any, any))
+                  .thenAnswer((_) async => info);
+            });
 
-          test('It throws exception ', () async {
-            expect(
-              () => _sut.writeCharacteristicWithoutResponse(characteristic,
-                  value: value),
-              throwsException,
-            );
+            test('It throws exception ', () async {
+              expect(
+                () => _sut.writeCharacteristicWithoutResponse(characteristic,
+                    value: value),
+                throwsException,
+              );
+            });
           });
         });
       });
-    });
-    group('Subscribe to characteristic', () {
-      QualifiedCharacteristic charDevice;
-      QualifiedCharacteristic charOtherSameDevice;
-      QualifiedCharacteristic charOtherDevice;
-      CharacteristicValue valueUpdate1;
-      CharacteristicValue valueUpdate2;
-      CharacteristicValue valueUpdateOtherDevice;
-      CharacteristicValue valueUpdateSameDeviceOtherChar;
-      Stream<List<int>> result;
-      Completer<ConnectionStateUpdate> terminateCompleter;
 
-      setUp(() {
-        terminateCompleter = Completer();
+      group('Subscribe to characteristic', () {
+        QualifiedCharacteristic charDevice;
+        QualifiedCharacteristic charOtherSameDevice;
+        QualifiedCharacteristic charOtherDevice;
+        CharacteristicValue valueUpdate1;
+        CharacteristicValue valueUpdate2;
+        CharacteristicValue valueUpdateOtherDevice;
+        CharacteristicValue valueUpdateSameDeviceOtherChar;
+        Stream<List<int>> result;
+        Completer<ConnectionStateUpdate> terminateCompleter;
 
-        charDevice = QualifiedCharacteristic(
-          characteristicId: Uuid.parse('FEFF'),
-          serviceId: Uuid.parse('FEFF'),
-          deviceId: '123',
-        );
+        setUp(() {
+          terminateCompleter = Completer();
 
-        charOtherSameDevice = QualifiedCharacteristic(
-          characteristicId: Uuid.parse('FEFF'),
-          serviceId: Uuid.parse('FAFF'),
-          deviceId: '123',
-        );
+          charDevice = QualifiedCharacteristic(
+            characteristicId: Uuid.parse('FEFF'),
+            serviceId: Uuid.parse('FEFF'),
+            deviceId: '123',
+          );
 
-        charOtherDevice = QualifiedCharacteristic(
-          characteristicId: Uuid.parse('FEFF'),
-          serviceId: Uuid.parse('FEFF'),
-          deviceId: '456',
-        );
+          charOtherSameDevice = QualifiedCharacteristic(
+            characteristicId: Uuid.parse('FEFF'),
+            serviceId: Uuid.parse('FAFF'),
+            deviceId: '123',
+          );
 
-        valueUpdate1 = CharacteristicValue(
-          characteristic: charDevice,
-          result: const Result.success([1]),
-        );
+          charOtherDevice = QualifiedCharacteristic(
+            characteristicId: Uuid.parse('FEFF'),
+            serviceId: Uuid.parse('FEFF'),
+            deviceId: '456',
+          );
 
-        valueUpdate2 = CharacteristicValue(
-          characteristic: charDevice,
-          result: const Result.success([2]),
-        );
+          valueUpdate1 = CharacteristicValue(
+            characteristic: charDevice,
+            result: const Result.success([1]),
+          );
 
-        valueUpdateSameDeviceOtherChar = CharacteristicValue(
-          characteristic: charOtherSameDevice,
-          result: const Result.success([3]),
-        );
+          valueUpdate2 = CharacteristicValue(
+            characteristic: charDevice,
+            result: const Result.success([2]),
+          );
 
-        valueUpdateOtherDevice = CharacteristicValue(
-          characteristic: charOtherDevice,
-          result: const Result.success([4]),
-        );
-      });
+          valueUpdateSameDeviceOtherChar = CharacteristicValue(
+            characteristic: charOtherSameDevice,
+            result: const Result.success([3]),
+          );
 
-      group('Given multiple updates are received for specific device', () {
-        setUp(() async {
-          when(_pluginController.charValueUpdateStream)
-              .thenAnswer((_) => Stream.fromIterable([
-                    valueUpdate1,
-                    valueUpdateOtherDevice,
-                    valueUpdate2,
-                    valueUpdateSameDeviceOtherChar,
-                  ]));
+          valueUpdateOtherDevice = CharacteristicValue(
+            characteristic: charOtherDevice,
+            result: const Result.success([4]),
+          );
 
-          when(_pluginController.subscribeToNotifications(any))
+          when(_controller.subscribeToNotifications(any))
               .thenAnswer((_) => Stream.fromIterable([0]));
-          when(_pluginController.stopSubscribingToNotifications(any))
-              .thenAnswer((_) => Future.value());
+
+          when(_controller.stopSubscribingToNotifications(any))
+              .thenAnswer((_) async => 0);
         });
 
-        group('And device remains connected', () {
-          setUp(() {
+        group('Given multiple updates are received for specific device', () {
+          setUp(() async {
+            when(_controller.charValueUpdateStream)
+                .thenAnswer((_) => Stream.fromIterable([
+                      valueUpdate1,
+                      valueUpdateOtherDevice,
+                      valueUpdate2,
+                      valueUpdateSameDeviceOtherChar,
+                    ]));
+
             result = _sut.subscribeToCharacteristic(
                 charDevice, terminateCompleter.future);
           });
-
-          group('And the stream is listened to', () {
-            StreamSubscription<List<int>> subscription;
-
-            setUp(() {
-              subscription = result.listen((event) {});
-            });
-
-            tearDown(() async {
-              await subscription.cancel();
-            });
-
-            test('It calls plugin controller with correct arguments', () async {
-              verify(_pluginController.subscribeToNotifications(charDevice))
-                  .called(1);
-            });
-
-            test('It calls plugin controller in case steam is cancelled',
-                () async {
-              await subscription.cancel();
-              verify(_pluginController
-                      .stopSubscribingToNotifications(charDevice))
-                  .called(1);
-            });
-          });
-
-          test('It does not stop notifications', () {
-            verifyNever(
-                _pluginController.stopSubscribingToNotifications(charDevice));
-          });
-
           test('It emits all values that matches', () {
             expect(
                 result,
@@ -373,80 +326,66 @@ void main() {
           });
         });
       });
-    });
 
-    group('Negotiate mtusize', () {
-      const deviceId = '123';
-      const mtuSize = 50;
-      int result;
+      group('Negotiate mtusize', () {
+        const deviceId = '123';
+        const mtuSize = 50;
+        int result;
 
-      setUp(() async {
-        when(_pluginController.requestMtuSize(any, any)).thenAnswer(
-          (_) => Future.value(mtuSize),
-        );
-
-        result = await _sut.requestMtu(deviceId, mtuSize);
-      });
-
-      test('It provides result retrieved from plugin', () {
-        expect(result, mtuSize);
-      });
-
-      test('It calls plugin controller with correct arguments', () {
-        verify(_pluginController.requestMtuSize(deviceId, mtuSize)).called(1);
-      });
-    });
-
-    group('Change connection priority', () {
-      const deviceId = '123';
-      ConnectionPriority priority;
-
-      setUp(() {
-        priority = ConnectionPriority.highPerformance;
-      });
-
-      group('Given request priority succeeds', () {
         setUp(() async {
-          when(_pluginController.requestConnectionPriority(any, any))
-              .thenAnswer(
-            (_) => Future.value(
-              const ConnectionPriorityInfo(result: Result.success(null)),
-            ),
-          );
+          when(_controller.requestMtuSize(any, any))
+              .thenAnswer((_) async => mtuSize);
 
-          await _sut.requestConnectionPriority(deviceId, priority);
+          result = await _sut.requestMtu(deviceId, mtuSize);
         });
 
-        test('It calls plugin controller with correct arguments', () {
-          verify(_pluginController.requestConnectionPriority(
-                  deviceId, priority))
-              .called(1);
+        test('It provides result retrieved from plugin', () {
+          expect(result, mtuSize);
         });
       });
 
-      group('Given request priority fails', () {
-        setUp(() async {
-          when(_pluginController.requestConnectionPriority(any, any))
-              .thenAnswer(
-            (_) => Future.value(
-              const ConnectionPriorityInfo(
-                result: Result.failure(
-                  GenericFailure<ConnectionPriorityFailure>(
-                      code: ConnectionPriorityFailure.unknown,
-                      message: 'whoops'),
-                ),
-              ),
-            ),
-          );
+      group('Change connection priority', () {
+        const deviceId = '123';
+        ConnectionPriority priority;
+
+        setUp(() {
+          priority = ConnectionPriority.highPerformance;
         });
 
-        test('It throws failure', () async {
-          expect(() async => _sut.requestConnectionPriority(deviceId, priority),
-              throwsException);
+        group('Given request priority succeeds', () {
+          setUp(() {
+            when(_controller.requestConnectionPriority(any, any))
+                .thenAnswer((_) async => const ConnectionPriorityInfo(
+                      result: Result.success(null),
+                    ));
+          });
+
+          test('It succeeds without an error', () async {
+            await _sut.requestConnectionPriority(deviceId, priority);
+
+            expect(true, true);
+          });
+        });
+
+        group('Given request priority fails', () {
+          setUp(() async {
+            when(_controller.requestConnectionPriority(any, any))
+                .thenAnswer((_) async => const ConnectionPriorityInfo(
+                      result: Result.failure(
+                        GenericFailure<ConnectionPriorityFailure>(
+                            code: ConnectionPriorityFailure.unknown,
+                            message: 'whoops'),
+                      ),
+                    ));
+          });
+
+          test('It throws failure', () async {
+            expect(
+                () async => _sut.requestConnectionPriority(deviceId, priority),
+                throwsException);
+          });
         });
       });
     });
   });
 }
-
-class _PluginControllerMock extends Mock implements PluginController {}

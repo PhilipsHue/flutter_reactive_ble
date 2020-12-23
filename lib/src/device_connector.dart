@@ -5,37 +5,59 @@ import 'package:flutter_reactive_ble/src/plugin_controller.dart';
 import 'package:flutter_reactive_ble/src/rx_ext/repeater.dart';
 import 'package:meta/meta.dart';
 
-import 'discovered_devices_registry.dart';
 import 'model/discovered_device.dart';
 import 'model/generic_failure.dart';
 import 'model/scan_mode.dart';
 import 'model/uuid.dart';
 
-class DeviceConnector {
-  const DeviceConnector({
-    @required PluginController pluginController,
-    @required DiscoveredDevicesRegistry discoveredDevicesRegistry,
+abstract class DeviceConnector {
+  Stream<ConnectionStateUpdate> get deviceConnectionStateUpdateStream;
+
+  Stream<ConnectionStateUpdate> connect({
+    @required String id,
+    Map<Uuid, List<Uuid>> servicesWithCharacteristicsToDiscover,
+    Duration connectionTimeout,
+  });
+
+  Stream<ConnectionStateUpdate> connectToAdvertisingDevice({
+    @required String id,
+    @required List<Uuid> withServices,
+    @required Duration prescanDuration,
+    Map<Uuid, List<Uuid>> servicesWithCharacteristicsToDiscover,
+    Duration connectionTimeout,
+  });
+}
+
+class DeviceConnectorImpl implements DeviceConnector {
+  const DeviceConnectorImpl({
+    @required DeviceConnectionController controller,
+    @required
+        bool Function({String deviceId, Duration cacheValidity})
+            deviceIsDiscoveredRecently,
     @required DeviceScanner deviceScanner,
     @required Duration delayAfterScanFailure,
-  })  : assert(pluginController != null),
+  })  : assert(controller != null),
         assert(deviceScanner != null),
-        assert(discoveredDevicesRegistry != null),
+        assert(deviceIsDiscoveredRecently != null),
         assert(delayAfterScanFailure != null),
-        _discoveredDevicesRegistry = discoveredDevicesRegistry,
+        _deviceIsDiscoveredRecently = deviceIsDiscoveredRecently,
         _deviceScanner = deviceScanner,
-        _controller = pluginController,
+        _controller = controller,
         _delayAfterScanFailure = delayAfterScanFailure;
 
-  final PluginController _controller;
-  final DiscoveredDevicesRegistry _discoveredDevicesRegistry;
+  final DeviceConnectionController _controller;
+  final bool Function({String deviceId, Duration cacheValidity})
+      _deviceIsDiscoveredRecently;
   final DeviceScanner _deviceScanner;
   final Duration _delayAfterScanFailure;
 
   static const _scanRegistryCacheValidityPeriod = Duration(seconds: 25);
 
+  @override
   Stream<ConnectionStateUpdate> get deviceConnectionStateUpdateStream =>
       _controller.connectionUpdateStream;
 
+  @override
   Stream<ConnectionStateUpdate> connect({
     @required String id,
     Map<Uuid, List<Uuid>> servicesWithCharacteristicsToDiscover,
@@ -60,6 +82,7 @@ class DeviceConnector {
     return autoconnectingRepeater.stream;
   }
 
+  @override
   Stream<ConnectionStateUpdate> connectToAdvertisingDevice({
     @required String id,
     @required List<Uuid> withServices,
@@ -93,7 +116,7 @@ class DeviceConnector {
     List<Uuid> withServices,
     Duration prescanDuration,
   ) {
-    if (_discoveredDevicesRegistry.deviceIsDiscoveredRecently(
+    if (_deviceIsDiscoveredRecently(
         deviceId: id, cacheValidity: _scanRegistryCacheValidityPeriod)) {
       return connect(
         id: id,
@@ -177,7 +200,7 @@ class DeviceConnector {
     Map<Uuid, List<Uuid>> servicesWithCharacteristicsToDiscover,
     Duration connectionTimeout,
   ) {
-    if (_discoveredDevicesRegistry.deviceIsDiscoveredRecently(
+    if (_deviceIsDiscoveredRecently(
       deviceId: id,
       cacheValidity: _scanRegistryCacheValidityPeriod,
     )) {

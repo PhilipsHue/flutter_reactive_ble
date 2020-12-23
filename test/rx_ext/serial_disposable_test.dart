@@ -1,31 +1,30 @@
 import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mockito/mockito.dart';
 
 void main() {
   group('Serialdisposable', () {
     SerialDisposable<int> sut;
-    _DisposerMock disposer;
+    _Disposer disposer;
 
     setUp(() {
-      disposer = _DisposerMock();
+      disposer = _Disposer();
       sut = SerialDisposable(disposer.dispose);
     });
     test('It emits last set value on dispose', () async {
       await sut.set(5);
       await sut.dispose();
-      verify(disposer.dispose(5)).called(1);
+      expect(disposer.disposedValues, [5]);
     });
 
     test('It disposes previous value when a new value is set', () async {
       await sut.set(4);
       await sut.set(5);
-      verify(disposer.dispose(4)).called(1);
+      expect(disposer.disposedValues, [4]);
     });
 
-    test('It dnever calls dispose method in case no value is set', () async {
+    test('It never calls dispose method in case no value is set', () async {
       await sut.dispose();
-      verifyNever(disposer.dispose(any));
+      expect(disposer.disposedValues, isEmpty);
     });
 
     test('It returns false in case it is not disposed', () async {
@@ -47,8 +46,11 @@ void main() {
   });
 }
 
-abstract class _Disposer {
-  Future<void> dispose(int value);
-}
+class _Disposer {
+  final _values = <int>[];
+  Future<void> dispose(int value) async {
+    _values.add(value);
+  }
 
-class _DisposerMock extends Mock implements _Disposer {}
+  List<int> get disposedValues => _values;
+}

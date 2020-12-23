@@ -9,11 +9,10 @@ import 'package:flutter_reactive_ble/src/model/unit.dart';
 import 'package:flutter_reactive_ble/src/model/uuid.dart';
 import 'package:flutter_reactive_ble/src/model/write_characteristic_info.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mockito/mockito.dart';
 
 void main() {
   group('$ProtobufConverter', () {
-    const sut = ProtobufConverter();
+    const sut = ProtobufConverterImpl();
 
     group("decoding ${pb.DeviceScanInfo}", () {
       const id = 'id';
@@ -115,34 +114,28 @@ void main() {
 
       test("converts an absent raw code using the fallback closure", () {
         const fallbackCode = "fallback code";
-        final fallback = _GenericFailureCodeFallbackMock();
-        when(fallback.call(any)).thenReturn(fallbackCode);
 
         final error = sut.genericFailureFrom(
           hasFailure: true,
           getFailure: () => pb.GenericFailure(),
           codes: <String>[fallbackCode],
-          fallback: fallback.call,
+          fallback: (_) => fallbackCode,
         );
 
-        verify(fallback.call(null)).called(1);
         expect(error.code, fallbackCode);
       });
 
       test("converts an unknown raw code using the fallback closure", () {
         const fallbackCode = "fallback code";
-        final fallback = _GenericFailureCodeFallbackMock();
-        when(fallback.call(any)).thenReturn(fallbackCode);
 
         const unknownRawCode = 10;
         final error = sut.genericFailureFrom(
           hasFailure: true,
           getFailure: () => pb.GenericFailure()..code = unknownRawCode,
           codes: <String>[fallbackCode],
-          fallback: fallback.call,
+          fallback: (_) => fallbackCode,
         );
 
-        verify(fallback.call(unknownRawCode)).called(1);
         expect(error.code, fallbackCode);
       });
 
@@ -191,12 +184,10 @@ void main() {
 
     group("constructing $Result", () {
       test("converts a failure", () {
-        final getter = _ResultValueGetterMock<String>();
         const failure = "failure";
 
-        final result = sut.resultFrom(getValue: getter.call, failure: failure);
+        final result = sut.resultFrom(getValue: () => 1, failure: failure);
 
-        verifyNever(getter.call());
         expect(result.iif(success: (_) => throw Exception(), failure: id),
             failure);
       });
@@ -204,12 +195,8 @@ void main() {
       test("converts a value", () {
         const value = "value";
         const String failure = null;
-        final getter = _ResultValueGetterMock<String>();
-        when(getter.call()).thenReturn(value);
+        final result = sut.resultFrom(getValue: () => value, failure: failure);
 
-        final result = sut.resultFrom(getValue: getter.call, failure: failure);
-
-        verify(getter.call()).called(1);
         expect(
             result.iif(success: id, failure: (_) => throw Exception()), value);
       });
@@ -531,22 +518,6 @@ void main() {
       });
     });
   });
-}
-
-class _GenericFailureCodeFallbackMock extends Mock
-    implements _GenericFailureCodeFallback {}
-
-// ignore: one_member_abstracts
-abstract class _GenericFailureCodeFallback {
-  String call(int rawOrNull);
-}
-
-class _ResultValueGetterMock<Value> extends Mock
-    implements _ResultValueGetter<Value> {}
-
-// ignore: one_member_abstracts
-abstract class _ResultValueGetter<Value> {
-  Value call();
 }
 
 T id<T>(T some) => some;

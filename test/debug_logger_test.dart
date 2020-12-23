@@ -1,19 +1,18 @@
 import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
 import 'package:flutter_reactive_ble/src/debug_logger.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mockito/mockito.dart';
 
 void main() {
   group('$DebugLogger', () {
     DebugLogger sut;
     const tag = 'TestTag';
-    _PrinterMock printerMock;
+    _PrinterStub printer;
 
     setUp(() {
-      printerMock = _PrinterMock();
+      printer = _PrinterStub();
       sut = DebugLogger(
         tag,
-        printerMock.print,
+        printer.print,
       );
     });
 
@@ -23,9 +22,8 @@ void main() {
       });
 
       test('It logs message', () {
-        const message = "Log message";
-        sut.log(message);
-        verify(printerMock.print('$tag: $message')).called(1);
+        sut.log("Log message");
+        expect(printer.lastLoggedMessage, 'TestTag: Log message');
       });
     });
 
@@ -33,14 +31,17 @@ void main() {
       test('It does not log message', () {
         const message = "Log message";
         sut.log(message);
-        verifyNever(printerMock.print(any));
+        expect(printer.lastLoggedMessage, null);
       });
     });
   });
 }
 
-abstract class _Printer {
-  void print(Object object);
-}
+class _PrinterStub {
+  String _lastLog;
+  String get lastLoggedMessage => _lastLog;
 
-class _PrinterMock extends Mock implements _Printer {}
+  void print(Object object) {
+    _lastLog = object.toString();
+  }
+}

@@ -14,7 +14,76 @@ import 'model/discovered_service.dart';
 import 'model/qualified_characteristic.dart';
 import 'model/unit.dart';
 
-class PluginController {
+abstract class DeviceOperationController {
+  Stream<CharacteristicValue> get charValueUpdateStream;
+
+  Future<List<DiscoveredService>> discoverServices(String deviceId);
+
+  Stream<void> readCharacteristic(QualifiedCharacteristic characteristic);
+
+  Future<WriteCharacteristicInfo> writeCharacteristicWithResponse(
+    QualifiedCharacteristic characteristic,
+    List<int> value,
+  );
+
+  Future<WriteCharacteristicInfo> writeCharacteristicWithoutResponse(
+    QualifiedCharacteristic characteristic,
+    List<int> value,
+  );
+
+  Stream<void> subscribeToNotifications(
+    QualifiedCharacteristic characteristic,
+  );
+
+  Future<void> stopSubscribingToNotifications(
+    QualifiedCharacteristic characteristic,
+  );
+
+  Future<int> requestMtuSize(String deviceId, int mtu);
+
+  Future<ConnectionPriorityInfo> requestConnectionPriority(
+      String deviceId, ConnectionPriority priority);
+}
+
+abstract class ScanOperationController {
+  Stream<ScanResult> get scanStream;
+
+  Stream<void> scanForDevices({
+    @required List<Uuid> withServices,
+    @required ScanMode scanMode,
+    @required bool requireLocationServicesEnabled,
+  });
+}
+
+abstract class DeviceConnectionController {
+  Stream<ConnectionStateUpdate> get connectionUpdateStream;
+
+  Stream<void> connectToDevice(
+    String id,
+    Map<Uuid, List<Uuid>> servicesWithCharacteristicsToDiscover,
+    Duration connectionTimeout,
+  );
+
+  Future<void> disconnectDevice(String deviceId);
+}
+
+abstract class BleOperationController {
+  Stream<BleStatus> get bleStatusStream;
+
+  Future<void> initialize();
+
+  Future<void> deinitialize();
+
+  Future<Result<Unit, GenericFailure<ClearGattCacheError>>> clearGattCache(
+      String deviceId);
+}
+
+class PluginController
+    implements
+        DeviceOperationController,
+        ScanOperationController,
+        DeviceConnectionController,
+        BleOperationController {
   PluginController({
     @required ArgsToProtobufConverter argsToProtobufConverter,
     @required ProtobufConverter protobufConverter,
@@ -23,7 +92,7 @@ class PluginController {
     @required Stream<List<int>> charUpdateChannel,
     @required Stream<List<int>> bleDeviceScanChannel,
     @required Stream<List<int>> bleStatusChannel,
-    @required DebugLogger debugLogger,
+    @required Logger debugLogger,
   })  : assert(argsToProtobufConverter != null),
         assert(protobufConverter != null),
         assert(bleMethodChannel != null),
@@ -48,13 +117,14 @@ class PluginController {
   final Stream<List<int>> _charUpdateRawStream;
   final Stream<List<int>> _bleDeviceScanRawStream;
   final Stream<List<int>> _bleStatusRawChannel;
-  final DebugLogger _debugLogger;
+  final Logger _debugLogger;
 
   Stream<ConnectionStateUpdate> _connectionUpdateStream;
   Stream<CharacteristicValue> _charValueStream;
   Stream<ScanResult> _scanResultStream;
   Stream<BleStatus> _bleStatusStream;
 
+  @override
   Stream<ConnectionStateUpdate> get connectionUpdateStream =>
       _connectionUpdateStream ??= _connectedDeviceRawStream
           .map(_protobufConverter.connectionStateUpdateFrom)
@@ -67,6 +137,7 @@ class PluginController {
         },
       );
 
+  @override
   Stream<CharacteristicValue> get charValueUpdateStream =>
       _charValueStream ??= _charUpdateRawStream
           .map(_protobufConverter.characteristicValueFrom)
@@ -78,6 +149,7 @@ class PluginController {
         },
       );
 
+  @override
   Stream<ScanResult> get scanStream => _scanResultStream ??=
           _bleDeviceScanRawStream.map(_protobufConverter.scanResultFrom).map(
         (scanResult) {
@@ -87,6 +159,7 @@ class PluginController {
         },
       );
 
+  @override
   Stream<BleStatus> get bleStatusStream =>
       _bleStatusStream ??= _bleStatusRawChannel
           .map(_protobufConverter.bleStatusFrom)
@@ -95,16 +168,19 @@ class PluginController {
         return status;
       });
 
+  @override
   Future<void> initialize() {
     _debugLogger.log('Initialize ble client');
     return _bleMethodChannel.invokeMethod("initialize");
   }
 
+  @override
   Future<void> deinitialize() {
     _debugLogger.log('DeIititialize ble client');
     return _bleMethodChannel.invokeMethod<void>("deinitialize");
   }
 
+  @override
   Stream<void> scanForDevices({
     @required List<Uuid> withServices,
     @required ScanMode scanMode,
@@ -127,6 +203,7 @@ class PluginController {
         .asStream();
   }
 
+  @override
   Stream<void> connectToDevice(
     String id,
     Map<Uuid, List<Uuid>> servicesWithCharacteristicsToDiscover,
@@ -149,6 +226,7 @@ class PluginController {
         .asStream();
   }
 
+  @override
   Future<void> disconnectDevice(String deviceId) {
     _debugLogger.log('Disconnect from device $deviceId');
     return _bleMethodChannel.invokeMethod<void>(
@@ -159,6 +237,7 @@ class PluginController {
     );
   }
 
+  @override
   Stream<void> readCharacteristic(QualifiedCharacteristic characteristic) {
     _debugLogger.log('Read characteristic $characteristic');
     return _bleMethodChannel
@@ -171,6 +250,7 @@ class PluginController {
         .asStream();
   }
 
+  @override
   Future<WriteCharacteristicInfo> writeCharacteristicWithResponse(
     QualifiedCharacteristic characteristic,
     List<int> value,
@@ -185,6 +265,7 @@ class PluginController {
         .then(_protobufConverter.writeCharacteristicInfoFrom);
   }
 
+  @override
   Future<WriteCharacteristicInfo> writeCharacteristicWithoutResponse(
     QualifiedCharacteristic characteristic,
     List<int> value,
@@ -201,6 +282,7 @@ class PluginController {
         .then(_protobufConverter.writeCharacteristicInfoFrom);
   }
 
+  @override
   Stream<void> subscribeToNotifications(
     QualifiedCharacteristic characteristic,
   ) {
@@ -215,6 +297,7 @@ class PluginController {
         .asStream();
   }
 
+  @override
   Future<void> stopSubscribingToNotifications(
     QualifiedCharacteristic characteristic,
   ) {
@@ -232,6 +315,7 @@ class PluginController {
         );
   }
 
+  @override
   Future<int> requestMtuSize(String deviceId, int mtu) async {
     _debugLogger
         .log('Request mtu size for device: $deviceId with mtuSize: $mtu');
@@ -245,6 +329,7 @@ class PluginController {
         .then(_protobufConverter.mtuSizeFrom);
   }
 
+  @override
   Future<ConnectionPriorityInfo> requestConnectionPriority(
       String deviceId, ConnectionPriority priority) {
     _debugLogger.log(
@@ -259,6 +344,7 @@ class PluginController {
         .then(_protobufConverter.connectionPriorityInfoFrom);
   }
 
+  @override
   Future<Result<Unit, GenericFailure<ClearGattCacheError>>> clearGattCache(
       String deviceId) {
     _debugLogger.log('Clear gatt cache for device: $deviceId');
@@ -272,6 +358,7 @@ class PluginController {
         .then(_protobufConverter.clearGattCacheResultFrom);
   }
 
+  @override
   Future<List<DiscoveredService>> discoverServices(String deviceId) async =>
       _bleMethodChannel
           .invokeMethod<List<int>>(
@@ -286,7 +373,7 @@ class PluginController {
 class PluginControllerFactory {
   const PluginControllerFactory();
 
-  PluginController create(DebugLogger logger) {
+  PluginController create(Logger logger) {
     const _bleMethodChannel = MethodChannel("flutter_reactive_ble_method");
 
     const connectedDeviceChannel =
@@ -296,8 +383,8 @@ class PluginControllerFactory {
     const bleStatusChannel = EventChannel("flutter_reactive_ble_status");
 
     return PluginController(
-      protobufConverter: const ProtobufConverter(),
-      argsToProtobufConverter: const ArgsToProtobufConverter(),
+      protobufConverter: const ProtobufConverterImpl(),
+      argsToProtobufConverter: const ArgsToProtobufConverterImpl(),
       bleMethodChannel: _bleMethodChannel,
       connectedDeviceChannel:
           connectedDeviceChannel.receiveBroadcastStream().cast<List<int>>(),

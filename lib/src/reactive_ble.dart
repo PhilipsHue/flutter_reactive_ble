@@ -31,13 +31,13 @@ class FlutterReactiveBle {
   ///Create a new instance where injected depedencies are used.
   @visibleForTesting
   FlutterReactiveBle.witDependencies({
-    @required PluginController pluginController,
+    @required BleOperationController bleOperationController,
     @required DeviceScanner deviceScanner,
     @required DeviceConnector deviceConnector,
     @required ConnectedDeviceOperation connectedDeviceOperation,
-    @required DebugLogger debugLogger,
+    @required Logger debugLogger,
   }) {
-    _pluginController = pluginController;
+    _bleOperationController = bleOperationController;
     _deviceScanner = deviceScanner;
     _deviceConnector = deviceConnector;
     _connectedDeviceOperator = connectedDeviceOperation;
@@ -50,7 +50,7 @@ class FlutterReactiveBle {
   }
 
   /// Registry that keeps track of all BLE devices found during a BLE scan.
-  final scanRegistry = DiscoveredDevicesRegistry.standard();
+  final scanRegistry = DiscoveredDevicesRegistryImpl.standard();
 
   /// A stream providing the host device BLE subsystem status updates.
   ///
@@ -82,11 +82,14 @@ class FlutterReactiveBle {
     yield* _connectedDeviceOperator.characteristicValueStream;
   }
 
+  BleOperationController _bleOperationController;
+
   PluginController _pluginController;
 
   BleStatus _status = BleStatus.unknown;
 
-  Stream<BleStatus> get _statusStream => _pluginController.bleStatusStream;
+  Stream<BleStatus> get _statusStream =>
+      _bleOperationController.bleStatusStream;
 
   Future<void> _trackStatus() async {
     await initialize();
@@ -98,7 +101,7 @@ class FlutterReactiveBle {
   DeviceConnector _deviceConnector;
   ConnectedDeviceOperation _connectedDeviceOperator;
   DeviceScanner _deviceScanner;
-  DebugLogger _debugLogger;
+  Logger _debugLogger;
 
   /// Initializes this [FlutterReactiveBle] instance and its platform-specific
   /// counterparts.
@@ -112,24 +115,25 @@ class FlutterReactiveBle {
     );
 
     _pluginController ??= const PluginControllerFactory().create(_debugLogger);
+    _bleOperationController ??= _pluginController;
 
-    _initialization ??= _pluginController.initialize();
+    _initialization ??= _bleOperationController.initialize();
 
-    _connectedDeviceOperator ??= ConnectedDeviceOperation(
-      pluginController: _pluginController,
+    _connectedDeviceOperator ??= ConnectedDeviceOperationImpl(
+      controller: _pluginController,
     );
-    _deviceScanner ??= DeviceScanner(
-      pluginController: _pluginController,
+    _deviceScanner ??= DeviceScannerImpl(
+      controller: _pluginController,
       platformIsAndroid: () => Platform.isAndroid,
       delayAfterScanCompletion: Future<void>.delayed(
         const Duration(milliseconds: 300),
       ),
-      scanRegistry: scanRegistry,
+      addToScanRegistry: scanRegistry.add,
     );
 
-    _deviceConnector ??= DeviceConnector(
-      pluginController: _pluginController,
-      discoveredDevicesRegistry: scanRegistry,
+    _deviceConnector ??= DeviceConnectorImpl(
+      controller: _pluginController,
+      deviceIsDiscoveredRecently: scanRegistry.deviceIsDiscoveredRecently,
       deviceScanner: _deviceScanner,
       delayAfterScanFailure: const Duration(seconds: 10),
     );
@@ -144,7 +148,7 @@ class FlutterReactiveBle {
   Future<void> deinitialize() async {
     if (_initialization != null) {
       _initialization = null;
-      await _pluginController.deinitialize();
+      await _bleOperationController.deinitialize();
     }
   }
 
@@ -302,14 +306,14 @@ class FlutterReactiveBle {
   ///
   /// When discovery fails this method throws an [Exception].
   Future<List<DiscoveredService>> discoverServices(String deviceId) =>
-      _pluginController.discoverServices(deviceId);
+      _connectedDeviceOperator.discoverServices(deviceId);
 
   /// Clears GATT attribute cache on Android using undocumented API. Completes with an error in case of a failure.
   ///
   /// Always completes with an error on iOS, as there is no way (and no need) to perform this operation on iOS.
   ///
   /// The connection may need to be reestablished after successful GATT attribute cache clearing.
-  Future<void> clearGattCache(String deviceId) => _pluginController
+  Future<void> clearGattCache(String deviceId) => _bleOperationController
       .clearGattCache(deviceId)
       .then((info) => info.dematerialize());
 
