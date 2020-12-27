@@ -14,7 +14,7 @@ Uuid _UART_RX   = Uuid.parse("6E400002-B5A3-F393-E0A9-E50E24DCCA9E");
 
 Uuid _UART_TX   = Uuid.parse("6E400003-B5A3-F393-E0A9-E50E24DCCA9E");
 
-##Usage
+## Usage
 
 This app can be used if the BLE peripheral implements the aforementioned services. The user interface is shown below:
 
