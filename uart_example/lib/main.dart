@@ -153,13 +153,13 @@ class _MyHomePageState extends State<MyHomePage> {
       switch(event.connectionState) {
         case DeviceConnectionState.connecting:
           {
-            _logTexts = _logTexts + "Connecting to " + id +"\n";
+            _logTexts = _logTexts + "Connecting to ${id}\n";
             break;
           }
         case DeviceConnectionState.connected:
           {
             _connected = true;
-            _logTexts = _logTexts + "Connected to " + id + "\n";
+            _logTexts = _logTexts + "Connected to ${id}\n";
             _numberOfMessagesReceived = 0;
             _receivedData = [];
             _txCharacteristic = QualifiedCharacteristic(serviceId: _UART_UUID, characteristicId: _UART_TX, deviceId: event.deviceId);
@@ -167,7 +167,7 @@ class _MyHomePageState extends State<MyHomePage> {
             _receivedDataStream.listen((data) {
                onNewReceivedData(data);
             }, onError: (dynamic error) {
-              _logTexts = _logTexts + "Error:" + error.toString() + id + "\n";
+              _logTexts = _logTexts + "Error: ${error} ${id}\n";
             });
             _rxCharacteristic = QualifiedCharacteristic(serviceId: _UART_UUID, characteristicId: _UART_RX, deviceId: event.deviceId);
             break;
@@ -175,12 +175,12 @@ class _MyHomePageState extends State<MyHomePage> {
         case DeviceConnectionState.disconnecting:
           {
             _connected = false;
-            _logTexts = _logTexts + "Disconnecting from " + id + "\n";
+            _logTexts = _logTexts + "Disconnecting from ${id}\n";
             break;
           }
         case DeviceConnectionState.disconnected:
           {
-            _logTexts = _logTexts + "Disconnected from " + id + "\n";
+            _logTexts = _logTexts + "Disconnected from ${id}\n";
             break;
           }
       }
