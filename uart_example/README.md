@@ -2,9 +2,7 @@
 
 This demo app shows an usecase for using flutter_reactive_ble library for building a UART emulation over BLE.
 
-This demo app uses one service: the Nordic UART Service. 
-
-The 128-bit vendor-specific UUID of the Nordic UART Service:
+This demo app uses one service: the Nordic UART Service with vendor-specific UUID:
 
 ```
 Uuid _UART_UUID = Uuid.parse("6E400001-B5A3-F393-E0A9-E50E24DCCA9E");
