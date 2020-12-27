@@ -1,4 +1,4 @@
-# flutter reactive BLE UART demo app
+# Flutter reactive BLE UART demo app
 
 This demo app shows an usecase for using flutter_reactive_ble library for building a UART emulation over BLE.
 
