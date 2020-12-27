@@ -23,7 +23,7 @@ This app can be used if the BLE peripheral implements the aforementioned service
 
 ![alt text](./screenshot.png "User interface")
 
-
+Use the play button for scanning and the stop button for stop a running scan. When an UART BLE service is found, it is displayed at the top. Press the found device at the right, then a connection is being established as can be seen in the Status messages pane. Then a message string can be sent to the BLE peripheral, Received data is shown in the Received data pane. An existing connection can be closed using the bottom rightmost button.
 
 
 
