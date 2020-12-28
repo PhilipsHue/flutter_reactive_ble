@@ -218,6 +218,6 @@ In case you are using ProGuard add the following snippet to your `proguard-rules
 
 This will prevent issues like [#131](https://github.com/PhilipsHue/flutter_reactive_ble/issues/131) .
 
-#### Further unofficial examples
+#### Unofficial example apps
 
-An example implementing an UART over BLE can be found at https://github.com/wolfc01/flutter_reactive_ble_uart_example
+[Example implementation UART over BLE:](https://github.com/wolfc01/flutter_reactive_ble_uart_example)
