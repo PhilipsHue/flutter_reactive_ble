@@ -220,4 +220,4 @@ This will prevent issues like [#131](https://github.com/PhilipsHue/flutter_react
 
 #### Unofficial example apps
 
-[Example implementation UART over BLE:](https://github.com/wolfc01/flutter_reactive_ble_uart_example)
+Example implementation UART over BLE:[link](https://github.com/wolfc01/flutter_reactive_ble_uart_example)
