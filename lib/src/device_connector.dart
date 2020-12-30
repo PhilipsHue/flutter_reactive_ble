@@ -13,13 +13,13 @@ import 'model/uuid.dart';
 abstract class DeviceConnector {
   Stream<ConnectionStateUpdate> get deviceConnectionStateUpdateStream;
 
-  Stream<ConnectionStateUpdate> connect({
+  Stream<ConnectionStateUpdate/*!*/> connect({
     @required String id,
     Map<Uuid, List<Uuid>> servicesWithCharacteristicsToDiscover,
     Duration connectionTimeout,
   });
 
-  Stream<ConnectionStateUpdate> connectToAdvertisingDevice({
+  Stream<ConnectionStateUpdate/*!*/> connectToAdvertisingDevice({
     @required String id,
     @required List<Uuid> withServices,
     @required Duration prescanDuration,

@@ -25,18 +25,18 @@ abstract class ProtobufConverter {
   ConnectionStateUpdate connectionStateUpdateFrom(List<int> data);
 
   Result<Unit, GenericFailure<ClearGattCacheError>> clearGattCacheResultFrom(
-      List<int> data);
+      List<int>/*!*/ data);
 
   CharacteristicValue characteristicValueFrom(List<int> data);
 
-  WriteCharacteristicInfo writeCharacteristicInfoFrom(List<int> data);
+  WriteCharacteristicInfo writeCharacteristicInfoFrom(List<int>/*!*/ data);
 
-  ConnectionPriorityInfo connectionPriorityInfoFrom(List<int> data);
+  ConnectionPriorityInfo connectionPriorityInfoFrom(List<int>/*!*/ data);
 
   int mtuSizeFrom(List<int> data) =>
       pb.NegotiateMtuInfo.fromBuffer(data).mtuSize;
 
-  List<DiscoveredService> discoveredServicesFrom(List<int> data);
+  List<DiscoveredService> discoveredServicesFrom(List<int>/*!*/ data);
 }
 
 class ProtobufConverterImpl implements ProtobufConverter {

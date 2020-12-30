@@ -5,8 +5,8 @@ import 'package:meta/meta.dart';
 
 /// Value update for specific [QualifiedCharacteristic].
 class CharacteristicValue {
-  final QualifiedCharacteristic characteristic;
-  final Result<List<int>, GenericFailure<CharacteristicValueUpdateError>>
+  final QualifiedCharacteristic/*!*/ characteristic;
+  final Result<List<int>, GenericFailure<CharacteristicValueUpdateError>/*!*/>
       result;
 
   const CharacteristicValue(

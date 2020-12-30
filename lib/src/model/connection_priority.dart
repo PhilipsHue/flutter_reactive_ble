@@ -13,7 +13,7 @@ enum ConnectionPriority {
 }
 
 ///util function to convert priority to a integer.
-int convertPriorityToInt(ConnectionPriority priority) {
+int convertPriorityToInt(ConnectionPriority/*!*/ priority) {
   switch (priority) {
     case ConnectionPriority.balanced:
       return 0;
@@ -31,7 +31,7 @@ int convertPriorityToInt(ConnectionPriority priority) {
 class ConnectionPriorityInfo {
   const ConnectionPriorityInfo({this.result});
 
-  final Result<void, GenericFailure<ConnectionPriorityFailure>> result;
+  final Result<void, GenericFailure<ConnectionPriorityFailure>/*!*/>/*?*/ result;
 }
 
 /// Error type for connection priority.

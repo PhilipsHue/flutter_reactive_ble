@@ -5,20 +5,20 @@ import 'package:meta/meta.dart';
 abstract class ConnectedDeviceOperation {
   Stream<CharacteristicValue> get characteristicValueStream;
 
-  Future<List<int>> readCharacteristic(QualifiedCharacteristic characteristic);
+  Future<List<int>/*!*/> readCharacteristic(QualifiedCharacteristic/*!*/ characteristic);
 
   Future<void> writeCharacteristicWithResponse(
-    QualifiedCharacteristic characteristic, {
+    QualifiedCharacteristic/*!*/ characteristic, {
     @required List<int> value,
   });
 
   Future<void> writeCharacteristicWithoutResponse(
-    QualifiedCharacteristic characteristic, {
+    QualifiedCharacteristic/*!*/ characteristic, {
     @required List<int> value,
   });
 
-  Stream<List<int>> subscribeToCharacteristic(
-    QualifiedCharacteristic characteristic,
+  Stream<List<int>/*!*/> subscribeToCharacteristic(
+    QualifiedCharacteristic/*!*/ characteristic,
     Future<void> isDisconnected,
   );
 
@@ -27,7 +27,7 @@ abstract class ConnectedDeviceOperation {
   Future<List<DiscoveredService>> discoverServices(String deviceId);
 
   Future<void> requestConnectionPriority(
-      String deviceId, ConnectionPriority priority);
+      String deviceId, ConnectionPriority/*!*/ priority);
 }
 
 class ConnectedDeviceOperationImpl implements ConnectedDeviceOperation {
@@ -43,7 +43,7 @@ class ConnectedDeviceOperationImpl implements ConnectedDeviceOperation {
       _controller.charValueUpdateStream;
 
   @override
-  Future<List<int>> readCharacteristic(QualifiedCharacteristic characteristic) {
+  Future<List<int>/*!*/> readCharacteristic(QualifiedCharacteristic characteristic) {
     final specificCharacteristicValueStream = characteristicValueStream
         .where((update) => update.characteristic == characteristic)
         .map((update) => update.result.dematerialize());
@@ -74,7 +74,7 @@ class ConnectedDeviceOperationImpl implements ConnectedDeviceOperation {
           .then((info) => info.result.dematerialize());
 
   @override
-  Stream<List<int>> subscribeToCharacteristic(
+  Stream<List<int>/*!*/> subscribeToCharacteristic(
     QualifiedCharacteristic characteristic,
     Future<void> isDisconnected,
   ) {
