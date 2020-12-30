@@ -13,30 +13,30 @@ abstract class ArgsToProtobufConverter {
   pb.DisconnectFromDeviceRequest createDisconnectDeviceArgs(String deviceId);
 
   pb.ReadCharacteristicRequest createReadCharacteristicRequest(
-    QualifiedCharacteristic characteristic,
+    QualifiedCharacteristic/*!*/ characteristic,
   );
 
   pb.WriteCharacteristicRequest createWriteChacracteristicRequest(
-    QualifiedCharacteristic characteristic,
+    QualifiedCharacteristic/*!*/ characteristic,
     List<int> value,
   );
 
   pb.NotifyCharacteristicRequest createNotifyCharacteristicRequest(
-    QualifiedCharacteristic characteristic,
+    QualifiedCharacteristic/*!*/ characteristic,
   );
 
   pb.NotifyNoMoreCharacteristicRequest createNotifyNoMoreCharacteristicRequest(
-    QualifiedCharacteristic characteristic,
+    QualifiedCharacteristic/*!*/ characteristic,
   );
 
   pb.NegotiateMtuRequest createNegotiateMtuRequest(
     String deviceId,
-    int mtu,
+    int/*!*/ mtu,
   );
 
   pb.ChangeConnectionPriorityRequest createChangeConnectionPrioRequest(
     String deviceId,
-    ConnectionPriority priority,
+    ConnectionPriority/*!*/ priority,
   );
 
   pb.ScanForDevicesRequest createScanForDevicesRequest({
@@ -89,7 +89,7 @@ class ArgsToProtobufConverterImpl implements ArgsToProtobufConverter {
 
   @override
   pb.ReadCharacteristicRequest createReadCharacteristicRequest(
-    QualifiedCharacteristic characteristic,
+    QualifiedCharacteristic/*!*/ characteristic,
   ) {
     final args = pb.ReadCharacteristicRequest()
       ..characteristic = (pb.CharacteristicAddress()

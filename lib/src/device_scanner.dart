@@ -15,7 +15,7 @@ import 'model/uuid.dart';
 abstract class DeviceScanner {
   ScanSession get currentScan;
 
-  Stream<DiscoveredDevice> scanForDevices({
+  Stream<DiscoveredDevice/*!*/> scanForDevices({
     @required List<Uuid> withServices,
     ScanMode scanMode = ScanMode.balanced,
     bool requireLocationServicesEnabled = true,
@@ -53,7 +53,7 @@ class DeviceScannerImpl implements DeviceScanner {
   ScanSession get currentScan => _currentScanSession;
 
   @override
-  Stream<DiscoveredDevice> scanForDevices({
+  Stream<DiscoveredDevice/*!*/> scanForDevices({
     @required List<Uuid> withServices,
     ScanMode scanMode = ScanMode.balanced,
     bool requireLocationServicesEnabled = true,

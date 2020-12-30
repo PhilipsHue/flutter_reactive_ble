@@ -13,7 +13,7 @@ class ConnectionStateUpdate extends $ConnectionStateUpdate {
   final DeviceConnectionState connectionState;
 
   /// Field `error` is null if there is no error reported.
-  final GenericFailure<ConnectionError> failure;
+  final GenericFailure<ConnectionError/*!*/> failure;
 
   const ConnectionStateUpdate({
     @required this.deviceId,
