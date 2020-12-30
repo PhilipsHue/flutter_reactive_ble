@@ -39,7 +39,7 @@ abstract class DeviceOperationController {
     QualifiedCharacteristic characteristic,
   );
 
-  Future<int> requestMtuSize(String deviceId, int mtu);
+  Future<int> requestMtuSize(String deviceId, int? mtu);
 
   Future<ConnectionPriorityInfo> requestConnectionPriority(
       String deviceId, ConnectionPriority priority);
@@ -49,9 +49,9 @@ abstract class ScanOperationController {
   Stream<ScanResult> get scanStream;
 
   Stream<void> scanForDevices({
-    @required List<Uuid> withServices,
-    @required ScanMode scanMode,
-    @required bool requireLocationServicesEnabled,
+    required List<Uuid> withServices,
+    required ScanMode? scanMode,
+    required bool? requireLocationServicesEnabled,
   });
 }
 
@@ -60,8 +60,8 @@ abstract class DeviceConnectionController {
 
   Stream<void> connectToDevice(
     String id,
-    Map<Uuid, List<Uuid>> servicesWithCharacteristicsToDiscover,
-    Duration connectionTimeout,
+    Map<Uuid, List<Uuid>>? servicesWithCharacteristicsToDiscover,
+    Duration? connectionTimeout,
   );
 
   Future<void> disconnectDevice(String deviceId);
@@ -74,7 +74,7 @@ abstract class BleOperationController {
 
   Future<void> deinitialize();
 
-  Future<Result<Unit, GenericFailure<ClearGattCacheError>>> clearGattCache(
+  Future<Result<Unit, GenericFailure<ClearGattCacheError>?>> clearGattCache(
       String deviceId);
 }
 
@@ -85,14 +85,14 @@ class PluginController
         DeviceConnectionController,
         BleOperationController {
   PluginController({
-    @required ArgsToProtobufConverter argsToProtobufConverter,
-    @required ProtobufConverter protobufConverter,
-    @required MethodChannel bleMethodChannel,
-    @required Stream<List<int>> connectedDeviceChannel,
-    @required Stream<List<int>> charUpdateChannel,
-    @required Stream<List<int>> bleDeviceScanChannel,
-    @required Stream<List<int>> bleStatusChannel,
-    @required Logger debugLogger,
+    required ArgsToProtobufConverter argsToProtobufConverter,
+    required ProtobufConverter protobufConverter,
+    required MethodChannel bleMethodChannel,
+    required Stream<List<int>> connectedDeviceChannel,
+    required Stream<List<int>> charUpdateChannel,
+    required Stream<List<int>> bleDeviceScanChannel,
+    required Stream<List<int>> bleStatusChannel,
+    required Logger debugLogger,
   })  : assert(argsToProtobufConverter != null),
         assert(protobufConverter != null),
         assert(bleMethodChannel != null),
@@ -119,10 +119,10 @@ class PluginController
   final Stream<List<int>> _bleStatusRawChannel;
   final Logger _debugLogger;
 
-  Stream<ConnectionStateUpdate> _connectionUpdateStream;
-  Stream<CharacteristicValue> _charValueStream;
-  Stream<ScanResult> _scanResultStream;
-  Stream<BleStatus> _bleStatusStream;
+  Stream<ConnectionStateUpdate>? _connectionUpdateStream;
+  Stream<CharacteristicValue>? _charValueStream;
+  Stream<ScanResult>? _scanResultStream;
+  Stream<BleStatus>? _bleStatusStream;
 
   @override
   Stream<ConnectionStateUpdate> get connectionUpdateStream =>
@@ -182,9 +182,9 @@ class PluginController
 
   @override
   Stream<void> scanForDevices({
-    @required List<Uuid> withServices,
-    @required ScanMode scanMode,
-    @required bool requireLocationServicesEnabled,
+    required List<Uuid> withServices,
+    required ScanMode? scanMode,
+    required bool? requireLocationServicesEnabled,
   }) {
     _debugLogger.log(
       'Start scanning for devices with arguments (withServices:$withServices, scanMode: $scanMode, locationServiceEnabled: $requireLocationServicesEnabled)',
@@ -206,8 +206,8 @@ class PluginController
   @override
   Stream<void> connectToDevice(
     String id,
-    Map<Uuid, List<Uuid>> servicesWithCharacteristicsToDiscover,
-    Duration connectionTimeout,
+    Map<Uuid, List<Uuid>>? servicesWithCharacteristicsToDiscover,
+    Duration? connectionTimeout,
   ) {
     _debugLogger.log(
       'Start connecting to device with arguments (deviceId: $id, servicesWithCharacteristicsToDiscover: $servicesWithCharacteristicsToDiscover, timeout: $connectionTimeout)',
@@ -262,7 +262,7 @@ class PluginController
             _argsToProtobufConverter
                 .createWriteChacracteristicRequest(characteristic, value)
                 .writeToBuffer())
-        .then(_protobufConverter.writeCharacteristicInfoFrom);
+        .then(_protobufConverter.writeCharacteristicInfoFrom as FutureOr<WriteCharacteristicInfo> Function(List<int>?));
   }
 
   @override
@@ -279,7 +279,7 @@ class PluginController
               .createWriteChacracteristicRequest(characteristic, value)
               .writeToBuffer(),
         )
-        .then(_protobufConverter.writeCharacteristicInfoFrom);
+        .then(_protobufConverter.writeCharacteristicInfoFrom as FutureOr<WriteCharacteristicInfo> Function(List<int>?));
   }
 
   @override
@@ -316,14 +316,14 @@ class PluginController
   }
 
   @override
-  Future<int> requestMtuSize(String deviceId, int mtu) async {
+  Future<int> requestMtuSize(String deviceId, int? mtu) async {
     _debugLogger
         .log('Request mtu size for device: $deviceId with mtuSize: $mtu');
     return _bleMethodChannel
         .invokeMethod<List<int>>(
           "negotiateMtuSize",
           _argsToProtobufConverter
-              .createNegotiateMtuRequest(deviceId, mtu)
+              .createNegotiateMtuRequest(deviceId, mtu!)
               .writeToBuffer(),
         )
         .then(_protobufConverter.mtuSizeFrom);
@@ -341,11 +341,11 @@ class PluginController
               .createChangeConnectionPrioRequest(deviceId, priority)
               .writeToBuffer(),
         )
-        .then(_protobufConverter.connectionPriorityInfoFrom);
+        .then(_protobufConverter.connectionPriorityInfoFrom as FutureOr<ConnectionPriorityInfo> Function(List<int>?));
   }
 
   @override
-  Future<Result<Unit, GenericFailure<ClearGattCacheError>>> clearGattCache(
+  Future<Result<Unit, GenericFailure<ClearGattCacheError>?>> clearGattCache(
       String deviceId) {
     _debugLogger.log('Clear gatt cache for device: $deviceId');
     return _bleMethodChannel
@@ -355,7 +355,7 @@ class PluginController
               .createClearGattCacheRequest(deviceId)
               .writeToBuffer(),
         )
-        .then(_protobufConverter.clearGattCacheResultFrom);
+        .then(_protobufConverter.clearGattCacheResultFrom as FutureOr<Result<Unit, GenericFailure<ClearGattCacheError>?>> Function(List<int>?));
   }
 
   @override
@@ -367,7 +367,7 @@ class PluginController
                 .createDiscoverServicesRequest(deviceId)
                 .writeToBuffer(),
           )
-          .then(_protobufConverter.discoveredServicesFrom);
+          .then(_protobufConverter.discoveredServicesFrom as FutureOr<List<DiscoveredService>> Function(List<int>?));
 }
 
 class PluginControllerFactory {

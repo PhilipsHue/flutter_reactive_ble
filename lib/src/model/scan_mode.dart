@@ -15,7 +15,7 @@ enum ScanMode {
 }
 
 /// Converts [ScanMode] to integer representation.
-int convertScanModeToArgs(ScanMode/*!*/ scanMode) {
+int convertScanModeToArgs(ScanMode scanMode) {
   switch (scanMode) {
     case ScanMode.opportunistic:
       return -1;

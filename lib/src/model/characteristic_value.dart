@@ -5,12 +5,12 @@ import 'package:meta/meta.dart';
 
 /// Value update for specific [QualifiedCharacteristic].
 class CharacteristicValue {
-  final QualifiedCharacteristic/*!*/ characteristic;
-  final Result<List<int>, GenericFailure<CharacteristicValueUpdateError>/*!*/>
+  final QualifiedCharacteristic characteristic;
+  final Result<List<int>, GenericFailure<CharacteristicValueUpdateError>>
       result;
 
   const CharacteristicValue(
-      {@required this.characteristic, @required this.result});
+      {required this.characteristic, required this.result});
 
   @override
   String toString() =>

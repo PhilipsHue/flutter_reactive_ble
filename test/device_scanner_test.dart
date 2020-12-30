@@ -16,12 +16,12 @@ import 'device_scanner_test.mocks.dart';
 @GenerateMocks([ScanOperationController])
 void main() {
   group('$DeviceScanner', () {
-    DiscoveredDevice _device1;
-    DiscoveredDevice _device2;
-    MockScanOperationController _controller;
-    Completer<void> _delayAfterScanCompletion;
+    DiscoveredDevice? _device1;
+    DiscoveredDevice? _device2;
+    late MockScanOperationController _controller;
+    late Completer<void> _delayAfterScanCompletion;
 
-    DeviceScannerImpl _sut;
+    late DeviceScannerImpl _sut;
 
     setUp(() {
       _device1 = DiscoveredDevice(
@@ -44,11 +44,11 @@ void main() {
     });
 
     group('Scan for devices', () {
-      Stream<DiscoveredDevice> scanStream;
+      Stream<DiscoveredDevice>? scanStream;
 
-      List<Uuid> withServices;
-      bool locationEnabled;
-      ScanMode scanmode;
+      late List<Uuid> withServices;
+      bool? locationEnabled;
+      ScanMode? scanmode;
 
       setUp(() {
         withServices = [Uuid.parse('FEFF')];
@@ -56,7 +56,7 @@ void main() {
         scanmode = ScanMode.lowLatency;
 
         when(_controller.scanForDevices(
-          withServices: anyNamed('withServices'),
+          withServices: anyNamed('withServices')!,
           scanMode: anyNamed('scanMode'),
           requireLocationServicesEnabled:
               anyNamed('requireLocationServicesEnabled'),
@@ -96,7 +96,7 @@ void main() {
           });
           test('It emits discovered devices ', () {
             expect(scanStream,
-                emitsInOrder(<DiscoveredDevice>[_device1, _device2]));
+                emitsInOrder(<DiscoveredDevice?>[_device1, _device2]));
           });
 
           test('It keeps instance of current scan session', () {
@@ -104,9 +104,9 @@ void main() {
           });
 
           group('When scanGetsCancelled', () {
-            StreamSubscription<DiscoveredDevice> subscription;
+            late StreamSubscription<DiscoveredDevice> subscription;
             setUp(() {
-              subscription = scanStream.listen((event) {});
+              subscription = scanStream!.listen((event) {});
             });
 
             test('It sets currentScan session is set to null', () async {
@@ -132,9 +132,9 @@ void main() {
           });
 
           group('When scanGetsCancelled and timeout is  completed', () {
-            StreamSubscription<DiscoveredDevice> subscription;
+            late StreamSubscription<DiscoveredDevice> subscription;
             setUp(() {
-              subscription = scanStream.listen((event) {});
+              subscription = scanStream!.listen((event) {});
               _delayAfterScanCompletion.complete();
             });
 
@@ -145,9 +145,9 @@ void main() {
           });
 
           group('When scanGetsCancelled and timeout is  completed', () {
-            StreamSubscription<DiscoveredDevice> subscription;
+            late StreamSubscription<DiscoveredDevice> subscription;
             setUp(() {
-              subscription = scanStream.listen((event) {});
+              subscription = scanStream!.listen((event) {});
             });
 
             test('It does not cancel current scan session', () {
@@ -163,7 +163,7 @@ void main() {
             GenericFailure(code: ScanFailure.unknown, message: 'Whoops');
         const resultFailure = ScanResult(result: Result.failure(failure));
 
-        Stream<DiscoveredDevice> scanStream;
+        Stream<DiscoveredDevice>? scanStream;
 
         setUp(() {
           when(_controller.scanStream)

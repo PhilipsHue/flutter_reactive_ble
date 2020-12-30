@@ -9,8 +9,8 @@ part 'discovered_service.g.dart';
 @FunctionalData()
 class DiscoveredService extends $DiscoveredService {
   const DiscoveredService({
-    @required this.serviceId,
-    @required this.characteristicIds,
+    required this.serviceId,
+    required this.characteristicIds,
     this.includedServices = const [],
   });
 

@@ -12,7 +12,7 @@ class Result<Value, Failure> {
         _value = null; // ignore: avoid_field_initializers_in_const_classes
 
   /// Provides the value in case of success or throws [Exception] in case of failure.
-  Value dematerialize() => iif(
+  Value? dematerialize() => iif(
         success: (value) => value,
         failure: (failure) {
           if (failure is Exception) {
@@ -26,8 +26,8 @@ class Result<Value, Failure> {
 
   /// Execute specific actions on success and on failure.
   T iif<T>(
-      {@required T Function(Value value) success,
-      @required T Function(Failure failure) failure}) {
+      {required T Function(Value? value) success,
+      required T Function(Failure? failure) failure}) {
     assert(_value == null || _failure == null);
 
     if (_failure != null) {
@@ -58,6 +58,6 @@ class Result<Value, Failure> {
       _value == other._value &&
       _failure == other._failure;
 
-  final Value _value;
-  final Failure _failure;
+  final Value? _value;
+  final Failure? _failure;
 }

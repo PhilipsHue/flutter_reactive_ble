@@ -10,7 +10,7 @@ import 'package:meta/meta.dart';
 /// to the output stream.
 class Repeater<T> {
   final Stream<T> Function() _onListenEmitFrom;
-  final Future<dynamic> Function() _onCancel;
+  final Future<dynamic> Function()? _onCancel;
   final bool _isSync;
   final bool _isBroadcast;
   int detachCount = 0;
@@ -18,8 +18,8 @@ class Repeater<T> {
   // ignore: prefer_function_declarations_over_variables
   void Function(String) log = (_) {};
 
-  StreamController<T> _streamController;
-  StreamSubscription<T> _sourceSubscription;
+  StreamController<T>? _streamController;
+  StreamSubscription<T>? _sourceSubscription;
 
   /// The output stream.
   Stream<T> get stream =>
@@ -35,17 +35,17 @@ class Repeater<T> {
     detachCount -= 1;
 
     if (detachCount < 0 &&
-        _streamController.hasListener &&
+        _streamController!.hasListener &&
         _sourceSubscription == null) {
       log("ATTACH");
       try {
         _sourceSubscription = _onListenEmitFrom().listen(
-          _streamController.add,
-          onError: _streamController.addError,
-          onDone: _streamController.close,
+          _streamController!.add,
+          onError: _streamController!.addError,
+          onDone: _streamController!.close,
         );
       } on Exception catch (e, s) {
-        _streamController.addError(e, s);
+        _streamController!.addError(e, s);
       }
     }
   }
@@ -56,24 +56,24 @@ class Repeater<T> {
   Future<void> detach() async {
     detachCount += 1;
 
-    if ((detachCount >= 0 || !_streamController.hasListener) &&
+    if ((detachCount >= 0 || !_streamController!.hasListener) &&
         _sourceSubscription != null) {
       log("DETACH");
-      await _sourceSubscription.cancel();
+      await _sourceSubscription!.cancel();
       _sourceSubscription = null;
 
       if (_onCancel != null) {
-        await _onCancel();
+        await _onCancel!();
       }
     }
   }
 
   /// Closes the `stream`.
-  Future dispose() => _streamController?.close();
+  Future? dispose() => _streamController?.close();
 
   Repeater({
-    @required Stream<T> Function() onListenEmitFrom,
-    Future<dynamic> Function() onCancel,
+    required Stream<T> Function() onListenEmitFrom,
+    Future<dynamic> Function()? onCancel,
     bool isSync = false,
   })  : _onListenEmitFrom = onListenEmitFrom,
         _onCancel = onCancel,
@@ -81,8 +81,8 @@ class Repeater<T> {
         _isSync = isSync;
 
   Repeater.broadcast({
-    @required Stream<T> Function() onListenEmitFrom,
-    Future<dynamic> Function() onCancel,
+    required Stream<T> Function() onListenEmitFrom,
+    Future<dynamic> Function()? onCancel,
     bool isSync = false,
   })  : _onListenEmitFrom = onListenEmitFrom,
         _onCancel = onCancel,
@@ -90,7 +90,7 @@ class Repeater<T> {
         _isSync = isSync;
 
   factory Repeater.fromStream(Stream<T> source,
-          {Future<dynamic> Function() onCancel, bool isSync = false}) =>
+          {Future<dynamic> Function()? onCancel, bool isSync = false}) =>
       source.isBroadcast
           ? Repeater.broadcast(
               onListenEmitFrom: () => source,

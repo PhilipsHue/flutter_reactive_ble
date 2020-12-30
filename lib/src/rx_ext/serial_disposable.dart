@@ -25,9 +25,9 @@ class SerialDisposable<T> {
   /// Returns whether or not the underlying resource is disposed
   bool get isDisposed => _isDisposed;
 
-  final Future<void> Function(T) _dispose;
+  final Future<void>? Function(T?) _dispose;
   bool _isDisposed = false;
-  T _value;
+  T? _value;
 }
 
 class _SerialAlreadyDisposed extends Error {
