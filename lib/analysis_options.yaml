@@ -8,6 +8,7 @@ analyzer:
     - lib/**/*.gen.dart
     - test/**.g.dart
     - test/**/*.g.dart
+    - test/**/*.mocks.dart
 
 linter:
   rules:

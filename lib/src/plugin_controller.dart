@@ -4,7 +4,6 @@ import 'package:flutter_reactive_ble/src/converter/args_to_protubuf_converter.da
 import 'package:flutter_reactive_ble/src/debug_logger.dart';
 import 'package:flutter_reactive_ble/src/model/uuid.dart';
 import 'package:flutter_reactive_ble/src/model/write_characteristic_info.dart';
-import 'package:meta/meta.dart';
 
 import 'converter/protobuf_converter.dart';
 import 'model/characteristic_value.dart';
@@ -93,15 +92,7 @@ class PluginController
     required Stream<List<int>> bleDeviceScanChannel,
     required Stream<List<int>> bleStatusChannel,
     required Logger debugLogger,
-  })  : assert(argsToProtobufConverter != null),
-        assert(protobufConverter != null),
-        assert(bleMethodChannel != null),
-        assert(connectedDeviceChannel != null),
-        assert(bleDeviceScanChannel != null),
-        assert(bleStatusChannel != null),
-        assert(charUpdateChannel != null),
-        assert(debugLogger != null),
-        _argsToProtobufConverter = argsToProtobufConverter,
+  })   : _argsToProtobufConverter = argsToProtobufConverter,
         _protobufConverter = protobufConverter,
         _bleMethodChannel = bleMethodChannel,
         _connectedDeviceRawStream = connectedDeviceChannel,
@@ -262,7 +253,7 @@ class PluginController
             _argsToProtobufConverter
                 .createWriteChacracteristicRequest(characteristic, value)
                 .writeToBuffer())
-        .then(_protobufConverter.writeCharacteristicInfoFrom as FutureOr<WriteCharacteristicInfo> Function(List<int>?));
+        .then((data) => _protobufConverter.writeCharacteristicInfoFrom(data!));
   }
 
   @override
@@ -279,7 +270,7 @@ class PluginController
               .createWriteChacracteristicRequest(characteristic, value)
               .writeToBuffer(),
         )
-        .then(_protobufConverter.writeCharacteristicInfoFrom as FutureOr<WriteCharacteristicInfo> Function(List<int>?));
+        .then((data) => _protobufConverter.writeCharacteristicInfoFrom(data!));
   }
 
   @override
@@ -341,7 +332,7 @@ class PluginController
               .createChangeConnectionPrioRequest(deviceId, priority)
               .writeToBuffer(),
         )
-        .then(_protobufConverter.connectionPriorityInfoFrom as FutureOr<ConnectionPriorityInfo> Function(List<int>?));
+        .then((data) => _protobufConverter.connectionPriorityInfoFrom(data!));
   }
 
   @override
@@ -355,7 +346,7 @@ class PluginController
               .createClearGattCacheRequest(deviceId)
               .writeToBuffer(),
         )
-        .then(_protobufConverter.clearGattCacheResultFrom as FutureOr<Result<Unit, GenericFailure<ClearGattCacheError>?>> Function(List<int>?));
+        .then((data) => _protobufConverter.clearGattCacheResultFrom(data!));
   }
 
   @override
@@ -367,7 +358,7 @@ class PluginController
                 .createDiscoverServicesRequest(deviceId)
                 .writeToBuffer(),
           )
-          .then(_protobufConverter.discoveredServicesFrom as FutureOr<List<DiscoveredService>> Function(List<int>?));
+          .then((data) => _protobufConverter.discoveredServicesFrom(data!));
 }
 
 class PluginControllerFactory {

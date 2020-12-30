@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
 import 'package:flutter_reactive_ble/src/connected_device_operation.dart';
@@ -25,10 +26,10 @@ import 'reactive_ble_test.mocks.dart';
 )
 void main() {
   group('$FlutterReactiveBle', () {
-    MockBleOperationController? _bleOperationController;
-    MockDeviceScanner? _deviceScanner;
-    MockDeviceConnector? _deviceConnector;
-    MockConnectedDeviceOperation? _deviceOperation;
+    late MockBleOperationController _bleOperationController;
+    late MockDeviceScanner _deviceScanner;
+    late MockDeviceConnector _deviceConnector;
+    late MockConnectedDeviceOperation _deviceOperation;
     late StreamController<BleStatus> _bleStatusController;
     MockLogger _debugLogger;
 
@@ -42,10 +43,10 @@ void main() {
       _bleStatusController = StreamController();
       _debugLogger = MockLogger();
 
-      when(_bleOperationController!.initialize()).thenAnswer(
+      when(_bleOperationController.initialize()).thenAnswer(
         (_) => Future.value(),
       );
-      when(_bleOperationController!.bleStatusStream).thenAnswer(
+      when(_bleOperationController.bleStatusStream).thenAnswer(
           (realInvocation) => _bleStatusController.stream.asBroadcastStream());
 
       _sut = FlutterReactiveBle.witDependencies(
@@ -102,7 +103,7 @@ void main() {
       Stream<CharacteristicValue>? charValueStream;
 
       setUp(() {
-        when(_deviceOperation!.characteristicValueStream)
+        when(_deviceOperation.characteristicValueStream)
             .thenAnswer((_) => Stream.fromIterable([charValue]));
         charValueStream = _sut.characteristicValueStream;
       });
@@ -119,7 +120,7 @@ void main() {
 
     group('Deinitialize', () {
       setUp(() async {
-        when(_bleOperationController!.deinitialize()).thenAnswer((_) async => 1);
+        when(_bleOperationController.deinitialize()).thenAnswer((_) async => 1);
         await _sut.deinitialize();
       });
 
@@ -134,7 +135,7 @@ void main() {
 
       setUp(() async {
         characteristic = _createChar();
-        when(_deviceOperation!.readCharacteristic(any!))
+        when(_deviceOperation.readCharacteristic(any))
             .thenAnswer((_) async => [1]);
 
         result = await _sut.readCharacteristic(characteristic);
@@ -152,9 +153,9 @@ void main() {
       setUp(() async {
         characteristic = _createChar();
 
-        when(_deviceOperation!.writeCharacteristicWithResponse(
-          any!,
-          value: anyNamed('value')!,
+        when(_deviceOperation.writeCharacteristicWithResponse(
+          any,
+          value: anyNamed('value'),
         )).thenAnswer((_) async => [0]);
 
         await _sut.writeCharacteristicWithResponse(characteristic,
@@ -173,9 +174,9 @@ void main() {
       setUp(() async {
         characteristic = _createChar();
 
-        when(_deviceOperation!.writeCharacteristicWithoutResponse(
-          any!,
-          value: anyNamed('value')!,
+        when(_deviceOperation.writeCharacteristicWithoutResponse(
+          any,
+          value: anyNamed('value'),
         )).thenAnswer((_) async => [0]);
 
         await _sut.writeCharacteristicWithoutResponse(
@@ -195,7 +196,7 @@ void main() {
       int? result;
 
       setUp(() async {
-        when(_deviceOperation!.requestMtu(any!, any))
+        when(_deviceOperation.requestMtu(any, any))
             .thenAnswer((_) async => mtu);
 
         result = await _sut.requestMtu(deviceId: deviceId, mtu: mtu);
@@ -211,7 +212,7 @@ void main() {
       const priority = ConnectionPriority.highPerformance;
 
       setUp(() async {
-        when(_deviceOperation!.requestConnectionPriority(any!, any!))
+        when(_deviceOperation.requestConnectionPriority(any, any))
             .thenAnswer((_) async => 0);
         await _sut.requestConnectionPriority(
             deviceId: deviceId, priority: priority);
@@ -227,9 +228,9 @@ void main() {
       const mode = ScanMode.lowPower;
       const requireLocation = false;
 
-      const device = DiscoveredDevice(
+      final device = DiscoveredDevice(
         id: 'deviceId',
-        manufacturerData: null,
+        manufacturerData: Uint8List.fromList([0]),
         name: 'test',
         rssi: -39,
         serviceData: {},
@@ -237,11 +238,11 @@ void main() {
       Stream<DiscoveredDevice>? deviceStream;
 
       setUp(() {
-        when(_deviceScanner!.scanForDevices(
-          withServices: anyNamed('withServices')!,
-          scanMode: anyNamed('scanMode')!,
+        when(_deviceScanner.scanForDevices(
+          withServices: anyNamed('withServices'),
+          scanMode: anyNamed('scanMode'),
           requireLocationServicesEnabled:
-              anyNamed('requireLocationServicesEnabled')!,
+              anyNamed('requireLocationServicesEnabled'),
         )).thenAnswer((_) => Stream.fromIterable([device]));
 
         deviceStream = _sut.scanForDevices(
@@ -276,8 +277,8 @@ void main() {
       Stream<ConnectionStateUpdate>? deviceUpdateStream;
 
       setUp(() {
-        when(_deviceConnector!.connect(
-                id: anyNamed('id')!,
+        when(_deviceConnector.connect(
+                id: anyNamed('id'),
                 servicesWithCharacteristicsToDiscover:
                     anyNamed('servicesWithCharacteristicsToDiscover'),
                 connectionTimeout: anyNamed('connectionTimeout')))
@@ -317,13 +318,13 @@ void main() {
       Stream<ConnectionStateUpdate>? deviceUpdateStream;
 
       setUp(() {
-        when(_deviceConnector!.connectToAdvertisingDevice(
-          id: anyNamed('id')!,
+        when(_deviceConnector.connectToAdvertisingDevice(
+          id: anyNamed('id'),
           servicesWithCharacteristicsToDiscover:
               anyNamed('servicesWithCharacteristicsToDiscover'),
           connectionTimeout: anyNamed('connectionTimeout'),
-          prescanDuration: anyNamed('prescanDuration')!,
-          withServices: anyNamed('withServices')!,
+          prescanDuration: anyNamed('prescanDuration'),
+          withServices: anyNamed('withServices'),
         )).thenAnswer((realInvocation) => Stream.fromIterable([update]));
 
         deviceUpdateStream = _sut.connectToAdvertisingDevice(
@@ -353,7 +354,7 @@ void main() {
       );
 
       setUp(() async {
-        when(_bleOperationController!.clearGattCache(any!))
+        when(_bleOperationController.clearGattCache(any))
             .thenAnswer((_) async => result);
 
         await _sut.clearGattCache(deviceId);
@@ -374,7 +375,7 @@ void main() {
       Stream<ConnectionStateUpdate>? updateStream;
 
       setUp(() {
-        when(_deviceConnector!.deviceConnectionStateUpdateStream)
+        when(_deviceConnector.deviceConnectionStateUpdateStream)
             .thenAnswer((realInvocation) => Stream.fromIterable([update]));
 
         updateStream = _sut.connectedDeviceStream;
@@ -404,7 +405,7 @@ void main() {
 
       setUp(() {
         char = _createChar();
-        when(_deviceConnector!.deviceConnectionStateUpdateStream)
+        when(_deviceConnector.deviceConnectionStateUpdateStream)
             .thenAnswer((_) => Stream.fromIterable([update]));
 
         valueStream = Stream.fromIterable([
@@ -412,7 +413,7 @@ void main() {
           [2]
         ]);
 
-        when(_deviceOperation!.subscribeToCharacteristic(any!, any!))
+        when(_deviceOperation.subscribeToCharacteristic(any, any))
             .thenAnswer((_) => valueStream);
 
         resultStream = _sut.subscribeToCharacteristic(char);
@@ -438,7 +439,7 @@ void main() {
         const result = <DiscoveredService>[];
 
         setUp(() {
-          when(_deviceOperation!.discoverServices(any!))
+          when(_deviceOperation.discoverServices(any))
               .thenAnswer((_) async => result);
         });
 

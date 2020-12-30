@@ -1,7 +1,5 @@
 import 'dart:async';
 
-import 'package:meta/meta.dart';
-
 /// [Repeater] sets an underlying stream up on the first subscription to
 /// the output [stream] and shuts it down when there are no more subscriptions.
 ///

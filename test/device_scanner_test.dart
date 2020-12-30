@@ -56,7 +56,7 @@ void main() {
         scanmode = ScanMode.lowLatency;
 
         when(_controller.scanForDevices(
-          withServices: anyNamed('withServices')!,
+          withServices: anyNamed('withServices'),
           scanMode: anyNamed('scanMode'),
           requireLocationServicesEnabled:
               anyNamed('requireLocationServicesEnabled'),

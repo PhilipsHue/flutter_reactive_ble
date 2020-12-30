@@ -52,8 +52,8 @@ void main() {
 
       test('converts name', () {
         expect(
-            scanresult.result
-                .iif(success: (d) => d!.name, failure: (_) => throw Exception()),
+            scanresult.result.iif(
+                success: (d) => d!.name, failure: (_) => throw Exception()),
             name);
       });
 
@@ -105,9 +105,9 @@ void main() {
       test("returns null if error is absent", () {
         final error = sut.genericFailureFrom(
           hasFailure: false,
-          getFailure: (() => throw Exception()) as pb.GenericFailure Function(),
+          getFailure: () => throw Exception(),
           codes: <String>[],
-          fallback: ((rawOrNull) => throw Exception()) as String Function(int?),
+          fallback: (int? rawOrNull) => throw Exception(),
         );
         expect(error, null);
       });
@@ -278,8 +278,8 @@ void main() {
         final message = (pb.ClearGattCacheInfo()..failure = pb.GenericFailure())
             .writeToBuffer();
         final result = sut.clearGattCacheResultFrom(message).iif(
-            success: ((_) => throw AssertionError("Not expected to succeed")) as GenericFailure<ClearGattCacheError> Function(Unit?),
-            failure: ((f) => f!) as GenericFailure<ClearGattCacheError> Function(GenericFailure<ClearGattCacheError>?));
+            success: (_) => throw AssertionError("Not expected to succeed"),
+            failure: (f) => f!);
 
         expect(result.code, ClearGattCacheError.unknown);
       });
@@ -398,9 +398,8 @@ void main() {
             .writeCharacteristicInfoFrom(failureMessage.writeToBuffer())
             .result
             .iif(
-              success: ((_) => throw AssertionError("Not expected to succeed")) as GenericFailure<WriteCharacteristicFailure> Function(void),
-              failure: ((f) => f!) as GenericFailure<WriteCharacteristicFailure> Function(GenericFailure<WriteCharacteristicFailure>?),
-            );
+                success: (_) => throw AssertionError("Not expected to succeed"),
+                failure: (f) => f!);
         expect(result.code, WriteCharacteristicFailure.unknown);
       });
     });
@@ -416,7 +415,7 @@ void main() {
 
       test('succeeds', () {
         final result =
-            sut.connectionPriorityInfoFrom(message.writeToBuffer()).result!;
+            sut.connectionPriorityInfoFrom(message.writeToBuffer()).result;
         expect(
           result.iif(
             success: (_) => "success",
@@ -430,10 +429,10 @@ void main() {
         final failureMessage = message..failure = pb.GenericFailure();
         final result = sut
             .connectionPriorityInfoFrom(failureMessage.writeToBuffer())
-            .result!
+            .result
             .iif(
-                success: ((_) => throw AssertionError("Not expected to succeed")) as GenericFailure<ConnectionPriorityFailure> Function(void),
-                failure: ((f) => f!) as GenericFailure<ConnectionPriorityFailure> Function(GenericFailure<ConnectionPriorityFailure>?));
+                success: (_) => throw AssertionError("Not expected to succeed"),
+                failure: (f) => f!);
         expect(result.code, ConnectionPriorityFailure.unknown);
       });
     });

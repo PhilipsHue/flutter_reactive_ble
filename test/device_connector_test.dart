@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
 import 'package:flutter_reactive_ble/src/device_connector.dart';
 import 'package:flutter_reactive_ble/src/device_scanner.dart';
@@ -16,14 +18,14 @@ void main() {
   group('$DeviceConnector', () {
     late DeviceConnector _sut;
     late MockDeviceConnectionController _controller;
-    Stream<ConnectionStateUpdate?>? _connectionStateUpdateStream;
-    Stream<ConnectionStateUpdate>? _result;
+    late Stream<ConnectionStateUpdate> _connectionStateUpdateStream;
+    late Stream<ConnectionStateUpdate> _result;
     late MockDiscoveredDevicesRegistry _registry;
     late MockDeviceScanner _scanner;
 
-    Map<Uuid, List<Uuid>>? _servicesToDiscover;
-    ConnectionStateUpdate? updateForDevice;
-    ConnectionStateUpdate? updateOtherDevice;
+    late Map<Uuid, List<Uuid>> _servicesToDiscover;
+    late ConnectionStateUpdate updateForDevice;
+    late ConnectionStateUpdate updateOtherDevice;
 
     const _deviceId = '123';
     const _connectionTimeout = Duration(seconds: 1);
@@ -37,9 +39,9 @@ void main() {
         Uuid.parse('FEFE'): [Uuid.parse('FEFE')]
       };
       when(_controller.connectionUpdateStream)
-          .thenAnswer(((_) => _connectionStateUpdateStream as Stream<ConnectionStateUpdate>) as Stream<ConnectionStateUpdate> Function(Invocation));
+          .thenAnswer((_) => _connectionStateUpdateStream);
 
-      when(_controller.disconnectDevice(any!)).thenAnswer((_) async => 0);
+      when(_controller.disconnectDevice(any)).thenAnswer((_) async => 0);
 
       updateForDevice = const ConnectionStateUpdate(
         deviceId: _deviceId,
@@ -71,7 +73,7 @@ void main() {
 
         group('And invoking connect method succeeds', () {
           setUp(() async {
-            when(_controller.connectToDevice(any!, any, any)).thenAnswer(
+            when(_controller.connectToDevice(any, any, any)).thenAnswer(
               (_) => Stream.fromIterable([1]),
             );
             _result = _sut.connect(
@@ -93,9 +95,9 @@ void main() {
       const deviceId = '123';
       final uuidDeviceToScan = Uuid.parse('FEFF');
       final uuidCurrentScan = Uuid.parse('FEFE');
-      const discoveredDevice = DiscoveredDevice(
+      final discoveredDevice = DiscoveredDevice(
         id: 'deviceId',
-        manufacturerData: null,
+        manufacturerData: Uint8List.fromList([0]),
         name: 'test',
         rssi: -39,
         serviceData: {},
@@ -155,7 +157,7 @@ void main() {
                     deviceId: deviceId,
                     cacheValidity: anyNamed('cacheValidity')))
                 .thenReturn(true);
-            when(_controller.connectToDevice(any!, any, any))
+            when(_controller.connectToDevice(any, any, any))
                 .thenAnswer((_) => Stream.fromIterable([1]));
 
             _result = _sut.connectToAdvertisingDevice(
@@ -216,7 +218,7 @@ void main() {
                     deviceId: deviceId,
                     cacheValidity: anyNamed('cacheValidity')))
                 .thenReturn(true);
-            when(_controller.connectToDevice(any!, any, any))
+            when(_controller.connectToDevice(any, any, any))
                 .thenAnswer((_) => Stream.fromIterable([1]));
 
             _result = _sut.connectToAdvertisingDevice(
@@ -235,8 +237,8 @@ void main() {
         group('And device is not discovered in a previous scan', () {
           setUp(() {
             when(_scanner.scanForDevices(
-              withServices: anyNamed('withServices')!,
-              scanMode: anyNamed('scanMode')!,
+              withServices: anyNamed('withServices'),
+              scanMode: anyNamed('scanMode'),
             )).thenAnswer((_) => Stream.fromIterable([discoveredDevice]));
           });
 
@@ -276,7 +278,7 @@ void main() {
                       cacheValidity: anyNamed('cacheValidity')))
                   .thenAnswer((_) => responses.removeAt(0));
 
-              when(_controller.connectToDevice(any!, any, any))
+              when(_controller.connectToDevice(any, any, any))
                   .thenAnswer((_) => Stream.fromIterable([1]));
 
               _result = _sut.connectToAdvertisingDevice(
