@@ -16,8 +16,8 @@ import 'connected_device_operation_test.mocks.dart';
 
 @GenerateMocks([DeviceOperationController])
 void main() {
-  MockDeviceOperationController _controller;
-  ConnectedDeviceOperation _sut;
+  late MockDeviceOperationController _controller;
+  late ConnectedDeviceOperation _sut;
 
   group('$ConnectedDeviceOperation', () {
     setUp(() {
@@ -27,7 +27,7 @@ void main() {
       );
     });
     group('Listen to char value updates', () {
-      CharacteristicValue valueUpdate;
+      CharacteristicValue? valueUpdate;
 
       setUp(() {
         valueUpdate = CharacteristicValue(
@@ -40,25 +40,25 @@ void main() {
         );
 
         when(_controller.charValueUpdateStream)
-            .thenAnswer((_) => Stream.fromIterable([valueUpdate]));
+            .thenAnswer(((_) => Stream.fromIterable([valueUpdate!])) as Stream<CharacteristicValue> Function(Invocation));
       });
 
       test('It emits value updates received from plugincontroller', () {
         expect(
           _sut.characteristicValueStream,
-          emitsInOrder(<CharacteristicValue>[valueUpdate]),
+          emitsInOrder(<CharacteristicValue?>[valueUpdate]),
         );
       });
     });
 
     group('Read characteristic', () {
-      QualifiedCharacteristic charDevice;
+      late QualifiedCharacteristic charDevice;
       QualifiedCharacteristic charOtherSameDevice;
       QualifiedCharacteristic charOtherDevice;
-      CharacteristicValue valueUpdate;
-      CharacteristicValue valueUpdateOtherDevice;
-      CharacteristicValue valueUpdateSameDeviceOtherChar;
-      List<int> result;
+      CharacteristicValue? valueUpdate;
+      CharacteristicValue? valueUpdateOtherDevice;
+      CharacteristicValue? valueUpdateSameDeviceOtherChar;
+      List<int>? result;
 
       setUp(() {
         charDevice = QualifiedCharacteristic(
@@ -94,7 +94,7 @@ void main() {
           result: const Result.success([4]),
         );
 
-        when(_controller.readCharacteristic(any)).thenAnswer(
+        when(_controller.readCharacteristic(any!)).thenAnswer(
           (_) => Stream.fromIterable([0]),
         );
       });
@@ -102,11 +102,11 @@ void main() {
       group('Given multiple updates are received for specific device', () {
         setUp(() async {
           when(_controller.charValueUpdateStream)
-              .thenAnswer((_) => Stream.fromIterable([
-                    valueUpdate,
-                    valueUpdateOtherDevice,
-                    valueUpdateSameDeviceOtherChar,
-                  ]));
+              .thenAnswer(((_) => Stream.fromIterable([
+                    valueUpdate!,
+                    valueUpdateOtherDevice!,
+                    valueUpdateSameDeviceOtherChar!,
+                  ])) as Stream<CharacteristicValue> Function(Invocation));
 
           result = await _sut.readCharacteristic(charDevice);
         });
@@ -121,10 +121,10 @@ void main() {
           () {
         setUp(() async {
           when(_controller.charValueUpdateStream)
-              .thenAnswer((_) => Stream.fromIterable([
-                    valueUpdateOtherDevice,
-                    valueUpdateSameDeviceOtherChar,
-                  ]));
+              .thenAnswer(((_) => Stream.fromIterable([
+                    valueUpdateOtherDevice!,
+                    valueUpdateSameDeviceOtherChar!,
+                  ])) as Stream<CharacteristicValue> Function(Invocation));
         });
 
         test('It emits first value that matches', () async {
@@ -137,7 +137,7 @@ void main() {
     });
 
     group('Write characteristic', () {
-      QualifiedCharacteristic characteristic;
+      late QualifiedCharacteristic characteristic;
       WriteCharacteristicInfo info;
       const value = [1, 0];
 
@@ -158,7 +158,7 @@ void main() {
                   GenericFailure<WriteCharacteristicFailure>>.success(null),
             );
 
-            when(_controller.writeCharacteristicWithResponse(any, any))
+            when(_controller.writeCharacteristicWithResponse(any!, any!))
                 .thenAnswer((_) async => info);
           });
 
@@ -181,7 +181,7 @@ void main() {
                 ),
               );
 
-              when(_controller.writeCharacteristicWithResponse(any, any))
+              when(_controller.writeCharacteristicWithResponse(any!, any!))
                   .thenAnswer((_) async => info);
             });
 
@@ -204,7 +204,7 @@ void main() {
                     GenericFailure<WriteCharacteristicFailure>>.success(null),
               );
 
-              when(_controller.writeCharacteristicWithoutResponse(any, any))
+              when(_controller.writeCharacteristicWithoutResponse(any!, any!))
                   .thenAnswer((_) async => info);
             });
 
@@ -229,7 +229,7 @@ void main() {
                 ),
               );
 
-              when(_controller.writeCharacteristicWithoutResponse(any, any))
+              when(_controller.writeCharacteristicWithoutResponse(any!, any!))
                   .thenAnswer((_) async => info);
             });
 
@@ -245,15 +245,15 @@ void main() {
       });
 
       group('Subscribe to characteristic', () {
-        QualifiedCharacteristic charDevice;
+        late QualifiedCharacteristic charDevice;
         QualifiedCharacteristic charOtherSameDevice;
         QualifiedCharacteristic charOtherDevice;
-        CharacteristicValue valueUpdate1;
-        CharacteristicValue valueUpdate2;
-        CharacteristicValue valueUpdateOtherDevice;
-        CharacteristicValue valueUpdateSameDeviceOtherChar;
-        Stream<List<int>> result;
-        Completer<ConnectionStateUpdate> terminateCompleter;
+        CharacteristicValue? valueUpdate1;
+        CharacteristicValue? valueUpdate2;
+        CharacteristicValue? valueUpdateOtherDevice;
+        CharacteristicValue? valueUpdateSameDeviceOtherChar;
+        Stream<List<int>>? result;
+        late Completer<ConnectionStateUpdate> terminateCompleter;
 
         setUp(() {
           terminateCompleter = Completer();
@@ -296,22 +296,22 @@ void main() {
             result: const Result.success([4]),
           );
 
-          when(_controller.subscribeToNotifications(any))
+          when(_controller.subscribeToNotifications(any!))
               .thenAnswer((_) => Stream.fromIterable([0]));
 
-          when(_controller.stopSubscribingToNotifications(any))
+          when(_controller.stopSubscribingToNotifications(any!))
               .thenAnswer((_) async => 0);
         });
 
         group('Given multiple updates are received for specific device', () {
           setUp(() async {
             when(_controller.charValueUpdateStream)
-                .thenAnswer((_) => Stream.fromIterable([
-                      valueUpdate1,
-                      valueUpdateOtherDevice,
-                      valueUpdate2,
-                      valueUpdateSameDeviceOtherChar,
-                    ]));
+                .thenAnswer(((_) => Stream.fromIterable([
+                      valueUpdate1!,
+                      valueUpdateOtherDevice!,
+                      valueUpdate2!,
+                      valueUpdateSameDeviceOtherChar!,
+                    ])) as Stream<CharacteristicValue> Function(Invocation));
 
             result = _sut.subscribeToCharacteristic(
                 charDevice, terminateCompleter.future);
@@ -330,10 +330,10 @@ void main() {
       group('Negotiate mtusize', () {
         const deviceId = '123';
         const mtuSize = 50;
-        int result;
+        int? result;
 
         setUp(() async {
-          when(_controller.requestMtuSize(any, any))
+          when(_controller.requestMtuSize(any!, any))
               .thenAnswer((_) async => mtuSize);
 
           result = await _sut.requestMtu(deviceId, mtuSize);
@@ -346,7 +346,7 @@ void main() {
 
       group('Change connection priority', () {
         const deviceId = '123';
-        ConnectionPriority priority;
+        late ConnectionPriority priority;
 
         setUp(() {
           priority = ConnectionPriority.highPerformance;
@@ -354,7 +354,7 @@ void main() {
 
         group('Given request priority succeeds', () {
           setUp(() {
-            when(_controller.requestConnectionPriority(any, any))
+            when(_controller.requestConnectionPriority(any!, any!))
                 .thenAnswer((_) async => const ConnectionPriorityInfo(
                       result: Result.success(null),
                     ));
@@ -369,7 +369,7 @@ void main() {
 
         group('Given request priority fails', () {
           setUp(() async {
-            when(_controller.requestConnectionPriority(any, any))
+            when(_controller.requestConnectionPriority(any!, any!))
                 .thenAnswer((_) async => const ConnectionPriorityInfo(
                       result: Result.failure(
                         GenericFailure<ConnectionPriorityFailure>(

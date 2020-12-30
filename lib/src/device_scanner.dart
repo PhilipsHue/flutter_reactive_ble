@@ -13,10 +13,10 @@ import 'model/scan_session.dart';
 import 'model/uuid.dart';
 
 abstract class DeviceScanner {
-  ScanSession get currentScan;
+  ScanSession? get currentScan;
 
-  Stream<DiscoveredDevice/*!*/> scanForDevices({
-    @required List<Uuid> withServices,
+  Stream<DiscoveredDevice> scanForDevices({
+    required List<Uuid> withServices,
     ScanMode scanMode = ScanMode.balanced,
     bool requireLocationServicesEnabled = true,
   });
@@ -24,10 +24,10 @@ abstract class DeviceScanner {
 
 class DeviceScannerImpl implements DeviceScanner {
   DeviceScannerImpl({
-    @required ScanOperationController controller,
-    @required bool Function() platformIsAndroid,
-    @required Future<void> delayAfterScanCompletion,
-    @required this.addToScanRegistry,
+    required ScanOperationController controller,
+    required bool Function() platformIsAndroid,
+    required Future<void> delayAfterScanCompletion,
+    required this.addToScanRegistry,
   })  : assert(controller != null),
         assert(platformIsAndroid != null),
         assert(addToScanRegistry != null),
@@ -37,7 +37,7 @@ class DeviceScannerImpl implements DeviceScanner {
         _platformIsAndroid = platformIsAndroid,
         _delayAfterScanCompletion = delayAfterScanCompletion;
 
-  ScanSession _currentScanSession;
+  ScanSession? _currentScanSession;
 
   final ScanOperationController _controller;
   final bool Function() _platformIsAndroid;
@@ -46,17 +46,17 @@ class DeviceScannerImpl implements DeviceScanner {
 
   Stream<ScanResult> get _scanStream => _controller.scanStream;
 
-  final SerialDisposable<Repeater<DiscoveredDevice>> _scanStreamDisposable =
-      SerialDisposable((repeater) => repeater.dispose());
+  final SerialDisposable<Repeater<DiscoveredDevice?>> _scanStreamDisposable =
+      SerialDisposable(((repeater) => repeater.dispose()) as Future<void>? Function(Repeater<DiscoveredDevice?>));
 
   @override
-  ScanSession get currentScan => _currentScanSession;
+  ScanSession? get currentScan => _currentScanSession;
 
   @override
-  Stream<DiscoveredDevice/*!*/> scanForDevices({
-    @required List<Uuid> withServices,
-    ScanMode scanMode = ScanMode.balanced,
-    bool requireLocationServicesEnabled = true,
+  Stream<DiscoveredDevice> scanForDevices({
+    required List<Uuid> withServices,
+    ScanMode? scanMode = ScanMode.balanced,
+    bool? requireLocationServicesEnabled = true,
   }) {
     final completer = Completer<void>();
     _currentScanSession =
@@ -101,10 +101,10 @@ class DeviceScannerImpl implements DeviceScanner {
           requireLocationServicesEnabled: requireLocationServicesEnabled,
         )
         .asyncExpand(
-          (_) => scanRepeater.stream.map((discoveredDevice) {
-            addToScanRegistry(discoveredDevice.id);
+          ((_) => scanRepeater.stream.map((discoveredDevice) {
+            addToScanRegistry(discoveredDevice!.id);
             return discoveredDevice;
-          }),
+          } as DiscoveredDevice Function(DiscoveredDevice?))) as Stream<DiscoveredDevice>? Function(void),
         );
   }
 }

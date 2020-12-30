@@ -4,9 +4,9 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('$DebugLogger', () {
-    DebugLogger sut;
+    late DebugLogger sut;
     const tag = 'TestTag';
-    _PrinterStub printer;
+    late _PrinterStub printer;
 
     setUp(() {
       printer = _PrinterStub();
@@ -38,8 +38,8 @@ void main() {
 }
 
 class _PrinterStub {
-  String _lastLog;
-  String get lastLoggedMessage => _lastLog;
+  String? _lastLog;
+  String? get lastLoggedMessage => _lastLog;
 
   void print(Object object) {
     _lastLog = object.toString();

@@ -15,9 +15,9 @@ class QualifiedCharacteristic {
   final String deviceId;
 
   const QualifiedCharacteristic({
-    @required this.characteristicId,
-    @required this.serviceId,
-    @required this.deviceId,
+    required this.characteristicId,
+    required this.serviceId,
+    required this.deviceId,
   });
 
   @override

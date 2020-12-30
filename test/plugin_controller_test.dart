@@ -26,14 +26,14 @@ import 'plugin_controller_test.mocks.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   group('$PluginController', () {
-    PluginController _sut;
-    MockMethodChannel _methodChannel;
-    MockArgsToProtobufConverter _argsConverter;
-    MockProtobufConverter _protobufConverter;
-    StreamController<List<int>> _connectedDeviceStreamController;
-    StreamController<List<int>> _argsStreamController;
-    StreamController<List<int>> _scanStreamController;
-    StreamController<List<int>> _statusStreamController;
+    late PluginController _sut;
+    late MockMethodChannel _methodChannel;
+    late MockArgsToProtobufConverter _argsConverter;
+    late MockProtobufConverter _protobufConverter;
+    late StreamController<List<int>> _connectedDeviceStreamController;
+    late StreamController<List<int>> _argsStreamController;
+    late StreamController<List<int>> _scanStreamController;
+    late StreamController<List<int>> _statusStreamController;
 
     setUp(() {
       _argsConverter = MockArgsToProtobufConverter();
@@ -45,8 +45,8 @@ void main() {
       _statusStreamController = StreamController();
 
       final logger = MockLogger();
-      when(logger.log(any)).thenReturn(null);
-      when(_methodChannel.invokeMethod<void>(any, any)).thenAnswer(
+      when(logger.log(any!)).thenReturn(null);
+      when(_methodChannel.invokeMethod<void>(any!, any)).thenAnswer(
         (_) async => 0,
       );
 
@@ -70,12 +70,12 @@ void main() {
     });
 
     group('connect to device', () {
-      pb.ConnectToDeviceRequest request;
-      StreamSubscription subscription;
+      pb.ConnectToDeviceRequest? request;
+      StreamSubscription? subscription;
       setUp(() {
         request = pb.ConnectToDeviceRequest();
-        when(_argsConverter.createConnectToDeviceArgs(any, any, any))
-            .thenReturn(request);
+        when(_argsConverter.createConnectToDeviceArgs(any!, any, any))
+            .thenReturn(request!);
       });
 
       test('It invokes methodchannel with correct method and arguments',
@@ -83,7 +83,7 @@ void main() {
         await _sut.connectToDevice('id', {}, null).first;
         verify(_methodChannel.invokeMethod<void>(
           'connectToDevice',
-          request.writeToBuffer(),
+          request!.writeToBuffer(),
         )).called(1);
       });
 
@@ -98,18 +98,18 @@ void main() {
     });
 
     group('connect to device', () {
-      pb.DisconnectFromDeviceRequest request;
+      pb.DisconnectFromDeviceRequest? request;
       setUp(() async {
         request = pb.DisconnectFromDeviceRequest();
-        when(_argsConverter.createDisconnectDeviceArgs(any))
-            .thenReturn(request);
+        when(_argsConverter.createDisconnectDeviceArgs(any!))
+            .thenReturn(request!);
         await _sut.disconnectDevice('id');
       });
 
       test('It invokes methodchannel with correct method and arguments', () {
         verify(_methodChannel.invokeMethod<void>(
           'disconnectFromDevice',
-          request.writeToBuffer(),
+          request!.writeToBuffer(),
         )).called(1);
       });
 
@@ -125,7 +125,7 @@ void main() {
         failure: null,
       );
 
-      Stream<ConnectionStateUpdate> result;
+      Stream<ConnectionStateUpdate>? result;
 
       setUp(() {
         _connectedDeviceStreamController.addStream(
@@ -135,7 +135,7 @@ void main() {
         );
 
         when(
-          _protobufConverter.connectionStateUpdateFrom(any),
+          _protobufConverter.connectionStateUpdateFrom(any!),
         ).thenReturn(update);
         result = _sut.connectionUpdateStream;
       });
@@ -146,8 +146,8 @@ void main() {
     });
 
     group('Char update stream', () {
-      CharacteristicValue valueUpdate;
-      Stream<CharacteristicValue> result;
+      CharacteristicValue? valueUpdate;
+      Stream<CharacteristicValue>? result;
 
       setUp(() {
         valueUpdate = CharacteristicValue(
@@ -165,20 +165,20 @@ void main() {
           ]),
         );
 
-        when(_protobufConverter.characteristicValueFrom(any))
-            .thenReturn(valueUpdate);
+        when(_protobufConverter.characteristicValueFrom(any!))
+            .thenReturn(valueUpdate!);
 
         result = _sut.charValueUpdateStream;
       });
 
       test('It emits updates', () {
-        expect(result, emitsInOrder(<CharacteristicValue>[valueUpdate]));
+        expect(result, emitsInOrder(<CharacteristicValue?>[valueUpdate]));
       });
     });
 
     group('Read characteristic', () {
-      QualifiedCharacteristic characteristic;
-      pb.ReadCharacteristicRequest request;
+      late QualifiedCharacteristic characteristic;
+      pb.ReadCharacteristicRequest? request;
 
       setUp(() {
         request = pb.ReadCharacteristicRequest();
@@ -187,14 +187,14 @@ void main() {
           serviceId: Uuid.parse('FEFF'),
           deviceId: '123',
         );
-        when(_argsConverter.createReadCharacteristicRequest(any))
-            .thenReturn(request);
+        when(_argsConverter.createReadCharacteristicRequest(any!))
+            .thenReturn(request!);
       });
 
       test('It invokes method channel with correct arguments', () async {
         await _sut.readCharacteristic(characteristic).first;
         verify(_methodChannel.invokeMethod<void>(
-                'readCharacteristic', request.writeToBuffer()))
+                'readCharacteristic', request!.writeToBuffer()))
             .called(1);
       });
 
@@ -207,9 +207,9 @@ void main() {
     group('Write characteristic with response', () {
       QualifiedCharacteristic characteristic;
       const value = [0, 1];
-      pb.WriteCharacteristicRequest request;
-      WriteCharacteristicInfo expectedResult;
-      WriteCharacteristicInfo result;
+      pb.WriteCharacteristicRequest? request;
+      WriteCharacteristicInfo? expectedResult;
+      WriteCharacteristicInfo? result;
 
       setUp(() async {
         request = pb.WriteCharacteristicRequest();
@@ -223,13 +223,13 @@ void main() {
         expectedResult = WriteCharacteristicInfo(
             characteristic: characteristic, result: const Result.success(null));
 
-        when(_methodChannel.invokeMethod<void>(any, any)).thenAnswer(
+        when(_methodChannel.invokeMethod<void>(any!, any)).thenAnswer(
           (_) async => [1],
         );
-        when(_argsConverter.createWriteChacracteristicRequest(any, any))
-            .thenReturn(request);
-        when(_protobufConverter.writeCharacteristicInfoFrom(any))
-            .thenReturn(expectedResult);
+        when(_argsConverter.createWriteChacracteristicRequest(any!, any!))
+            .thenReturn(request!);
+        when(_protobufConverter.writeCharacteristicInfoFrom(any!))
+            .thenReturn(expectedResult!);
 
         result =
             await _sut.writeCharacteristicWithResponse(characteristic, value);
@@ -237,7 +237,7 @@ void main() {
 
       test('It invokes method channel with correct arguments', () {
         verify(_methodChannel.invokeMethod<void>(
-                'writeCharacteristicWithResponse', request.writeToBuffer()))
+                'writeCharacteristicWithResponse', request!.writeToBuffer()))
             .called(1);
       });
 
@@ -249,9 +249,9 @@ void main() {
     group('Write characteristic without response', () {
       QualifiedCharacteristic characteristic;
       const value = [0, 1];
-      pb.WriteCharacteristicRequest request;
-      WriteCharacteristicInfo expectedResult;
-      WriteCharacteristicInfo result;
+      pb.WriteCharacteristicRequest? request;
+      WriteCharacteristicInfo? expectedResult;
+      WriteCharacteristicInfo? result;
 
       setUp(() async {
         request = pb.WriteCharacteristicRequest();
@@ -264,13 +264,13 @@ void main() {
         expectedResult = WriteCharacteristicInfo(
             characteristic: characteristic, result: const Result.success(null));
 
-        when(_methodChannel.invokeMethod<void>(any, any)).thenAnswer(
+        when(_methodChannel.invokeMethod<void>(any!, any)).thenAnswer(
           (_) async => [1],
         );
-        when(_argsConverter.createWriteChacracteristicRequest(any, any))
-            .thenReturn(request);
-        when(_protobufConverter.writeCharacteristicInfoFrom(any))
-            .thenReturn(expectedResult);
+        when(_argsConverter.createWriteChacracteristicRequest(any!, any!))
+            .thenReturn(request!);
+        when(_protobufConverter.writeCharacteristicInfoFrom(any!))
+            .thenReturn(expectedResult!);
         result = await _sut.writeCharacteristicWithoutResponse(
             characteristic, value);
       });
@@ -281,14 +281,14 @@ void main() {
 
       test('It invokes method channel with correct arguments', () {
         verify(_methodChannel.invokeMethod<void>(
-                'writeCharacteristicWithoutResponse', request.writeToBuffer()))
+                'writeCharacteristicWithoutResponse', request!.writeToBuffer()))
             .called(1);
       });
     });
 
     group('Subscribe to notifications', () {
-      QualifiedCharacteristic characteristic;
-      pb.NotifyCharacteristicRequest request;
+      late QualifiedCharacteristic characteristic;
+      pb.NotifyCharacteristicRequest? request;
 
       setUp(() {
         request = pb.NotifyCharacteristicRequest();
@@ -298,8 +298,8 @@ void main() {
           deviceId: '123',
         );
 
-        when(_argsConverter.createNotifyCharacteristicRequest(any))
-            .thenReturn(request);
+        when(_argsConverter.createNotifyCharacteristicRequest(any!))
+            .thenReturn(request!);
       });
 
       test('It emits one item', () async {
@@ -313,7 +313,7 @@ void main() {
         verify(
           _methodChannel.invokeMethod<void>(
             'readNotifications',
-            request.writeToBuffer(),
+            request!.writeToBuffer(),
           ),
         ).called(1);
       });
@@ -321,7 +321,7 @@ void main() {
 
     group('Stop subscribe to notifications', () {
       QualifiedCharacteristic characteristic;
-      pb.NotifyNoMoreCharacteristicRequest request;
+      pb.NotifyNoMoreCharacteristicRequest? request;
 
       setUp(() async {
         request = pb.NotifyNoMoreCharacteristicRequest();
@@ -331,8 +331,8 @@ void main() {
           deviceId: '123',
         );
 
-        when(_argsConverter.createNotifyNoMoreCharacteristicRequest(any))
-            .thenReturn(request);
+        when(_argsConverter.createNotifyNoMoreCharacteristicRequest(any!))
+            .thenReturn(request!);
         await _sut.stopSubscribingToNotifications(characteristic);
       });
 
@@ -340,7 +340,7 @@ void main() {
         verify(
           _methodChannel.invokeMethod<void>(
             'stopNotifications',
-            request.writeToBuffer(),
+            request!.writeToBuffer(),
           ),
         ).called(1);
       });
@@ -349,14 +349,14 @@ void main() {
     group('Request mtu size', () {
       const deviceId = '123';
       const mtuSize = 40;
-      pb.NegotiateMtuRequest request;
-      int result;
+      pb.NegotiateMtuRequest? request;
+      int? result;
 
       setUp(() async {
         request = pb.NegotiateMtuRequest();
-        when(_argsConverter.createNegotiateMtuRequest(any, any))
-            .thenReturn(request);
-        when(_methodChannel.invokeMethod<void>(any, any)).thenAnswer(
+        when(_argsConverter.createNegotiateMtuRequest(any!, any!))
+            .thenReturn(request!);
+        when(_methodChannel.invokeMethod<void>(any!, any)).thenAnswer(
           (_) async => [1],
         );
 
@@ -372,7 +372,7 @@ void main() {
         verify(
           _methodChannel.invokeMethod<void>(
             'negotiateMtuSize',
-            request.writeToBuffer(),
+            request!.writeToBuffer(),
           ),
         ).called(1);
       });
@@ -381,22 +381,22 @@ void main() {
     group('Request connection priority', () {
       const deviceId = '123';
       ConnectionPriority priority;
-      pb.ChangeConnectionPriorityRequest request;
-      ConnectionPriorityInfo info;
-      ConnectionPriorityInfo result;
+      pb.ChangeConnectionPriorityRequest? request;
+      ConnectionPriorityInfo? info;
+      ConnectionPriorityInfo? result;
 
       setUp(() async {
         request = pb.ChangeConnectionPriorityRequest();
         priority = ConnectionPriority.highPerformance;
         info = const ConnectionPriorityInfo(result: Result.success(null));
-        when(_methodChannel.invokeMethod<void>(any, any)).thenAnswer(
+        when(_methodChannel.invokeMethod<void>(any!, any)).thenAnswer(
           (_) async => [1],
         );
-        when(_argsConverter.createChangeConnectionPrioRequest(any, any))
-            .thenReturn(request);
+        when(_argsConverter.createChangeConnectionPrioRequest(any!, any!))
+            .thenReturn(request!);
 
-        when(_protobufConverter.connectionPriorityInfoFrom(any))
-            .thenReturn(info);
+        when(_protobufConverter.connectionPriorityInfoFrom(any!))
+            .thenReturn(info!);
         result = await _sut.requestConnectionPriority(deviceId, priority);
       });
 
@@ -408,7 +408,7 @@ void main() {
         verify(
           _methodChannel.invokeMethod<void>(
             'requestConnectionPriority',
-            request.writeToBuffer(),
+            request!.writeToBuffer(),
           ),
         ).called(1);
       });
@@ -419,16 +419,16 @@ void main() {
       const locationEnabled = true;
       final withServices = [Uuid.parse('FEFF')];
 
-      pb.ScanForDevicesRequest request;
+      pb.ScanForDevicesRequest? request;
 
       setUp(() {
         request = pb.ScanForDevicesRequest();
         when(_argsConverter.createScanForDevicesRequest(
-          withServices: anyNamed('withServices'),
+          withServices: anyNamed('withServices')!,
           scanMode: anyNamed('scanMode'),
           requireLocationServicesEnabled:
               anyNamed('requireLocationServicesEnabled'),
-        )).thenReturn(request);
+        )).thenReturn(request!);
       });
 
       test('It emits 1 item', () async {
@@ -453,7 +453,7 @@ void main() {
             .first;
         verify(_methodChannel.invokeMethod<void>(
           'scanForDevices',
-          request.writeToBuffer(),
+          request!.writeToBuffer(),
         )).called(1);
       });
     });
@@ -466,13 +466,13 @@ void main() {
         serviceData: const {},
         manufacturerData: Uint8List.fromList([1]),
       );
-      ScanResult scanResult;
+      ScanResult? scanResult;
 
-      Stream<ScanResult> result;
+      Stream<ScanResult>? result;
       setUp(() {
         scanResult = ScanResult(result: Result.success(device));
 
-        when(_protobufConverter.scanResultFrom(any)).thenReturn(scanResult);
+        when(_protobufConverter.scanResultFrom(any!)).thenReturn(scanResult!);
 
         _scanStreamController.addStream(
           Stream<List<int>>.fromIterable([
@@ -483,7 +483,7 @@ void main() {
       });
 
       test('It emits correct values', () {
-        expect(result, emitsInOrder(<ScanResult>[scanResult]));
+        expect(result, emitsInOrder(<ScanResult?>[scanResult]));
       });
     });
 
@@ -509,32 +509,32 @@ void main() {
     group('Clear gatt cache', () {
       const deviceId = '123';
 
-      pb.ClearGattCacheRequest request;
-      Result<Unit, GenericFailure<ClearGattCacheError>> result;
+      pb.ClearGattCacheRequest? request;
+      Result<Unit, GenericFailure<ClearGattCacheError>?>? result;
 
-      Result<Unit, GenericFailure<ClearGattCacheError>> convertedResult;
+      Result<Unit, GenericFailure<ClearGattCacheError>>? convertedResult;
 
       setUp(() async {
         request = pb.ClearGattCacheRequest();
         convertedResult =
             const Result<Unit, GenericFailure<ClearGattCacheError>>.success(
                 Unit());
-        when(_methodChannel.invokeMethod<void>(any, any)).thenAnswer(
+        when(_methodChannel.invokeMethod<void>(any!, any)).thenAnswer(
           (_) async => [1],
         );
 
-        when(_argsConverter.createClearGattCacheRequest(any))
-            .thenReturn(request);
+        when(_argsConverter.createClearGattCacheRequest(any!))
+            .thenReturn(request!);
 
-        when(_protobufConverter.clearGattCacheResultFrom(any))
-            .thenReturn(convertedResult);
+        when(_protobufConverter.clearGattCacheResultFrom(any!))
+            .thenReturn(convertedResult!);
         result = await _sut.clearGattCache(deviceId);
       });
 
       test('It calls method channel with correct arguments', () {
         verify(_methodChannel.invokeMethod<List<int>>(
           'clearGattCache',
-          request.writeToBuffer(),
+          request!.writeToBuffer(),
         )).called(1);
       });
 
@@ -547,7 +547,7 @@ void main() {
       const status1 = BleStatus.poweredOff;
       const status2 = BleStatus.ready;
 
-      Stream<BleStatus> _bleStatusStream;
+      Stream<BleStatus>? _bleStatusStream;
 
       setUp(() {
         _statusStreamController.addStream(
@@ -570,7 +570,7 @@ void main() {
 
     group('Discover services', () {
       const deviceId = "testdevice";
-      pb.DiscoverServicesRequest request;
+      pb.DiscoverServicesRequest? request;
       final services = [
         DiscoveredService(
           serviceId: Uuid([0x01, 0x02]),
@@ -578,17 +578,17 @@ void main() {
           includedServices: const [],
         ),
       ];
-      List<DiscoveredService> result;
+      List<DiscoveredService>? result;
 
       setUp(() async {
         request = pb.DiscoverServicesRequest();
 
-        when(_methodChannel.invokeMethod<void>(any, any)).thenAnswer(
+        when(_methodChannel.invokeMethod<void>(any!, any)).thenAnswer(
           (_) async => [1],
         );
-        when(_argsConverter.createDiscoverServicesRequest(any))
-            .thenReturn(request);
-        when(_protobufConverter.discoveredServicesFrom(any))
+        when(_argsConverter.createDiscoverServicesRequest(any!))
+            .thenReturn(request!);
+        when(_protobufConverter.discoveredServicesFrom(any!))
             .thenReturn(services);
 
         result = await _sut.discoverServices(deviceId);
@@ -600,7 +600,7 @@ void main() {
 
       test('It invokes methodchannel with correct arguments', () {
         verify(_methodChannel.invokeMethod<List<int>>(
-                'discoverServices', request.writeToBuffer()))
+                'discoverServices', request!.writeToBuffer()))
             .called(1);
       });
     });

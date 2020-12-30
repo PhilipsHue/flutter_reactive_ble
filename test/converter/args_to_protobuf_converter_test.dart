@@ -10,9 +10,9 @@ void main() {
 
     group('Connect to device args', () {
       const deviceId = '123';
-      Map<Uuid, List<Uuid>> servicesToDiscover;
-      Duration timeout;
-      pb.ConnectToDeviceRequest result;
+      Map<Uuid, List<Uuid>>? servicesToDiscover;
+      Duration? timeout;
+      late pb.ConnectToDeviceRequest result;
 
       group('And servicesToDiscover is not null', () {
         setUp(() {
@@ -74,7 +74,7 @@ void main() {
 
     group('Disconnect device', () {
       const deviceId = '123';
-      pb.DisconnectFromDeviceRequest result;
+      late pb.DisconnectFromDeviceRequest result;
 
       setUp(() {
         result = _sut.createDisconnectDeviceArgs(deviceId);
@@ -86,7 +86,7 @@ void main() {
     });
 
     group('Create ReadCharacteristicRequest', () {
-      pb.ReadCharacteristicRequest result;
+      late pb.ReadCharacteristicRequest result;
       const deviceId = '123';
       final serviceUuid = Uuid.parse('FEFF');
       final charUuid = Uuid.parse('FEEF');
@@ -116,7 +116,7 @@ void main() {
     });
 
     group('Create WriteRequest', () {
-      pb.WriteCharacteristicRequest result;
+      late pb.WriteCharacteristicRequest result;
       const deviceId = '123';
       final serviceUuid = Uuid.parse('FEFF');
       final charUuid = Uuid.parse('FEEF');
@@ -152,7 +152,7 @@ void main() {
     });
 
     group('Create NotifyCharacteristic request', () {
-      pb.NotifyCharacteristicRequest result;
+      late pb.NotifyCharacteristicRequest result;
       const deviceId = '123';
       final serviceUuid = Uuid.parse('FEFF');
       final charUuid = Uuid.parse('FEEF');
@@ -184,7 +184,7 @@ void main() {
     group('Create negotiate mtu request', () {
       const deviceId = '123';
       const mtuSize = 30;
-      pb.NegotiateMtuRequest result;
+      late pb.NegotiateMtuRequest result;
 
       setUp(() {
         result = _sut.createNegotiateMtuRequest(deviceId, mtuSize);
@@ -202,7 +202,7 @@ void main() {
     group('Change connection prio request', () {
       const deviceId = '123';
       ConnectionPriority priority;
-      pb.ChangeConnectionPriorityRequest result;
+      late pb.ChangeConnectionPriorityRequest result;
 
       setUp(() {
         priority = ConnectionPriority.highPerformance;
@@ -219,7 +219,7 @@ void main() {
     });
 
     group('Scan for devices request', () {
-      pb.ScanForDevicesRequest result;
+      late pb.ScanForDevicesRequest result;
       const scanMode = ScanMode.lowLatency;
       List<Uuid> withServices;
 
@@ -301,7 +301,7 @@ void main() {
 
     group('Create clear gatt request', () {
       const deviceId = '123';
-      pb.ClearGattCacheRequest result;
+      late pb.ClearGattCacheRequest result;
       setUp(() {
         result = _sut.createClearGattCacheRequest(deviceId);
       });
@@ -316,7 +316,7 @@ void main() {
       final serviceUuid = Uuid.parse('FEFF');
       final charUuid = Uuid.parse('FEEF');
       QualifiedCharacteristic characteristic;
-      pb.NotifyNoMoreCharacteristicRequest result;
+      late pb.NotifyNoMoreCharacteristicRequest result;
 
       setUp(() {
         characteristic = QualifiedCharacteristic(
@@ -342,7 +342,7 @@ void main() {
 
     group('DiscoverDevices request', () {
       const deviceId = "testdevice";
-      pb.DiscoverServicesRequest result;
+      late pb.DiscoverServicesRequest result;
 
       setUp(() {
         result = _sut.createDiscoverServicesRequest(deviceId);

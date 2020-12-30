@@ -3,7 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group("$DiscoveredDevicesRegistry", () {
-    DiscoveredDevicesRegistryImpl sut;
+    late DiscoveredDevicesRegistryImpl sut;
     const device = "Testdevice";
     final timestamp = DateTime(2019);
 

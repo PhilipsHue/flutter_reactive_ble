@@ -3,8 +3,8 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('Serialdisposable', () {
-    SerialDisposable<int> sut;
-    _Disposer disposer;
+    late SerialDisposable<int> sut;
+    late _Disposer disposer;
 
     setUp(() {
       disposer = _Disposer();
