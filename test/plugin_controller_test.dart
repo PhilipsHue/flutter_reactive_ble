@@ -45,8 +45,8 @@ void main() {
       _statusStreamController = StreamController();
 
       final logger = MockLogger();
-      when(logger.log(any!)).thenReturn(null);
-      when(_methodChannel.invokeMethod<void>(any!, any)).thenAnswer(
+      when(logger.log(any)).thenAnswer((_) {});
+      when(_methodChannel.invokeMethod<void>(any, any)).thenAnswer(
         (_) async => 0,
       );
 
@@ -74,7 +74,7 @@ void main() {
       StreamSubscription? subscription;
       setUp(() {
         request = pb.ConnectToDeviceRequest();
-        when(_argsConverter.createConnectToDeviceArgs(any!, any, any))
+        when(_argsConverter.createConnectToDeviceArgs(any, any, any))
             .thenReturn(request!);
       });
 
@@ -101,7 +101,7 @@ void main() {
       pb.DisconnectFromDeviceRequest? request;
       setUp(() async {
         request = pb.DisconnectFromDeviceRequest();
-        when(_argsConverter.createDisconnectDeviceArgs(any!))
+        when(_argsConverter.createDisconnectDeviceArgs(any))
             .thenReturn(request!);
         await _sut.disconnectDevice('id');
       });
@@ -135,7 +135,7 @@ void main() {
         );
 
         when(
-          _protobufConverter.connectionStateUpdateFrom(any!),
+          _protobufConverter.connectionStateUpdateFrom(any),
         ).thenReturn(update);
         result = _sut.connectionUpdateStream;
       });
@@ -165,7 +165,7 @@ void main() {
           ]),
         );
 
-        when(_protobufConverter.characteristicValueFrom(any!))
+        when(_protobufConverter.characteristicValueFrom(any))
             .thenReturn(valueUpdate!);
 
         result = _sut.charValueUpdateStream;
@@ -187,7 +187,7 @@ void main() {
           serviceId: Uuid.parse('FEFF'),
           deviceId: '123',
         );
-        when(_argsConverter.createReadCharacteristicRequest(any!))
+        when(_argsConverter.createReadCharacteristicRequest(any))
             .thenReturn(request!);
       });
 
@@ -207,9 +207,9 @@ void main() {
     group('Write characteristic with response', () {
       QualifiedCharacteristic characteristic;
       const value = [0, 1];
-      pb.WriteCharacteristicRequest? request;
-      WriteCharacteristicInfo? expectedResult;
-      WriteCharacteristicInfo? result;
+      late pb.WriteCharacteristicRequest request;
+      late WriteCharacteristicInfo expectedResult;
+      late WriteCharacteristicInfo result;
 
       setUp(() async {
         request = pb.WriteCharacteristicRequest();
@@ -223,21 +223,21 @@ void main() {
         expectedResult = WriteCharacteristicInfo(
             characteristic: characteristic, result: const Result.success(null));
 
-        when(_methodChannel.invokeMethod<void>(any!, any)).thenAnswer(
+        when(_methodChannel.invokeMethod<List<int>?>(any, any)).thenAnswer(
           (_) async => [1],
         );
-        when(_argsConverter.createWriteChacracteristicRequest(any!, any!))
-            .thenReturn(request!);
-        when(_protobufConverter.writeCharacteristicInfoFrom(any!))
-            .thenReturn(expectedResult!);
+        when(_argsConverter.createWriteChacracteristicRequest(any, any))
+            .thenReturn(request);
+        when(_protobufConverter.writeCharacteristicInfoFrom(any))
+            .thenReturn(expectedResult);
 
         result =
             await _sut.writeCharacteristicWithResponse(characteristic, value);
       });
 
       test('It invokes method channel with correct arguments', () {
-        verify(_methodChannel.invokeMethod<void>(
-                'writeCharacteristicWithResponse', request!.writeToBuffer()))
+        verify(_methodChannel.invokeMethod<List<int>?>(
+                'writeCharacteristicWithResponse', request.writeToBuffer()))
             .called(1);
       });
 
@@ -249,9 +249,9 @@ void main() {
     group('Write characteristic without response', () {
       QualifiedCharacteristic characteristic;
       const value = [0, 1];
-      pb.WriteCharacteristicRequest? request;
-      WriteCharacteristicInfo? expectedResult;
-      WriteCharacteristicInfo? result;
+      late pb.WriteCharacteristicRequest request;
+      late WriteCharacteristicInfo expectedResult;
+      late WriteCharacteristicInfo result;
 
       setUp(() async {
         request = pb.WriteCharacteristicRequest();
@@ -262,15 +262,18 @@ void main() {
         );
 
         expectedResult = WriteCharacteristicInfo(
-            characteristic: characteristic, result: const Result.success(null));
+            // ignore: void_checks
+            characteristic: characteristic,
+            // ignore: void_checks
+            result: const Result.success(0));
 
-        when(_methodChannel.invokeMethod<void>(any!, any)).thenAnswer(
+        when(_methodChannel.invokeMethod<List<int>?>(any, any)).thenAnswer(
           (_) async => [1],
         );
-        when(_argsConverter.createWriteChacracteristicRequest(any!, any!))
-            .thenReturn(request!);
-        when(_protobufConverter.writeCharacteristicInfoFrom(any!))
-            .thenReturn(expectedResult!);
+        when(_argsConverter.createWriteChacracteristicRequest(any, any))
+            .thenReturn(request);
+        when(_protobufConverter.writeCharacteristicInfoFrom(any))
+            .thenReturn(expectedResult);
         result = await _sut.writeCharacteristicWithoutResponse(
             characteristic, value);
       });
@@ -281,7 +284,7 @@ void main() {
 
       test('It invokes method channel with correct arguments', () {
         verify(_methodChannel.invokeMethod<void>(
-                'writeCharacteristicWithoutResponse', request!.writeToBuffer()))
+                'writeCharacteristicWithoutResponse', request.writeToBuffer()))
             .called(1);
       });
     });
@@ -298,7 +301,7 @@ void main() {
           deviceId: '123',
         );
 
-        when(_argsConverter.createNotifyCharacteristicRequest(any!))
+        when(_argsConverter.createNotifyCharacteristicRequest(any))
             .thenReturn(request!);
       });
 
@@ -331,7 +334,7 @@ void main() {
           deviceId: '123',
         );
 
-        when(_argsConverter.createNotifyNoMoreCharacteristicRequest(any!))
+        when(_argsConverter.createNotifyNoMoreCharacteristicRequest(any))
             .thenReturn(request!);
         await _sut.stopSubscribingToNotifications(characteristic);
       });
@@ -349,14 +352,14 @@ void main() {
     group('Request mtu size', () {
       const deviceId = '123';
       const mtuSize = 40;
-      pb.NegotiateMtuRequest? request;
+      late pb.NegotiateMtuRequest request;
       int? result;
 
       setUp(() async {
         request = pb.NegotiateMtuRequest();
-        when(_argsConverter.createNegotiateMtuRequest(any!, any!))
-            .thenReturn(request!);
-        when(_methodChannel.invokeMethod<void>(any!, any)).thenAnswer(
+        when(_argsConverter.createNegotiateMtuRequest(any, any))
+            .thenReturn(request);
+        when(_methodChannel.invokeMethod<List<int>>(any, any)).thenAnswer(
           (_) async => [1],
         );
 
@@ -370,9 +373,9 @@ void main() {
 
       test('It invokes method channel with correct arguments', () {
         verify(
-          _methodChannel.invokeMethod<void>(
+          _methodChannel.invokeMethod<List<int>>(
             'negotiateMtuSize',
-            request!.writeToBuffer(),
+            request.writeToBuffer(),
           ),
         ).called(1);
       });
@@ -389,13 +392,13 @@ void main() {
         request = pb.ChangeConnectionPriorityRequest();
         priority = ConnectionPriority.highPerformance;
         info = const ConnectionPriorityInfo(result: Result.success(null));
-        when(_methodChannel.invokeMethod<void>(any!, any)).thenAnswer(
+        when(_methodChannel.invokeMethod<List<int>>(any, any)).thenAnswer(
           (_) async => [1],
         );
-        when(_argsConverter.createChangeConnectionPrioRequest(any!, any!))
+        when(_argsConverter.createChangeConnectionPrioRequest(any, any))
             .thenReturn(request!);
 
-        when(_protobufConverter.connectionPriorityInfoFrom(any!))
+        when(_protobufConverter.connectionPriorityInfoFrom(any))
             .thenReturn(info!);
         result = await _sut.requestConnectionPriority(deviceId, priority);
       });
@@ -406,7 +409,7 @@ void main() {
 
       test('It invokes method channel with correct arguments', () {
         verify(
-          _methodChannel.invokeMethod<void>(
+          _methodChannel.invokeMethod<List<int>>(
             'requestConnectionPriority',
             request!.writeToBuffer(),
           ),
@@ -419,16 +422,16 @@ void main() {
       const locationEnabled = true;
       final withServices = [Uuid.parse('FEFF')];
 
-      pb.ScanForDevicesRequest? request;
+      late pb.ScanForDevicesRequest request;
 
       setUp(() {
         request = pb.ScanForDevicesRequest();
         when(_argsConverter.createScanForDevicesRequest(
-          withServices: anyNamed('withServices')!,
+          withServices: anyNamed('withServices'),
           scanMode: anyNamed('scanMode'),
           requireLocationServicesEnabled:
               anyNamed('requireLocationServicesEnabled'),
-        )).thenReturn(request!);
+        )).thenReturn(request);
       });
 
       test('It emits 1 item', () async {
@@ -453,7 +456,7 @@ void main() {
             .first;
         verify(_methodChannel.invokeMethod<void>(
           'scanForDevices',
-          request!.writeToBuffer(),
+          request.writeToBuffer(),
         )).called(1);
       });
     });
@@ -472,7 +475,7 @@ void main() {
       setUp(() {
         scanResult = ScanResult(result: Result.success(device));
 
-        when(_protobufConverter.scanResultFrom(any!)).thenReturn(scanResult!);
+        when(_protobufConverter.scanResultFrom(any)).thenReturn(scanResult!);
 
         _scanStreamController.addStream(
           Stream<List<int>>.fromIterable([
@@ -519,14 +522,14 @@ void main() {
         convertedResult =
             const Result<Unit, GenericFailure<ClearGattCacheError>>.success(
                 Unit());
-        when(_methodChannel.invokeMethod<void>(any!, any)).thenAnswer(
+        when(_methodChannel.invokeMethod<List<int>>(any, any)).thenAnswer(
           (_) async => [1],
         );
 
-        when(_argsConverter.createClearGattCacheRequest(any!))
+        when(_argsConverter.createClearGattCacheRequest(any))
             .thenReturn(request!);
 
-        when(_protobufConverter.clearGattCacheResultFrom(any!))
+        when(_protobufConverter.clearGattCacheResultFrom(any))
             .thenReturn(convertedResult!);
         result = await _sut.clearGattCache(deviceId);
       });
@@ -583,12 +586,12 @@ void main() {
       setUp(() async {
         request = pb.DiscoverServicesRequest();
 
-        when(_methodChannel.invokeMethod<void>(any!, any)).thenAnswer(
+        when(_methodChannel.invokeMethod<List<int>>(any, any)).thenAnswer(
           (_) async => [1],
         );
-        when(_argsConverter.createDiscoverServicesRequest(any!))
+        when(_argsConverter.createDiscoverServicesRequest(any))
             .thenReturn(request!);
-        when(_protobufConverter.discoveredServicesFrom(any!))
+        when(_protobufConverter.discoveredServicesFrom(any))
             .thenReturn(services);
 
         result = await _sut.discoverServices(deviceId);

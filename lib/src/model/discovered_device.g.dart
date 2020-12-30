@@ -18,11 +18,11 @@ abstract class $DiscoveredDevice {
   Uint8List get manufacturerData;
   int get rssi;
   DiscoveredDevice copyWith(
-          {String id,
-          String name,
-          Map<Uuid, Uint8List> serviceData,
-          Uint8List manufacturerData,
-          int rssi}) =>
+          {String? id,
+          String? name,
+          Map<Uuid, Uint8List>? serviceData,
+          Uint8List? manufacturerData,
+          int? rssi}) =>
       DiscoveredDevice(
           id: id ?? this.id,
           name: name ?? this.name,

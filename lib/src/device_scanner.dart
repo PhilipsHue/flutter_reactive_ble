@@ -4,7 +4,6 @@ import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
 import 'package:flutter_reactive_ble/src/plugin_controller.dart';
 import 'package:flutter_reactive_ble/src/rx_ext/repeater.dart';
 import 'package:flutter_reactive_ble/src/rx_ext/serial_disposable.dart';
-import 'package:meta/meta.dart';
 import 'package:pedantic/pedantic.dart';
 
 import 'model/discovered_device.dart';
@@ -28,12 +27,7 @@ class DeviceScannerImpl implements DeviceScanner {
     required bool Function() platformIsAndroid,
     required Future<void> delayAfterScanCompletion,
     required this.addToScanRegistry,
-  })  : assert(controller != null),
-        assert(platformIsAndroid != null),
-        assert(addToScanRegistry != null),
-        assert(platformIsAndroid != null),
-        assert(delayAfterScanCompletion != null),
-        _controller = controller,
+  })   : _controller = controller,
         _platformIsAndroid = platformIsAndroid,
         _delayAfterScanCompletion = delayAfterScanCompletion;
 
@@ -46,8 +40,9 @@ class DeviceScannerImpl implements DeviceScanner {
 
   Stream<ScanResult> get _scanStream => _controller.scanStream;
 
-  final SerialDisposable<Repeater<DiscoveredDevice?>> _scanStreamDisposable =
-      SerialDisposable(((repeater) => repeater.dispose()) as Future<void>? Function(Repeater<DiscoveredDevice?>));
+  final SerialDisposable<Repeater<DiscoveredDevice>> _scanStreamDisposable =
+      SerialDisposable(
+          (Repeater<DiscoveredDevice> repeater) => repeater.dispose());
 
   @override
   ScanSession? get currentScan => _currentScanSession;
@@ -92,7 +87,7 @@ class DeviceScannerImpl implements DeviceScanner {
       },
     );
 
-    _scanStreamDisposable.set(scanRepeater);
+    _scanStreamDisposable.set(scanRepeater as Repeater<DiscoveredDevice>);
 
     return _controller
         .scanForDevices(
@@ -101,10 +96,9 @@ class DeviceScannerImpl implements DeviceScanner {
           requireLocationServicesEnabled: requireLocationServicesEnabled,
         )
         .asyncExpand(
-          ((_) => scanRepeater.stream.map((discoveredDevice) {
-            addToScanRegistry(discoveredDevice!.id);
-            return discoveredDevice;
-          } as DiscoveredDevice Function(DiscoveredDevice?))) as Stream<DiscoveredDevice>? Function(void),
-        );
+            (_) => scanRepeater.stream.map((DiscoveredDevice discoveredDevice) {
+                  addToScanRegistry(discoveredDevice.id);
+                  return discoveredDevice;
+                } as DiscoveredDevice Function(DiscoveredDevice?)));
   }
 }

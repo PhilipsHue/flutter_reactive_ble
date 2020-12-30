@@ -1,12 +1,11 @@
 import 'package:flutter_reactive_ble/src/model/generic_failure.dart';
 import 'package:flutter_reactive_ble/src/model/qualified_characteristic.dart';
 import 'package:flutter_reactive_ble/src/model/result.dart';
-import 'package:meta/meta.dart';
 
 /// Value update for specific [QualifiedCharacteristic].
 class CharacteristicValue {
   final QualifiedCharacteristic characteristic;
-  final Result<List<int>, GenericFailure<CharacteristicValueUpdateError>>
+  final Result<List<int>, GenericFailure<CharacteristicValueUpdateError>?>
       result;
 
   const CharacteristicValue(

@@ -29,9 +29,9 @@ int convertPriorityToInt(ConnectionPriority priority) {
 
 /// Result of the connection priority request
 class ConnectionPriorityInfo {
-  const ConnectionPriorityInfo({this.result});
+  const ConnectionPriorityInfo({required this.result});
 
-  final Result<void, GenericFailure<ConnectionPriorityFailure>>? result;
+  final Result<void, GenericFailure<ConnectionPriorityFailure>?> result;
 }
 
 /// Error type for connection priority.

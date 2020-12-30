@@ -16,9 +16,9 @@ abstract class $DiscoveredService {
   List<Uuid> get characteristicIds;
   List<DiscoveredService> get includedServices;
   DiscoveredService copyWith(
-          {Uuid serviceId,
-          List<Uuid> characteristicIds,
-          List<DiscoveredService> includedServices}) =>
+          {Uuid? serviceId,
+          List<Uuid>? characteristicIds,
+          List<DiscoveredService>? includedServices}) =>
       DiscoveredService(
           serviceId: serviceId ?? this.serviceId,
           characteristicIds: characteristicIds ?? this.characteristicIds,

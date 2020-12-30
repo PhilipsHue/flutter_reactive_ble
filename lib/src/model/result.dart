@@ -17,7 +17,7 @@ class Result<Value, Failure> {
         failure: (failure) {
           if (failure is Exception) {
             // ignore: only_throw_errors
-            throw failure;
+            throw failure!;
           } else {
             throw Exception(failure);
           }

@@ -6,7 +6,7 @@ import 'package:meta/meta.dart';
 @immutable
 class WriteCharacteristicInfo {
   final QualifiedCharacteristic characteristic;
-  final Result<void, GenericFailure<WriteCharacteristicFailure>> result;
+  final Result<void, GenericFailure<WriteCharacteristicFailure>?> result;
 
   const WriteCharacteristicInfo({
     required this.characteristic,

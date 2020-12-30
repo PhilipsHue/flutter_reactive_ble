@@ -40,7 +40,7 @@ void main() {
         );
 
         when(_controller.charValueUpdateStream)
-            .thenAnswer(((_) => Stream.fromIterable([valueUpdate!])) as Stream<CharacteristicValue> Function(Invocation));
+            .thenAnswer((_) => Stream.fromIterable([valueUpdate!]));
       });
 
       test('It emits value updates received from plugincontroller', () {
@@ -94,7 +94,7 @@ void main() {
           result: const Result.success([4]),
         );
 
-        when(_controller.readCharacteristic(any!)).thenAnswer(
+        when(_controller.readCharacteristic(any)).thenAnswer(
           (_) => Stream.fromIterable([0]),
         );
       });
@@ -102,11 +102,11 @@ void main() {
       group('Given multiple updates are received for specific device', () {
         setUp(() async {
           when(_controller.charValueUpdateStream)
-              .thenAnswer(((_) => Stream.fromIterable([
+              .thenAnswer((_) => Stream.fromIterable([
                     valueUpdate!,
                     valueUpdateOtherDevice!,
                     valueUpdateSameDeviceOtherChar!,
-                  ])) as Stream<CharacteristicValue> Function(Invocation));
+                  ]));
 
           result = await _sut.readCharacteristic(charDevice);
         });
@@ -121,10 +121,10 @@ void main() {
           () {
         setUp(() async {
           when(_controller.charValueUpdateStream)
-              .thenAnswer(((_) => Stream.fromIterable([
+              .thenAnswer((_) => Stream.fromIterable([
                     valueUpdateOtherDevice!,
                     valueUpdateSameDeviceOtherChar!,
-                  ])) as Stream<CharacteristicValue> Function(Invocation));
+                  ]));
         });
 
         test('It emits first value that matches', () async {
@@ -158,7 +158,7 @@ void main() {
                   GenericFailure<WriteCharacteristicFailure>>.success(null),
             );
 
-            when(_controller.writeCharacteristicWithResponse(any!, any!))
+            when(_controller.writeCharacteristicWithResponse(any, any))
                 .thenAnswer((_) async => info);
           });
 
@@ -181,7 +181,7 @@ void main() {
                 ),
               );
 
-              when(_controller.writeCharacteristicWithResponse(any!, any!))
+              when(_controller.writeCharacteristicWithResponse(any, any))
                   .thenAnswer((_) async => info);
             });
 
@@ -204,7 +204,7 @@ void main() {
                     GenericFailure<WriteCharacteristicFailure>>.success(null),
               );
 
-              when(_controller.writeCharacteristicWithoutResponse(any!, any!))
+              when(_controller.writeCharacteristicWithoutResponse(any, any))
                   .thenAnswer((_) async => info);
             });
 
@@ -229,7 +229,7 @@ void main() {
                 ),
               );
 
-              when(_controller.writeCharacteristicWithoutResponse(any!, any!))
+              when(_controller.writeCharacteristicWithoutResponse(any, any))
                   .thenAnswer((_) async => info);
             });
 
@@ -296,22 +296,22 @@ void main() {
             result: const Result.success([4]),
           );
 
-          when(_controller.subscribeToNotifications(any!))
+          when(_controller.subscribeToNotifications(any))
               .thenAnswer((_) => Stream.fromIterable([0]));
 
-          when(_controller.stopSubscribingToNotifications(any!))
+          when(_controller.stopSubscribingToNotifications(any))
               .thenAnswer((_) async => 0);
         });
 
         group('Given multiple updates are received for specific device', () {
           setUp(() async {
             when(_controller.charValueUpdateStream)
-                .thenAnswer(((_) => Stream.fromIterable([
+                .thenAnswer((_) => Stream.fromIterable([
                       valueUpdate1!,
                       valueUpdateOtherDevice!,
                       valueUpdate2!,
                       valueUpdateSameDeviceOtherChar!,
-                    ])) as Stream<CharacteristicValue> Function(Invocation));
+                    ]));
 
             result = _sut.subscribeToCharacteristic(
                 charDevice, terminateCompleter.future);
@@ -333,7 +333,7 @@ void main() {
         int? result;
 
         setUp(() async {
-          when(_controller.requestMtuSize(any!, any))
+          when(_controller.requestMtuSize(any, any))
               .thenAnswer((_) async => mtuSize);
 
           result = await _sut.requestMtu(deviceId, mtuSize);
@@ -354,7 +354,7 @@ void main() {
 
         group('Given request priority succeeds', () {
           setUp(() {
-            when(_controller.requestConnectionPriority(any!, any!))
+            when(_controller.requestConnectionPriority(any, any))
                 .thenAnswer((_) async => const ConnectionPriorityInfo(
                       result: Result.success(null),
                     ));
@@ -369,7 +369,7 @@ void main() {
 
         group('Given request priority fails', () {
           setUp(() async {
-            when(_controller.requestConnectionPriority(any!, any!))
+            when(_controller.requestConnectionPriority(any, any))
                 .thenAnswer((_) async => const ConnectionPriorityInfo(
                       result: Result.failure(
                         GenericFailure<ConnectionPriorityFailure>(

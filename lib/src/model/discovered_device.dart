@@ -13,7 +13,7 @@ part 'discovered_device.g.dart';
 /// Result of a scan interval.
 @immutable
 class ScanResult {
-  final Result<DiscoveredDevice, GenericFailure<ScanFailure>> result;
+  final Result<DiscoveredDevice, GenericFailure<ScanFailure>?> result;
   const ScanResult({required this.result});
 
   @override

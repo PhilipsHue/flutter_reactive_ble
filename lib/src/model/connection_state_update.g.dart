@@ -14,11 +14,11 @@ abstract class $ConnectionStateUpdate {
   const $ConnectionStateUpdate();
   String get deviceId;
   DeviceConnectionState get connectionState;
-  GenericFailure<ConnectionError> get failure;
+  GenericFailure<ConnectionError>? get failure;
   ConnectionStateUpdate copyWith(
-          {String deviceId,
-          DeviceConnectionState connectionState,
-          GenericFailure<ConnectionError> failure}) =>
+          {String? deviceId,
+          DeviceConnectionState? connectionState,
+          GenericFailure<ConnectionError>? failure}) =>
       ConnectionStateUpdate(
           deviceId: deviceId ?? this.deviceId,
           connectionState: connectionState ?? this.connectionState,
@@ -51,6 +51,6 @@ class ConnectionStateUpdate$ {
           (s_, connectionState) =>
               s_.copyWith(connectionState: connectionState));
   static final failure =
-      Lens<ConnectionStateUpdate, GenericFailure<ConnectionError>>(
+      Lens<ConnectionStateUpdate, GenericFailure<ConnectionError>?>(
           (s_) => s_.failure, (s_, failure) => s_.copyWith(failure: failure));
 }

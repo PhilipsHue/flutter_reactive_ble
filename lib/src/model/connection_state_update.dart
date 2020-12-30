@@ -19,11 +19,7 @@ class ConnectionStateUpdate extends $ConnectionStateUpdate {
     required this.deviceId,
     required this.connectionState,
     required this.failure,
-  });
-
-  @override
-  String toString() =>
-      "$runtimeType(deviceId: $deviceId, connectionState: $connectionState, error: $failure)";
+  }); 
 }
 
 /// Connection status.

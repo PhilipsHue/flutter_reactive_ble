@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_reactive_ble/src/generated/bledata.pb.dart' as pb;
 import 'package:flutter_reactive_ble/src/model/ble_status.dart';
 import 'package:flutter_reactive_ble/src/model/characteristic_value.dart';
@@ -15,7 +16,6 @@ import 'package:flutter_reactive_ble/src/model/unit.dart';
 import 'package:flutter_reactive_ble/src/model/uuid.dart';
 import 'package:flutter_reactive_ble/src/model/write_characteristic_info.dart';
 import 'package:flutter_reactive_ble/src/select_from.dart';
-import 'package:meta/meta.dart';
 
 abstract class ProtobufConverter {
   BleStatus bleStatusFrom(List<int> data);
@@ -87,14 +87,13 @@ class ProtobufConverterImpl implements ProtobufConverter {
       connectionState: selectFrom(
         DeviceConnectionState.values,
         index: deviceInfo.connectionState,
-        fallback: ((raw) => throw _InvalidConnectionState(raw)) as DeviceConnectionState Function(int?),
+        fallback: (int? raw) => throw _InvalidConnectionState(raw),
       ),
       failure: genericFailureFrom(
         hasFailure: deviceInfo.hasFailure(),
         getFailure: () => deviceInfo.failure,
         codes: ConnectionError.values,
-        fallback: (rawOrNull) =>
-            rawOrNull == null ? null : ConnectionError.unknown,
+        fallback: (int? rawOrNull) => ConnectionError.unknown,
       ),
     );
   }

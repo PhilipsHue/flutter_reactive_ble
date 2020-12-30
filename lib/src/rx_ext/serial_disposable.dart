@@ -9,23 +9,22 @@ class SerialDisposable<T> {
     if (_isDisposed) {
       throw _SerialAlreadyDisposed(runtimeType);
     }
-    if (_value != null) await _dispose(_value);
+    if (_value != null) await _dispose(_value!);
     _value = newValue;
-    return newValue;
   }
 
   /// Dispose underlying resource
   Future<void> dispose() async {
     _isDisposed = true;
     if (_value != null) {
-      await _dispose(_value);
+      await _dispose(_value!);
     }
   }
 
   /// Returns whether or not the underlying resource is disposed
   bool get isDisposed => _isDisposed;
 
-  final Future<void>? Function(T?) _dispose;
+  final Future<void>? Function(T) _dispose;
   bool _isDisposed = false;
   T? _value;
 }

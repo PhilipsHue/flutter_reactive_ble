@@ -33,8 +33,7 @@ abstract class ConnectedDeviceOperation {
 class ConnectedDeviceOperationImpl implements ConnectedDeviceOperation {
   ConnectedDeviceOperationImpl({
     required DeviceOperationController controller,
-  })  : assert(controller != null),
-        _controller = controller;
+  }) : _controller = controller;
 
   final DeviceOperationController _controller;
 
@@ -49,10 +48,11 @@ class ConnectedDeviceOperationImpl implements ConnectedDeviceOperation {
         .map((update) => update.result.dematerialize());
 
     return _controller
-        .readCharacteristic(characteristic)
-        .asyncExpand((Object? _) => specificCharacteristicValueStream)
-        .firstWhere((_) => true,
-            orElse: () => throw NoBleCharacteristicDataReceived()) as Future<List<int>>;
+            .readCharacteristic(characteristic)
+            .asyncExpand((Object? _) => specificCharacteristicValueStream)
+            .firstWhere((_) => true,
+                orElse: () => throw NoBleCharacteristicDataReceived())
+        as Future<List<int>>;
   }
 
   @override
@@ -110,7 +110,7 @@ class ConnectedDeviceOperationImpl implements ConnectedDeviceOperation {
           String deviceId, ConnectionPriority priority) async =>
       _controller
           .requestConnectionPriority(deviceId, priority)
-          .then((message) => message.result!.dematerialize());
+          .then((message) => message.result.dematerialize());
 }
 
 @visibleForTesting
