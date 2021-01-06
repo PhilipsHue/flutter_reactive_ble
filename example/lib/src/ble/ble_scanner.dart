@@ -51,14 +51,14 @@ class BleScanner implements ReactiveState<BleScannerState> {
     await _stateStreamController.close();
   }
 
-  StreamSubscription _subscription;
+  StreamSubscription? _subscription;
 }
 
 @immutable
 class BleScannerState {
   const BleScannerState({
-    @required this.discoveredDevices,
-    @required this.scanIsInProgress,
+    required this.discoveredDevices,
+    required this.scanIsInProgress,
   });
 
   final List<DiscoveredDevice> discoveredDevices;
