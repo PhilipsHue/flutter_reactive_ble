@@ -10,11 +10,12 @@ class DeviceDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      Consumer2<BleDeviceConnector, ConnectionStateUpdate>(
+      Consumer2<BleDeviceConnector, ConnectionStateUpdate?>(
         builder: (_, deviceConnector, connectionStateUpdate, __) =>
             _DeviceDetail(
           device: device,
-          connectionUpdate: connectionStateUpdate.deviceId == device.id
+          connectionUpdate: connectionStateUpdate != null &&
+                  connectionStateUpdate.deviceId == device.id
               ? connectionStateUpdate
               : ConnectionStateUpdate(
                   deviceId: device.id,

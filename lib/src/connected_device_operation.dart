@@ -48,11 +48,10 @@ class ConnectedDeviceOperationImpl implements ConnectedDeviceOperation {
         .map((update) => update.result.dematerialize());
 
     return _controller
-            .readCharacteristic(characteristic)
-            .asyncExpand((Object? _) => specificCharacteristicValueStream)
-            .firstWhere((_) => true,
-                orElse: () => throw NoBleCharacteristicDataReceived())
-        as Future<List<int>>;
+        .readCharacteristic(characteristic)
+        .asyncExpand((Object? _) => specificCharacteristicValueStream)
+        .firstWhere((_) => true,
+            orElse: () => throw NoBleCharacteristicDataReceived());
   }
 
   @override

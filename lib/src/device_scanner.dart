@@ -87,7 +87,7 @@ class DeviceScannerImpl implements DeviceScanner {
       },
     );
 
-    _scanStreamDisposable.set(scanRepeater as Repeater<DiscoveredDevice>);
+    _scanStreamDisposable.set(scanRepeater);
 
     return _controller
         .scanForDevices(
@@ -95,10 +95,9 @@ class DeviceScannerImpl implements DeviceScanner {
           scanMode: scanMode,
           requireLocationServicesEnabled: requireLocationServicesEnabled,
         )
-        .asyncExpand(
-            (_) => scanRepeater.stream.map((DiscoveredDevice discoveredDevice) {
-                  addToScanRegistry(discoveredDevice.id);
-                  return discoveredDevice;
-                } as DiscoveredDevice Function(DiscoveredDevice?)));
+        .asyncExpand((_) => scanRepeater.stream.map((discoveredDevice) {
+              addToScanRegistry(discoveredDevice.id);
+              return discoveredDevice;
+            }));
   }
 }
