@@ -19,12 +19,9 @@ class DeviceListScreen extends StatelessWidget {
 
 class _DeviceList extends StatefulWidget {
   const _DeviceList(
-      {@required this.scannerState,
-      @required this.startScan,
-      @required this.stopScan})
-      : assert(scannerState != null),
-        assert(startScan != null),
-        assert(stopScan != null);
+      {required this.scannerState,
+      required this.startScan,
+      required this.stopScan});
 
   final BleScannerState scannerState;
   final void Function(List<Uuid>) startScan;
@@ -35,7 +32,7 @@ class _DeviceList extends StatefulWidget {
 }
 
 class _DeviceListState extends State<_DeviceList> {
-  TextEditingController _uuidController;
+  TextEditingController? _uuidController;
 
   @override
   void initState() {
@@ -47,12 +44,12 @@ class _DeviceListState extends State<_DeviceList> {
   @override
   void dispose() {
     widget.stopScan();
-    _uuidController.dispose();
+    _uuidController!.dispose();
     super.dispose();
   }
 
   bool _isValidUuidInput() {
-    final uuidText = _uuidController.text;
+    final uuidText = _uuidController!.text;
     if (uuidText.isEmpty) {
       return true;
     } else {
@@ -66,8 +63,8 @@ class _DeviceListState extends State<_DeviceList> {
   }
 
   void _startScanning() {
-    final text = _uuidController.text;
-    widget.startScan(text.isEmpty ? [] : [Uuid.parse(_uuidController.text)]);
+    final text = _uuidController!.text;
+    widget.startScan(text.isEmpty ? [] : [Uuid.parse(_uuidController!.text)]);
   }
 
   @override
@@ -89,7 +86,7 @@ class _DeviceListState extends State<_DeviceList> {
                     enabled: !widget.scannerState.scanIsInProgress,
                     decoration: InputDecoration(
                         errorText:
-                            _uuidController.text.isEmpty || _isValidUuidInput()
+                            _uuidController!.text.isEmpty || _isValidUuidInput()
                                 ? null
                                 : 'Invalid UUID format'),
                     autocorrect: false,

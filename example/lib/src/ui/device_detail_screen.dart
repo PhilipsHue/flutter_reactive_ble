@@ -6,7 +6,7 @@ import 'package:provider/provider.dart';
 class DeviceDetailScreen extends StatelessWidget {
   final DiscoveredDevice device;
 
-  const DeviceDetailScreen({@required this.device}) : assert(device != null);
+  const DeviceDetailScreen({required this.device, Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) =>
@@ -14,8 +14,7 @@ class DeviceDetailScreen extends StatelessWidget {
         builder: (_, deviceConnector, connectionStateUpdate, __) =>
             _DeviceDetail(
           device: device,
-          connectionUpdate: connectionStateUpdate != null &&
-                  connectionStateUpdate.deviceId == device.id
+          connectionUpdate: connectionStateUpdate.deviceId == device.id
               ? connectionStateUpdate
               : ConnectionStateUpdate(
                   deviceId: device.id,
@@ -31,18 +30,13 @@ class DeviceDetailScreen extends StatelessWidget {
 
 class _DeviceDetail extends StatelessWidget {
   const _DeviceDetail({
-    @required this.device,
-    @required this.connectionUpdate,
-    @required this.connect,
-    @required this.disconnect,
-    @required this.discoverServices,
-    Key key,
-  })  : assert(device != null),
-        assert(connectionUpdate != null),
-        assert(connect != null),
-        assert(disconnect != null),
-        assert(discoverServices != null),
-        super(key: key);
+    required this.device,
+    required this.connectionUpdate,
+    required this.connect,
+    required this.disconnect,
+    required this.discoverServices,
+    Key? key,
+  }) : super(key: key);
 
   final DiscoveredDevice device;
   final ConnectionStateUpdate connectionUpdate;
@@ -61,7 +55,7 @@ class _DeviceDetail extends StatelessWidget {
         },
         child: Scaffold(
           appBar: AppBar(
-            title: Text(device.name ?? "unknown"),
+            title: Text(device.name),
           ),
           body: Center(
             child: Column(
