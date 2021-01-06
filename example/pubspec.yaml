@@ -12,10 +12,10 @@ dependencies:
     sdk: flutter
   flutter_reactive_ble:
     path: ../
-  provider: ^4.0.4
+  provider: ^5.0.0-nullsafety.2
 
 dev_dependencies:
-  dependency_validator:
+  dependency_validator: ^2.0.1
   flutter_test:
     sdk: flutter
 
