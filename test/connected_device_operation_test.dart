@@ -155,7 +155,7 @@ void main() {
             info = WriteCharacteristicInfo(
               characteristic: characteristic,
               result: const Result<void,
-                  GenericFailure<WriteCharacteristicFailure>>.success(null),
+                  GenericFailure<WriteCharacteristicFailure>>.success(1),
             );
 
             when(_controller.writeCharacteristicWithResponse(any, any))
@@ -201,7 +201,7 @@ void main() {
               info = WriteCharacteristicInfo(
                 characteristic: characteristic,
                 result: const Result<void,
-                    GenericFailure<WriteCharacteristicFailure>>.success(null),
+                    GenericFailure<WriteCharacteristicFailure>>.success(1),
               );
 
               when(_controller.writeCharacteristicWithoutResponse(any, any))
@@ -248,11 +248,11 @@ void main() {
         late QualifiedCharacteristic charDevice;
         QualifiedCharacteristic charOtherSameDevice;
         QualifiedCharacteristic charOtherDevice;
-        CharacteristicValue? valueUpdate1;
-        CharacteristicValue? valueUpdate2;
-        CharacteristicValue? valueUpdateOtherDevice;
-        CharacteristicValue? valueUpdateSameDeviceOtherChar;
-        Stream<List<int>>? result;
+        late CharacteristicValue valueUpdate1;
+        late CharacteristicValue valueUpdate2;
+        late CharacteristicValue valueUpdateOtherDevice;
+        late CharacteristicValue valueUpdateSameDeviceOtherChar;
+        late Stream<List<int>?> result;
         late Completer<ConnectionStateUpdate> terminateCompleter;
 
         setUp(() {
@@ -307,10 +307,10 @@ void main() {
           setUp(() async {
             when(_controller.charValueUpdateStream)
                 .thenAnswer((_) => Stream.fromIterable([
-                      valueUpdate1!,
-                      valueUpdateOtherDevice!,
-                      valueUpdate2!,
-                      valueUpdateSameDeviceOtherChar!,
+                      valueUpdate1,
+                      valueUpdateOtherDevice,
+                      valueUpdate2,
+                      valueUpdateSameDeviceOtherChar,
                     ]));
 
             result = _sut.subscribeToCharacteristic(
@@ -356,7 +356,7 @@ void main() {
           setUp(() {
             when(_controller.requestConnectionPriority(any, any))
                 .thenAnswer((_) async => const ConnectionPriorityInfo(
-                      result: Result.success(null),
+                      result: Result.success(1),
                     ));
           });
 

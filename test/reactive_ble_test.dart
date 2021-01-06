@@ -400,8 +400,8 @@ void main() {
 
       QualifiedCharacteristic char;
 
-      Stream<List<int>> valueStream;
-      Stream<List<int>>? resultStream;
+      late Stream<List<int>> valueStream;
+      late Stream<List<int>?> resultStream;
 
       setUp(() {
         char = _createChar();

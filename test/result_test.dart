@@ -27,8 +27,8 @@ void main() {
 
     test("executes the success branch for null success value", () {
       const int? value = null;
-      const sut = Result<int, int>.success(value);
-      final handler = _ResultHandler<int?, int?, int>();
+      const sut = Result<int, int?>.success(value);
+      final handler = _ResultHandler<int?, int?, int?>();
 
       final result =
           sut.iif(success: handler.success, failure: handler.failure);

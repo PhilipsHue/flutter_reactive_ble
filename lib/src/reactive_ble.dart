@@ -320,7 +320,7 @@ class FlutterReactiveBle {
   /// Subscribes to updates from the characteristic specified.
   ///
   /// This stream terminates automatically when the device is disconnected.
-  Stream<List<int>> subscribeToCharacteristic(
+  Stream<List<int>?> subscribeToCharacteristic(
     QualifiedCharacteristic characteristic,
   ) {
     final isDisconnected = connectedDeviceStream
