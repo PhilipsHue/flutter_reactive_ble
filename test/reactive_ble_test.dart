@@ -274,7 +274,7 @@ void main() {
       final servicesToDiscover = {
         Uuid.parse('FEFF'): [Uuid.parse('FE1F')]
       };
-      Stream<ConnectionStateUpdate>? deviceUpdateStream;
+      Stream<ConnectionStateUpdate?>? deviceUpdateStream;
 
       setUp(() {
         when(_deviceConnector.connect(
@@ -315,7 +315,7 @@ void main() {
       final servicesToDiscover = {
         Uuid.parse('FEFF'): [Uuid.parse('FE1F')]
       };
-      Stream<ConnectionStateUpdate>? deviceUpdateStream;
+      Stream<ConnectionStateUpdate?>? deviceUpdateStream;
 
       setUp(() {
         when(_deviceConnector.connectToAdvertisingDevice(

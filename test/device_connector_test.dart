@@ -19,7 +19,7 @@ void main() {
     late DeviceConnector _sut;
     late MockDeviceConnectionController _controller;
     late Stream<ConnectionStateUpdate> _connectionStateUpdateStream;
-    late Stream<ConnectionStateUpdate> _result;
+    late Stream<ConnectionStateUpdate?> _result;
     late MockDiscoveredDevicesRegistry _registry;
     late MockDeviceScanner _scanner;
 

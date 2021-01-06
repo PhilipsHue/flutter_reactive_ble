@@ -12,13 +12,13 @@ import 'model/uuid.dart';
 abstract class DeviceConnector {
   Stream<ConnectionStateUpdate> get deviceConnectionStateUpdateStream;
 
-  Stream<ConnectionStateUpdate> connect({
+  Stream<ConnectionStateUpdate?> connect({
     required String id,
     Map<Uuid, List<Uuid>>? servicesWithCharacteristicsToDiscover,
     Duration? connectionTimeout,
   });
 
-  Stream<ConnectionStateUpdate> connectToAdvertisingDevice({
+  Stream<ConnectionStateUpdate?> connectToAdvertisingDevice({
     required String id,
     required List<Uuid> withServices,
     required Duration prescanDuration,
@@ -52,7 +52,7 @@ class DeviceConnectorImpl implements DeviceConnector {
       _controller.connectionUpdateStream;
 
   @override
-  Stream<ConnectionStateUpdate> connect({
+  Stream<ConnectionStateUpdate?> connect({
     required String id,
     Map<Uuid, List<Uuid>>? servicesWithCharacteristicsToDiscover,
     Duration? connectionTimeout,
@@ -73,12 +73,12 @@ class DeviceConnectorImpl implements DeviceConnector {
       onCancel: () => _controller.disconnectDevice(id),
     );
 
-    return autoconnectingRepeater.stream as Stream<
-        ConnectionStateUpdate>; //cast needed because of bug in analyzer
+    return autoconnectingRepeater
+        .stream; //cast needed because of bug in analyzer
   }
 
   @override
-  Stream<ConnectionStateUpdate> connectToAdvertisingDevice({
+  Stream<ConnectionStateUpdate?> connectToAdvertisingDevice({
     required String id,
     required List<Uuid> withServices,
     required Duration prescanDuration,
@@ -104,7 +104,7 @@ class DeviceConnectorImpl implements DeviceConnector {
     }
   }
 
-  Stream<ConnectionStateUpdate> _prescanAndConnect(
+  Stream<ConnectionStateUpdate?> _prescanAndConnect(
     String id,
     Map<Uuid, List<Uuid>>? servicesWithCharacteristicsToDiscover,
     Duration? connectionTimeout,
@@ -155,7 +155,7 @@ class DeviceConnectorImpl implements DeviceConnector {
     }
   }
 
-  Stream<ConnectionStateUpdate> _awaitCurrentScanAndConnect(
+  Stream<ConnectionStateUpdate?> _awaitCurrentScanAndConnect(
     List<Uuid> withServices,
     Duration prescanDuration,
     String id,
@@ -190,7 +190,7 @@ class DeviceConnectorImpl implements DeviceConnector {
     }
   }
 
-  Stream<ConnectionStateUpdate> _connectIfRecentlyDiscovered(
+  Stream<ConnectionStateUpdate?> _connectIfRecentlyDiscovered(
     String id,
     Map<Uuid, List<Uuid>>? servicesWithCharacteristicsToDiscover,
     Duration? connectionTimeout,
