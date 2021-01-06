@@ -12,12 +12,11 @@ class Result<Value, Failure> {
         _value = null; // ignore: avoid_field_initializers_in_const_classes
 
   /// Provides the value in case of success or throws [Exception] in case of failure.
-  Value? dematerialize() => iif(
-        success: (value) => value,
+  Value dematerialize() => iif(
+        success: (value) => value!,
         failure: (failure) {
-          if (failure is Exception) {
-            // ignore: only_throw_errors
-            throw failure!;
+          if (failure is Exception && failure != null) {
+            throw failure;
           } else {
             throw Exception(failure);
           }

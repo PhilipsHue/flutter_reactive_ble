@@ -8,9 +8,10 @@ import 'device_detail_screen.dart';
 
 class DeviceListScreen extends StatelessWidget {
   @override
-  Widget build(BuildContext context) => Consumer2<BleScanner, BleScannerState>(
+  Widget build(BuildContext context) => Consumer2<BleScanner, BleScannerState?>(
         builder: (_, bleScanner, bleScannerState, __) => _DeviceList(
-          scannerState: bleScannerState,
+          scannerState: bleScannerState ??
+              BleScannerState(discoveredDevices: [], scanIsInProgress: false),
           startScan: bleScanner.startScan,
           stopScan: bleScanner.stopScan,
         ),

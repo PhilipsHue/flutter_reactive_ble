@@ -22,18 +22,18 @@ void main() {
         Provider.value(value: _scanner),
         Provider.value(value: _monitor),
         Provider.value(value: _connector),
-        StreamProvider<BleScannerState>(
+        StreamProvider<BleScannerState?>(
           create: (_) => _scanner.state,
           initialData: const BleScannerState(
             discoveredDevices: [],
             scanIsInProgress: false,
           ),
         ),
-        StreamProvider<BleStatus>(
+        StreamProvider<BleStatus?>(
           create: (_) => _monitor.state,
           initialData: BleStatus.unknown,
         ),
-        StreamProvider<ConnectionStateUpdate>(
+        StreamProvider<ConnectionStateUpdate?>(
           create: (_) => _connector.state,
           initialData: const ConnectionStateUpdate(
             deviceId: 'Unknown device',
@@ -54,12 +54,12 @@ void main() {
 
 class HomeScreen extends StatelessWidget {
   @override
-  Widget build(BuildContext context) => Consumer<BleStatus>(
+  Widget build(BuildContext context) => Consumer<BleStatus?>(
         builder: (_, status, __) {
           if (status == BleStatus.ready) {
             return DeviceListScreen();
           } else {
-            return BleStatusScreen(status: status);
+            return BleStatusScreen(status: status ?? BleStatus.unknown);
           }
         },
       );
