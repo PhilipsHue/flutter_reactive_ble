@@ -269,7 +269,7 @@ void main() {
 
         expect(
           result,
-          const Result<Unit, GenericFailure<ClearGattCacheError>>.success(
+          const Result<Unit, GenericFailure<ClearGattCacheError>?>.success(
               Unit()),
         );
       });

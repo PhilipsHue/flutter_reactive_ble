@@ -17,7 +17,7 @@ abstract class ConnectedDeviceOperation {
     required List<int> value,
   });
 
-  Stream<List<int>> subscribeToCharacteristic(
+  Stream<List<int>?> subscribeToCharacteristic(
     QualifiedCharacteristic characteristic,
     Future<void> isDisconnected,
   );
@@ -73,7 +73,7 @@ class ConnectedDeviceOperationImpl implements ConnectedDeviceOperation {
           .then((info) => info.result.dematerialize());
 
   @override
-  Stream<List<int>> subscribeToCharacteristic(
+  Stream<List<int>?> subscribeToCharacteristic(
     QualifiedCharacteristic characteristic,
     Future<void> isDisconnected,
   ) {
@@ -93,7 +93,7 @@ class ConnectedDeviceOperationImpl implements ConnectedDeviceOperation {
 
     isDisconnected.then<void>((_) => autosubscribingRepeater.dispose());
 
-    return autosubscribingRepeater.stream as Stream<List<int>>;
+    return autosubscribingRepeater.stream;
   }
 
   @override
