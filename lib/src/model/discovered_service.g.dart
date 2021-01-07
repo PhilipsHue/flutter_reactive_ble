@@ -27,7 +27,8 @@ abstract class $DiscoveredService {
   String toString() =>
       "DiscoveredService(serviceId: $serviceId, characteristicIds: $characteristicIds, includedServices: $includedServices)";
   @override
-  bool operator ==(dynamic other) =>
+  bool operator ==(Object other) =>
+      other is DiscoveredService &&
       other.runtimeType == runtimeType &&
       serviceId == other.serviceId &&
       const DeepCollectionEquality()

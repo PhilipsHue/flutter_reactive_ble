@@ -33,7 +33,8 @@ abstract class $DiscoveredDevice {
   String toString() =>
       "DiscoveredDevice(id: $id, name: $name, serviceData: $serviceData, manufacturerData: $manufacturerData, rssi: $rssi)";
   @override
-  bool operator ==(dynamic other) =>
+  bool operator ==(Object other) =>
+      other is DiscoveredDevice &&
       other.runtimeType == runtimeType &&
       id == other.id &&
       name == other.name &&

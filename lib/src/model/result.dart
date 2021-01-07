@@ -52,7 +52,8 @@ class Result<Value, Failure> {
       ((17 * 37) + (_value?.hashCode ?? 0)) * 37 + (_failure?.hashCode ?? 0);
 
   @override
-  bool operator ==(dynamic other) =>
+  bool operator ==(Object other) =>
+      other is Result &&
       runtimeType == other.runtimeType &&
       _value == other._value &&
       _failure == other._failure;

@@ -206,7 +206,7 @@ packages:
       name: functional_data_generator
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.0.0-nullsafety.0"
+    version: "1.0.0-nullsafety.1"
   glob:
     dependency: transitive
     description:

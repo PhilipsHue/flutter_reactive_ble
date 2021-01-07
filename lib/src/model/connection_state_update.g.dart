@@ -27,7 +27,8 @@ abstract class $ConnectionStateUpdate {
   String toString() =>
       "ConnectionStateUpdate(deviceId: $deviceId, connectionState: $connectionState, failure: $failure)";
   @override
-  bool operator ==(dynamic other) =>
+  bool operator ==(Object other) =>
+      other is ConnectionStateUpdate &&
       other.runtimeType == runtimeType &&
       deviceId == other.deviceId &&
       connectionState == other.connectionState &&
