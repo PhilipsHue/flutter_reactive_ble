@@ -7,6 +7,7 @@ import android.os.ParcelUuid
 import androidx.annotation.VisibleForTesting
 import com.polidea.rxandroidble2.LogConstants
 import com.polidea.rxandroidble2.LogOptions
+import com.polidea.rxandroidble2.NotificationSetupMode
 import com.polidea.rxandroidble2.RxBleClient
 import com.polidea.rxandroidble2.RxBleConnection
 import com.polidea.rxandroidble2.RxBleDevice
@@ -111,11 +112,11 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
     override fun discoverServices(deviceId: String): Single<RxBleDeviceServices> {
 
         return getConnection(deviceId).flatMapSingle { connectionResult ->
-                when (connectionResult) {
-                    is EstablishedConnection ->
-                        connectionResult.rxConnection.discoverServices()
-                    is EstablishConnectionFailure -> Single.error(Exception(connectionResult.errorMessage))
-                }
+            when (connectionResult) {
+                is EstablishedConnection ->
+                    connectionResult.rxConnection.discoverServices()
+                is EstablishConnectionFailure -> Single.error(Exception(connectionResult.errorMessage))
+            }
         }.firstOrError()
     }
 
@@ -227,10 +228,16 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
                     deviceConnection.rxConnection.discoverServices()
                             .flatMap { deviceServices -> deviceServices.getCharacteristic(characteristic) }
                             .flatMapObservable { char ->
-                                if ((char.properties and BluetoothGattCharacteristic.PROPERTY_NOTIFY) > 0) {
-                                    deviceConnection.rxConnection.setupNotification(characteristic)
+                                val mode = if (char.descriptors.isEmpty()) {
+                                    NotificationSetupMode.COMPAT
                                 } else {
-                                    deviceConnection.rxConnection.setupIndication(characteristic)
+                                    NotificationSetupMode.DEFAULT
+                                }
+
+                                if ((char.properties and BluetoothGattCharacteristic.PROPERTY_NOTIFY) > 0) {
+                                    deviceConnection.rxConnection.setupNotification(characteristic, mode)
+                                } else {
+                                    deviceConnection.rxConnection.setupIndication(characteristic, mode)
                                 }
                             }
                 }
