@@ -9,20 +9,20 @@ abstract class ConnectedDeviceOperation {
 
   Future<void> writeCharacteristicWithResponse(
     QualifiedCharacteristic characteristic, {
-    @required List<int> value,
+    required List<int> value,
   });
 
   Future<void> writeCharacteristicWithoutResponse(
     QualifiedCharacteristic characteristic, {
-    @required List<int> value,
+    required List<int> value,
   });
 
-  Stream<List<int>> subscribeToCharacteristic(
+  Stream<List<int>?> subscribeToCharacteristic(
     QualifiedCharacteristic characteristic,
     Future<void> isDisconnected,
   );
 
-  Future<int> requestMtu(String deviceId, int mtu);
+  Future<int> requestMtu(String deviceId, int? mtu);
 
   Future<List<DiscoveredService>> discoverServices(String deviceId);
 
@@ -32,9 +32,8 @@ abstract class ConnectedDeviceOperation {
 
 class ConnectedDeviceOperationImpl implements ConnectedDeviceOperation {
   ConnectedDeviceOperationImpl({
-    @required DeviceOperationController controller,
-  })  : assert(controller != null),
-        _controller = controller;
+    required DeviceOperationController controller,
+  }) : _controller = controller;
 
   final DeviceOperationController _controller;
 
@@ -50,7 +49,7 @@ class ConnectedDeviceOperationImpl implements ConnectedDeviceOperation {
 
     return _controller
         .readCharacteristic(characteristic)
-        .asyncExpand((Object _) => specificCharacteristicValueStream)
+        .asyncExpand((Object? _) => specificCharacteristicValueStream)
         .firstWhere((_) => true,
             orElse: () => throw NoBleCharacteristicDataReceived());
   }
@@ -58,7 +57,7 @@ class ConnectedDeviceOperationImpl implements ConnectedDeviceOperation {
   @override
   Future<void> writeCharacteristicWithResponse(
     QualifiedCharacteristic characteristic, {
-    @required List<int> value,
+    required List<int> value,
   }) async =>
       _controller
           .writeCharacteristicWithResponse(characteristic, value)
@@ -67,14 +66,14 @@ class ConnectedDeviceOperationImpl implements ConnectedDeviceOperation {
   @override
   Future<void> writeCharacteristicWithoutResponse(
     QualifiedCharacteristic characteristic, {
-    @required List<int> value,
+    required List<int> value,
   }) async =>
       _controller
           .writeCharacteristicWithoutResponse(characteristic, value)
           .then((info) => info.result.dematerialize());
 
   @override
-  Stream<List<int>> subscribeToCharacteristic(
+  Stream<List<int>?> subscribeToCharacteristic(
     QualifiedCharacteristic characteristic,
     Future<void> isDisconnected,
   ) {
@@ -82,10 +81,10 @@ class ConnectedDeviceOperationImpl implements ConnectedDeviceOperation {
         .where((update) => update.characteristic == characteristic)
         .map((update) => update.result.dematerialize());
 
-    final autosubscribingRepeater = Repeater<List<int>>.broadcast(
+    final autosubscribingRepeater = Repeater<List<int>?>.broadcast(
       onListenEmitFrom: () => _controller
           .subscribeToNotifications(characteristic)
-          .asyncExpand((Object _) => specificCharacteristicValueStream),
+          .asyncExpand((Object? _) => specificCharacteristicValueStream),
       onCancel: () => _controller
           .stopSubscribingToNotifications(characteristic)
           .catchError((Object e) =>
@@ -98,7 +97,7 @@ class ConnectedDeviceOperationImpl implements ConnectedDeviceOperation {
   }
 
   @override
-  Future<int> requestMtu(String deviceId, int mtu) async =>
+  Future<int> requestMtu(String deviceId, int? mtu) async =>
       _controller.requestMtuSize(deviceId, mtu);
 
   @override

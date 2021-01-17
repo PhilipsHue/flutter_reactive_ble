@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
 import 'package:flutter_reactive_ble/src/connected_device_operation.dart';
@@ -25,14 +26,14 @@ import 'reactive_ble_test.mocks.dart';
 )
 void main() {
   group('$FlutterReactiveBle', () {
-    MockBleOperationController _bleOperationController;
-    MockDeviceScanner _deviceScanner;
-    MockDeviceConnector _deviceConnector;
-    MockConnectedDeviceOperation _deviceOperation;
-    StreamController<BleStatus> _bleStatusController;
+    late MockBleOperationController _bleOperationController;
+    late MockDeviceScanner _deviceScanner;
+    late MockDeviceConnector _deviceConnector;
+    late MockConnectedDeviceOperation _deviceOperation;
+    late StreamController<BleStatus> _bleStatusController;
     MockLogger _debugLogger;
 
-    FlutterReactiveBle _sut;
+    late FlutterReactiveBle _sut;
 
     setUp(() {
       _bleOperationController = MockBleOperationController();
@@ -62,7 +63,7 @@ void main() {
     });
 
     group('BleStatus stream', () {
-      Stream<BleStatus> bleStatusStream;
+      Stream<BleStatus>? bleStatusStream;
       setUp(() {
         bleStatusStream = _sut.statusStream;
       });
@@ -99,7 +100,7 @@ void main() {
       );
       final charValue = CharacteristicValue(
           characteristic: _createChar(), result: characteristic);
-      Stream<CharacteristicValue> charValueStream;
+      Stream<CharacteristicValue>? charValueStream;
 
       setUp(() {
         when(_deviceOperation.characteristicValueStream)
@@ -130,7 +131,7 @@ void main() {
 
     group('Read characteristic', () {
       QualifiedCharacteristic characteristic;
-      List<int> result;
+      List<int>? result;
 
       setUp(() async {
         characteristic = _createChar();
@@ -192,7 +193,7 @@ void main() {
     group('Request mtu', () {
       const deviceId = '123';
       const mtu = 120;
-      int result;
+      int? result;
 
       setUp(() async {
         when(_deviceOperation.requestMtu(any, any))
@@ -227,14 +228,14 @@ void main() {
       const mode = ScanMode.lowPower;
       const requireLocation = false;
 
-      const device = DiscoveredDevice(
+      final device = DiscoveredDevice(
         id: 'deviceId',
-        manufacturerData: null,
+        manufacturerData: Uint8List.fromList([0]),
         name: 'test',
         rssi: -39,
         serviceData: {},
       );
-      Stream<DiscoveredDevice> deviceStream;
+      Stream<DiscoveredDevice>? deviceStream;
 
       setUp(() {
         when(_deviceScanner.scanForDevices(
@@ -273,7 +274,7 @@ void main() {
       final servicesToDiscover = {
         Uuid.parse('FEFF'): [Uuid.parse('FE1F')]
       };
-      Stream<ConnectionStateUpdate> deviceUpdateStream;
+      Stream<ConnectionStateUpdate?>? deviceUpdateStream;
 
       setUp(() {
         when(_deviceConnector.connect(
@@ -314,7 +315,7 @@ void main() {
       final servicesToDiscover = {
         Uuid.parse('FEFF'): [Uuid.parse('FE1F')]
       };
-      Stream<ConnectionStateUpdate> deviceUpdateStream;
+      Stream<ConnectionStateUpdate?>? deviceUpdateStream;
 
       setUp(() {
         when(_deviceConnector.connectToAdvertisingDevice(
@@ -371,7 +372,7 @@ void main() {
         failure: null,
       );
 
-      Stream<ConnectionStateUpdate> updateStream;
+      Stream<ConnectionStateUpdate>? updateStream;
 
       setUp(() {
         when(_deviceConnector.deviceConnectionStateUpdateStream)
@@ -399,8 +400,8 @@ void main() {
 
       QualifiedCharacteristic char;
 
-      Stream<List<int>> valueStream;
-      Stream<List<int>> resultStream;
+      late Stream<List<int>> valueStream;
+      late Stream<List<int>?> resultStream;
 
       setUp(() {
         char = _createChar();

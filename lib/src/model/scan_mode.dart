@@ -26,5 +26,4 @@ int convertScanModeToArgs(ScanMode scanMode) {
     case ScanMode.lowLatency:
       return 2;
   }
-  throw AssertionError("Unknown scanmode provided.");
 }

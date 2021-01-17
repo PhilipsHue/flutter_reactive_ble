@@ -3,7 +3,6 @@ import 'package:flutter_reactive_ble/src/device_scanner.dart';
 import 'package:flutter_reactive_ble/src/model/connection_state_update.dart';
 import 'package:flutter_reactive_ble/src/plugin_controller.dart';
 import 'package:flutter_reactive_ble/src/rx_ext/repeater.dart';
-import 'package:meta/meta.dart';
 
 import 'model/discovered_device.dart';
 import 'model/generic_failure.dart';
@@ -13,40 +12,35 @@ import 'model/uuid.dart';
 abstract class DeviceConnector {
   Stream<ConnectionStateUpdate> get deviceConnectionStateUpdateStream;
 
-  Stream<ConnectionStateUpdate> connect({
-    @required String id,
-    Map<Uuid, List<Uuid>> servicesWithCharacteristicsToDiscover,
-    Duration connectionTimeout,
+  Stream<ConnectionStateUpdate?> connect({
+    required String id,
+    Map<Uuid, List<Uuid>>? servicesWithCharacteristicsToDiscover,
+    Duration? connectionTimeout,
   });
 
-  Stream<ConnectionStateUpdate> connectToAdvertisingDevice({
-    @required String id,
-    @required List<Uuid> withServices,
-    @required Duration prescanDuration,
-    Map<Uuid, List<Uuid>> servicesWithCharacteristicsToDiscover,
-    Duration connectionTimeout,
+  Stream<ConnectionStateUpdate?> connectToAdvertisingDevice({
+    required String id,
+    required List<Uuid> withServices,
+    required Duration prescanDuration,
+    Map<Uuid, List<Uuid>>? servicesWithCharacteristicsToDiscover,
+    Duration? connectionTimeout,
   });
 }
 
 class DeviceConnectorImpl implements DeviceConnector {
   const DeviceConnectorImpl({
-    @required DeviceConnectionController controller,
-    @required
-        bool Function({String deviceId, Duration cacheValidity})
-            deviceIsDiscoveredRecently,
-    @required DeviceScanner deviceScanner,
-    @required Duration delayAfterScanFailure,
-  })  : assert(controller != null),
-        assert(deviceScanner != null),
-        assert(deviceIsDiscoveredRecently != null),
-        assert(delayAfterScanFailure != null),
-        _deviceIsDiscoveredRecently = deviceIsDiscoveredRecently,
+    required DeviceConnectionController controller,
+    required bool Function({String? deviceId, Duration? cacheValidity})
+        deviceIsDiscoveredRecently,
+    required DeviceScanner deviceScanner,
+    required Duration delayAfterScanFailure,
+  })   : _deviceIsDiscoveredRecently = deviceIsDiscoveredRecently,
         _deviceScanner = deviceScanner,
         _controller = controller,
         _delayAfterScanFailure = delayAfterScanFailure;
 
   final DeviceConnectionController _controller;
-  final bool Function({String deviceId, Duration cacheValidity})
+  final bool Function({String? deviceId, Duration? cacheValidity})
       _deviceIsDiscoveredRecently;
   final DeviceScanner _deviceScanner;
   final Duration _delayAfterScanFailure;
@@ -58,10 +52,10 @@ class DeviceConnectorImpl implements DeviceConnector {
       _controller.connectionUpdateStream;
 
   @override
-  Stream<ConnectionStateUpdate> connect({
-    @required String id,
-    Map<Uuid, List<Uuid>> servicesWithCharacteristicsToDiscover,
-    Duration connectionTimeout,
+  Stream<ConnectionStateUpdate?> connect({
+    required String id,
+    Map<Uuid, List<Uuid>>? servicesWithCharacteristicsToDiscover,
+    Duration? connectionTimeout,
   }) {
     final specificConnectedDeviceStream = deviceConnectionStateUpdateStream
         .where((update) => update.deviceId == id)
@@ -75,20 +69,21 @@ class DeviceConnectorImpl implements DeviceConnector {
       onListenEmitFrom: () => _controller
           .connectToDevice(
               id, servicesWithCharacteristicsToDiscover, connectionTimeout)
-          .asyncExpand((Object _) => specificConnectedDeviceStream),
+          .asyncExpand((Object? _) => specificConnectedDeviceStream),
       onCancel: () => _controller.disconnectDevice(id),
     );
 
-    return autoconnectingRepeater.stream;
+    return autoconnectingRepeater
+        .stream; //cast needed because of bug in analyzer
   }
 
   @override
-  Stream<ConnectionStateUpdate> connectToAdvertisingDevice({
-    @required String id,
-    @required List<Uuid> withServices,
-    @required Duration prescanDuration,
-    Map<Uuid, List<Uuid>> servicesWithCharacteristicsToDiscover,
-    Duration connectionTimeout,
+  Stream<ConnectionStateUpdate?> connectToAdvertisingDevice({
+    required String id,
+    required List<Uuid> withServices,
+    required Duration prescanDuration,
+    Map<Uuid, List<Uuid>>? servicesWithCharacteristicsToDiscover,
+    Duration? connectionTimeout,
   }) {
     if (_deviceScanner.currentScan != null) {
       return _awaitCurrentScanAndConnect(
@@ -109,10 +104,10 @@ class DeviceConnectorImpl implements DeviceConnector {
     }
   }
 
-  Stream<ConnectionStateUpdate> _prescanAndConnect(
+  Stream<ConnectionStateUpdate?> _prescanAndConnect(
     String id,
-    Map<Uuid, List<Uuid>> servicesWithCharacteristicsToDiscover,
-    Duration connectionTimeout,
+    Map<Uuid, List<Uuid>>? servicesWithCharacteristicsToDiscover,
+    Duration? connectionTimeout,
     List<Uuid> withServices,
     Duration prescanDuration,
   ) {
@@ -133,7 +128,7 @@ class DeviceConnectorImpl implements DeviceConnector {
         scanSubscription.cancel();
       });
 
-      return _deviceScanner.currentScan.future
+      return _deviceScanner.currentScan!.future
           .then((_) => true)
           .catchError((Object _) => false)
           .asStream()
@@ -160,16 +155,16 @@ class DeviceConnectorImpl implements DeviceConnector {
     }
   }
 
-  Stream<ConnectionStateUpdate> _awaitCurrentScanAndConnect(
+  Stream<ConnectionStateUpdate?> _awaitCurrentScanAndConnect(
     List<Uuid> withServices,
     Duration prescanDuration,
     String id,
-    Map<Uuid, List<Uuid>> servicesWithCharacteristicsToDiscover,
-    Duration connectionTimeout,
+    Map<Uuid, List<Uuid>>? servicesWithCharacteristicsToDiscover,
+    Duration? connectionTimeout,
   ) {
     if (const DeepCollectionEquality()
-        .equals(_deviceScanner.currentScan.withServices, withServices)) {
-      return _deviceScanner.currentScan.future
+        .equals(_deviceScanner.currentScan!.withServices, withServices)) {
+      return _deviceScanner.currentScan!.future
           .timeout(prescanDuration + const Duration(seconds: 1))
           .asStream()
           .asyncExpand(
@@ -195,10 +190,10 @@ class DeviceConnectorImpl implements DeviceConnector {
     }
   }
 
-  Stream<ConnectionStateUpdate> _connectIfRecentlyDiscovered(
+  Stream<ConnectionStateUpdate?> _connectIfRecentlyDiscovered(
     String id,
-    Map<Uuid, List<Uuid>> servicesWithCharacteristicsToDiscover,
-    Duration connectionTimeout,
+    Map<Uuid, List<Uuid>>? servicesWithCharacteristicsToDiscover,
+    Duration? connectionTimeout,
   ) {
     if (_deviceIsDiscoveredRecently(
       deviceId: id,

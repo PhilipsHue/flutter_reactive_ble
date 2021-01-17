@@ -3,21 +3,22 @@ import 'dart:async';
 import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
 import 'package:flutter_reactive_ble_example/src/ble/reactive_state.dart';
 
-class BleDeviceConnector extends ReactiveState<ConnectionStateUpdate> {
+class BleDeviceConnector extends ReactiveState<ConnectionStateUpdate?> {
   BleDeviceConnector(this._ble);
 
   final FlutterReactiveBle _ble;
 
   @override
-  Stream<ConnectionStateUpdate> get state => _deviceConnectionController.stream;
+  Stream<ConnectionStateUpdate?> get state => _deviceConnectionController.stream;
 
-  final _deviceConnectionController = StreamController<ConnectionStateUpdate>();
+  final _deviceConnectionController = StreamController<ConnectionStateUpdate?>();
 
-  StreamSubscription<ConnectionStateUpdate> _connection;
+  // ignore: cancel_subscriptions
+  StreamSubscription<ConnectionStateUpdate?>? _connection;
 
   Future<void> connect(String deviceId) async {
     if (_connection != null) {
-      await _connection.cancel();
+      await _connection!.cancel();
     }
     _connection = _ble.connectToDevice(id: deviceId).listen(
           _deviceConnectionController.add,
@@ -27,7 +28,7 @@ class BleDeviceConnector extends ReactiveState<ConnectionStateUpdate> {
   Future<void> disconnect(String deviceId) async {
     if (_connection != null) {
       try {
-        await _connection.cancel();
+        await _connection!.cancel();
       } on Exception catch (e, _) {
         print("Error disconnecting from a device: $e");
       } finally {

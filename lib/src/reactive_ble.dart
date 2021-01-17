@@ -31,11 +31,11 @@ class FlutterReactiveBle {
   ///Create a new instance where injected depedencies are used.
   @visibleForTesting
   FlutterReactiveBle.witDependencies({
-    @required BleOperationController bleOperationController,
-    @required DeviceScanner deviceScanner,
-    @required DeviceConnector deviceConnector,
-    @required ConnectedDeviceOperation connectedDeviceOperation,
-    @required Logger debugLogger,
+    required BleOperationController? bleOperationController,
+    required DeviceScanner? deviceScanner,
+    required DeviceConnector? deviceConnector,
+    required ConnectedDeviceOperation? connectedDeviceOperation,
+    required Logger debugLogger,
   }) {
     _bleOperationController = bleOperationController;
     _deviceScanner = deviceScanner;
@@ -70,7 +70,7 @@ class FlutterReactiveBle {
   Stream<ConnectionStateUpdate> get connectedDeviceStream =>
       Repeater(onListenEmitFrom: () async* {
         await initialize();
-        yield* _deviceConnector.deviceConnectionStateUpdateStream;
+        yield* _deviceConnector!.deviceConnectionStateUpdateStream;
       }).stream.asBroadcastStream()
         ..listen((_) {});
 
@@ -79,29 +79,29 @@ class FlutterReactiveBle {
   /// The updates include read responses as well as notifications.
   Stream<CharacteristicValue> get characteristicValueStream async* {
     await initialize();
-    yield* _connectedDeviceOperator.characteristicValueStream;
+    yield* _connectedDeviceOperator!.characteristicValueStream;
   }
 
-  BleOperationController _bleOperationController;
+  BleOperationController? _bleOperationController;
 
-  PluginController _pluginController;
+  PluginController? _pluginController;
 
   BleStatus _status = BleStatus.unknown;
 
   Stream<BleStatus> get _statusStream =>
-      _bleOperationController.bleStatusStream;
+      _bleOperationController!.bleStatusStream;
 
   Future<void> _trackStatus() async {
     await initialize();
     _statusStream.listen((status) => _status = status);
   }
 
-  Future<void> _initialization;
+  Future<void>? _initialization;
 
-  DeviceConnector _deviceConnector;
-  ConnectedDeviceOperation _connectedDeviceOperator;
-  DeviceScanner _deviceScanner;
-  Logger _debugLogger;
+  DeviceConnector? _deviceConnector;
+  ConnectedDeviceOperation? _connectedDeviceOperator;
+  DeviceScanner? _deviceScanner;
+  Logger? _debugLogger;
 
   /// Initializes this [FlutterReactiveBle] instance and its platform-specific
   /// counterparts.
@@ -114,16 +114,16 @@ class FlutterReactiveBle {
       print,
     );
 
-    _pluginController ??= const PluginControllerFactory().create(_debugLogger);
+    _pluginController ??= const PluginControllerFactory().create(_debugLogger!);
     _bleOperationController ??= _pluginController;
 
-    _initialization ??= _bleOperationController.initialize();
+    _initialization ??= _bleOperationController!.initialize();
 
     _connectedDeviceOperator ??= ConnectedDeviceOperationImpl(
-      controller: _pluginController,
+      controller: _pluginController!,
     );
     _deviceScanner ??= DeviceScannerImpl(
-      controller: _pluginController,
+      controller: _pluginController!,
       platformIsAndroid: () => Platform.isAndroid,
       delayAfterScanCompletion: Future<void>.delayed(
         const Duration(milliseconds: 300),
@@ -132,9 +132,9 @@ class FlutterReactiveBle {
     );
 
     _deviceConnector ??= DeviceConnectorImpl(
-      controller: _pluginController,
+      controller: _pluginController!,
       deviceIsDiscoveredRecently: scanRegistry.deviceIsDiscoveredRecently,
-      deviceScanner: _deviceScanner,
+      deviceScanner: _deviceScanner!,
       delayAfterScanFailure: const Duration(seconds: 10),
     );
 
@@ -148,7 +148,7 @@ class FlutterReactiveBle {
   Future<void> deinitialize() async {
     if (_initialization != null) {
       _initialization = null;
-      await _bleOperationController.deinitialize();
+      await _bleOperationController!.deinitialize();
     }
   }
 
@@ -162,7 +162,7 @@ class FlutterReactiveBle {
   Future<List<int>> readCharacteristic(
       QualifiedCharacteristic characteristic) async {
     await initialize();
-    return _connectedDeviceOperator.readCharacteristic(characteristic);
+    return _connectedDeviceOperator!.readCharacteristic(characteristic);
   }
 
   /// Writes a value to the specified characteristic awaiting for an acknowledgement.
@@ -170,10 +170,10 @@ class FlutterReactiveBle {
   /// The returned future completes with an error in case of a failure during writing.
   Future<void> writeCharacteristicWithResponse(
     QualifiedCharacteristic characteristic, {
-    @required List<int> value,
+    required List<int> value,
   }) async {
     await initialize();
-    return _connectedDeviceOperator.writeCharacteristicWithResponse(
+    return _connectedDeviceOperator!.writeCharacteristicWithResponse(
       characteristic,
       value: value,
     );
@@ -189,10 +189,10 @@ class FlutterReactiveBle {
   /// The returned future completes with an error in case of a failure during writing.
   Future<void> writeCharacteristicWithoutResponse(
     QualifiedCharacteristic characteristic, {
-    @required List<int> value,
+    required List<int> value,
   }) async {
     await initialize();
-    return _connectedDeviceOperator.writeCharacteristicWithoutResponse(
+    return _connectedDeviceOperator!.writeCharacteristicWithoutResponse(
       characteristic,
       value: value,
     );
@@ -206,20 +206,20 @@ class FlutterReactiveBle {
   ///
   /// * BLE 4.0–4.1 max ATT MTU is 23 bytes
   /// * BLE 4.2–5.1 max ATT MTU is 247 bytes
-  Future<int> requestMtu({@required String deviceId, int mtu}) async {
+  Future<int> requestMtu({required String deviceId, int? mtu}) async {
     await initialize();
-    return _connectedDeviceOperator.requestMtu(deviceId, mtu);
+    return _connectedDeviceOperator!.requestMtu(deviceId, mtu);
   }
 
   /// Requests for a connection parameter update on the connected device.
   ///
   /// Always completes with an error on iOS, as there is no way (and no need) to perform this operation on iOS.
   Future<void> requestConnectionPriority(
-      {@required String deviceId,
-      @required ConnectionPriority priority}) async {
+      {required String deviceId,
+      required ConnectionPriority priority}) async {
     await initialize();
 
-    return _connectedDeviceOperator.requestConnectionPriority(
+    return _connectedDeviceOperator!.requestConnectionPriority(
         deviceId, priority);
   }
 
@@ -233,13 +233,13 @@ class FlutterReactiveBle {
   ///   When set to true and location services are disabled, an exception is thrown. Default is true.
   ///   Setting the value to false can result in not finding BLE peripherals on some Android devices.
   Stream<DiscoveredDevice> scanForDevices({
-    @required List<Uuid> withServices,
+    required List<Uuid> withServices,
     ScanMode scanMode = ScanMode.balanced,
     bool requireLocationServicesEnabled = true,
   }) async* {
     await initialize();
 
-    yield* _deviceScanner.scanForDevices(
+    yield* _deviceScanner!.scanForDevices(
       withServices: withServices,
       scanMode: scanMode,
       requireLocationServicesEnabled: requireLocationServicesEnabled,
@@ -259,13 +259,13 @@ class FlutterReactiveBle {
   /// is not established. The pending connection attempt will be cancelled. On Android when no timeout is specified
   /// the `autoConnect` flag is set in the [connectGatt()](https://developer.android.com/reference/android/bluetooth/BluetoothDevice#connectGatt(android.content.Context,%20boolean,%20android.bluetooth.BluetoothGattCallback)) call, otherwise it's cleared.```
 
-  Stream<ConnectionStateUpdate> connectToDevice({
-    @required String id,
-    Map<Uuid, List<Uuid>> servicesWithCharacteristicsToDiscover,
-    Duration connectionTimeout,
+  Stream<ConnectionStateUpdate?> connectToDevice({
+    required String id,
+    Map<Uuid, List<Uuid>>? servicesWithCharacteristicsToDiscover,
+    Duration? connectionTimeout,
   }) =>
       initialize().asStream().asyncExpand(
-            (_) => _deviceConnector.connect(
+            (_) => _deviceConnector!.connect(
               id: id,
               servicesWithCharacteristicsToDiscover:
                   servicesWithCharacteristicsToDiscover,
@@ -284,15 +284,15 @@ class FlutterReactiveBle {
   /// this variable is ignored since partial discovery is not possible.
   /// The [connectionTimeout] parameter can be used to emit a failure after a certain period in case the connection
   /// is not established. The pending connection attempt will be cancelled.
-  Stream<ConnectionStateUpdate> connectToAdvertisingDevice({
-    @required String id,
-    @required List<Uuid> withServices,
-    @required Duration prescanDuration,
-    Map<Uuid, List<Uuid>> servicesWithCharacteristicsToDiscover,
-    Duration connectionTimeout,
+  Stream<ConnectionStateUpdate?> connectToAdvertisingDevice({
+    required String id,
+    required List<Uuid> withServices,
+    required Duration prescanDuration,
+    Map<Uuid, List<Uuid>>? servicesWithCharacteristicsToDiscover,
+    Duration? connectionTimeout,
   }) =>
       initialize().asStream().asyncExpand(
-            (_) => _deviceConnector.connectToAdvertisingDevice(
+            (_) => _deviceConnector!.connectToAdvertisingDevice(
               id: id,
               withServices: withServices,
               prescanDuration: prescanDuration,
@@ -306,21 +306,21 @@ class FlutterReactiveBle {
   ///
   /// When discovery fails this method throws an [Exception].
   Future<List<DiscoveredService>> discoverServices(String deviceId) =>
-      _connectedDeviceOperator.discoverServices(deviceId);
+      _connectedDeviceOperator!.discoverServices(deviceId);
 
   /// Clears GATT attribute cache on Android using undocumented API. Completes with an error in case of a failure.
   ///
   /// Always completes with an error on iOS, as there is no way (and no need) to perform this operation on iOS.
   ///
   /// The connection may need to be reestablished after successful GATT attribute cache clearing.
-  Future<void> clearGattCache(String deviceId) => _bleOperationController
+  Future<void> clearGattCache(String deviceId) => _bleOperationController!
       .clearGattCache(deviceId)
       .then((info) => info.dematerialize());
 
   /// Subscribes to updates from the characteristic specified.
   ///
   /// This stream terminates automatically when the device is disconnected.
-  Stream<List<int>> subscribeToCharacteristic(
+  Stream<List<int>?> subscribeToCharacteristic(
     QualifiedCharacteristic characteristic,
   ) {
     final isDisconnected = connectedDeviceStream
@@ -332,7 +332,7 @@ class FlutterReactiveBle {
         .firstWhere((_) => true, orElse: () {});
 
     return initialize().asStream().asyncExpand(
-          (_) => _connectedDeviceOperator.subscribeToCharacteristic(
+          (_) => _connectedDeviceOperator!.subscribeToCharacteristic(
             characteristic,
             isDisconnected,
           ),
@@ -343,5 +343,5 @@ class FlutterReactiveBle {
   ///
   /// Use [LogLevel.verbose] for full debug output. Make sure to  run this only for debugging purposes.
   /// Use [LogLevel.none] to disable logging. This is also the default.
-  set logLevel(LogLevel logLevel) => _debugLogger.logLevel = logLevel;
+  set logLevel(LogLevel logLevel) => _debugLogger!.logLevel = logLevel;
 }

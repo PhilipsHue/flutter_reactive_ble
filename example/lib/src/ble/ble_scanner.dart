@@ -4,7 +4,7 @@ import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
 import 'package:flutter_reactive_ble_example/src/ble/reactive_state.dart';
 import 'package:meta/meta.dart';
 
-class BleScanner implements ReactiveState<BleScannerState> {
+class BleScanner implements ReactiveState<BleScannerState?> {
   BleScanner(this._ble);
 
   final FlutterReactiveBle _ble;
@@ -14,7 +14,7 @@ class BleScanner implements ReactiveState<BleScannerState> {
   final _devices = <DiscoveredDevice>[];
 
   @override
-  Stream<BleScannerState> get state => _stateStreamController.stream;
+  Stream<BleScannerState?> get state => _stateStreamController.stream;
 
   void startScan(List<Uuid> serviceIds) {
     _devices.clear();
@@ -51,14 +51,14 @@ class BleScanner implements ReactiveState<BleScannerState> {
     await _stateStreamController.close();
   }
 
-  StreamSubscription _subscription;
+  StreamSubscription? _subscription;
 }
 
 @immutable
 class BleScannerState {
   const BleScannerState({
-    @required this.discoveredDevices,
-    @required this.scanIsInProgress,
+    required this.discoveredDevices,
+    required this.scanIsInProgress,
   });
 
   final List<DiscoveredDevice> discoveredDevices;

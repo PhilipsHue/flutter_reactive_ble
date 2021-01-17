@@ -18,11 +18,11 @@ abstract class $DiscoveredDevice {
   Uint8List get manufacturerData;
   int get rssi;
   DiscoveredDevice copyWith(
-          {String id,
-          String name,
-          Map<Uuid, Uint8List> serviceData,
-          Uint8List manufacturerData,
-          int rssi}) =>
+          {String? id,
+          String? name,
+          Map<Uuid, Uint8List>? serviceData,
+          Uint8List? manufacturerData,
+          int? rssi}) =>
       DiscoveredDevice(
           id: id ?? this.id,
           name: name ?? this.name,
@@ -33,7 +33,8 @@ abstract class $DiscoveredDevice {
   String toString() =>
       "DiscoveredDevice(id: $id, name: $name, serviceData: $serviceData, manufacturerData: $manufacturerData, rssi: $rssi)";
   @override
-  bool operator ==(dynamic other) =>
+  bool operator ==(Object other) =>
+      other is DiscoveredDevice &&
       other.runtimeType == runtimeType &&
       id == other.id &&
       name == other.name &&
