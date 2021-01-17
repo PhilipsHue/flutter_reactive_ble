@@ -1,3 +1,4 @@
+# Main releases
 ## 2.7.1
 
 * Fix #115 by updating to new protobuf lite on Android.
@@ -112,3 +113,9 @@ Other improvements:
 ## 1.0.0
 
 * Initial Open Source release.
+
+# Null safety
+
+## 1.0.0-nullsafety.0
+
+* Initial migration
