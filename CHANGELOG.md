@@ -1,3 +1,4 @@
+# Main releases
 ## 2.7.3
 
 * Upgrade Android dependencies to comply to newer Gradle distributions.
