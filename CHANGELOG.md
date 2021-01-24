@@ -1,3 +1,8 @@
+## 2.7.2
+
+* Fix #188 `subscribeToCharacteristic` fails when characteristic config descriptor is not present.
+* Fix #195 `scanFailure` when using backgroundmode messaging Firebase.
+
 # Main releases
 ## 2.7.1
 
