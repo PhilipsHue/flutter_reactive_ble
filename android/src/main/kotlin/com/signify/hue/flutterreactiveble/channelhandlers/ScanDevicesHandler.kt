@@ -15,7 +15,10 @@ class ScanDevicesHandler(private val bleClient: com.signify.hue.flutterreactiveb
     private var scanDevicesSink: EventChannel.EventSink? = null
     private lateinit var scanForDevicesDisposable: Disposable
     private val converter = ProtobufMessageConverter()
-    private var scanParameters: ScanParameters? = null
+
+    companion object {
+        private var scanParameters: ScanParameters? = null
+    }
 
     override fun onListen(objectSink: Any?, eventSink: EventChannel.EventSink?) {
         eventSink?.let {
@@ -51,7 +54,7 @@ class ScanDevicesHandler(private val bleClient: com.signify.hue.flutterreactiveb
                 it.dispose()
                 scanParameters = null
             }
-       }
+        }
     }
 
     fun prepareScan(scanMessage: pb.ScanForDevicesRequest) {
