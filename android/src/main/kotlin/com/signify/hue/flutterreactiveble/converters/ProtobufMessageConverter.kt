@@ -214,10 +214,8 @@ class ProtobufMessageConverter {
     }
 
     private fun createUuidFromParcelUuid(uuid: UUID): pb.Uuid {
-
         val convertedUuid = uuidConverter.byteArrayFromUuid(uuid)
-        val byteArray = byteArrayOf(convertedUuid[positionMostSignificantBit],
-                convertedUuid[positionLeastSignificantBit])
-        return pb.Uuid.newBuilder().setData(ByteString.copyFrom(byteArray)).build()
+
+        return pb.Uuid.newBuilder().setData(ByteString.copyFrom(convertedUuid)).build()
     }
 }
