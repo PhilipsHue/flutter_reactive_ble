@@ -1,5 +1,7 @@
 package com.signify.hue.flutterreactiveble.ble
 
+import android.bluetooth.BluetoothDevice
+import android.bluetooth.BluetoothDevice.BOND_BONDED
 import android.content.Context
 import com.google.common.truth.Truth.assertThat
 import com.polidea.rxandroidble2.RxBleClient
@@ -54,6 +56,9 @@ class ReactiveBleClientTest {
 
     @MockK
     private lateinit var bleDevice: RxBleDevice
+
+    @MockK
+    private lateinit var bluetoothDevice: BluetoothDevice
 
     @MockK
     lateinit var rxConnection: RxBleConnection
@@ -315,6 +320,12 @@ class ReactiveBleClientTest {
     @Nested
     @DisplayName("Discover services")
     inner class DiscoverServicesTest {
+
+        @BeforeEach
+        fun setup() {
+            every { bleDevice.bluetoothDevice }.returns(bluetoothDevice)
+            every {bluetoothDevice.bondState}.returns(BOND_BONDED)
+        }
 
         @Test
         fun `It returns success in case services can be discovered`() {
