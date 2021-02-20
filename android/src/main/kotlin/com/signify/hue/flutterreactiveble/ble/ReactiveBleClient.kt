@@ -1,5 +1,6 @@
 package com.signify.hue.flutterreactiveble.ble
 
+import android.bluetooth.BluetoothDevice.BOND_BONDING
 import android.bluetooth.BluetoothGattCharacteristic
 import android.content.Context
 import android.os.Build
@@ -114,7 +115,11 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
         return getConnection(deviceId).flatMapSingle { connectionResult ->
             when (connectionResult) {
                 is EstablishedConnection ->
-                    connectionResult.rxConnection.discoverServices()
+                    if (rxBleClient.getBleDevice(connectionResult.deviceId).bluetoothDevice.bondState == BOND_BONDING) {
+                        Single.error(Exception("Bonding is in progress wait for bonding to be finished before executing more operations on the device"))
+                    } else {
+                        connectionResult.rxConnection.discoverServices()
+                    }
                 is EstablishConnectionFailure -> Single.error(Exception(connectionResult.errorMessage))
             }
         }.firstOrError()
@@ -225,24 +230,29 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
 
             when (deviceConnection) {
                 is EstablishedConnection -> {
-                    deviceConnection.rxConnection.discoverServices()
-                            .flatMap { deviceServices -> deviceServices.getCharacteristic(characteristic) }
-                            .flatMapObservable { char ->
-                                val mode = if (char.descriptors.isEmpty()) {
-                                    NotificationSetupMode.COMPAT
-                                } else {
-                                    NotificationSetupMode.DEFAULT
-                                }
 
-                                if ((char.properties and BluetoothGattCharacteristic.PROPERTY_NOTIFY) > 0) {
-                                    deviceConnection.rxConnection.setupNotification(characteristic, mode)
-                                } else {
-                                    deviceConnection.rxConnection.setupIndication(characteristic, mode)
+                    if (rxBleClient.getBleDevice(deviceConnection.deviceId).bluetoothDevice.bondState == BOND_BONDING) {
+                        Observable.error(Exception("Bonding is in progress wait for bonding to be finished before executing more operations on the device"))
+                    } else {
+                        deviceConnection.rxConnection.discoverServices()
+                                .flatMap { deviceServices -> deviceServices.getCharacteristic(characteristic) }
+                                .flatMapObservable { char ->
+                                    val mode = if (char.descriptors.isEmpty()) {
+                                        NotificationSetupMode.COMPAT
+                                    } else {
+                                        NotificationSetupMode.DEFAULT
+                                    }
+
+                                    if ((char.properties and BluetoothGattCharacteristic.PROPERTY_NOTIFY) > 0) {
+                                        deviceConnection.rxConnection.setupNotification(characteristic, mode)
+                                    } else {
+                                        deviceConnection.rxConnection.setupIndication(characteristic, mode)
+                                    }
                                 }
-                            }
+                    }
                 }
                 is EstablishConnectionFailure -> {
-                    Observable.just(Observable.empty<ByteArray>())
+                    Observable.just(Observable.empty())
                 }
             }
 
