@@ -4,7 +4,7 @@ import 'package:flutter_reactive_ble_example/src/ble/ble_scanner.dart';
 import 'package:provider/provider.dart';
 
 import '../widgets.dart';
-import 'device_detail_screen.dart';
+import 'device_detail/device_detail_screen.dart';
 
 class DeviceListScreen extends StatelessWidget {
   @override
