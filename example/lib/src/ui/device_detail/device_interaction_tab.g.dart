@@ -15,30 +15,35 @@ abstract class $DeviceInteractionViewModel {
   String get deviceId;
   DeviceConnectionState get connectionStatus;
   BleDeviceConnector get deviceConnector;
+  Future<List<DiscoveredService>> Function() get discoverServices;
   DeviceInteractionViewModel copyWith(
           {String? deviceId,
           DeviceConnectionState? connectionStatus,
-          BleDeviceConnector? deviceConnector}) =>
+          BleDeviceConnector? deviceConnector,
+          Future<List<DiscoveredService>> Function()? discoverServices}) =>
       DeviceInteractionViewModel(
           deviceId: deviceId ?? this.deviceId,
           connectionStatus: connectionStatus ?? this.connectionStatus,
-          deviceConnector: deviceConnector ?? this.deviceConnector);
+          deviceConnector: deviceConnector ?? this.deviceConnector,
+          discoverServices: discoverServices ?? this.discoverServices);
   @override
   String toString() =>
-      "DeviceInteractionViewModel(deviceId: $deviceId, connectionStatus: $connectionStatus, deviceConnector: $deviceConnector)";
+      "DeviceInteractionViewModel(deviceId: $deviceId, connectionStatus: $connectionStatus, deviceConnector: $deviceConnector, discoverServices: $discoverServices)";
   @override
   bool operator ==(Object other) =>
       other is DeviceInteractionViewModel &&
       other.runtimeType == runtimeType &&
       deviceId == other.deviceId &&
       connectionStatus == other.connectionStatus &&
-      deviceConnector == other.deviceConnector;
+      deviceConnector == other.deviceConnector &&
+      const Ignore().equals(discoverServices, other.discoverServices);
   @override
   int get hashCode {
     var result = 17;
     result = 37 * result + deviceId.hashCode;
     result = 37 * result + connectionStatus.hashCode;
     result = 37 * result + deviceConnector.hashCode;
+    result = 37 * result + const Ignore().hash(discoverServices);
     return result;
   }
 }
@@ -56,4 +61,9 @@ class DeviceInteractionViewModel$ {
           (s_) => s_.deviceConnector,
           (s_, deviceConnector) =>
               s_.copyWith(deviceConnector: deviceConnector));
+  static final discoverServices = Lens<DeviceInteractionViewModel,
+          Future<List<DiscoveredService>> Function()>(
+      (s_) => s_.discoverServices,
+      (s_, discoverServices) =>
+          s_.copyWith(discoverServices: discoverServices));
 }

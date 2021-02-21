@@ -9,9 +9,11 @@ class BleDeviceConnector extends ReactiveState<ConnectionStateUpdate?> {
   final FlutterReactiveBle _ble;
 
   @override
-  Stream<ConnectionStateUpdate?> get state => _deviceConnectionController.stream;
+  Stream<ConnectionStateUpdate?> get state =>
+      _deviceConnectionController.stream;
 
-  final _deviceConnectionController = StreamController<ConnectionStateUpdate?>();
+  final _deviceConnectionController =
+      StreamController<ConnectionStateUpdate?>();
 
   // ignore: cancel_subscriptions
   StreamSubscription<ConnectionStateUpdate?>? _connection;
@@ -42,12 +44,6 @@ class BleDeviceConnector extends ReactiveState<ConnectionStateUpdate?> {
         );
       }
     }
-  }
-
-  Future<void> discoverServices(String deviceId) async {
-    await _ble.discoverServices(deviceId).then(
-          (value) => print('Services discovered: $value'),
-        );
   }
 
   Future<void> dispose() async {

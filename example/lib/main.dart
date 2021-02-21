@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
 import 'package:flutter_reactive_ble_example/src/ble/ble_device_connector.dart';
+import 'package:flutter_reactive_ble_example/src/ble/ble_device_interactor.dart';
 import 'package:flutter_reactive_ble_example/src/ble/ble_scanner.dart';
 import 'package:flutter_reactive_ble_example/src/ble/ble_status_monitor.dart';
 import 'package:flutter_reactive_ble_example/src/ui/ble_status_screen.dart';
@@ -16,12 +17,14 @@ void main() {
   final _scanner = BleScanner(_ble);
   final _monitor = BleStatusMonitor(_ble);
   final _connector = BleDeviceConnector(_ble);
+  final _serviceDiscoverer = BleServiceDiscoverer(_ble.discoverServices);
   runApp(
     MultiProvider(
       providers: [
         Provider.value(value: _scanner),
         Provider.value(value: _monitor),
         Provider.value(value: _connector),
+        Provider.value(value: _serviceDiscoverer),
         StreamProvider<BleScannerState?>(
           create: (_) => _scanner.state,
           initialData: const BleScannerState(
