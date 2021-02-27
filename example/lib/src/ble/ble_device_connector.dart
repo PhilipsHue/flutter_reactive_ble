@@ -4,9 +4,10 @@ import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
 import 'package:flutter_reactive_ble_example/src/ble/reactive_state.dart';
 
 class BleDeviceConnector extends ReactiveState<ConnectionStateUpdate?> {
-  BleDeviceConnector(this._ble);
+  BleDeviceConnector(this._ble, this._logMessage);
 
   final FlutterReactiveBle _ble;
+  final void Function(String message) _logMessage;
 
   @override
   Stream<ConnectionStateUpdate?> get state =>
@@ -19,20 +20,28 @@ class BleDeviceConnector extends ReactiveState<ConnectionStateUpdate?> {
   StreamSubscription<ConnectionStateUpdate?>? _connection;
 
   Future<void> connect(String deviceId) async {
+    _logMessage('Start connecting to $deviceId');
     if (_connection != null) {
       await _connection!.cancel();
     }
     _connection = _ble.connectToDevice(id: deviceId).listen(
-          _deviceConnectionController.add,
-        );
+      (update) {
+        _logMessage(
+            'ConnectionState for device $deviceId : ${update?.connectionState}');
+        _deviceConnectionController.add(update);
+      },
+      onError: (e) =>
+          _logMessage('Connecting to device $deviceId resulted in error $e'),
+    );
   }
 
   Future<void> disconnect(String deviceId) async {
     if (_connection != null) {
       try {
+        _logMessage('disconnecting to device: $deviceId');
         await _connection!.cancel();
       } on Exception catch (e, _) {
-        print("Error disconnecting from a device: $e");
+        _logMessage("Error disconnecting from a device: $e");
       } finally {
         // Since [_connection] subscription is terminated, the "disconnected" state cannot be received and propagated
         _deviceConnectionController.add(
