@@ -3,11 +3,12 @@ import 'dart:async';
 import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
 
 class BleServiceDiscoverer {
-  BleServiceDiscoverer(
-    Future<List<DiscoveredService>> Function(String deviceId)
+  BleServiceDiscoverer({
+    required Future<List<DiscoveredService>> Function(String deviceId)
         bleDiscoverServices,
-    this._logMessage,
-  ) : _bleDiscoverServices = bleDiscoverServices;
+    required void Function(String message) logMessage,
+  })   : _bleDiscoverServices = bleDiscoverServices,
+        _logMessage = logMessage;
 
   final Future<List<DiscoveredService>> Function(String deviceId)
       _bleDiscoverServices;

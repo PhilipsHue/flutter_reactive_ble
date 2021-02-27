@@ -215,12 +215,11 @@ class FlutterReactiveBle {
   ///
   /// Always completes with an error on iOS, as there is no way (and no need) to perform this operation on iOS.
   Future<void> requestConnectionPriority(
-      {required String deviceId,
-      required ConnectionPriority priority}) async {
+      {required String deviceId, required ConnectionPriority priority}) async {
     await initialize();
 
-    return _connectedDeviceOperator!.requestConnectionPriority(
-        deviceId, priority);
+    return _connectedDeviceOperator!
+        .requestConnectionPriority(deviceId, priority);
   }
 
   /// Scan for BLE peripherals advertising the services specified in [withServices]
