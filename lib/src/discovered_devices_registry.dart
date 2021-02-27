@@ -40,7 +40,10 @@ class DiscoveredDevicesRegistryImpl implements DiscoveredDevicesRegistry {
   bool isEmpty() => discoveredDevices.isEmpty;
 
   @override
-  bool deviceIsDiscoveredRecently({String? deviceId, Duration? cacheValidity}) =>
+  bool deviceIsDiscoveredRecently({
+    String? deviceId,
+    Duration? cacheValidity,
+  }) =>
       discoveredDevices.containsKey(deviceId) &&
       discoveredDevices[deviceId!]!
           .isAfter(getTimestamp().subtract(cacheValidity!));

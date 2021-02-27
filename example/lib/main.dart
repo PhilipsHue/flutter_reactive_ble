@@ -1,27 +1,40 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
 import 'package:flutter_reactive_ble_example/src/ble/ble_device_connector.dart';
+import 'package:flutter_reactive_ble_example/src/ble/ble_device_interactor.dart';
 import 'package:flutter_reactive_ble_example/src/ble/ble_scanner.dart';
 import 'package:flutter_reactive_ble_example/src/ble/ble_status_monitor.dart';
 import 'package:flutter_reactive_ble_example/src/ui/ble_status_screen.dart';
 import 'package:flutter_reactive_ble_example/src/ui/device_list.dart';
 import 'package:provider/provider.dart';
 
+import 'src/ble/ble_logger.dart';
+
 const _themeColor = Colors.lightGreen;
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
 
+  final _bleLogger = BleLogger();
   final _ble = FlutterReactiveBle();
-  final _scanner = BleScanner(_ble);
+  final _scanner = BleScanner(ble: _ble, logMessage: _bleLogger.addToLog);
   final _monitor = BleStatusMonitor(_ble);
-  final _connector = BleDeviceConnector(_ble);
+  final _connector = BleDeviceConnector(
+    ble: _ble,
+    logMessage: _bleLogger.addToLog,
+  );
+  final _serviceDiscoverer = BleServiceDiscoverer(
+    bleDiscoverServices: _ble.discoverServices,
+    logMessage: _bleLogger.addToLog,
+  );
   runApp(
     MultiProvider(
       providers: [
         Provider.value(value: _scanner),
         Provider.value(value: _monitor),
         Provider.value(value: _connector),
+        Provider.value(value: _serviceDiscoverer),
+        Provider.value(value: _bleLogger),
         StreamProvider<BleScannerState?>(
           create: (_) => _scanner.state,
           initialData: const BleScannerState(
