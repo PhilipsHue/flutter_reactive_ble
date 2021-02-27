@@ -5,7 +5,11 @@ import 'package:flutter_reactive_ble_example/src/ble/reactive_state.dart';
 import 'package:meta/meta.dart';
 
 class BleScanner implements ReactiveState<BleScannerState?> {
-  BleScanner(this._ble, this._logMessage);
+  BleScanner({
+    required FlutterReactiveBle ble,
+    required Function(String message) logMessage,
+  })   : _ble = ble,
+        _logMessage = logMessage;
 
   final FlutterReactiveBle _ble;
   final void Function(String message) _logMessage;
