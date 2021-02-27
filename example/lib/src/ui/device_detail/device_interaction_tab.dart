@@ -95,15 +95,19 @@ class __DeviceInteractionTabState extends State<_DeviceInteractionTab> {
           delegate: SliverChildListDelegate.fixed(
             [
               Padding(
-                padding: const EdgeInsets.only(top: 8.0, bottom: 16.0),
+                padding: const EdgeInsetsDirectional.only(
+                    top: 8.0, bottom: 16.0, start: 16.0),
                 child: Text(
                   "ID: ${widget.viewModel.deviceId}",
                   style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
-              Text(
-                "Status: ${widget.viewModel.connectionStatus}",
-                style: const TextStyle(fontWeight: FontWeight.bold),
+              Padding(
+                padding: EdgeInsetsDirectional.only(start: 16.0),
+                child: Text(
+                  "Status: ${widget.viewModel.connectionStatus}",
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
               ),
               Padding(
                 padding: const EdgeInsets.only(top: 16.0),
@@ -131,9 +135,10 @@ class __DeviceInteractionTabState extends State<_DeviceInteractionTab> {
                   ],
                 ),
               ),
-              _ServiceDiscoveryList(
-                discoveredServices: discoveredServices,
-              ),
+              if (widget.viewModel.deviceConnected)
+                _ServiceDiscoveryList(
+                  discoveredServices: discoveredServices,
+                ),
             ],
           ),
         ),
@@ -163,18 +168,53 @@ class _ServiceDiscoveryListState extends State<_ServiceDiscoveryList> {
     super.initState();
   }
 
+  Widget _characteristicTile(String characteristicId) {
+    return ListTile(
+      title: Text(
+        '$characteristicId',
+        style: TextStyle(fontSize: 14),
+      ),
+    );
+  }
+
   List<ExpansionPanel> buildPanels() {
     final panels = <ExpansionPanel>[];
 
-    widget.discoveredServices.asMap().forEach((index, service) => panels.add(
-          ExpansionPanel(
-            body: ListTile(title: Text('${service.characteristicIds.first}')),
-            headerBuilder: (context, isExpanded) => ListTile(
-              title: Text('${service.serviceId}'),
+    widget.discoveredServices.asMap().forEach(
+          (index, service) => panels.add(
+            ExpansionPanel(
+              body: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Padding(
+                    padding: const EdgeInsetsDirectional.only(start: 16.0),
+                    child: Text(
+                      'Characteristics',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  ListView.builder(
+                    shrinkWrap: true,
+                    itemBuilder: (context, index) => _characteristicTile(
+                      service.characteristicIds[index].toString(),
+                    ),
+                    itemCount: service.characteristicIds.length,
+                  ),
+                ],
+              ),
+              headerBuilder: (context, isExpanded) => ListTile(
+                title: Text(
+                  '${service.serviceId}',
+                  style: TextStyle(fontSize: 14),
+                ),
+              ),
+              isExpanded: _expandedItems.contains(index),
             ),
-            isExpanded: _expandedItems.contains(index),
           ),
-        ));
+        );
 
     return panels;
   }
