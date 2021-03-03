@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/services.dart';
 import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
 import 'package:flutter_reactive_ble/src/converter/args_to_protubuf_converter.dart';
@@ -12,6 +14,7 @@ import 'model/connection_state_update.dart';
 import 'model/discovered_service.dart';
 import 'model/qualified_characteristic.dart';
 import 'model/unit.dart';
+import 'linux_plugin_controller.dart';
 
 abstract class DeviceOperationController {
   Stream<CharacteristicValue> get charValueUpdateStream;
@@ -77,13 +80,16 @@ abstract class BleOperationController {
       String deviceId);
 }
 
-class PluginController
+abstract class PluginController
     implements
         DeviceOperationController,
         ScanOperationController,
         DeviceConnectionController,
         BleOperationController {
-  PluginController({
+}
+
+class NativePluginController extends PluginController {
+  NativePluginController({
     required ArgsToProtobufConverter argsToProtobufConverter,
     required ProtobufConverter protobufConverter,
     required MethodChannel bleMethodChannel,
@@ -365,6 +371,10 @@ class PluginControllerFactory {
   const PluginControllerFactory();
 
   PluginController create(Logger logger) {
+    if (Platform.isLinux) {
+      return LinuxPluginController();
+    }
+
     const _bleMethodChannel = MethodChannel("flutter_reactive_ble_method");
 
     const connectedDeviceChannel =
@@ -373,7 +383,7 @@ class PluginControllerFactory {
     const scanEventChannel = EventChannel("flutter_reactive_ble_scan");
     const bleStatusChannel = EventChannel("flutter_reactive_ble_status");
 
-    return PluginController(
+    return NativePluginController(
       protobufConverter: const ProtobufConverterImpl(),
       argsToProtobufConverter: const ArgsToProtobufConverterImpl(),
       bleMethodChannel: _bleMethodChannel,
