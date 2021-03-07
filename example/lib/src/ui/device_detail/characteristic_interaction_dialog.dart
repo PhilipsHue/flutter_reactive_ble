@@ -69,17 +69,24 @@ class _CharacteristicInteractionDialogState
     });
   }
 
+  List<int> _parseInput() {
+    return textEditingController.text
+        .split(',')
+        .map(
+          (value) => int.parse(value),
+        )
+        .toList();
+  }
+
   Future<void> writeCharacteristicWithResponse() async {
-    final value = int.parse(textEditingController.text);
-    await widget.writeWithResponse(widget.characteristic, [value]);
+    await widget.writeWithResponse(widget.characteristic, _parseInput());
     setState(() {
-      writeOutput = 'Acknowledged';
+      writeOutput = 'Ok';
     });
   }
 
   Future<void> writeCharacteristicWithoutResponse() async {
-    final value = int.parse(textEditingController.text);
-    await widget.writeWithoutResponse(widget.characteristic, [value]);
+    await widget.writeWithoutResponse(widget.characteristic, _parseInput());
     setState(() {
       writeOutput = 'Done';
     });
@@ -122,7 +129,6 @@ class _CharacteristicInteractionDialogState
                 border: OutlineInputBorder(),
                 labelText: 'Value',
               ),
-              keyboardType: TextInputType.numberWithOptions(decimal: false),
             ),
             Row(
               children: [
