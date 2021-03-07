@@ -28,6 +28,7 @@ void main() {
     readCharacteristic: _ble.readCharacteristic,
     writeWithResponse: _ble.writeCharacteristicWithResponse,
     writeWithOutResponse: _ble.writeCharacteristicWithoutResponse,
+    subscribeToCharacteristic: _ble.subscribeToCharacteristic,
     logMessage: _bleLogger.addToLog,
   );
   runApp(

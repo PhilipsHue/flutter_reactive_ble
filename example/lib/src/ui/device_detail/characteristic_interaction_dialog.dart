@@ -18,6 +18,7 @@ class CharacteristicInteractionDialog extends StatelessWidget {
         readCharacteristic: interactor.readCharacteristic,
         writeWithResponse: interactor.writeCharacterisiticWithResponse,
         writeWithoutResponse: interactor.writeCharacterisiticWithoutResponse,
+        subscribeToCharacteristic: interactor.subScribeToCharacteristic,
       );
     });
   }
@@ -29,6 +30,7 @@ class _CharacteristicInteractionDialog extends StatefulWidget {
     required this.readCharacteristic,
     required this.writeWithResponse,
     required this.writeWithoutResponse,
+    required this.subscribeToCharacteristic,
     Key? key,
   }) : super(key: key);
 
@@ -38,6 +40,9 @@ class _CharacteristicInteractionDialog extends StatefulWidget {
   final Future<void> Function(
           QualifiedCharacteristic characteristic, List<int> value)
       writeWithResponse;
+
+  final Stream<List<int>?> Function(QualifiedCharacteristic characteristic)
+      subscribeToCharacteristic;
 
   final Future<void> Function(
           QualifiedCharacteristic characteristic, List<int> value)
@@ -52,14 +57,24 @@ class _CharacteristicInteractionDialogState
     extends State<_CharacteristicInteractionDialog> {
   late String readOutput;
   late String writeOutput;
+  late String subscribeOutput;
   late TextEditingController textEditingController;
+  Stream<List<int>?>? subScribeStream;
 
   @override
   void initState() {
     readOutput = '';
     writeOutput = '';
+    subscribeOutput = '';
     textEditingController = TextEditingController();
     super.initState();
+  }
+
+  Future<void> subscribeCharacteristic() async {
+    subScribeStream = widget.subscribeToCharacteristic(widget.characteristic);
+    setState(() {
+      subscribeOutput = 'Done';
+    });
   }
 
   Future<void> readCharacteristic() async {
@@ -145,6 +160,28 @@ class _CharacteristicInteractionDialogState
             ElevatedButton(
               onPressed: writeCharacteristicWithoutResponse,
               child: Text('Write without response'),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 14.0),
+              child: Text(
+                'Characteristic: ${widget.characteristic.characteristicId}',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: subscribeCharacteristic,
+              child: Text('Subscribe/notify'),
+            ),
+            StreamBuilder<List<int>?>(
+                stream: subScribeStream,
+                builder: (context, value) {
+                  return Padding(
+                    padding: const EdgeInsetsDirectional.only(start: 14.0),
+                    child: Text('Output: $value'),
+                  );
+                }),
+            Divider(
+              thickness: 2.0,
             ),
             Align(
               alignment: Alignment.bottomRight,
