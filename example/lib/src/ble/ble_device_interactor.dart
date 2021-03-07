@@ -15,10 +15,13 @@ class BleDeviceInteractor {
             {required List<int> value})
         writeWithOutResponse,
     required void Function(String message) logMessage,
+    required Stream<List<int>?> Function(QualifiedCharacteristic characteristic)
+        subscribeToCharacteristic,
   })   : _bleDiscoverServices = bleDiscoverServices,
         _readCharacteristic = readCharacteristic,
         _writeWithResponse = writeWithResponse,
         _writeWithoutResponse = writeWithOutResponse,
+        _subScribeToCharacteristic = subscribeToCharacteristic,
         _logMessage = logMessage;
 
   final Future<List<DiscoveredService>> Function(String deviceId)
@@ -32,6 +35,9 @@ class BleDeviceInteractor {
 
   final Future<void> Function(QualifiedCharacteristic characteristic,
       {required List<int> value}) _writeWithoutResponse;
+
+  final Stream<List<int>?> Function(QualifiedCharacteristic characteristic)
+      _subScribeToCharacteristic;
 
   final void Function(String message) _logMessage;
 
@@ -54,10 +60,11 @@ class BleDeviceInteractor {
 
       _logMessage('Read ${characteristic.characteristicId}: value = $result');
       return result;
-    } on Error catch (e) {
+    } on Error catch (e, s) {
       _logMessage(
         'Error occured when reading ${characteristic.characteristicId} : $e',
       );
+      print(s);
       throw e;
     }
   }
@@ -83,11 +90,18 @@ class BleDeviceInteractor {
       await _writeWithoutResponse(characteristic, value: value);
       _logMessage(
           'Write without response value: $value to ${characteristic.characteristicId}');
-    } on Error catch (e) {
+    } on Error catch (e, s) {
       _logMessage(
         'Error occured when writing ${characteristic.characteristicId} : $e',
       );
+      print(s);
       throw e;
     }
+  }
+
+  Stream<List<int>?> subScribeToCharacteristic(
+      QualifiedCharacteristic characteristic) {
+    _logMessage('Subscribing to: ${characteristic.characteristicId} ');
+    return _subScribeToCharacteristic(characteristic);
   }
 }
