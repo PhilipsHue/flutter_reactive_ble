@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
 import 'package:flutter_reactive_ble_example/src/ble/ble_device_interactor.dart';
@@ -59,7 +61,7 @@ class _CharacteristicInteractionDialogState
   late String writeOutput;
   late String subscribeOutput;
   late TextEditingController textEditingController;
-  Stream<List<int>?>? subScribeStream;
+  late StreamSubscription<List<int>?> subscribeStream;
 
   @override
   void initState() {
@@ -70,10 +72,21 @@ class _CharacteristicInteractionDialogState
     super.initState();
   }
 
+  @override
+  void dispose() {
+    subscribeStream.cancel();
+    super.dispose();
+  }
+
   Future<void> subscribeCharacteristic() async {
-    subScribeStream = widget.subscribeToCharacteristic(widget.characteristic);
     setState(() {
-      subscribeOutput = 'Done';
+      subscribeOutput = 'Notification set';
+    });
+    subscribeStream =
+        widget.subscribeToCharacteristic(widget.characteristic).listen((event) {
+      setState(() {
+        subscribeOutput = event.toString();
+      });
     });
   }
 
@@ -107,82 +120,100 @@ class _CharacteristicInteractionDialogState
     });
   }
 
+  Widget sectionHeader(String text) => Text(
+        text,
+        style: TextStyle(fontWeight: FontWeight.bold),
+      );
+
+  List<Widget> get writeSection => [
+        sectionHeader('Write characteristic'),
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8.0),
+          child: TextField(
+            controller: textEditingController,
+            decoration: InputDecoration(
+              border: OutlineInputBorder(),
+              labelText: 'Value',
+            ),
+          ),
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            ElevatedButton(
+              onPressed: writeCharacteristicWithResponse,
+              child: Text('With response'),
+            ),
+            ElevatedButton(
+              onPressed: writeCharacteristicWithoutResponse,
+              child: Text('Without response'),
+            ),
+          ],
+        ),
+        Padding(
+          padding: const EdgeInsetsDirectional.only(top: 8.0),
+          child: Text('Output: $writeOutput'),
+        ),
+      ];
+
+  List<Widget> get readSection => [
+        sectionHeader('Read characteristic'),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            ElevatedButton(
+              onPressed: readCharacteristic,
+              child: Text('Read'),
+            ),
+            Text('Output: $readOutput'),
+          ],
+        ),
+      ];
+
+  List<Widget> get subscribeSection => [
+        sectionHeader('Subscribe / notify'),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            ElevatedButton(
+              onPressed: subscribeCharacteristic,
+              child: Text('Subscribe'),
+            ),
+            Text('Output: $subscribeOutput'),
+          ],
+        ),
+      ];
+
+  Widget get divider => Padding(
+        padding: const EdgeInsets.symmetric(vertical: 12.0),
+        child: Divider(thickness: 2.0),
+      );
+
   @override
   Widget build(BuildContext context) {
     return Dialog(
       child: Padding(
         padding: const EdgeInsets.all(20.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
+        child: ListView(
+          shrinkWrap: true,
           children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 14.0),
-              child: Text(
-                'Characteristic: ${widget.characteristic.characteristicId}',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ),
-            Row(
-              children: [
-                ElevatedButton(
-                  onPressed: readCharacteristic,
-                  child: Text('Read'),
-                ),
-                Padding(
-                  padding: const EdgeInsetsDirectional.only(start: 14.0),
-                  child: Text('Output: $readOutput'),
-                ),
-              ],
-            ),
-            Divider(
-              thickness: 2.0,
-            ),
-            TextField(
-              controller: textEditingController,
-              decoration: InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: 'Value',
-              ),
-            ),
-            Row(
-              children: [
-                ElevatedButton(
-                  onPressed: writeCharacteristicWithResponse,
-                  child: Text('Write with response'),
-                ),
-                Padding(
-                  padding: const EdgeInsetsDirectional.only(start: 14.0),
-                  child: Text('Output: $writeOutput'),
-                ),
-              ],
-            ),
-            ElevatedButton(
-              onPressed: writeCharacteristicWithoutResponse,
-              child: Text('Write without response'),
+            Text(
+              'Select an operation',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(vertical: 14.0),
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
               child: Text(
-                'Characteristic: ${widget.characteristic.characteristicId}',
-                style: TextStyle(fontWeight: FontWeight.bold),
+                widget.characteristic.characteristicId.toString(),
               ),
             ),
-            ElevatedButton(
-              onPressed: subscribeCharacteristic,
-              child: Text('Subscribe/notify'),
-            ),
-            StreamBuilder<List<int>?>(
-                stream: subScribeStream,
-                builder: (context, value) {
-                  return Padding(
-                    padding: const EdgeInsetsDirectional.only(start: 14.0),
-                    child: Text('Output: $value'),
-                  );
-                }),
-            Divider(
-              thickness: 2.0,
-            ),
+            divider,
+            ...readSection,
+            divider,
+            ...writeSection,
+            divider,
+            ...subscribeSection,
+            divider,
             Align(
               alignment: Alignment.bottomRight,
               child: Padding(
