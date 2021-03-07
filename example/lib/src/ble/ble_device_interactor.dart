@@ -68,10 +68,11 @@ class BleDeviceInteractor {
       _logMessage(
           'Write with response value : $value to ${characteristic.characteristicId}');
       await _writeWithResponse(characteristic, value: value);
-    } on Error catch (e) {
+    } on Error catch (e, s) {
       _logMessage(
         'Error occured when writing ${characteristic.characteristicId} : $e',
       );
+      print(s);
       throw e;
     }
   }

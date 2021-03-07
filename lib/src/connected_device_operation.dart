@@ -45,7 +45,7 @@ class ConnectedDeviceOperationImpl implements ConnectedDeviceOperation {
   Future<List<int>> readCharacteristic(QualifiedCharacteristic characteristic) {
     final specificCharacteristicValueStream = characteristicValueStream
         .where((update) => update.characteristic == characteristic)
-        .map((update) => update.result.dematerialize());
+        .map((update) => update.result.dematerialize()!);
 
     return _controller
         .readCharacteristic(characteristic)
