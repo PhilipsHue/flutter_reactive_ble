@@ -5,6 +5,8 @@ import 'package:flutter_reactive_ble_example/src/ble/ble_device_interactor.dart'
 import 'package:functional_data/functional_data.dart';
 import 'package:provider/provider.dart';
 
+import 'characteristic_interaction_dialog.dart';
+
 part 'device_interaction_tab.g.dart';
 
 class DeviceInteractionTab extends StatelessWidget {
@@ -17,7 +19,7 @@ class DeviceInteractionTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Consumer3<BleDeviceConnector,
-          ConnectionStateUpdate?, BleServiceDiscoverer>(
+          ConnectionStateUpdate?, BleDeviceInteractor>(
         builder: (_, deviceConnector, connectionStateUpdate, serviceDiscoverer,
                 __) =>
             _DeviceInteractionTab(
@@ -137,6 +139,7 @@ class __DeviceInteractionTabState extends State<_DeviceInteractionTab> {
               ),
               if (widget.viewModel.deviceConnected)
                 _ServiceDiscoveryList(
+                  deviceId: widget.viewModel.deviceId,
                   discoveredServices: discoveredServices,
                 ),
             ],
@@ -149,10 +152,12 @@ class __DeviceInteractionTabState extends State<_DeviceInteractionTab> {
 
 class _ServiceDiscoveryList extends StatefulWidget {
   const _ServiceDiscoveryList({
+    required this.deviceId,
     required this.discoveredServices,
     Key? key,
   }) : super(key: key);
 
+  final String deviceId;
   final List<DiscoveredService> discoveredServices;
 
   @override
@@ -168,11 +173,20 @@ class _ServiceDiscoveryListState extends State<_ServiceDiscoveryList> {
     super.initState();
   }
 
-  Widget _characteristicTile(String characteristicId) {
+  Widget _characteristicTile(QualifiedCharacteristic characteristic) {
     return ListTile(
+      onTap: () => showDialog(
+          context: context,
+          builder: (context) {
+            return CharacteristicInteractionDialog(
+              characteristic: characteristic,
+            );
+          }),
       title: Text(
-        '$characteristicId',
-        style: TextStyle(fontSize: 14),
+        '${characteristic.characteristicId}',
+        style: TextStyle(
+          fontSize: 14,
+        ),
       ),
     );
   }
@@ -199,7 +213,11 @@ class _ServiceDiscoveryListState extends State<_ServiceDiscoveryList> {
                   ListView.builder(
                     shrinkWrap: true,
                     itemBuilder: (context, index) => _characteristicTile(
-                      service.characteristicIds[index].toString(),
+                      QualifiedCharacteristic(
+                        characteristicId: service.characteristicIds[index],
+                        serviceId: service.serviceId,
+                        deviceId: widget.deviceId,
+                      ),
                     ),
                     itemCount: service.characteristicIds.length,
                   ),
