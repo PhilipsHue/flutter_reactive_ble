@@ -138,7 +138,7 @@ class ProtobufConverterImpl implements ProtobufConverter {
     return WriteCharacteristicInfo(
       characteristic: qualifiedCharacteristicFrom(message.characteristic),
       result: resultFrom(
-        getValue: () {},
+        getValue: () => Unit(),
         failure: genericFailureFrom(
           hasFailure: message.hasFailure(),
           getFailure: () => message.failure,

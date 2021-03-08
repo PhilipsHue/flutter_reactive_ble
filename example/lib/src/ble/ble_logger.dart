@@ -2,7 +2,7 @@ import 'package:intl/intl.dart';
 
 class BleLogger {
   final List<String> _logMessages = [];
-  final DateFormat formatter = DateFormat('hh:mm:ss.SSS');
+  final DateFormat formatter = DateFormat('HH:mm:ss.SSS');
 
   List<String> get messages => _logMessages;
 

@@ -279,9 +279,9 @@ void main() {
             .writeToBuffer();
         final result = sut.clearGattCacheResultFrom(message).iif(
             success: (_) => throw AssertionError("Not expected to succeed"),
-            failure: (f) => f!);
+            failure: (f) => f);
 
-        expect(result.code, ClearGattCacheError.unknown);
+        expect(result?.code, ClearGattCacheError.unknown);
       });
     });
 
