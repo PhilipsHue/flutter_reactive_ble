@@ -5,6 +5,7 @@ import 'package:flutter_reactive_ble/src/connected_device_operation.dart';
 import 'package:flutter_reactive_ble/src/model/characteristic_value.dart';
 import 'package:flutter_reactive_ble/src/model/qualified_characteristic.dart';
 import 'package:flutter_reactive_ble/src/model/result.dart';
+import 'package:flutter_reactive_ble/src/model/unit.dart';
 import 'package:flutter_reactive_ble/src/model/uuid.dart';
 import 'package:flutter_reactive_ble/src/model/write_characteristic_info.dart';
 import 'package:flutter_reactive_ble/src/plugin_controller.dart';
@@ -154,8 +155,8 @@ void main() {
           setUp(() {
             info = WriteCharacteristicInfo(
               characteristic: characteristic,
-              result: const Result<void,
-                  GenericFailure<WriteCharacteristicFailure>>.success(1),
+              result: const Result<Unit,
+                  GenericFailure<WriteCharacteristicFailure>>.success(Unit()),
             );
 
             when(_controller.writeCharacteristicWithResponse(any, any))
@@ -172,7 +173,7 @@ void main() {
             setUp(() {
               info = WriteCharacteristicInfo(
                 characteristic: characteristic,
-                result: const Result<void,
+                result: const Result<Unit,
                     GenericFailure<WriteCharacteristicFailure>>.failure(
                   GenericFailure<WriteCharacteristicFailure>(
                     code: WriteCharacteristicFailure.unknown,
@@ -200,8 +201,8 @@ void main() {
             setUp(() {
               info = WriteCharacteristicInfo(
                 characteristic: characteristic,
-                result: const Result<void,
-                    GenericFailure<WriteCharacteristicFailure>>.success(1),
+                result: const Result<Unit,
+                    GenericFailure<WriteCharacteristicFailure>>.success(Unit()),
               );
 
               when(_controller.writeCharacteristicWithoutResponse(any, any))
@@ -220,7 +221,7 @@ void main() {
             setUp(() {
               info = WriteCharacteristicInfo(
                 characteristic: characteristic,
-                result: const Result<void,
+                result: const Result<Unit,
                     GenericFailure<WriteCharacteristicFailure>>.failure(
                   GenericFailure<WriteCharacteristicFailure>(
                     code: WriteCharacteristicFailure.unknown,

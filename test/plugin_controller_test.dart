@@ -265,7 +265,7 @@ void main() {
             // ignore: void_checks
             characteristic: characteristic,
             // ignore: void_checks
-            result: const Result.success(0));
+            result: const Result.success(Unit()));
 
         when(_methodChannel.invokeMethod<List<int>?>(any, any)).thenAnswer(
           (_) async => [1],

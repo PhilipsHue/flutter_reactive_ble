@@ -61,7 +61,7 @@ class DeviceScannerImpl implements DeviceScanner {
 
     final scanRepeater = Repeater(
       onListenEmitFrom: () =>
-          _scanStream.map((scan) => scan.result.dematerialize()!).handleError(
+          _scanStream.map((scan) => scan.result.dematerialize()).handleError(
         (Object e, StackTrace s) {
           if (!completer.isCompleted) {
             completer.completeError(e, s);

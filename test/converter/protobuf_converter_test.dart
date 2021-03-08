@@ -400,7 +400,7 @@ void main() {
             .iif(
                 success: (_) => throw AssertionError("Not expected to succeed"),
                 failure: (f) => f!);
-        expect(result?.code, WriteCharacteristicFailure.unknown);
+        expect(result.code, WriteCharacteristicFailure.unknown);
       });
     });
 
@@ -433,7 +433,7 @@ void main() {
             .iif(
                 success: (_) => throw AssertionError("Not expected to succeed"),
                 failure: (f) => f!);
-        expect(result?.code, ConnectionPriorityFailure.unknown);
+        expect(result.code, ConnectionPriorityFailure.unknown);
       });
     });
 

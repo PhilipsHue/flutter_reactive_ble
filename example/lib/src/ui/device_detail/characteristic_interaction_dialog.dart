@@ -135,6 +135,10 @@ class _CharacteristicInteractionDialogState
               border: OutlineInputBorder(),
               labelText: 'Value',
             ),
+            keyboardType: TextInputType.numberWithOptions(
+              decimal: true,
+              signed: false,
+            ),
           ),
         ),
         Row(
