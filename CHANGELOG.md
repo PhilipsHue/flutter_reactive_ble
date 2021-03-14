@@ -1,4 +1,10 @@
 # Main releases
+
+## 3.0.0
+
+* Breaking: Migration to null-safety
+* Improve example app 
+
 ## 2.7.3
 
 * Upgrade Android dependencies to comply to newer Gradle distributions.
@@ -122,9 +128,3 @@ Other improvements:
 ## 1.0.0
 
 * Initial Open Source release.
-
-# Null safety
-
-## 3.0.0-nullsafety.0
-
-* Initial migration
