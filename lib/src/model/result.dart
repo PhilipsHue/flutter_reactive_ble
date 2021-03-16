@@ -15,7 +15,7 @@ class Result<Value, Failure> {
   Value dematerialize() => iif(
         success: (value) => value!,
         failure: (failure) {
-          if (failure is Exception && failure != null) {
+          if (failure is Exception) {
             throw failure;
           } else {
             throw Exception(failure);
@@ -25,14 +25,16 @@ class Result<Value, Failure> {
 
   /// Execute specific actions on success and on failure.
   T iif<T>(
-      {required T Function(Value? value) success,
-      required T Function(Failure? failure) failure}) {
+      {required T Function(Value value) success,
+      required T Function(Failure failure) failure}) {
     assert(_value == null || _failure == null);
 
     if (_failure != null) {
-      return failure(_failure);
+      return failure(_failure!);
+    } else if (_value != null) {
+      return success(_value!);
     } else {
-      return success(_value);
+      throw Exception('Both value and failure cannot be null');
     }
   }
 

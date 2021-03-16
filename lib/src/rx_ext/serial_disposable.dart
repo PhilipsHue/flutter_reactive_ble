@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import '../model/unit.dart';
+
 /// A disposable resource whose underlying resource can be replaced by another resource
 /// causing automatic disposal of the previous underlying resource.
 class SerialDisposable<T> {
@@ -24,7 +26,7 @@ class SerialDisposable<T> {
   /// Returns whether or not the underlying resource is disposed
   bool get isDisposed => _isDisposed;
 
-  final Future<void>? Function(T) _dispose;
+  final Future<Unit> Function(T) _dispose;
   bool _isDisposed = false;
   T? _value;
 }
@@ -42,5 +44,8 @@ class _SerialAlreadyDisposed extends Error {
 class StreamSubscriptionSerialDisposable
     extends SerialDisposable<StreamSubscription> {
   StreamSubscriptionSerialDisposable()
-      : super((StreamSubscription subscription) => subscription.cancel());
+      : super((StreamSubscription subscription) async {
+          subscription.cancel();
+          return Unit();
+        });
 }

@@ -46,14 +46,14 @@ void main() {
       test('converts id', () {
         expect(
             scanresult.result
-                .iif(success: (d) => d!.id, failure: (_) => throw Exception()),
+                .iif(success: (d) => d.id, failure: (_) => throw Exception()),
             id);
       });
 
       test('converts name', () {
         expect(
             scanresult.result.iif(
-                success: (d) => d!.name, failure: (_) => throw Exception()),
+                success: (d) => d.name, failure: (_) => throw Exception()),
             name);
       });
 
@@ -61,13 +61,13 @@ void main() {
         expect(
             scanresult.result.iif(
                 success: (d) =>
-                    d!.serviceData[Uuid(serviceDataEntry1.serviceUuid.data)],
+                    d.serviceData[Uuid(serviceDataEntry1.serviceUuid.data)],
                 failure: (_) => throw Exception()),
             serviceDataEntry1.data);
         expect(
             scanresult.result.iif(
                 success: (d) =>
-                    d!.serviceData[Uuid(serviceDataEntry2.serviceUuid.data)],
+                    d.serviceData[Uuid(serviceDataEntry2.serviceUuid.data)],
                 failure: (_) => throw Exception()),
             serviceDataEntry2.data);
       });
@@ -75,7 +75,7 @@ void main() {
       test('converts manufacturer data', () {
         expect(
             scanresult.result.iif(
-                success: (d) => d!.manufacturerData,
+                success: (d) => d.manufacturerData,
                 failure: (_) => throw Exception()),
             manufacturerData);
       });
@@ -92,7 +92,7 @@ void main() {
           expect(
             scanresult.result.iif(
               success: (d) =>
-                  d!.serviceData[Uuid(serviceDataEntry1.serviceUuid.data)],
+                  d.serviceData[Uuid(serviceDataEntry1.serviceUuid.data)],
               failure: (_) => "Failed",
             ),
             "Failed",

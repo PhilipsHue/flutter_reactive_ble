@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import '../model/unit.dart';
+
 /// [Repeater] sets an underlying stream up on the first subscription to
 /// the output [stream] and shuts it down when there are no more subscriptions.
 ///
@@ -67,7 +69,10 @@ class Repeater<T> {
   }
 
   /// Closes the `stream`.
-  Future? dispose() => _streamController?.close();
+  Future<Unit> dispose() async {
+    _streamController?.close();
+    return Unit();
+  }
 
   Repeater({
     required Stream<T> Function() onListenEmitFrom,
