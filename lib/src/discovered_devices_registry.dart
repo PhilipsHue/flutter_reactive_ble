@@ -45,6 +45,6 @@ class DiscoveredDevicesRegistryImpl implements DiscoveredDevicesRegistry {
     Duration? cacheValidity,
   }) =>
       discoveredDevices.containsKey(deviceId) &&
-      discoveredDevices[deviceId!]!
-          .isAfter(getTimestamp().subtract(cacheValidity!));
+      (discoveredDevices[deviceId]
+          ?.isAfter(getTimestamp().subtract(cacheValidity!))?? false);
 }

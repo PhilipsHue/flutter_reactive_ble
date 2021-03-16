@@ -70,10 +70,10 @@ class _DeviceInteractionTab extends StatefulWidget {
   final DeviceInteractionViewModel viewModel;
 
   @override
-  __DeviceInteractionTabState createState() => __DeviceInteractionTabState();
+  _DeviceInteractionTabState createState() => _DeviceInteractionTabState();
 }
 
-class __DeviceInteractionTabState extends State<_DeviceInteractionTab> {
+class _DeviceInteractionTabState extends State<_DeviceInteractionTab> {
   late List<DiscoveredService> discoveredServices;
 
   @override
