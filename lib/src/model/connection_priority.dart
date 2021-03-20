@@ -1,6 +1,8 @@
 import 'package:flutter_reactive_ble/src/model/generic_failure.dart';
 import 'package:flutter_reactive_ble/src/model/result.dart';
 
+import '../model/unit.dart';
+
 /// The priority that can be requested to update the connection parameter.
 enum ConnectionPriority {
   /// connection with recommended parameters.
@@ -31,7 +33,7 @@ int convertPriorityToInt(ConnectionPriority priority) {
 class ConnectionPriorityInfo {
   const ConnectionPriorityInfo({required this.result});
 
-  final Result<void, GenericFailure<ConnectionPriorityFailure>?> result;
+  final Result<Unit, GenericFailure<ConnectionPriorityFailure>?> result;
 }
 
 /// Error type for connection priority.

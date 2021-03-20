@@ -154,7 +154,7 @@ class ProtobufConverterImpl implements ProtobufConverter {
     final message = pb.ChangeConnectionPriorityInfo.fromBuffer(data);
     return ConnectionPriorityInfo(
       result: resultFrom(
-        getValue: () {},
+        getValue: () => Unit(),
         failure: genericFailureFrom(
           hasFailure: message.hasFailure(),
           getFailure: () => message.failure,

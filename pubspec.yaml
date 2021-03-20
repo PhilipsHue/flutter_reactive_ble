@@ -21,11 +21,8 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   functional_data_generator: ^1.0.0
-  mockito: ^5.0.1
+  mockito: ^5.0.2
   
-dependency_overrides:
-  build: '2.0.0'  
-
 flutter:
   plugin:
     platforms:

@@ -46,6 +46,11 @@ void main() {
       when(_bleOperationController.initialize()).thenAnswer(
         (_) => Future.value(),
       );
+
+      when(_bleOperationController.deinitialize()).thenAnswer(
+        (_) => Future.value(),
+      );
+
       when(_bleOperationController.bleStatusStream).thenAnswer(
           (realInvocation) => _bleStatusController.stream.asBroadcastStream());
 
@@ -55,10 +60,12 @@ void main() {
         deviceConnector: _deviceConnector,
         connectedDeviceOperation: _deviceOperation,
         debugLogger: _debugLogger,
+        initialization: Future.value(),
       );
     });
 
     tearDown(() async {
+      await _sut.deinitialize();
       await _bleStatusController.close();
     });
 

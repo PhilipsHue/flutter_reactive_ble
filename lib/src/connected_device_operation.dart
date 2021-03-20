@@ -17,12 +17,12 @@ abstract class ConnectedDeviceOperation {
     required List<int> value,
   });
 
-  Stream<List<int>?> subscribeToCharacteristic(
+  Stream<List<int>> subscribeToCharacteristic(
     QualifiedCharacteristic characteristic,
     Future<void> isDisconnected,
   );
 
-  Future<int> requestMtu(String deviceId, int? mtu);
+  Future<int> requestMtu(String deviceId, int mtu);
 
   Future<List<DiscoveredService>> discoverServices(String deviceId);
 
@@ -73,7 +73,7 @@ class ConnectedDeviceOperationImpl implements ConnectedDeviceOperation {
           .then((info) => info.result.dematerialize());
 
   @override
-  Stream<List<int>?> subscribeToCharacteristic(
+  Stream<List<int>> subscribeToCharacteristic(
     QualifiedCharacteristic characteristic,
     Future<void> isDisconnected,
   ) {
@@ -81,7 +81,7 @@ class ConnectedDeviceOperationImpl implements ConnectedDeviceOperation {
         .where((update) => update.characteristic == characteristic)
         .map((update) => update.result.dematerialize());
 
-    final autosubscribingRepeater = Repeater<List<int>?>.broadcast(
+    final autosubscribingRepeater = Repeater<List<int>>.broadcast(
       onListenEmitFrom: () => _controller
           .subscribeToNotifications(characteristic)
           .asyncExpand((Object? _) => specificCharacteristicValueStream),
@@ -97,7 +97,7 @@ class ConnectedDeviceOperationImpl implements ConnectedDeviceOperation {
   }
 
   @override
-  Future<int> requestMtu(String deviceId, int? mtu) async =>
+  Future<int> requestMtu(String deviceId, int mtu) async =>
       _controller.requestMtuSize(deviceId, mtu);
 
   @override

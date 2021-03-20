@@ -52,8 +52,8 @@ void main() {
 
       test('converts name', () {
         expect(
-            scanresult.result.iif(
-                success: (d) => d.name, failure: (_) => throw Exception()),
+            scanresult.result
+                .iif(success: (d) => d.name, failure: (_) => throw Exception()),
             name);
       });
 

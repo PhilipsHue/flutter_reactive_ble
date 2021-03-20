@@ -357,7 +357,7 @@ void main() {
           setUp(() {
             when(_controller.requestConnectionPriority(any, any))
                 .thenAnswer((_) async => const ConnectionPriorityInfo(
-                      result: Result.success(1),
+                      result: Result.success(Unit()),
                     ));
           });
 

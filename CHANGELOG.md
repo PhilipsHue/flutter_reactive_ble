@@ -2,8 +2,8 @@
 
 ## 3.0.0
 
-* Breaking: Migration to null-safety
-* Improve example app 
+* Breaking: Migration to null-safety.
+* Improve example app by adding discover services, read, write and subscribe to characteristic.
 
 ## 2.7.3
 

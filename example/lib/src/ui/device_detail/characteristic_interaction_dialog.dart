@@ -79,14 +79,14 @@ class _CharacteristicInteractionDialogState
   }
 
   Future<void> subscribeCharacteristic() async {
-    setState(() {
-      subscribeOutput = 'Notification set';
-    });
     subscribeStream =
         widget.subscribeToCharacteristic(widget.characteristic).listen((event) {
       setState(() {
         subscribeOutput = event.toString();
       });
+    });
+    setState(() {
+      subscribeOutput = 'Notification set';
     });
   }
 
