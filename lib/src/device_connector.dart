@@ -12,13 +12,13 @@ import 'model/uuid.dart';
 abstract class DeviceConnector {
   Stream<ConnectionStateUpdate> get deviceConnectionStateUpdateStream;
 
-  Stream<ConnectionStateUpdate?> connect({
+  Stream<ConnectionStateUpdate> connect({
     required String id,
     Map<Uuid, List<Uuid>>? servicesWithCharacteristicsToDiscover,
     Duration? connectionTimeout,
   });
 
-  Stream<ConnectionStateUpdate?> connectToAdvertisingDevice({
+  Stream<ConnectionStateUpdate> connectToAdvertisingDevice({
     required String id,
     required List<Uuid> withServices,
     required Duration prescanDuration,
@@ -30,7 +30,8 @@ abstract class DeviceConnector {
 class DeviceConnectorImpl implements DeviceConnector {
   const DeviceConnectorImpl({
     required DeviceConnectionController controller,
-    required bool Function({String? deviceId, Duration? cacheValidity})
+    required bool Function(
+            {required String deviceId, required Duration cacheValidity})
         deviceIsDiscoveredRecently,
     required DeviceScanner deviceScanner,
     required Duration delayAfterScanFailure,
@@ -40,8 +41,10 @@ class DeviceConnectorImpl implements DeviceConnector {
         _delayAfterScanFailure = delayAfterScanFailure;
 
   final DeviceConnectionController _controller;
-  final bool Function({String? deviceId, Duration? cacheValidity})
-      _deviceIsDiscoveredRecently;
+  final bool Function({
+    required String deviceId,
+    required Duration cacheValidity,
+  }) _deviceIsDiscoveredRecently;
   final DeviceScanner _deviceScanner;
   final Duration _delayAfterScanFailure;
 
@@ -52,7 +55,7 @@ class DeviceConnectorImpl implements DeviceConnector {
       _controller.connectionUpdateStream;
 
   @override
-  Stream<ConnectionStateUpdate?> connect({
+  Stream<ConnectionStateUpdate> connect({
     required String id,
     Map<Uuid, List<Uuid>>? servicesWithCharacteristicsToDiscover,
     Duration? connectionTimeout,
@@ -63,22 +66,25 @@ class DeviceConnectorImpl implements DeviceConnector {
             update.connectionState != DeviceConnectionState.disconnected
                 ? [update]
                 : [update, null])
-        .takeWhile((update) => update != null);
+        .takeWhile((update) => update != null)
+        .cast<ConnectionStateUpdate>();
 
     final autoconnectingRepeater = Repeater.broadcast(
       onListenEmitFrom: () => _controller
           .connectToDevice(
-              id, servicesWithCharacteristicsToDiscover, connectionTimeout)
-          .asyncExpand((Object? _) => specificConnectedDeviceStream),
+            id,
+            servicesWithCharacteristicsToDiscover,
+            connectionTimeout,
+          )
+          .asyncExpand((_) => specificConnectedDeviceStream),
       onCancel: () => _controller.disconnectDevice(id),
     );
 
-    return autoconnectingRepeater
-        .stream; //cast needed because of bug in analyzer
+    return autoconnectingRepeater.stream;
   }
 
   @override
-  Stream<ConnectionStateUpdate?> connectToAdvertisingDevice({
+  Stream<ConnectionStateUpdate> connectToAdvertisingDevice({
     required String id,
     required List<Uuid> withServices,
     required Duration prescanDuration,
@@ -104,7 +110,7 @@ class DeviceConnectorImpl implements DeviceConnector {
     }
   }
 
-  Stream<ConnectionStateUpdate?> _prescanAndConnect(
+  Stream<ConnectionStateUpdate> _prescanAndConnect(
     String id,
     Map<Uuid, List<Uuid>>? servicesWithCharacteristicsToDiscover,
     Duration? connectionTimeout,
@@ -155,7 +161,7 @@ class DeviceConnectorImpl implements DeviceConnector {
     }
   }
 
-  Stream<ConnectionStateUpdate?> _awaitCurrentScanAndConnect(
+  Stream<ConnectionStateUpdate> _awaitCurrentScanAndConnect(
     List<Uuid> withServices,
     Duration prescanDuration,
     String id,
@@ -190,7 +196,7 @@ class DeviceConnectorImpl implements DeviceConnector {
     }
   }
 
-  Stream<ConnectionStateUpdate?> _connectIfRecentlyDiscovered(
+  Stream<ConnectionStateUpdate> _connectIfRecentlyDiscovered(
     String id,
     Map<Uuid, List<Uuid>>? servicesWithCharacteristicsToDiscover,
     Duration? connectionTimeout,

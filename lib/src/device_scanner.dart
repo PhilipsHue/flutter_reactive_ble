@@ -50,8 +50,8 @@ class DeviceScannerImpl implements DeviceScanner {
   @override
   Stream<DiscoveredDevice> scanForDevices({
     required List<Uuid> withServices,
-    ScanMode? scanMode = ScanMode.balanced,
-    bool? requireLocationServicesEnabled = true,
+    ScanMode scanMode = ScanMode.balanced,
+    bool requireLocationServicesEnabled = true,
   }) {
     final completer = Completer<void>();
     _currentScanSession =

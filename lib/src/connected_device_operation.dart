@@ -49,7 +49,7 @@ class ConnectedDeviceOperationImpl implements ConnectedDeviceOperation {
 
     return _controller
         .readCharacteristic(characteristic)
-        .asyncExpand((Object? _) => specificCharacteristicValueStream)
+        .asyncExpand((_) => specificCharacteristicValueStream)
         .firstWhere((_) => true,
             orElse: () => throw NoBleCharacteristicDataReceived());
   }
@@ -84,7 +84,7 @@ class ConnectedDeviceOperationImpl implements ConnectedDeviceOperation {
     final autosubscribingRepeater = Repeater<List<int>>.broadcast(
       onListenEmitFrom: () => _controller
           .subscribeToNotifications(characteristic)
-          .asyncExpand((Object? _) => specificCharacteristicValueStream),
+          .asyncExpand((_) => specificCharacteristicValueStream),
       onCancel: () => _controller
           .stopSubscribingToNotifications(characteristic)
           .catchError((Object e) =>

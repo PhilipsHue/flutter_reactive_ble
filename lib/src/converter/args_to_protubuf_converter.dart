@@ -39,9 +39,9 @@ abstract class ArgsToProtobufConverter {
   );
 
   pb.ScanForDevicesRequest createScanForDevicesRequest({
-    required List<Uuid> withServices,
-    required ScanMode? scanMode,
-    required bool? requireLocationServicesEnabled,
+    required List<Uuid>? withServices,
+    required ScanMode scanMode,
+    required bool requireLocationServicesEnabled,
   });
 
   pb.ClearGattCacheRequest createClearGattCacheRequest(String deviceId);
@@ -171,12 +171,12 @@ class ArgsToProtobufConverterImpl implements ArgsToProtobufConverter {
   @override
   pb.ScanForDevicesRequest createScanForDevicesRequest({
     required List<Uuid>? withServices,
-    required ScanMode? scanMode,
-    required bool? requireLocationServicesEnabled,
+    required ScanMode scanMode,
+    required bool requireLocationServicesEnabled,
   }) {
     final args = pb.ScanForDevicesRequest()
-      ..scanMode = convertScanModeToArgs(scanMode!)
-      ..requireLocationServicesEnabled = requireLocationServicesEnabled!;
+      ..scanMode = convertScanModeToArgs(scanMode)
+      ..requireLocationServicesEnabled = requireLocationServicesEnabled;
 
     if (withServices != null) {
       for (final withService in withServices) {

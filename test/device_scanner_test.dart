@@ -44,11 +44,11 @@ void main() {
     });
 
     group('Scan for devices', () {
-      Stream<DiscoveredDevice>? scanStream;
+      late Stream<DiscoveredDevice> scanStream;
 
       late List<Uuid> withServices;
-      bool? locationEnabled;
-      ScanMode? scanmode;
+      late bool locationEnabled;
+      late ScanMode scanmode;
 
       setUp(() {
         withServices = [Uuid.parse('FEFF')];
@@ -106,7 +106,7 @@ void main() {
           group('When scanGetsCancelled', () {
             late StreamSubscription<DiscoveredDevice> subscription;
             setUp(() {
-              subscription = scanStream!.listen((event) {});
+              subscription = scanStream.listen((event) {});
             });
 
             test('It sets currentScan session is set to null', () async {
@@ -134,7 +134,7 @@ void main() {
           group('When scanGetsCancelled and timeout is  completed', () {
             late StreamSubscription<DiscoveredDevice> subscription;
             setUp(() {
-              subscription = scanStream!.listen((event) {});
+              subscription = scanStream.listen((event) {});
               _delayAfterScanCompletion.complete();
             });
 
@@ -147,7 +147,7 @@ void main() {
           group('When scanGetsCancelled and timeout is  completed', () {
             late StreamSubscription<DiscoveredDevice> subscription;
             setUp(() {
-              subscription = scanStream!.listen((event) {});
+              subscription = scanStream.listen((event) {});
             });
 
             test('It does not cancel current scan session', () {

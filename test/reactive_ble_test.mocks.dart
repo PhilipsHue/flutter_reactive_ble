@@ -166,7 +166,7 @@ class MockDeviceConnector extends _i1.Mock implements _i16.DeviceConnector {
               returnValue: Stream<_i17.ConnectionStateUpdate>.empty())
           as _i4.Stream<_i17.ConnectionStateUpdate>);
   @override
-  _i4.Stream<_i17.ConnectionStateUpdate?> connect(
+  _i4.Stream<_i17.ConnectionStateUpdate> connect(
           {String? id,
           Map<_i18.Uuid, List<_i18.Uuid>>?
               servicesWithCharacteristicsToDiscover,
@@ -178,10 +178,10 @@ class MockDeviceConnector extends _i1.Mock implements _i16.DeviceConnector {
                     servicesWithCharacteristicsToDiscover,
                 #connectionTimeout: connectionTimeout
               }),
-              returnValue: Stream<_i17.ConnectionStateUpdate?>.empty())
-          as _i4.Stream<_i17.ConnectionStateUpdate?>);
+              returnValue: Stream<_i17.ConnectionStateUpdate>.empty())
+          as _i4.Stream<_i17.ConnectionStateUpdate>);
   @override
-  _i4.Stream<_i17.ConnectionStateUpdate?> connectToAdvertisingDevice(
+  _i4.Stream<_i17.ConnectionStateUpdate> connectToAdvertisingDevice(
           {String? id,
           List<_i18.Uuid>? withServices,
           Duration? prescanDuration,
@@ -197,8 +197,8 @@ class MockDeviceConnector extends _i1.Mock implements _i16.DeviceConnector {
                     servicesWithCharacteristicsToDiscover,
                 #connectionTimeout: connectionTimeout
               }),
-              returnValue: Stream<_i17.ConnectionStateUpdate?>.empty())
-          as _i4.Stream<_i17.ConnectionStateUpdate?>);
+              returnValue: Stream<_i17.ConnectionStateUpdate>.empty())
+          as _i4.Stream<_i17.ConnectionStateUpdate>);
 }
 
 /// A class which mocks [DeviceScanner].

@@ -262,7 +262,7 @@ class FlutterReactiveBle {
   /// is not established. The pending connection attempt will be cancelled. On Android when no timeout is specified
   /// the `autoConnect` flag is set in the [connectGatt()](https://developer.android.com/reference/android/bluetooth/BluetoothDevice#connectGatt(android.content.Context,%20boolean,%20android.bluetooth.BluetoothGattCallback)) call, otherwise it's cleared.```
 
-  Stream<ConnectionStateUpdate?> connectToDevice({
+  Stream<ConnectionStateUpdate> connectToDevice({
     required String id,
     Map<Uuid, List<Uuid>>? servicesWithCharacteristicsToDiscover,
     Duration? connectionTimeout,
@@ -287,7 +287,7 @@ class FlutterReactiveBle {
   /// this variable is ignored since partial discovery is not possible.
   /// The [connectionTimeout] parameter can be used to emit a failure after a certain period in case the connection
   /// is not established. The pending connection attempt will be cancelled.
-  Stream<ConnectionStateUpdate?> connectToAdvertisingDevice({
+  Stream<ConnectionStateUpdate> connectToAdvertisingDevice({
     required String id,
     required List<Uuid> withServices,
     required Duration prescanDuration,
@@ -323,7 +323,7 @@ class FlutterReactiveBle {
   /// Subscribes to updates from the characteristic specified.
   ///
   /// This stream terminates automatically when the device is disconnected.
-  Stream<List<int>?> subscribeToCharacteristic(
+  Stream<List<int>> subscribeToCharacteristic(
     QualifiedCharacteristic characteristic,
   ) {
     final isDisconnected = connectedDeviceStream

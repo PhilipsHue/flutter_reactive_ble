@@ -49,8 +49,8 @@ abstract class ScanOperationController {
 
   Stream<void> scanForDevices({
     required List<Uuid> withServices,
-    required ScanMode? scanMode,
-    required bool? requireLocationServicesEnabled,
+    required ScanMode scanMode,
+    required bool requireLocationServicesEnabled,
   });
 }
 
@@ -174,8 +174,8 @@ class PluginController
   @override
   Stream<void> scanForDevices({
     required List<Uuid> withServices,
-    required ScanMode? scanMode,
-    required bool? requireLocationServicesEnabled,
+    required ScanMode scanMode,
+    required bool requireLocationServicesEnabled,
   }) {
     _debugLogger.log(
       'Start scanning for devices with arguments (withServices:$withServices, scanMode: $scanMode, locationServiceEnabled: $requireLocationServicesEnabled)',
@@ -317,7 +317,7 @@ class PluginController
               .createNegotiateMtuRequest(deviceId, mtu!)
               .writeToBuffer(),
         )
-        .then(_protobufConverter.mtuSizeFrom);
+        .then((data) => _protobufConverter.mtuSizeFrom(data!));
   }
 
   @override

@@ -11,7 +11,8 @@ abstract class DiscoveredDevicesRegistry {
 
   bool isEmpty();
 
-  bool deviceIsDiscoveredRecently({String? deviceId, Duration? cacheValidity});
+  bool deviceIsDiscoveredRecently(
+      {required String deviceId, required Duration cacheValidity});
 }
 
 class DiscoveredDevicesRegistryImpl implements DiscoveredDevicesRegistry {
@@ -41,11 +42,11 @@ class DiscoveredDevicesRegistryImpl implements DiscoveredDevicesRegistry {
 
   @override
   bool deviceIsDiscoveredRecently({
-    String? deviceId,
-    Duration? cacheValidity,
+    required String deviceId,
+    required Duration cacheValidity,
   }) =>
       discoveredDevices.containsKey(deviceId) &&
       (discoveredDevices[deviceId]
-              ?.isAfter(getTimestamp().subtract(cacheValidity!)) ??
+              ?.isAfter(getTimestamp().subtract(cacheValidity)) ??
           false);
 }

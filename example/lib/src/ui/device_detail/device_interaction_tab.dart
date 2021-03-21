@@ -18,14 +18,14 @@ class DeviceInteractionTab extends StatelessWidget {
   }) : super(key: key);
 
   @override
-  Widget build(BuildContext context) => Consumer3<BleDeviceConnector,
-          ConnectionStateUpdate?, BleDeviceInteractor>(
+  Widget build(BuildContext context) =>
+      Consumer3<BleDeviceConnector, ConnectionStateUpdate, BleDeviceInteractor>(
         builder: (_, deviceConnector, connectionStateUpdate, serviceDiscoverer,
                 __) =>
             _DeviceInteractionTab(
           viewModel: DeviceInteractionViewModel(
               deviceId: device.id,
-              connectionStatus: connectionStateUpdate!.connectionState,
+              connectionStatus: connectionStateUpdate.connectionState,
               deviceConnector: deviceConnector,
               discoverServices: () =>
                   serviceDiscoverer.discoverServices(device.id)),
