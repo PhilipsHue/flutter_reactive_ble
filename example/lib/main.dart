@@ -50,7 +50,7 @@ void main() {
           create: (_) => _monitor.state,
           initialData: BleStatus.unknown,
         ),
-        StreamProvider<ConnectionStateUpdate?>(
+        StreamProvider<ConnectionStateUpdate>(
           create: (_) => _connector.state,
           initialData: const ConnectionStateUpdate(
             deviceId: 'Unknown device',

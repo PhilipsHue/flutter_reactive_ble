@@ -43,7 +43,7 @@ class _CharacteristicInteractionDialog extends StatefulWidget {
           QualifiedCharacteristic characteristic, List<int> value)
       writeWithResponse;
 
-  final Stream<List<int>?> Function(QualifiedCharacteristic characteristic)
+  final Stream<List<int>> Function(QualifiedCharacteristic characteristic)
       subscribeToCharacteristic;
 
   final Future<void> Function(
@@ -61,7 +61,7 @@ class _CharacteristicInteractionDialogState
   late String writeOutput;
   late String subscribeOutput;
   late TextEditingController textEditingController;
-  late StreamSubscription<List<int>?> subscribeStream;
+  late StreamSubscription<List<int>>? subscribeStream;
 
   @override
   void initState() {
@@ -74,7 +74,7 @@ class _CharacteristicInteractionDialogState
 
   @override
   void dispose() {
-    subscribeStream.cancel();
+    subscribeStream?.cancel();
     super.dispose();
   }
 

@@ -15,7 +15,7 @@ class BleDeviceInteractor {
             {required List<int> value})
         writeWithOutResponse,
     required void Function(String message) logMessage,
-    required Stream<List<int>?> Function(QualifiedCharacteristic characteristic)
+    required Stream<List<int>> Function(QualifiedCharacteristic characteristic)
         subscribeToCharacteristic,
   })   : _bleDiscoverServices = bleDiscoverServices,
         _readCharacteristic = readCharacteristic,
@@ -36,7 +36,7 @@ class BleDeviceInteractor {
   final Future<void> Function(QualifiedCharacteristic characteristic,
       {required List<int> value}) _writeWithoutResponse;
 
-  final Stream<List<int>?> Function(QualifiedCharacteristic characteristic)
+  final Stream<List<int>> Function(QualifiedCharacteristic characteristic)
       _subScribeToCharacteristic;
 
   final void Function(String message) _logMessage;
@@ -99,7 +99,7 @@ class BleDeviceInteractor {
     }
   }
 
-  Stream<List<int>?> subScribeToCharacteristic(
+  Stream<List<int>> subScribeToCharacteristic(
       QualifiedCharacteristic characteristic) {
     _logMessage('Subscribing to: ${characteristic.characteristicId} ');
     return _subScribeToCharacteristic(characteristic);
