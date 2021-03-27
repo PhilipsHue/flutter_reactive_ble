@@ -4,7 +4,6 @@ import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
 import 'package:flutter_reactive_ble/src/plugin_controller.dart';
 import 'package:flutter_reactive_ble/src/rx_ext/repeater.dart';
 import 'package:flutter_reactive_ble/src/rx_ext/serial_disposable.dart';
-import 'package:meta/meta.dart';
 import 'package:pedantic/pedantic.dart';
 
 import 'model/discovered_device.dart';
@@ -13,10 +12,10 @@ import 'model/scan_session.dart';
 import 'model/uuid.dart';
 
 abstract class DeviceScanner {
-  ScanSession get currentScan;
+  ScanSession? get currentScan;
 
   Stream<DiscoveredDevice> scanForDevices({
-    @required List<Uuid> withServices,
+    required List<Uuid> withServices,
     ScanMode scanMode = ScanMode.balanced,
     bool requireLocationServicesEnabled = true,
   });
@@ -24,20 +23,15 @@ abstract class DeviceScanner {
 
 class DeviceScannerImpl implements DeviceScanner {
   DeviceScannerImpl({
-    @required ScanOperationController controller,
-    @required bool Function() platformIsAndroid,
-    @required Future<void> delayAfterScanCompletion,
-    @required this.addToScanRegistry,
-  })  : assert(controller != null),
-        assert(platformIsAndroid != null),
-        assert(addToScanRegistry != null),
-        assert(platformIsAndroid != null),
-        assert(delayAfterScanCompletion != null),
-        _controller = controller,
+    required ScanOperationController controller,
+    required bool Function() platformIsAndroid,
+    required Future<void> delayAfterScanCompletion,
+    required this.addToScanRegistry,
+  })   : _controller = controller,
         _platformIsAndroid = platformIsAndroid,
         _delayAfterScanCompletion = delayAfterScanCompletion;
 
-  ScanSession _currentScanSession;
+  ScanSession? _currentScanSession;
 
   final ScanOperationController _controller;
   final bool Function() _platformIsAndroid;
@@ -47,14 +41,15 @@ class DeviceScannerImpl implements DeviceScanner {
   Stream<ScanResult> get _scanStream => _controller.scanStream;
 
   final SerialDisposable<Repeater<DiscoveredDevice>> _scanStreamDisposable =
-      SerialDisposable((repeater) => repeater.dispose());
+      SerialDisposable(
+          (Repeater<DiscoveredDevice> repeater) => repeater.dispose());
 
   @override
-  ScanSession get currentScan => _currentScanSession;
+  ScanSession? get currentScan => _currentScanSession;
 
   @override
   Stream<DiscoveredDevice> scanForDevices({
-    @required List<Uuid> withServices,
+    required List<Uuid> withServices,
     ScanMode scanMode = ScanMode.balanced,
     bool requireLocationServicesEnabled = true,
   }) {
@@ -100,11 +95,9 @@ class DeviceScannerImpl implements DeviceScanner {
           scanMode: scanMode,
           requireLocationServicesEnabled: requireLocationServicesEnabled,
         )
-        .asyncExpand(
-          (_) => scanRepeater.stream.map((discoveredDevice) {
-            addToScanRegistry(discoveredDevice.id);
-            return discoveredDevice;
-          }),
-        );
+        .asyncExpand((_) => scanRepeater.stream.map((discoveredDevice) {
+              addToScanRegistry(discoveredDevice.id);
+              return discoveredDevice;
+            }));
   }
 }

@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
 import 'package:flutter_reactive_ble/src/device_connector.dart';
 import 'package:flutter_reactive_ble/src/device_scanner.dart';
@@ -14,16 +16,16 @@ import 'device_connector_test.mocks.dart';
     [DeviceConnectionController, DeviceScanner, DiscoveredDevicesRegistry])
 void main() {
   group('$DeviceConnector', () {
-    DeviceConnector _sut;
-    MockDeviceConnectionController _controller;
-    Stream<ConnectionStateUpdate> _connectionStateUpdateStream;
-    Stream<ConnectionStateUpdate> _result;
-    MockDiscoveredDevicesRegistry _registry;
-    MockDeviceScanner _scanner;
+    late DeviceConnector _sut;
+    late MockDeviceConnectionController _controller;
+    late Stream<ConnectionStateUpdate> _connectionStateUpdateStream;
+    late Stream<ConnectionStateUpdate?> _result;
+    late MockDiscoveredDevicesRegistry _registry;
+    late MockDeviceScanner _scanner;
 
-    Map<Uuid, List<Uuid>> _servicesToDiscover;
-    ConnectionStateUpdate updateForDevice;
-    ConnectionStateUpdate updateOtherDevice;
+    late Map<Uuid, List<Uuid>> _servicesToDiscover;
+    late ConnectionStateUpdate updateForDevice;
+    late ConnectionStateUpdate updateOtherDevice;
 
     const _deviceId = '123';
     const _connectionTimeout = Duration(seconds: 1);
@@ -83,7 +85,7 @@ void main() {
 
           test('It emits connection updates for that device', () {
             expect(_result,
-                emitsInOrder(<ConnectionStateUpdate>[updateForDevice]));
+                emitsInOrder(<ConnectionStateUpdate?>[updateForDevice]));
           });
         });
       });
@@ -93,9 +95,9 @@ void main() {
       const deviceId = '123';
       final uuidDeviceToScan = Uuid.parse('FEFF');
       final uuidCurrentScan = Uuid.parse('FEFE');
-      const discoveredDevice = DiscoveredDevice(
+      final discoveredDevice = DiscoveredDevice(
         id: 'deviceId',
-        manufacturerData: null,
+        manufacturerData: Uint8List.fromList([0]),
         name: 'test',
         rssi: -39,
         serviceData: {},
@@ -167,7 +169,7 @@ void main() {
 
           test('It connects to device after scan has finished', () {
             expect(_result,
-                emitsInOrder(<ConnectionStateUpdate>[updateForDevice]));
+                emitsInOrder(<ConnectionStateUpdate?>[updateForDevice]));
           });
         });
 
@@ -228,7 +230,7 @@ void main() {
 
           test('It emits device update', () {
             expect(_result,
-                emitsInOrder(<ConnectionStateUpdate>[updateForDevice]));
+                emitsInOrder(<ConnectionStateUpdate?>[updateForDevice]));
           });
         });
 
@@ -288,7 +290,7 @@ void main() {
 
             test('It emits device update', () {
               expect(_result,
-                  emitsInOrder(<ConnectionStateUpdate>[updateForDevice]));
+                  emitsInOrder(<ConnectionStateUpdate?>[updateForDevice]));
             });
           });
         });

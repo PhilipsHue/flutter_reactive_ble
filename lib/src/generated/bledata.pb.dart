@@ -2,7 +2,7 @@
 //  Generated code. Do not modify.
 //  source: bledata.proto
 //
-// @dart = 2.3
+// @dart = 2.12
 // ignore_for_file: annotate_overrides,camel_case_types,unnecessary_const,non_constant_identifier_names,library_prefixes,unused_import,unused_shown_name,return_of_invalid_type,unnecessary_this,prefer_final_fields
 
 import 'dart:core' as $core;
@@ -49,8 +49,8 @@ class ScanForDevicesRequest extends $pb.GeneratedMessage {
       'Will be removed in next major version')
   ScanForDevicesRequest copyWith(
           void Function(ScanForDevicesRequest) updates) =>
-      super.copyWith((message) => updates(
-          message as ScanForDevicesRequest)); // ignore: deprecated_member_use
+      super.copyWith((message) => updates(message as ScanForDevicesRequest))
+          as ScanForDevicesRequest; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
   static ScanForDevicesRequest create() => ScanForDevicesRequest._();
@@ -60,7 +60,7 @@ class ScanForDevicesRequest extends $pb.GeneratedMessage {
   @$core.pragma('dart2js:noInline')
   static ScanForDevicesRequest getDefault() => _defaultInstance ??=
       $pb.GeneratedMessage.$_defaultFor<ScanForDevicesRequest>(create);
-  static ScanForDevicesRequest _defaultInstance;
+  static ScanForDevicesRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
   $core.List<Uuid> get serviceUuids => $_getList(0);
@@ -138,8 +138,8 @@ class DeviceScanInfo extends $pb.GeneratedMessage {
       'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
       'Will be removed in next major version')
   DeviceScanInfo copyWith(void Function(DeviceScanInfo) updates) =>
-      super.copyWith((message) =>
-          updates(message as DeviceScanInfo)); // ignore: deprecated_member_use
+      super.copyWith((message) => updates(message as DeviceScanInfo))
+          as DeviceScanInfo; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
   static DeviceScanInfo create() => DeviceScanInfo._();
@@ -149,7 +149,7 @@ class DeviceScanInfo extends $pb.GeneratedMessage {
   @$core.pragma('dart2js:noInline')
   static DeviceScanInfo getDefault() => _defaultInstance ??=
       $pb.GeneratedMessage.$_defaultFor<DeviceScanInfo>(create);
-  static DeviceScanInfo _defaultInstance;
+  static DeviceScanInfo? _defaultInstance;
 
   @$pb.TagNumber(1)
   $core.String get id => $_getSZ(0);
@@ -258,8 +258,8 @@ class ConnectToDeviceRequest extends $pb.GeneratedMessage {
       'Will be removed in next major version')
   ConnectToDeviceRequest copyWith(
           void Function(ConnectToDeviceRequest) updates) =>
-      super.copyWith((message) => updates(
-          message as ConnectToDeviceRequest)); // ignore: deprecated_member_use
+      super.copyWith((message) => updates(message as ConnectToDeviceRequest))
+          as ConnectToDeviceRequest; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
   static ConnectToDeviceRequest create() => ConnectToDeviceRequest._();
@@ -269,7 +269,7 @@ class ConnectToDeviceRequest extends $pb.GeneratedMessage {
   @$core.pragma('dart2js:noInline')
   static ConnectToDeviceRequest getDefault() => _defaultInstance ??=
       $pb.GeneratedMessage.$_defaultFor<ConnectToDeviceRequest>(create);
-  static ConnectToDeviceRequest _defaultInstance;
+  static ConnectToDeviceRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
   $core.String get deviceId => $_getSZ(0);
@@ -354,8 +354,8 @@ class DeviceInfo extends $pb.GeneratedMessage {
       'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
       'Will be removed in next major version')
   DeviceInfo copyWith(void Function(DeviceInfo) updates) =>
-      super.copyWith((message) =>
-          updates(message as DeviceInfo)); // ignore: deprecated_member_use
+      super.copyWith((message) => updates(message as DeviceInfo))
+          as DeviceInfo; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
   static DeviceInfo create() => DeviceInfo._();
@@ -364,7 +364,7 @@ class DeviceInfo extends $pb.GeneratedMessage {
   @$core.pragma('dart2js:noInline')
   static DeviceInfo getDefault() => _defaultInstance ??=
       $pb.GeneratedMessage.$_defaultFor<DeviceInfo>(create);
-  static DeviceInfo _defaultInstance;
+  static DeviceInfo? _defaultInstance;
 
   @$pb.TagNumber(1)
   $core.String get id => $_getSZ(0);
@@ -437,8 +437,9 @@ class DisconnectFromDeviceRequest extends $pb.GeneratedMessage {
       'Will be removed in next major version')
   DisconnectFromDeviceRequest copyWith(
           void Function(DisconnectFromDeviceRequest) updates) =>
-      super.copyWith((message) => updates(message
-          as DisconnectFromDeviceRequest)); // ignore: deprecated_member_use
+      super.copyWith(
+              (message) => updates(message as DisconnectFromDeviceRequest))
+          as DisconnectFromDeviceRequest; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
   static DisconnectFromDeviceRequest create() =>
@@ -449,7 +450,7 @@ class DisconnectFromDeviceRequest extends $pb.GeneratedMessage {
   @$core.pragma('dart2js:noInline')
   static DisconnectFromDeviceRequest getDefault() => _defaultInstance ??=
       $pb.GeneratedMessage.$_defaultFor<DisconnectFromDeviceRequest>(create);
-  static DisconnectFromDeviceRequest _defaultInstance;
+  static DisconnectFromDeviceRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
   $core.String get deviceId => $_getSZ(0);
@@ -496,8 +497,8 @@ class ClearGattCacheRequest extends $pb.GeneratedMessage {
       'Will be removed in next major version')
   ClearGattCacheRequest copyWith(
           void Function(ClearGattCacheRequest) updates) =>
-      super.copyWith((message) => updates(
-          message as ClearGattCacheRequest)); // ignore: deprecated_member_use
+      super.copyWith((message) => updates(message as ClearGattCacheRequest))
+          as ClearGattCacheRequest; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
   static ClearGattCacheRequest create() => ClearGattCacheRequest._();
@@ -507,7 +508,7 @@ class ClearGattCacheRequest extends $pb.GeneratedMessage {
   @$core.pragma('dart2js:noInline')
   static ClearGattCacheRequest getDefault() => _defaultInstance ??=
       $pb.GeneratedMessage.$_defaultFor<ClearGattCacheRequest>(create);
-  static ClearGattCacheRequest _defaultInstance;
+  static ClearGattCacheRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
   $core.String get deviceId => $_getSZ(0);
@@ -552,8 +553,8 @@ class ClearGattCacheInfo extends $pb.GeneratedMessage {
       'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
       'Will be removed in next major version')
   ClearGattCacheInfo copyWith(void Function(ClearGattCacheInfo) updates) =>
-      super.copyWith((message) => updates(
-          message as ClearGattCacheInfo)); // ignore: deprecated_member_use
+      super.copyWith((message) => updates(message as ClearGattCacheInfo))
+          as ClearGattCacheInfo; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
   static ClearGattCacheInfo create() => ClearGattCacheInfo._();
@@ -563,7 +564,7 @@ class ClearGattCacheInfo extends $pb.GeneratedMessage {
   @$core.pragma('dart2js:noInline')
   static ClearGattCacheInfo getDefault() => _defaultInstance ??=
       $pb.GeneratedMessage.$_defaultFor<ClearGattCacheInfo>(create);
-  static ClearGattCacheInfo _defaultInstance;
+  static ClearGattCacheInfo? _defaultInstance;
 
   @$pb.TagNumber(1)
   GenericFailure get failure => $_getN(0);
@@ -612,8 +613,9 @@ class NotifyCharacteristicRequest extends $pb.GeneratedMessage {
       'Will be removed in next major version')
   NotifyCharacteristicRequest copyWith(
           void Function(NotifyCharacteristicRequest) updates) =>
-      super.copyWith((message) => updates(message
-          as NotifyCharacteristicRequest)); // ignore: deprecated_member_use
+      super.copyWith(
+              (message) => updates(message as NotifyCharacteristicRequest))
+          as NotifyCharacteristicRequest; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
   static NotifyCharacteristicRequest create() =>
@@ -624,7 +626,7 @@ class NotifyCharacteristicRequest extends $pb.GeneratedMessage {
   @$core.pragma('dart2js:noInline')
   static NotifyCharacteristicRequest getDefault() => _defaultInstance ??=
       $pb.GeneratedMessage.$_defaultFor<NotifyCharacteristicRequest>(create);
-  static NotifyCharacteristicRequest _defaultInstance;
+  static NotifyCharacteristicRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
   CharacteristicAddress get characteristic => $_getN(0);
@@ -673,8 +675,9 @@ class NotifyNoMoreCharacteristicRequest extends $pb.GeneratedMessage {
       'Will be removed in next major version')
   NotifyNoMoreCharacteristicRequest copyWith(
           void Function(NotifyNoMoreCharacteristicRequest) updates) =>
-      super.copyWith((message) => updates(message
-          as NotifyNoMoreCharacteristicRequest)); // ignore: deprecated_member_use
+      super.copyWith((message) =>
+              updates(message as NotifyNoMoreCharacteristicRequest))
+          as NotifyNoMoreCharacteristicRequest; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
   static NotifyNoMoreCharacteristicRequest create() =>
@@ -686,7 +689,7 @@ class NotifyNoMoreCharacteristicRequest extends $pb.GeneratedMessage {
   static NotifyNoMoreCharacteristicRequest getDefault() => _defaultInstance ??=
       $pb.GeneratedMessage.$_defaultFor<NotifyNoMoreCharacteristicRequest>(
           create);
-  static NotifyNoMoreCharacteristicRequest _defaultInstance;
+  static NotifyNoMoreCharacteristicRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
   CharacteristicAddress get characteristic => $_getN(0);
@@ -735,8 +738,8 @@ class ReadCharacteristicRequest extends $pb.GeneratedMessage {
       'Will be removed in next major version')
   ReadCharacteristicRequest copyWith(
           void Function(ReadCharacteristicRequest) updates) =>
-      super.copyWith((message) => updates(message
-          as ReadCharacteristicRequest)); // ignore: deprecated_member_use
+      super.copyWith((message) => updates(message as ReadCharacteristicRequest))
+          as ReadCharacteristicRequest; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
   static ReadCharacteristicRequest create() => ReadCharacteristicRequest._();
@@ -746,7 +749,7 @@ class ReadCharacteristicRequest extends $pb.GeneratedMessage {
   @$core.pragma('dart2js:noInline')
   static ReadCharacteristicRequest getDefault() => _defaultInstance ??=
       $pb.GeneratedMessage.$_defaultFor<ReadCharacteristicRequest>(create);
-  static ReadCharacteristicRequest _defaultInstance;
+  static ReadCharacteristicRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
   CharacteristicAddress get characteristic => $_getN(0);
@@ -804,8 +807,8 @@ class CharacteristicValueInfo extends $pb.GeneratedMessage {
       'Will be removed in next major version')
   CharacteristicValueInfo copyWith(
           void Function(CharacteristicValueInfo) updates) =>
-      super.copyWith((message) => updates(
-          message as CharacteristicValueInfo)); // ignore: deprecated_member_use
+      super.copyWith((message) => updates(message as CharacteristicValueInfo))
+          as CharacteristicValueInfo; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
   static CharacteristicValueInfo create() => CharacteristicValueInfo._();
@@ -815,7 +818,7 @@ class CharacteristicValueInfo extends $pb.GeneratedMessage {
   @$core.pragma('dart2js:noInline')
   static CharacteristicValueInfo getDefault() => _defaultInstance ??=
       $pb.GeneratedMessage.$_defaultFor<CharacteristicValueInfo>(create);
-  static CharacteristicValueInfo _defaultInstance;
+  static CharacteristicValueInfo? _defaultInstance;
 
   @$pb.TagNumber(1)
   CharacteristicAddress get characteristic => $_getN(0);
@@ -896,8 +899,9 @@ class WriteCharacteristicRequest extends $pb.GeneratedMessage {
       'Will be removed in next major version')
   WriteCharacteristicRequest copyWith(
           void Function(WriteCharacteristicRequest) updates) =>
-      super.copyWith((message) => updates(message
-          as WriteCharacteristicRequest)); // ignore: deprecated_member_use
+      super.copyWith(
+              (message) => updates(message as WriteCharacteristicRequest))
+          as WriteCharacteristicRequest; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
   static WriteCharacteristicRequest create() => WriteCharacteristicRequest._();
@@ -907,7 +911,7 @@ class WriteCharacteristicRequest extends $pb.GeneratedMessage {
   @$core.pragma('dart2js:noInline')
   static WriteCharacteristicRequest getDefault() => _defaultInstance ??=
       $pb.GeneratedMessage.$_defaultFor<WriteCharacteristicRequest>(create);
-  static WriteCharacteristicRequest _defaultInstance;
+  static WriteCharacteristicRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
   CharacteristicAddress get characteristic => $_getN(0);
@@ -974,8 +978,8 @@ class WriteCharacteristicInfo extends $pb.GeneratedMessage {
       'Will be removed in next major version')
   WriteCharacteristicInfo copyWith(
           void Function(WriteCharacteristicInfo) updates) =>
-      super.copyWith((message) => updates(
-          message as WriteCharacteristicInfo)); // ignore: deprecated_member_use
+      super.copyWith((message) => updates(message as WriteCharacteristicInfo))
+          as WriteCharacteristicInfo; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
   static WriteCharacteristicInfo create() => WriteCharacteristicInfo._();
@@ -985,7 +989,7 @@ class WriteCharacteristicInfo extends $pb.GeneratedMessage {
   @$core.pragma('dart2js:noInline')
   static WriteCharacteristicInfo getDefault() => _defaultInstance ??=
       $pb.GeneratedMessage.$_defaultFor<WriteCharacteristicInfo>(create);
-  static WriteCharacteristicInfo _defaultInstance;
+  static WriteCharacteristicInfo? _defaultInstance;
 
   @$pb.TagNumber(1)
   CharacteristicAddress get characteristic => $_getN(0);
@@ -1053,8 +1057,8 @@ class NegotiateMtuRequest extends $pb.GeneratedMessage {
       'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
       'Will be removed in next major version')
   NegotiateMtuRequest copyWith(void Function(NegotiateMtuRequest) updates) =>
-      super.copyWith((message) => updates(
-          message as NegotiateMtuRequest)); // ignore: deprecated_member_use
+      super.copyWith((message) => updates(message as NegotiateMtuRequest))
+          as NegotiateMtuRequest; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
   static NegotiateMtuRequest create() => NegotiateMtuRequest._();
@@ -1064,7 +1068,7 @@ class NegotiateMtuRequest extends $pb.GeneratedMessage {
   @$core.pragma('dart2js:noInline')
   static NegotiateMtuRequest getDefault() => _defaultInstance ??=
       $pb.GeneratedMessage.$_defaultFor<NegotiateMtuRequest>(create);
-  static NegotiateMtuRequest _defaultInstance;
+  static NegotiateMtuRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
   $core.String get deviceId => $_getSZ(0);
@@ -1128,8 +1132,8 @@ class NegotiateMtuInfo extends $pb.GeneratedMessage {
       'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
       'Will be removed in next major version')
   NegotiateMtuInfo copyWith(void Function(NegotiateMtuInfo) updates) =>
-      super.copyWith((message) => updates(
-          message as NegotiateMtuInfo)); // ignore: deprecated_member_use
+      super.copyWith((message) => updates(message as NegotiateMtuInfo))
+          as NegotiateMtuInfo; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
   static NegotiateMtuInfo create() => NegotiateMtuInfo._();
@@ -1139,7 +1143,7 @@ class NegotiateMtuInfo extends $pb.GeneratedMessage {
   @$core.pragma('dart2js:noInline')
   static NegotiateMtuInfo getDefault() => _defaultInstance ??=
       $pb.GeneratedMessage.$_defaultFor<NegotiateMtuInfo>(create);
-  static NegotiateMtuInfo _defaultInstance;
+  static NegotiateMtuInfo? _defaultInstance;
 
   @$pb.TagNumber(1)
   $core.String get deviceId => $_getSZ(0);
@@ -1210,8 +1214,8 @@ class BleStatusInfo extends $pb.GeneratedMessage {
       'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
       'Will be removed in next major version')
   BleStatusInfo copyWith(void Function(BleStatusInfo) updates) =>
-      super.copyWith((message) =>
-          updates(message as BleStatusInfo)); // ignore: deprecated_member_use
+      super.copyWith((message) => updates(message as BleStatusInfo))
+          as BleStatusInfo; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
   static BleStatusInfo create() => BleStatusInfo._();
@@ -1221,7 +1225,7 @@ class BleStatusInfo extends $pb.GeneratedMessage {
   @$core.pragma('dart2js:noInline')
   static BleStatusInfo getDefault() => _defaultInstance ??=
       $pb.GeneratedMessage.$_defaultFor<BleStatusInfo>(create);
-  static BleStatusInfo _defaultInstance;
+  static BleStatusInfo? _defaultInstance;
 
   @$pb.TagNumber(1)
   $core.int get status => $_getIZ(0);
@@ -1276,8 +1280,9 @@ class ChangeConnectionPriorityRequest extends $pb.GeneratedMessage {
       'Will be removed in next major version')
   ChangeConnectionPriorityRequest copyWith(
           void Function(ChangeConnectionPriorityRequest) updates) =>
-      super.copyWith((message) => updates(message
-          as ChangeConnectionPriorityRequest)); // ignore: deprecated_member_use
+      super.copyWith(
+              (message) => updates(message as ChangeConnectionPriorityRequest))
+          as ChangeConnectionPriorityRequest; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
   static ChangeConnectionPriorityRequest create() =>
@@ -1289,7 +1294,7 @@ class ChangeConnectionPriorityRequest extends $pb.GeneratedMessage {
   static ChangeConnectionPriorityRequest getDefault() => _defaultInstance ??=
       $pb.GeneratedMessage.$_defaultFor<ChangeConnectionPriorityRequest>(
           create);
-  static ChangeConnectionPriorityRequest _defaultInstance;
+  static ChangeConnectionPriorityRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
   $core.String get deviceId => $_getSZ(0);
@@ -1354,8 +1359,9 @@ class ChangeConnectionPriorityInfo extends $pb.GeneratedMessage {
       'Will be removed in next major version')
   ChangeConnectionPriorityInfo copyWith(
           void Function(ChangeConnectionPriorityInfo) updates) =>
-      super.copyWith((message) => updates(message
-          as ChangeConnectionPriorityInfo)); // ignore: deprecated_member_use
+      super.copyWith(
+              (message) => updates(message as ChangeConnectionPriorityInfo))
+          as ChangeConnectionPriorityInfo; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
   static ChangeConnectionPriorityInfo create() =>
@@ -1366,7 +1372,7 @@ class ChangeConnectionPriorityInfo extends $pb.GeneratedMessage {
   @$core.pragma('dart2js:noInline')
   static ChangeConnectionPriorityInfo getDefault() => _defaultInstance ??=
       $pb.GeneratedMessage.$_defaultFor<ChangeConnectionPriorityInfo>(create);
-  static ChangeConnectionPriorityInfo _defaultInstance;
+  static ChangeConnectionPriorityInfo? _defaultInstance;
 
   @$pb.TagNumber(1)
   $core.String get deviceId => $_getSZ(0);
@@ -1438,8 +1444,8 @@ class CharacteristicAddress extends $pb.GeneratedMessage {
       'Will be removed in next major version')
   CharacteristicAddress copyWith(
           void Function(CharacteristicAddress) updates) =>
-      super.copyWith((message) => updates(
-          message as CharacteristicAddress)); // ignore: deprecated_member_use
+      super.copyWith((message) => updates(message as CharacteristicAddress))
+          as CharacteristicAddress; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
   static CharacteristicAddress create() => CharacteristicAddress._();
@@ -1449,7 +1455,7 @@ class CharacteristicAddress extends $pb.GeneratedMessage {
   @$core.pragma('dart2js:noInline')
   static CharacteristicAddress getDefault() => _defaultInstance ??=
       $pb.GeneratedMessage.$_defaultFor<CharacteristicAddress>(create);
-  static CharacteristicAddress _defaultInstance;
+  static CharacteristicAddress? _defaultInstance;
 
   @$pb.TagNumber(1)
   $core.String get deviceId => $_getSZ(0);
@@ -1529,8 +1535,8 @@ class ServiceDataEntry extends $pb.GeneratedMessage {
       'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
       'Will be removed in next major version')
   ServiceDataEntry copyWith(void Function(ServiceDataEntry) updates) =>
-      super.copyWith((message) => updates(
-          message as ServiceDataEntry)); // ignore: deprecated_member_use
+      super.copyWith((message) => updates(message as ServiceDataEntry))
+          as ServiceDataEntry; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
   static ServiceDataEntry create() => ServiceDataEntry._();
@@ -1540,7 +1546,7 @@ class ServiceDataEntry extends $pb.GeneratedMessage {
   @$core.pragma('dart2js:noInline')
   static ServiceDataEntry getDefault() => _defaultInstance ??=
       $pb.GeneratedMessage.$_defaultFor<ServiceDataEntry>(create);
-  static ServiceDataEntry _defaultInstance;
+  static ServiceDataEntry? _defaultInstance;
 
   @$pb.TagNumber(1)
   Uuid get serviceUuid => $_getN(0);
@@ -1602,8 +1608,9 @@ class ServicesWithCharacteristics extends $pb.GeneratedMessage {
       'Will be removed in next major version')
   ServicesWithCharacteristics copyWith(
           void Function(ServicesWithCharacteristics) updates) =>
-      super.copyWith((message) => updates(message
-          as ServicesWithCharacteristics)); // ignore: deprecated_member_use
+      super.copyWith(
+              (message) => updates(message as ServicesWithCharacteristics))
+          as ServicesWithCharacteristics; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
   static ServicesWithCharacteristics create() =>
@@ -1614,7 +1621,7 @@ class ServicesWithCharacteristics extends $pb.GeneratedMessage {
   @$core.pragma('dart2js:noInline')
   static ServicesWithCharacteristics getDefault() => _defaultInstance ??=
       $pb.GeneratedMessage.$_defaultFor<ServicesWithCharacteristics>(create);
-  static ServicesWithCharacteristics _defaultInstance;
+  static ServicesWithCharacteristics? _defaultInstance;
 
   @$pb.TagNumber(1)
   $core.List<ServiceWithCharacteristics> get items => $_getList(0);
@@ -1660,8 +1667,9 @@ class ServiceWithCharacteristics extends $pb.GeneratedMessage {
       'Will be removed in next major version')
   ServiceWithCharacteristics copyWith(
           void Function(ServiceWithCharacteristics) updates) =>
-      super.copyWith((message) => updates(message
-          as ServiceWithCharacteristics)); // ignore: deprecated_member_use
+      super.copyWith(
+              (message) => updates(message as ServiceWithCharacteristics))
+          as ServiceWithCharacteristics; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
   static ServiceWithCharacteristics create() => ServiceWithCharacteristics._();
@@ -1671,7 +1679,7 @@ class ServiceWithCharacteristics extends $pb.GeneratedMessage {
   @$core.pragma('dart2js:noInline')
   static ServiceWithCharacteristics getDefault() => _defaultInstance ??=
       $pb.GeneratedMessage.$_defaultFor<ServiceWithCharacteristics>(create);
-  static ServiceWithCharacteristics _defaultInstance;
+  static ServiceWithCharacteristics? _defaultInstance;
 
   @$pb.TagNumber(1)
   Uuid get serviceId => $_getN(0);
@@ -1723,8 +1731,8 @@ class DiscoverServicesRequest extends $pb.GeneratedMessage {
       'Will be removed in next major version')
   DiscoverServicesRequest copyWith(
           void Function(DiscoverServicesRequest) updates) =>
-      super.copyWith((message) => updates(
-          message as DiscoverServicesRequest)); // ignore: deprecated_member_use
+      super.copyWith((message) => updates(message as DiscoverServicesRequest))
+          as DiscoverServicesRequest; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
   static DiscoverServicesRequest create() => DiscoverServicesRequest._();
@@ -1734,7 +1742,7 @@ class DiscoverServicesRequest extends $pb.GeneratedMessage {
   @$core.pragma('dart2js:noInline')
   static DiscoverServicesRequest getDefault() => _defaultInstance ??=
       $pb.GeneratedMessage.$_defaultFor<DiscoverServicesRequest>(create);
-  static DiscoverServicesRequest _defaultInstance;
+  static DiscoverServicesRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
   $core.String get deviceId => $_getSZ(0);
@@ -1788,8 +1796,8 @@ class DiscoverServicesInfo extends $pb.GeneratedMessage {
       'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
       'Will be removed in next major version')
   DiscoverServicesInfo copyWith(void Function(DiscoverServicesInfo) updates) =>
-      super.copyWith((message) => updates(
-          message as DiscoverServicesInfo)); // ignore: deprecated_member_use
+      super.copyWith((message) => updates(message as DiscoverServicesInfo))
+          as DiscoverServicesInfo; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
   static DiscoverServicesInfo create() => DiscoverServicesInfo._();
@@ -1799,7 +1807,7 @@ class DiscoverServicesInfo extends $pb.GeneratedMessage {
   @$core.pragma('dart2js:noInline')
   static DiscoverServicesInfo getDefault() => _defaultInstance ??=
       $pb.GeneratedMessage.$_defaultFor<DiscoverServicesInfo>(create);
-  static DiscoverServicesInfo _defaultInstance;
+  static DiscoverServicesInfo? _defaultInstance;
 
   @$pb.TagNumber(1)
   $core.String get deviceId => $_getSZ(0);
@@ -1857,8 +1865,8 @@ class DiscoveredService extends $pb.GeneratedMessage {
       'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
       'Will be removed in next major version')
   DiscoveredService copyWith(void Function(DiscoveredService) updates) =>
-      super.copyWith((message) => updates(
-          message as DiscoveredService)); // ignore: deprecated_member_use
+      super.copyWith((message) => updates(message as DiscoveredService))
+          as DiscoveredService; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
   static DiscoveredService create() => DiscoveredService._();
@@ -1868,7 +1876,7 @@ class DiscoveredService extends $pb.GeneratedMessage {
   @$core.pragma('dart2js:noInline')
   static DiscoveredService getDefault() => _defaultInstance ??=
       $pb.GeneratedMessage.$_defaultFor<DiscoveredService>(create);
-  static DiscoveredService _defaultInstance;
+  static DiscoveredService? _defaultInstance;
 
   @$pb.TagNumber(1)
   Uuid get serviceUuid => $_getN(0);
@@ -1920,8 +1928,9 @@ class Uuid extends $pb.GeneratedMessage {
   @$core.Deprecated('Using this can add significant overhead to your binary. '
       'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
       'Will be removed in next major version')
-  Uuid copyWith(void Function(Uuid) updates) => super.copyWith(
-      (message) => updates(message as Uuid)); // ignore: deprecated_member_use
+  Uuid copyWith(void Function(Uuid) updates) =>
+      super.copyWith((message) => updates(message as Uuid))
+          as Uuid; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
   static Uuid create() => Uuid._();
@@ -1930,7 +1939,7 @@ class Uuid extends $pb.GeneratedMessage {
   @$core.pragma('dart2js:noInline')
   static Uuid getDefault() =>
       _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Uuid>(create);
-  static Uuid _defaultInstance;
+  static Uuid? _defaultInstance;
 
   @$pb.TagNumber(1)
   $core.List<$core.int> get data => $_getN(0);
@@ -1980,8 +1989,8 @@ class GenericFailure extends $pb.GeneratedMessage {
       'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
       'Will be removed in next major version')
   GenericFailure copyWith(void Function(GenericFailure) updates) =>
-      super.copyWith((message) =>
-          updates(message as GenericFailure)); // ignore: deprecated_member_use
+      super.copyWith((message) => updates(message as GenericFailure))
+          as GenericFailure; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
   static GenericFailure create() => GenericFailure._();
@@ -1991,7 +2000,7 @@ class GenericFailure extends $pb.GeneratedMessage {
   @$core.pragma('dart2js:noInline')
   static GenericFailure getDefault() => _defaultInstance ??=
       $pb.GeneratedMessage.$_defaultFor<GenericFailure>(create);
-  static GenericFailure _defaultInstance;
+  static GenericFailure? _defaultInstance;
 
   @$pb.TagNumber(1)
   $core.int get code => $_getIZ(0);

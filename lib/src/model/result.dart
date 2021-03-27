@@ -13,10 +13,9 @@ class Result<Value, Failure> {
 
   /// Provides the value in case of success or throws [Exception] in case of failure.
   Value dematerialize() => iif(
-        success: (value) => value,
+        success: (value) => value!,
         failure: (failure) {
           if (failure is Exception) {
-            // ignore: only_throw_errors
             throw failure;
           } else {
             throw Exception(failure);
@@ -26,14 +25,16 @@ class Result<Value, Failure> {
 
   /// Execute specific actions on success and on failure.
   T iif<T>(
-      {@required T Function(Value value) success,
-      @required T Function(Failure failure) failure}) {
+      {required T Function(Value value) success,
+      required T Function(Failure failure) failure}) {
     assert(_value == null || _failure == null);
 
     if (_failure != null) {
-      return failure(_failure);
+      return failure(_failure!);
+    } else if (_value != null) {
+      return success(_value!);
     } else {
-      return success(_value);
+      throw Exception('Both value and failure cannot be null');
     }
   }
 
@@ -53,11 +54,12 @@ class Result<Value, Failure> {
       ((17 * 37) + (_value?.hashCode ?? 0)) * 37 + (_failure?.hashCode ?? 0);
 
   @override
-  bool operator ==(dynamic other) =>
+  bool operator ==(Object other) =>
+      other is Result &&
       runtimeType == other.runtimeType &&
       _value == other._value &&
       _failure == other._failure;
 
-  final Value _value;
-  final Failure _failure;
+  final Value? _value;
+  final Failure? _failure;
 }

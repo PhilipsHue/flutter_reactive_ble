@@ -5,8 +5,8 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group("Repeater", () {
-    StreamController<int> underlyingStreamController;
-    _RepeaterHandler<int> handler;
+    late StreamController<int> underlyingStreamController;
+    late _RepeaterHandler<int> handler;
 
     setUp(() {
       underlyingStreamController = StreamController(sync: true);
@@ -18,7 +18,7 @@ void main() {
     });
 
     group('Repeater internals', () {
-      Repeater<int> sut;
+      late Repeater<int> sut;
 
       setUp(() {
         sut = Repeater(
@@ -28,7 +28,7 @@ void main() {
         );
       });
       group('Has subscription', () {
-        StreamSubscription<int> subscription;
+        late StreamSubscription<int> subscription;
 
         setUp(() {
           subscription = sut.stream.listen((_) {});
@@ -65,7 +65,7 @@ void main() {
     });
 
     group('Broadcast repeater', () {
-      Repeater<int> sut;
+      late Repeater<int> sut;
 
       setUp(() {
         sut = Repeater.broadcast(
@@ -82,7 +82,7 @@ void main() {
 
     group('Repeater from stream', () {
       Repeater<int> sut;
-      StreamSubscription<int> subscription;
+      late StreamSubscription<int> subscription;
 
       setUp(() {
         sut = Repeater.fromStream(underlyingStreamController.stream);

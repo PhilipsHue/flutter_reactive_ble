@@ -13,17 +13,13 @@ class ConnectionStateUpdate extends $ConnectionStateUpdate {
   final DeviceConnectionState connectionState;
 
   /// Field `error` is null if there is no error reported.
-  final GenericFailure<ConnectionError> failure;
+  final GenericFailure<ConnectionError>? failure;
 
   const ConnectionStateUpdate({
-    @required this.deviceId,
-    @required this.connectionState,
-    @required this.failure,
+    required this.deviceId,
+    required this.connectionState,
+    required this.failure,
   });
-
-  @override
-  String toString() =>
-      "$runtimeType(deviceId: $deviceId, connectionState: $connectionState, error: $failure)";
 }
 
 /// Connection status.
