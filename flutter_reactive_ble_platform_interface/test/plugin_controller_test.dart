@@ -26,6 +26,7 @@ import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 
 import 'plugin_controller_test.mocks.dart';
+// ignore_for_file: avoid_implementing_value_types
 
 @GenerateMocks([
   ArgsToProtobufConverter,
