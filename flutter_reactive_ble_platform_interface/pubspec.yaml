@@ -1,6 +1,6 @@
 name: flutter_reactive_ble_platform_interface
 description: A new Flutter package project.
-version: 0.0.1
+version: 0.1.0
 author:
 homepage:
 
@@ -11,9 +11,15 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  functional_data: ^1.0.0
+  protobuf: ^2.0.0
 
 dev_dependencies:
+  build_runner: ^1.12.1
   flutter_test:
     sdk: flutter
+  functional_data_generator: ^1.0.0
+  mockito: ^5.0.2
+
 
 flutter:
