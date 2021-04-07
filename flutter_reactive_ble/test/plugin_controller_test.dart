@@ -2,10 +2,10 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:flutter/services.dart';
-import 'package:flutter_reactive_ble_platform_interface/src/converter/args_to_protubuf_converter.dart';
-import 'package:flutter_reactive_ble_platform_interface/src/converter/protobuf_converter.dart';
-import 'package:flutter_reactive_ble_platform_interface/src/generated/bledata.pbserver.dart'
-    as pb;
+import 'package:flutter_reactive_ble/src/converter/args_to_protubuf_converter.dart';
+import 'package:flutter_reactive_ble/src/converter/protobuf_converter.dart';
+import 'package:flutter_reactive_ble/src/generated/bledata.pbserver.dart' as pb;
+import 'package:flutter_reactive_ble/src/plugin_controller.dart';
 import 'package:flutter_reactive_ble_platform_interface/src/model/ble_status.dart';
 import 'package:flutter_reactive_ble_platform_interface/src/model/characteristic_value.dart';
 import 'package:flutter_reactive_ble_platform_interface/src/model/clear_gatt_cache_error.dart';
@@ -20,7 +20,6 @@ import 'package:flutter_reactive_ble_platform_interface/src/model/scan_mode.dart
 import 'package:flutter_reactive_ble_platform_interface/src/model/unit.dart';
 import 'package:flutter_reactive_ble_platform_interface/src/model/uuid.dart';
 import 'package:flutter_reactive_ble_platform_interface/src/model/write_characteristic_info.dart';
-import 'package:flutter_reactive_ble_platform_interface/src/plugin_controller.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
@@ -29,7 +28,6 @@ import 'plugin_controller_test.mocks.dart';
 // ignore_for_file: avoid_implementing_value_types
 
 @GenerateMocks([
-  Logger,
   ArgsToProtobufConverter,
   ProtobufConverter,
   MethodChannel,
@@ -55,8 +53,6 @@ void main() {
       _scanStreamController = StreamController();
       _statusStreamController = StreamController();
 
-      final logger = MockLogger();
-      when(logger.log(any)).thenAnswer((_) {});
       when(_methodChannel.invokeMethod<void>(any, any)).thenAnswer(
         (_) async => 0,
       );
@@ -69,7 +65,6 @@ void main() {
         charUpdateChannel: _argsStreamController.stream,
         bleDeviceScanChannel: _scanStreamController.stream,
         bleStatusChannel: _statusStreamController.stream,
-        debugLogger: logger,
       );
     });
 

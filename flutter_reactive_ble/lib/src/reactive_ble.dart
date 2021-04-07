@@ -10,6 +10,8 @@ import 'package:flutter_reactive_ble/src/rx_ext/repeater.dart';
 import 'package:flutter_reactive_ble_platform_interface/flutter_reactive_ble_platform_interface.dart';
 import 'package:meta/meta.dart';
 
+import 'plugin_controller.dart';
+
 /// [FlutterReactiveBle] is the facade of the library. Its interface allows to
 /// perform all the supported BLE operations.
 class FlutterReactiveBle {
@@ -19,13 +21,14 @@ class FlutterReactiveBle {
 
   ///Create a new instance where injected depedencies are used.
   @visibleForTesting
-  FlutterReactiveBle.witDependencies(
-      {required DeviceScanner deviceScanner,
-      required DeviceConnector deviceConnector,
-      required ConnectedDeviceOperation connectedDeviceOperation,
-      required Logger debugLogger,
-      required Future<void> initialization,
-      required ReactiveBlePlatform reactiveBlePlatform}) {
+  FlutterReactiveBle.witDependencies({
+    required DeviceScanner deviceScanner,
+    required DeviceConnector deviceConnector,
+    required ConnectedDeviceOperation connectedDeviceOperation,
+    required Logger debugLogger,
+    required Future<void> initialization,
+    required ReactiveBlePlatform reactiveBlePlatform,
+  }) {
     _deviceScanner = deviceScanner;
     _deviceConnector = deviceConnector;
     _connectedDeviceOperator = connectedDeviceOperation;
@@ -101,6 +104,8 @@ class FlutterReactiveBle {
         'REACTIVE_BLE',
         print,
       );
+
+      ReactiveBlePlatform.instance = PluginControllerFactory().create();
 
       _blePlatform = ReactiveBlePlatform.instance;
 

@@ -24,6 +24,7 @@ void main() {
       _device1 = DiscoveredDevice(
         id: '123',
         name: 'Test1',
+        serviceUuids: [],
         serviceData: const {},
         manufacturerData: Uint8List.fromList([1]),
         rssi: -40,
@@ -31,6 +32,7 @@ void main() {
       _device2 = DiscoveredDevice(
         id: '456',
         name: 'Test2',
+        serviceUuids: [],
         serviceData: const {},
         manufacturerData: Uint8List.fromList([0]),
         rssi: -80,

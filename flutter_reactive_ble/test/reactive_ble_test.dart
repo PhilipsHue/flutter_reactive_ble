@@ -239,6 +239,7 @@ void main() {
         name: 'test',
         rssi: -39,
         serviceData: {},
+        serviceUuids: [],
       );
       Stream<DiscoveredDevice>? deviceStream;
 
@@ -359,8 +360,7 @@ void main() {
       );
 
       setUp(() async {
-        when(_blePlatform.clearGattCache(any))
-            .thenAnswer((_) async => result);
+        when(_blePlatform.clearGattCache(any)).thenAnswer((_) async => result);
 
         await _sut.clearGattCache(deviceId);
       });

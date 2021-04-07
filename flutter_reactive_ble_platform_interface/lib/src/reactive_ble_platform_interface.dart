@@ -1,4 +1,3 @@
-import 'package:flutter_reactive_ble_platform_interface/src/plugin_controller.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 import 'models.dart';
@@ -7,8 +6,7 @@ abstract class ReactiveBlePlatform extends PlatformInterface {
   ReactiveBlePlatform() : super(token: _token);
   static final Object _token = Object();
 
-  static ReactiveBlePlatform _instance =
-      const PluginControllerFactory().create();
+  static late ReactiveBlePlatform _instance;
 
   static ReactiveBlePlatform get instance => _instance;
 

@@ -1,8 +1,6 @@
+import 'package:flutter_reactive_ble_platform_interface/flutter_reactive_ble_platform_interface.dart';
+
 import '../generated/bledata.pb.dart' as pb;
-import '../model/connection_priority.dart';
-import '../model/qualified_characteristic.dart';
-import '../model/scan_mode.dart';
-import '../model/uuid.dart';
 
 abstract class ArgsToProtobufConverter {
   pb.ConnectToDeviceRequest createConnectToDeviceArgs(

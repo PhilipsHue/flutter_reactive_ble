@@ -1,8 +1,7 @@
 import 'dart:typed_data';
 
-import 'package:flutter_reactive_ble_platform_interface/src/converter/protobuf_converter.dart';
-import 'package:flutter_reactive_ble_platform_interface/src/generated/bledata.pb.dart'
-    as pb;
+import 'package:flutter_reactive_ble/src/converter/protobuf_converter.dart';
+import 'package:flutter_reactive_ble/src/generated/bledata.pbserver.dart' as pb;
 import 'package:flutter_reactive_ble_platform_interface/src/model/ble_status.dart';
 import 'package:flutter_reactive_ble_platform_interface/src/model/characteristic_value.dart';
 import 'package:flutter_reactive_ble_platform_interface/src/model/clear_gatt_cache_error.dart';
