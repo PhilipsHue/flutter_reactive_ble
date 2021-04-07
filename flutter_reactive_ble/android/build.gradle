@@ -44,7 +44,7 @@ android {
         test.java.srcDirs += 'src/test/kotlin'
         main {
             proto {
-                srcDir '../../flutter_reactive_ble_platform_interface/protos/'
+                srcDir '../protos/'
             }
         }
     }

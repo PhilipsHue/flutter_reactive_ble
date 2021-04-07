@@ -1,21 +1,9 @@
 import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter_reactive_ble_platform_interface/flutter_reactive_ble_platform_interface.dart';
 
 import '../generated/bledata.pb.dart' as pb;
-import '../model/ble_status.dart';
-import '../model/characteristic_value.dart';
-import '../model/clear_gatt_cache_error.dart';
-import '../model/connection_priority.dart';
-import '../model/connection_state_update.dart';
-import '../model/discovered_device.dart';
-import '../model/discovered_service.dart';
-import '../model/generic_failure.dart';
-import '../model/qualified_characteristic.dart';
-import '../model/result.dart';
-import '../model/unit.dart';
-import '../model/uuid.dart';
-import '../model/write_characteristic_info.dart';
 import '../select_from.dart';
 
 abstract class ProtobufConverter {

@@ -31,9 +31,8 @@ abstract class ConnectedDeviceOperation {
 }
 
 class ConnectedDeviceOperationImpl implements ConnectedDeviceOperation {
-  ConnectedDeviceOperationImpl({
-    required ReactiveBlePlatform blePlatform
-  }) : _blePlatform = blePlatform;
+  ConnectedDeviceOperationImpl({required ReactiveBlePlatform blePlatform})
+      : _blePlatform = blePlatform;
 
   final ReactiveBlePlatform _blePlatform;
 

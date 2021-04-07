@@ -1,9 +1,8 @@
 import 'package:flutter/services.dart';
+import 'package:flutter_reactive_ble_platform_interface/flutter_reactive_ble_platform_interface.dart';
 
-import 'converter/args_to_protubuf_converter.dart';
-import 'converter/protobuf_converter.dart';
-import 'models.dart';
-import 'reactive_ble_platform_interface.dart';
+import './converter/args_to_protubuf_converter.dart';
+import './converter/protobuf_converter.dart';
 
 class PluginController extends ReactiveBlePlatform {
   PluginController({

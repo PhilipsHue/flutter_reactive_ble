@@ -326,13 +326,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.5.0"
-  protobuf:
-    dependency: "direct main"
-    description:
-      name: protobuf
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "2.0.0"
   pub_semver:
     dependency: transitive
     description:
