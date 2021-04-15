@@ -2,6 +2,7 @@ import class CoreBluetooth.CBUUID
 import class CoreBluetooth.CBService
 import enum CoreBluetooth.CBManagerState
 import var CoreBluetooth.CBAdvertisementDataServiceDataKey
+import var CoreBluetooth.CBAdvertisementDataServiceUUIDsKey
 import var CoreBluetooth.CBAdvertisementDataManufacturerDataKey
 import var CoreBluetooth.CBAdvertisementDataLocalNameKey
 
@@ -38,6 +39,7 @@ final class PluginController {
                 else { assert(false); return }
 
                 let serviceData = advertisementData[CBAdvertisementDataServiceDataKey] as? ServiceData ?? [:]
+                let serviceUuids = advertisementData[CBAdvertisementDataServiceUUIDsKey] as? [CBUUID] ?? []
                 let manufacturerData = advertisementData[CBAdvertisementDataManufacturerDataKey] as? Data ?? Data();
                 let name = advertisementData[CBAdvertisementDataLocalNameKey] as? String ?? peripheral.name ?? String();
 
@@ -52,6 +54,7 @@ final class PluginController {
                                 $0.data = entry.value
                             }
                         }
+                    $0.serviceUuids = serviceUuids.map { entry in Uuid.with { $0.data = entry.data }}
                     $0.manufacturerData = manufacturerData
                 }
 

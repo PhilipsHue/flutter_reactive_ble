@@ -30,6 +30,9 @@ class DiscoveredDevice extends $DiscoveredDevice {
   @CustomEquality(DeepCollectionEquality())
   final Map<Uuid, Uint8List> serviceData;
 
+  @CustomEquality(DeepCollectionEquality())
+  final List<Uuid> serviceUuids;
+
   /// Manufacturer specific data. The first 2 bytes are the Company Identifier Codes.
   final Uint8List manufacturerData;
 
@@ -39,6 +42,7 @@ class DiscoveredDevice extends $DiscoveredDevice {
     required this.id,
     required this.name,
     required this.serviceData,
+    required this.serviceUuids,
     required this.manufacturerData,
     required this.rssi,
   });
