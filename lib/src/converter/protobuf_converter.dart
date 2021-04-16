@@ -60,8 +60,9 @@ class ProtobufConverterImpl implements ProtobufConverter {
       message.serviceData.map((entry) => Uuid(entry.serviceUuid.data)),
       message.serviceData.map((entry) => Uint8List.fromList(entry.data)),
     );
-    final serviceUuids =
-        message.serviceUuids.map((entry) => Uuid(entry.data)).toList();
+    final serviceUuids = message.serviceUuids
+        .map((entry) => Uuid(entry.data))
+        .toList(growable: false);
 
     return ScanResult(
       result: resultFrom(
