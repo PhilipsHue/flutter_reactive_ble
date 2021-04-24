@@ -37,18 +37,21 @@ workflows:
       - |
         # set up local properties
         echo "flutter.sdk=$HOME/programs/flutter" > "$FCI_BUILD_DIR/android/local.properties"
-      - cd . && flutter packages pub get
-      - cd . && flutter analyze
-      - cd . && flutter test
-      - cd example && flutter packages pub get
-      - cd example && flutter analyze
-      - cd example && flutter test
-      - cd . && pub publish --dry-run
+      - name: Pub get 
+        script: cd . && flutter pub get
+      - name: Flutter analyze
+        script: cd . && flutter analyze
+      - name: Flutter test
+        script: cd . && flutter test
+      - name: Dry run publish
+        script: cd . && flutter pub publish --dry-run
       - |
         #!/bin/bash -ex
         cd example/android && ls && ./gradlew detekt && ./gradlew testDebugUnitTest
-      - cd example && flutter build apk --debug
-      - find . -name "Podfile" -execdir pod install \;
+      - name: Build android app
+        script: cd example && flutter build apk --debug
+      - name: Build iOS app
+        script: find . -name "Podfile" -execdir pod install \;
       - cd example && flutter build ios --debug --no-codesign
     artifacts:
       - build/**/outputs/**/*.apk
