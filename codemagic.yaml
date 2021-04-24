@@ -2,7 +2,7 @@
 # Note that this configuration is not an exact match to UI settings. Review and adjust as necessary.
 
 workflows:
-  default-workflow:
+  ble-workflow:
     name: Ble Workflow
     max_build_duration: 60
     environment:
