@@ -2,7 +2,6 @@ import 'dart:typed_data';
 
 import 'package:collection/collection.dart';
 import 'package:flutter_reactive_ble_platform_interface/src/model/uuid.dart';
-
 import 'package:functional_data/functional_data.dart';
 import 'package:meta/meta.dart';
 
@@ -33,6 +32,10 @@ class DiscoveredDevice extends $DiscoveredDevice {
   @CustomEquality(DeepCollectionEquality())
   final Map<Uuid, Uint8List> serviceData;
 
+  /// Advertised services
+  @CustomEquality(DeepCollectionEquality())
+  final List<Uuid> serviceUuids;
+
   /// Manufacturer specific data. The first 2 bytes are the Company Identifier Codes.
   final Uint8List manufacturerData;
 
@@ -44,6 +47,7 @@ class DiscoveredDevice extends $DiscoveredDevice {
     required this.serviceData,
     required this.manufacturerData,
     required this.rssi,
+    required this.serviceUuids,
   });
 }
 

@@ -1,13 +1,9 @@
 import 'package:collection/collection.dart';
 import 'package:flutter_reactive_ble/src/device_scanner.dart';
-import 'package:flutter_reactive_ble/src/model/connection_state_update.dart';
-import 'package:flutter_reactive_ble/src/plugin_controller.dart';
+import 'package:flutter_reactive_ble_platform_interface/flutter_reactive_ble_platform_interface.dart';
+
 import 'package:flutter_reactive_ble/src/rx_ext/repeater.dart';
 
-import 'model/discovered_device.dart';
-import 'model/generic_failure.dart';
-import 'model/scan_mode.dart';
-import 'model/uuid.dart';
 
 abstract class DeviceConnector {
   Stream<ConnectionStateUpdate> get deviceConnectionStateUpdateStream;

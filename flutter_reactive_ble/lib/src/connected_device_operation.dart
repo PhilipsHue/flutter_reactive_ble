@@ -1,5 +1,5 @@
 import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
-import 'package:flutter_reactive_ble/src/plugin_controller.dart';
+import 'package:flutter_reactive_ble_platform_interface/flutter_reactive_ble_platform_interface.dart';
 import 'package:meta/meta.dart';
 
 abstract class ConnectedDeviceOperation {
