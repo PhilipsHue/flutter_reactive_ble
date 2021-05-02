@@ -467,6 +467,7 @@ void main() {
         name: 'Testdevice',
         rssi: -40,
         serviceData: const {},
+        serviceUuids: const [],
         manufacturerData: Uint8List.fromList([1]),
       );
       late ScanResult scanResult;

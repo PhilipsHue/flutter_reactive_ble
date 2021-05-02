@@ -21,7 +21,9 @@ void main() {
       late pb.ServiceDataEntry serviceDataEntry1;
       late pb.ServiceDataEntry serviceDataEntry2;
       pb.DeviceScanInfo message;
-      Uint8List? manufacturerData;
+      late pb.Uuid serviceUuid1;
+      late pb.Uuid serviceUuid2;
+      late Uint8List manufacturerData;
       late ScanResult scanresult;
 
       setUp(() {
@@ -31,6 +33,8 @@ void main() {
         serviceDataEntry2 = pb.ServiceDataEntry()
           ..serviceUuid = (pb.Uuid()..data = [1])
           ..data = [4, 5, 6];
+        serviceUuid1 = pb.Uuid()..data = [2];
+        serviceUuid2 = pb.Uuid()..data = [3];
         manufacturerData = Uint8List.fromList([1, 2, 3]);
 
         message = pb.DeviceScanInfo()
@@ -38,7 +42,9 @@ void main() {
           ..name = name
           ..serviceData.add(serviceDataEntry1)
           ..serviceData.add(serviceDataEntry2)
-          ..manufacturerData = manufacturerData!;
+          ..serviceUuids.add(serviceUuid1)
+          ..serviceUuids.add(serviceUuid2)
+          ..manufacturerData = manufacturerData;
 
         scanresult = sut.scanResultFrom(message.writeToBuffer());
       });
@@ -70,6 +76,19 @@ void main() {
                     d.serviceData[Uuid(serviceDataEntry2.serviceUuid.data)],
                 failure: (_) => throw Exception()),
             serviceDataEntry2.data);
+      });
+
+      test('converts service uuids', () {
+        expect(
+            scanresult.result.iif(
+                success: (d) => d.serviceUuids[0].data,
+                failure: (_) => throw Exception()),
+            serviceUuid1.data);
+        expect(
+            scanresult.result.iif(
+                success: (d) => d.serviceUuids[1].data,
+                failure: (_) => throw Exception()),
+            serviceUuid2.data);
       });
 
       test('converts manufacturer data', () {

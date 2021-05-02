@@ -28,6 +28,7 @@ void main() {
         id: '123',
         name: 'Test1',
         serviceData: const {},
+        serviceUuids: const [],
         manufacturerData: Uint8List.fromList([1]),
         rssi: -40,
       );
@@ -35,6 +36,7 @@ void main() {
         id: '456',
         name: 'Test2',
         serviceData: const {},
+        serviceUuids: const [],
         manufacturerData: Uint8List.fromList([0]),
         rssi: -80,
       );

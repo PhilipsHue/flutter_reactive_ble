@@ -15,23 +15,26 @@ abstract class $DiscoveredDevice {
   String get id;
   String get name;
   Map<Uuid, Uint8List> get serviceData;
+  List<Uuid> get serviceUuids;
   Uint8List get manufacturerData;
   int get rssi;
   DiscoveredDevice copyWith(
           {String? id,
           String? name,
           Map<Uuid, Uint8List>? serviceData,
+          List<Uuid>? serviceUuids,
           Uint8List? manufacturerData,
           int? rssi}) =>
       DiscoveredDevice(
           id: id ?? this.id,
           name: name ?? this.name,
           serviceData: serviceData ?? this.serviceData,
+          serviceUuids: serviceUuids ?? this.serviceUuids,
           manufacturerData: manufacturerData ?? this.manufacturerData,
           rssi: rssi ?? this.rssi);
   @override
   String toString() =>
-      "DiscoveredDevice(id: $id, name: $name, serviceData: $serviceData, manufacturerData: $manufacturerData, rssi: $rssi)";
+      "DiscoveredDevice(id: $id, name: $name, serviceData: $serviceData, serviceUuids: $serviceUuids, manufacturerData: $manufacturerData, rssi: $rssi)";
   @override
   bool operator ==(Object other) =>
       other is DiscoveredDevice &&
@@ -39,6 +42,7 @@ abstract class $DiscoveredDevice {
       id == other.id &&
       name == other.name &&
       const DeepCollectionEquality().equals(serviceData, other.serviceData) &&
+      const DeepCollectionEquality().equals(serviceUuids, other.serviceUuids) &&
       manufacturerData == other.manufacturerData &&
       rssi == other.rssi;
   @override
@@ -47,6 +51,7 @@ abstract class $DiscoveredDevice {
     result = 37 * result + id.hashCode;
     result = 37 * result + name.hashCode;
     result = 37 * result + const DeepCollectionEquality().hash(serviceData);
+    result = 37 * result + const DeepCollectionEquality().hash(serviceUuids);
     result = 37 * result + manufacturerData.hashCode;
     result = 37 * result + rssi.hashCode;
     return result;
@@ -61,6 +66,9 @@ class DiscoveredDevice$ {
   static final serviceData = Lens<DiscoveredDevice, Map<Uuid, Uint8List>>(
       (s_) => s_.serviceData,
       (s_, serviceData) => s_.copyWith(serviceData: serviceData));
+  static final serviceUuids = Lens<DiscoveredDevice, List<Uuid>>(
+      (s_) => s_.serviceUuids,
+      (s_, serviceUuids) => s_.copyWith(serviceUuids: serviceUuids));
   static final manufacturerData = Lens<DiscoveredDevice, Uint8List>(
       (s_) => s_.manufacturerData,
       (s_, manufacturerData) =>

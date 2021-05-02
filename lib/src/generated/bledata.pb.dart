@@ -32,7 +32,23 @@ class ScanForDevicesRequest extends $pb.GeneratedMessage {
     ..hasRequiredFields = false;
 
   ScanForDevicesRequest._() : super();
-  factory ScanForDevicesRequest() => create();
+  factory ScanForDevicesRequest({
+    $core.Iterable<Uuid>? serviceUuids,
+    $core.int? scanMode,
+    $core.bool? requireLocationServicesEnabled,
+  }) {
+    final _result = create();
+    if (serviceUuids != null) {
+      _result.serviceUuids.addAll(serviceUuids);
+    }
+    if (scanMode != null) {
+      _result.scanMode = scanMode;
+    }
+    if (requireLocationServicesEnabled != null) {
+      _result.requireLocationServicesEnabled = requireLocationServicesEnabled;
+    }
+    return _result;
+  }
   factory ScanForDevicesRequest.fromBuffer($core.List<$core.int> i,
           [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
       create()..mergeFromBuffer(i, r);
@@ -103,8 +119,7 @@ class DeviceScanInfo extends $pb.GeneratedMessage {
         const $core.bool.fromEnvironment('protobuf.omit_field_names')
             ? ''
             : 'name')
-    ..aOM<GenericFailure>(
-        3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'failure',
+    ..aOM<GenericFailure>(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'failure',
         subBuilder: GenericFailure.create)
     ..pc<ServiceDataEntry>(
         4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'serviceData', $pb.PbFieldType.PM,
@@ -116,14 +131,46 @@ class DeviceScanInfo extends $pb.GeneratedMessage {
             : 'rssi',
         $pb.PbFieldType.O3)
     ..a<$core.List<$core.int>>(
-        6,
-        const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'manufacturerData',
-        $pb.PbFieldType.OY,
+        6, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'manufacturerData', $pb.PbFieldType.OY,
         protoName: 'manufacturerData')
+    ..pc<Uuid>(7, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'serviceUuids', $pb.PbFieldType.PM,
+        protoName: 'serviceUuids', subBuilder: Uuid.create)
     ..hasRequiredFields = false;
 
   DeviceScanInfo._() : super();
-  factory DeviceScanInfo() => create();
+  factory DeviceScanInfo({
+    $core.String? id,
+    $core.String? name,
+    GenericFailure? failure,
+    $core.Iterable<ServiceDataEntry>? serviceData,
+    $core.int? rssi,
+    $core.List<$core.int>? manufacturerData,
+    $core.Iterable<Uuid>? serviceUuids,
+  }) {
+    final _result = create();
+    if (id != null) {
+      _result.id = id;
+    }
+    if (name != null) {
+      _result.name = name;
+    }
+    if (failure != null) {
+      _result.failure = failure;
+    }
+    if (serviceData != null) {
+      _result.serviceData.addAll(serviceData);
+    }
+    if (rssi != null) {
+      _result.rssi = rssi;
+    }
+    if (manufacturerData != null) {
+      _result.manufacturerData = manufacturerData;
+    }
+    if (serviceUuids != null) {
+      _result.serviceUuids.addAll(serviceUuids);
+    }
+    return _result;
+  }
   factory DeviceScanInfo.fromBuffer($core.List<$core.int> i,
           [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
       create()..mergeFromBuffer(i, r);
@@ -215,6 +262,9 @@ class DeviceScanInfo extends $pb.GeneratedMessage {
   $core.bool hasManufacturerData() => $_has(5);
   @$pb.TagNumber(6)
   void clearManufacturerData() => clearField(6);
+
+  @$pb.TagNumber(7)
+  $core.List<Uuid> get serviceUuids => $_getList(6);
 }
 
 class ConnectToDeviceRequest extends $pb.GeneratedMessage {
@@ -241,7 +291,24 @@ class ConnectToDeviceRequest extends $pb.GeneratedMessage {
     ..hasRequiredFields = false;
 
   ConnectToDeviceRequest._() : super();
-  factory ConnectToDeviceRequest() => create();
+  factory ConnectToDeviceRequest({
+    $core.String? deviceId,
+    ServicesWithCharacteristics? servicesWithCharacteristicsToDiscover,
+    $core.int? timeoutInMs,
+  }) {
+    final _result = create();
+    if (deviceId != null) {
+      _result.deviceId = deviceId;
+    }
+    if (servicesWithCharacteristicsToDiscover != null) {
+      _result.servicesWithCharacteristicsToDiscover =
+          servicesWithCharacteristicsToDiscover;
+    }
+    if (timeoutInMs != null) {
+      _result.timeoutInMs = timeoutInMs;
+    }
+    return _result;
+  }
   factory ConnectToDeviceRequest.fromBuffer($core.List<$core.int> i,
           [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
       create()..mergeFromBuffer(i, r);
@@ -339,7 +406,23 @@ class DeviceInfo extends $pb.GeneratedMessage {
     ..hasRequiredFields = false;
 
   DeviceInfo._() : super();
-  factory DeviceInfo() => create();
+  factory DeviceInfo({
+    $core.String? id,
+    $core.int? connectionState,
+    GenericFailure? failure,
+  }) {
+    final _result = create();
+    if (id != null) {
+      _result.id = id;
+    }
+    if (connectionState != null) {
+      _result.connectionState = connectionState;
+    }
+    if (failure != null) {
+      _result.failure = failure;
+    }
+    return _result;
+  }
   factory DeviceInfo.fromBuffer($core.List<$core.int> i,
           [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
       create()..mergeFromBuffer(i, r);
@@ -420,7 +503,15 @@ class DisconnectFromDeviceRequest extends $pb.GeneratedMessage {
     ..hasRequiredFields = false;
 
   DisconnectFromDeviceRequest._() : super();
-  factory DisconnectFromDeviceRequest() => create();
+  factory DisconnectFromDeviceRequest({
+    $core.String? deviceId,
+  }) {
+    final _result = create();
+    if (deviceId != null) {
+      _result.deviceId = deviceId;
+    }
+    return _result;
+  }
   factory DisconnectFromDeviceRequest.fromBuffer($core.List<$core.int> i,
           [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
       create()..mergeFromBuffer(i, r);
@@ -480,7 +571,15 @@ class ClearGattCacheRequest extends $pb.GeneratedMessage {
     ..hasRequiredFields = false;
 
   ClearGattCacheRequest._() : super();
-  factory ClearGattCacheRequest() => create();
+  factory ClearGattCacheRequest({
+    $core.String? deviceId,
+  }) {
+    final _result = create();
+    if (deviceId != null) {
+      _result.deviceId = deviceId;
+    }
+    return _result;
+  }
   factory ClearGattCacheRequest.fromBuffer($core.List<$core.int> i,
           [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
       create()..mergeFromBuffer(i, r);
@@ -538,7 +637,15 @@ class ClearGattCacheInfo extends $pb.GeneratedMessage {
     ..hasRequiredFields = false;
 
   ClearGattCacheInfo._() : super();
-  factory ClearGattCacheInfo() => create();
+  factory ClearGattCacheInfo({
+    GenericFailure? failure,
+  }) {
+    final _result = create();
+    if (failure != null) {
+      _result.failure = failure;
+    }
+    return _result;
+  }
   factory ClearGattCacheInfo.fromBuffer($core.List<$core.int> i,
           [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
       create()..mergeFromBuffer(i, r);
@@ -596,7 +703,15 @@ class NotifyCharacteristicRequest extends $pb.GeneratedMessage {
     ..hasRequiredFields = false;
 
   NotifyCharacteristicRequest._() : super();
-  factory NotifyCharacteristicRequest() => create();
+  factory NotifyCharacteristicRequest({
+    CharacteristicAddress? characteristic,
+  }) {
+    final _result = create();
+    if (characteristic != null) {
+      _result.characteristic = characteristic;
+    }
+    return _result;
+  }
   factory NotifyCharacteristicRequest.fromBuffer($core.List<$core.int> i,
           [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
       create()..mergeFromBuffer(i, r);
@@ -658,7 +773,15 @@ class NotifyNoMoreCharacteristicRequest extends $pb.GeneratedMessage {
     ..hasRequiredFields = false;
 
   NotifyNoMoreCharacteristicRequest._() : super();
-  factory NotifyNoMoreCharacteristicRequest() => create();
+  factory NotifyNoMoreCharacteristicRequest({
+    CharacteristicAddress? characteristic,
+  }) {
+    final _result = create();
+    if (characteristic != null) {
+      _result.characteristic = characteristic;
+    }
+    return _result;
+  }
   factory NotifyNoMoreCharacteristicRequest.fromBuffer($core.List<$core.int> i,
           [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
       create()..mergeFromBuffer(i, r);
@@ -721,7 +844,15 @@ class ReadCharacteristicRequest extends $pb.GeneratedMessage {
     ..hasRequiredFields = false;
 
   ReadCharacteristicRequest._() : super();
-  factory ReadCharacteristicRequest() => create();
+  factory ReadCharacteristicRequest({
+    CharacteristicAddress? characteristic,
+  }) {
+    final _result = create();
+    if (characteristic != null) {
+      _result.characteristic = characteristic;
+    }
+    return _result;
+  }
   factory ReadCharacteristicRequest.fromBuffer($core.List<$core.int> i,
           [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
       create()..mergeFromBuffer(i, r);
@@ -790,7 +921,23 @@ class CharacteristicValueInfo extends $pb.GeneratedMessage {
     ..hasRequiredFields = false;
 
   CharacteristicValueInfo._() : super();
-  factory CharacteristicValueInfo() => create();
+  factory CharacteristicValueInfo({
+    CharacteristicAddress? characteristic,
+    $core.List<$core.int>? value,
+    GenericFailure? failure,
+  }) {
+    final _result = create();
+    if (characteristic != null) {
+      _result.characteristic = characteristic;
+    }
+    if (value != null) {
+      _result.value = value;
+    }
+    if (failure != null) {
+      _result.failure = failure;
+    }
+    return _result;
+  }
   factory CharacteristicValueInfo.fromBuffer($core.List<$core.int> i,
           [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
       create()..mergeFromBuffer(i, r);
@@ -882,7 +1029,19 @@ class WriteCharacteristicRequest extends $pb.GeneratedMessage {
     ..hasRequiredFields = false;
 
   WriteCharacteristicRequest._() : super();
-  factory WriteCharacteristicRequest() => create();
+  factory WriteCharacteristicRequest({
+    CharacteristicAddress? characteristic,
+    $core.List<$core.int>? value,
+  }) {
+    final _result = create();
+    if (characteristic != null) {
+      _result.characteristic = characteristic;
+    }
+    if (value != null) {
+      _result.value = value;
+    }
+    return _result;
+  }
   factory WriteCharacteristicRequest.fromBuffer($core.List<$core.int> i,
           [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
       create()..mergeFromBuffer(i, r);
@@ -961,7 +1120,19 @@ class WriteCharacteristicInfo extends $pb.GeneratedMessage {
     ..hasRequiredFields = false;
 
   WriteCharacteristicInfo._() : super();
-  factory WriteCharacteristicInfo() => create();
+  factory WriteCharacteristicInfo({
+    CharacteristicAddress? characteristic,
+    GenericFailure? failure,
+  }) {
+    final _result = create();
+    if (characteristic != null) {
+      _result.characteristic = characteristic;
+    }
+    if (failure != null) {
+      _result.failure = failure;
+    }
+    return _result;
+  }
   factory WriteCharacteristicInfo.fromBuffer($core.List<$core.int> i,
           [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
       create()..mergeFromBuffer(i, r);
@@ -1042,7 +1213,19 @@ class NegotiateMtuRequest extends $pb.GeneratedMessage {
     ..hasRequiredFields = false;
 
   NegotiateMtuRequest._() : super();
-  factory NegotiateMtuRequest() => create();
+  factory NegotiateMtuRequest({
+    $core.String? deviceId,
+    $core.int? mtuSize,
+  }) {
+    final _result = create();
+    if (deviceId != null) {
+      _result.deviceId = deviceId;
+    }
+    if (mtuSize != null) {
+      _result.mtuSize = mtuSize;
+    }
+    return _result;
+  }
   factory NegotiateMtuRequest.fromBuffer($core.List<$core.int> i,
           [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
       create()..mergeFromBuffer(i, r);
@@ -1117,7 +1300,23 @@ class NegotiateMtuInfo extends $pb.GeneratedMessage {
     ..hasRequiredFields = false;
 
   NegotiateMtuInfo._() : super();
-  factory NegotiateMtuInfo() => create();
+  factory NegotiateMtuInfo({
+    $core.String? deviceId,
+    $core.int? mtuSize,
+    GenericFailure? failure,
+  }) {
+    final _result = create();
+    if (deviceId != null) {
+      _result.deviceId = deviceId;
+    }
+    if (mtuSize != null) {
+      _result.mtuSize = mtuSize;
+    }
+    if (failure != null) {
+      _result.failure = failure;
+    }
+    return _result;
+  }
   factory NegotiateMtuInfo.fromBuffer($core.List<$core.int> i,
           [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
       create()..mergeFromBuffer(i, r);
@@ -1199,7 +1398,15 @@ class BleStatusInfo extends $pb.GeneratedMessage {
     ..hasRequiredFields = false;
 
   BleStatusInfo._() : super();
-  factory BleStatusInfo() => create();
+  factory BleStatusInfo({
+    $core.int? status,
+  }) {
+    final _result = create();
+    if (status != null) {
+      _result.status = status;
+    }
+    return _result;
+  }
   factory BleStatusInfo.fromBuffer($core.List<$core.int> i,
           [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
       create()..mergeFromBuffer(i, r);
@@ -1263,7 +1470,19 @@ class ChangeConnectionPriorityRequest extends $pb.GeneratedMessage {
     ..hasRequiredFields = false;
 
   ChangeConnectionPriorityRequest._() : super();
-  factory ChangeConnectionPriorityRequest() => create();
+  factory ChangeConnectionPriorityRequest({
+    $core.String? deviceId,
+    $core.int? priority,
+  }) {
+    final _result = create();
+    if (deviceId != null) {
+      _result.deviceId = deviceId;
+    }
+    if (priority != null) {
+      _result.priority = priority;
+    }
+    return _result;
+  }
   factory ChangeConnectionPriorityRequest.fromBuffer($core.List<$core.int> i,
           [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
       create()..mergeFromBuffer(i, r);
@@ -1342,7 +1561,19 @@ class ChangeConnectionPriorityInfo extends $pb.GeneratedMessage {
     ..hasRequiredFields = false;
 
   ChangeConnectionPriorityInfo._() : super();
-  factory ChangeConnectionPriorityInfo() => create();
+  factory ChangeConnectionPriorityInfo({
+    $core.String? deviceId,
+    GenericFailure? failure,
+  }) {
+    final _result = create();
+    if (deviceId != null) {
+      _result.deviceId = deviceId;
+    }
+    if (failure != null) {
+      _result.failure = failure;
+    }
+    return _result;
+  }
   factory ChangeConnectionPriorityInfo.fromBuffer($core.List<$core.int> i,
           [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
       create()..mergeFromBuffer(i, r);
@@ -1427,7 +1658,23 @@ class CharacteristicAddress extends $pb.GeneratedMessage {
     ..hasRequiredFields = false;
 
   CharacteristicAddress._() : super();
-  factory CharacteristicAddress() => create();
+  factory CharacteristicAddress({
+    $core.String? deviceId,
+    Uuid? serviceUuid,
+    Uuid? characteristicUuid,
+  }) {
+    final _result = create();
+    if (deviceId != null) {
+      _result.deviceId = deviceId;
+    }
+    if (serviceUuid != null) {
+      _result.serviceUuid = serviceUuid;
+    }
+    if (characteristicUuid != null) {
+      _result.characteristicUuid = characteristicUuid;
+    }
+    return _result;
+  }
   factory CharacteristicAddress.fromBuffer($core.List<$core.int> i,
           [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
       create()..mergeFromBuffer(i, r);
@@ -1520,7 +1767,19 @@ class ServiceDataEntry extends $pb.GeneratedMessage {
     ..hasRequiredFields = false;
 
   ServiceDataEntry._() : super();
-  factory ServiceDataEntry() => create();
+  factory ServiceDataEntry({
+    Uuid? serviceUuid,
+    $core.List<$core.int>? data,
+  }) {
+    final _result = create();
+    if (serviceUuid != null) {
+      _result.serviceUuid = serviceUuid;
+    }
+    if (data != null) {
+      _result.data = data;
+    }
+    return _result;
+  }
   factory ServiceDataEntry.fromBuffer($core.List<$core.int> i,
           [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
       create()..mergeFromBuffer(i, r);
@@ -1591,7 +1850,15 @@ class ServicesWithCharacteristics extends $pb.GeneratedMessage {
     ..hasRequiredFields = false;
 
   ServicesWithCharacteristics._() : super();
-  factory ServicesWithCharacteristics() => create();
+  factory ServicesWithCharacteristics({
+    $core.Iterable<ServiceWithCharacteristics>? items,
+  }) {
+    final _result = create();
+    if (items != null) {
+      _result.items.addAll(items);
+    }
+    return _result;
+  }
   factory ServicesWithCharacteristics.fromBuffer($core.List<$core.int> i,
           [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
       create()..mergeFromBuffer(i, r);
@@ -1650,7 +1917,19 @@ class ServiceWithCharacteristics extends $pb.GeneratedMessage {
     ..hasRequiredFields = false;
 
   ServiceWithCharacteristics._() : super();
-  factory ServiceWithCharacteristics() => create();
+  factory ServiceWithCharacteristics({
+    Uuid? serviceId,
+    $core.Iterable<Uuid>? characteristics,
+  }) {
+    final _result = create();
+    if (serviceId != null) {
+      _result.serviceId = serviceId;
+    }
+    if (characteristics != null) {
+      _result.characteristics.addAll(characteristics);
+    }
+    return _result;
+  }
   factory ServiceWithCharacteristics.fromBuffer($core.List<$core.int> i,
           [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
       create()..mergeFromBuffer(i, r);
@@ -1714,7 +1993,15 @@ class DiscoverServicesRequest extends $pb.GeneratedMessage {
     ..hasRequiredFields = false;
 
   DiscoverServicesRequest._() : super();
-  factory DiscoverServicesRequest() => create();
+  factory DiscoverServicesRequest({
+    $core.String? deviceId,
+  }) {
+    final _result = create();
+    if (deviceId != null) {
+      _result.deviceId = deviceId;
+    }
+    return _result;
+  }
   factory DiscoverServicesRequest.fromBuffer($core.List<$core.int> i,
           [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
       create()..mergeFromBuffer(i, r);
@@ -1780,7 +2067,19 @@ class DiscoverServicesInfo extends $pb.GeneratedMessage {
     ..hasRequiredFields = false;
 
   DiscoverServicesInfo._() : super();
-  factory DiscoverServicesInfo() => create();
+  factory DiscoverServicesInfo({
+    $core.String? deviceId,
+    $core.Iterable<DiscoveredService>? services,
+  }) {
+    final _result = create();
+    if (deviceId != null) {
+      _result.deviceId = deviceId;
+    }
+    if (services != null) {
+      _result.services.addAll(services);
+    }
+    return _result;
+  }
   factory DiscoverServicesInfo.fromBuffer($core.List<$core.int> i,
           [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
       create()..mergeFromBuffer(i, r);
@@ -1850,7 +2149,23 @@ class DiscoveredService extends $pb.GeneratedMessage {
     ..hasRequiredFields = false;
 
   DiscoveredService._() : super();
-  factory DiscoveredService() => create();
+  factory DiscoveredService({
+    Uuid? serviceUuid,
+    $core.Iterable<Uuid>? characteristicUuids,
+    $core.Iterable<DiscoveredService>? includedServices,
+  }) {
+    final _result = create();
+    if (serviceUuid != null) {
+      _result.serviceUuid = serviceUuid;
+    }
+    if (characteristicUuids != null) {
+      _result.characteristicUuids.addAll(characteristicUuids);
+    }
+    if (includedServices != null) {
+      _result.includedServices.addAll(includedServices);
+    }
+    return _result;
+  }
   factory DiscoveredService.fromBuffer($core.List<$core.int> i,
           [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
       create()..mergeFromBuffer(i, r);
@@ -1914,7 +2229,15 @@ class Uuid extends $pb.GeneratedMessage {
     ..hasRequiredFields = false;
 
   Uuid._() : super();
-  factory Uuid() => create();
+  factory Uuid({
+    $core.List<$core.int>? data,
+  }) {
+    final _result = create();
+    if (data != null) {
+      _result.data = data;
+    }
+    return _result;
+  }
   factory Uuid.fromBuffer($core.List<$core.int> i,
           [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
       create()..mergeFromBuffer(i, r);
@@ -1974,7 +2297,19 @@ class GenericFailure extends $pb.GeneratedMessage {
     ..hasRequiredFields = false;
 
   GenericFailure._() : super();
-  factory GenericFailure() => create();
+  factory GenericFailure({
+    $core.int? code,
+    $core.String? message,
+  }) {
+    final _result = create();
+    if (code != null) {
+      _result.code = code;
+    }
+    if (message != null) {
+      _result.message = message;
+    }
+    return _result;
+  }
   factory GenericFailure.fromBuffer($core.List<$core.int> i,
           [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
       create()..mergeFromBuffer(i, r);

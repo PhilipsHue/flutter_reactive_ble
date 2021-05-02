@@ -101,6 +101,7 @@ void main() {
         name: 'test',
         rssi: -39,
         serviceData: {},
+        serviceUuids: [],
       );
 
       setUp(() {

@@ -60,6 +60,9 @@ class ProtobufConverterImpl implements ProtobufConverter {
       message.serviceData.map((entry) => Uuid(entry.serviceUuid.data)),
       message.serviceData.map((entry) => Uint8List.fromList(entry.data)),
     );
+    final serviceUuids = message.serviceUuids
+        .map((entry) => Uuid(entry.data))
+        .toList(growable: false);
 
     return ScanResult(
       result: resultFrom(
@@ -67,6 +70,7 @@ class ProtobufConverterImpl implements ProtobufConverter {
           id: message.id,
           name: message.name,
           serviceData: serviceData,
+          serviceUuids: serviceUuids,
           manufacturerData: Uint8List.fromList(message.manufacturerData),
           rssi: message.rssi,
         ),
