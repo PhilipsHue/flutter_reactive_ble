@@ -36,26 +36,24 @@ workflows:
           -validity 10000
       - |
         # set up local properties
-        echo "flutter.sdk=$HOME/programs/flutter" > "$FCI_BUILD_DIR/android/local.properties"
-      - name: Pub get 
-        script: cd . && flutter pub get
-      - name: Flutter analyze
-        script: cd . && flutter analyze
-      - name: Flutter test
-        script: cd . && flutter test
-      - name: Dry run publish
-        script: cd . && flutter pub publish --dry-run
+        echo "flutter.sdk=$HOME/programs/flutter" > "$FCI_BUILD_DIR/flutter_reactive_ble/android/local.properties"
+      - name: Pub get platform interface
+        script: cd flutter_reactive_ble_platform_interface/ && flutter pub get
+      - name: Platform interface quality checks
+        script: cd flutter_reactive_ble_platform_interface/ && flutter analyze && flutter test  && flutter pub publish --dry-run
+      - name: Pub get reactive ble
+        script: cd flutter_reactive_ble/ && flutter pub get     
+      - name: Reactive ble  quality checks
+        script: cd flutter_reactive_ble/ && flutter analyze && flutter test  && flutter pub publish --dry-run
       - |
         #!/bin/bash -ex
-        cd example/android && ls && ./gradlew detekt && ./gradlew testDebugUnitTest
+        cd flutter_reactive_ble/example/android && ls && ./gradlew detekt && ./gradlew testDebugUnitTest
       - name: Build android app
-        script: cd example && flutter build apk --debug
+        script: cd flutter_reactive_ble/example && flutter build apk --debug
       - name: Build iOS app
         script: find . -name "Podfile" -execdir pod install \;
-      - cd example && flutter build ios --debug --no-codesign
+      - cd flutter_reactive_ble/example && flutter build ios --debug --no-codesign
     artifacts:
-      - build/**/outputs/**/*.apk
-      - build/**/outputs/**/mapping.txt
-      - build/ios/ipa/*.ipa
-      - /tmp/xcodebuild_logs/*.log
-      - flutter_drive.log
+      - flutter_reactive_ble/build/**/outputs/**/*.apk
+      - flutter_reactive_ble/build/**/outputs/**/mapping.txt
+      - flutter_reactive_ble/build/ios/ipa/*.ipa
