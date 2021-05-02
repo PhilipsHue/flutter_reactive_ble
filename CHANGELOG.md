@@ -1,5 +1,9 @@
 # Main releases
 
+# 3.1.0
+
+* Add discoverable services to `ScanResult`. Kudos to @xvrh.
+
 ## 3.0.0
 
 * Breaking: Migration to null-safety.
