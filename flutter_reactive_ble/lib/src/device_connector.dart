@@ -1,9 +1,7 @@
 import 'package:collection/collection.dart';
 import 'package:flutter_reactive_ble/src/device_scanner.dart';
-import 'package:flutter_reactive_ble_platform_interface/flutter_reactive_ble_platform_interface.dart';
-
 import 'package:flutter_reactive_ble/src/rx_ext/repeater.dart';
-
+import 'package:flutter_reactive_ble_platform_interface/flutter_reactive_ble_platform_interface.dart';
 
 abstract class DeviceConnector {
   Stream<ConnectionStateUpdate> get deviceConnectionStateUpdateStream;
@@ -25,7 +23,7 @@ abstract class DeviceConnector {
 
 class DeviceConnectorImpl implements DeviceConnector {
   const DeviceConnectorImpl({
-    required DeviceConnectionController controller,
+    required ReactiveBlePlatform blePlatform,
     required bool Function(
             {required String deviceId, required Duration cacheValidity})
         deviceIsDiscoveredRecently,
@@ -33,10 +31,10 @@ class DeviceConnectorImpl implements DeviceConnector {
     required Duration delayAfterScanFailure,
   })   : _deviceIsDiscoveredRecently = deviceIsDiscoveredRecently,
         _deviceScanner = deviceScanner,
-        _controller = controller,
+        _blePlatform = blePlatform,
         _delayAfterScanFailure = delayAfterScanFailure;
 
-  final DeviceConnectionController _controller;
+  final ReactiveBlePlatform _blePlatform;
   final bool Function({
     required String deviceId,
     required Duration cacheValidity,
@@ -48,7 +46,7 @@ class DeviceConnectorImpl implements DeviceConnector {
 
   @override
   Stream<ConnectionStateUpdate> get deviceConnectionStateUpdateStream =>
-      _controller.connectionUpdateStream;
+      _blePlatform.connectionUpdateStream;
 
   @override
   Stream<ConnectionStateUpdate> connect({
@@ -66,14 +64,14 @@ class DeviceConnectorImpl implements DeviceConnector {
         .cast<ConnectionStateUpdate>();
 
     final autoconnectingRepeater = Repeater.broadcast(
-      onListenEmitFrom: () => _controller
+      onListenEmitFrom: () => _blePlatform
           .connectToDevice(
             id,
             servicesWithCharacteristicsToDiscover,
             connectionTimeout,
           )
           .asyncExpand((_) => specificConnectedDeviceStream),
-      onCancel: () => _controller.disconnectDevice(id),
+      onCancel: () => _blePlatform.disconnectDevice(id),
     );
 
     return autoconnectingRepeater.stream;

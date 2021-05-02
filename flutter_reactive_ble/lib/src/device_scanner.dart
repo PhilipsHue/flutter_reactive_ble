@@ -18,22 +18,22 @@ abstract class DeviceScanner {
 
 class DeviceScannerImpl implements DeviceScanner {
   DeviceScannerImpl({
-    required ScanOperationController controller,
+    required ReactiveBlePlatform blePlatform,
     required bool Function() platformIsAndroid,
     required Future<void> delayAfterScanCompletion,
     required this.addToScanRegistry,
-  })   : _controller = controller,
+  })   : _blePlatform = blePlatform,
         _platformIsAndroid = platformIsAndroid,
         _delayAfterScanCompletion = delayAfterScanCompletion;
 
   ScanSession? _currentScanSession;
 
-  final ScanOperationController _controller;
+  final ReactiveBlePlatform _blePlatform;
   final bool Function() _platformIsAndroid;
   final Future<void> _delayAfterScanCompletion;
   final void Function(String deviceId) addToScanRegistry;
 
-  Stream<ScanResult> get _scanStream => _controller.scanStream;
+  Stream<ScanResult> get _scanStream => _blePlatform.scanStream;
 
   final SerialDisposable<Repeater<DiscoveredDevice>> _scanStreamDisposable =
       SerialDisposable(
@@ -84,7 +84,7 @@ class DeviceScannerImpl implements DeviceScanner {
 
     _scanStreamDisposable.set(scanRepeater);
 
-    return _controller
+    return _blePlatform
         .scanForDevices(
           withServices: withServices,
           scanMode: scanMode,
