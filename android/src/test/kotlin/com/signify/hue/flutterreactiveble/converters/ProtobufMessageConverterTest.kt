@@ -65,6 +65,15 @@ class ProtobufMessageConverterTest {
         }
 
         @Test
+        fun `converts serviceuuids into message structure`() {
+            val scanInfo = createScanInfo()
+
+            val result = protobufConverter.convertScanInfo(scanInfo)
+
+            assertThat(result.serviceUuidsList.size).isEqualTo(1)
+        }
+
+        @Test
         fun `converts servicedataentry value into message structure`() {
             val scanInfo = createScanInfo()
             val expected = ByteString.copyFrom("12".toByteArray())
@@ -178,14 +187,18 @@ class ProtobufMessageConverterTest {
         val rssi = 200
         val uuid = UUID.randomUUID()
         val testString = "12".toByteArray()
+        val serviceUuid = UUID.randomUUID()
 
         val serviceData = mutableMapOf<UUID, ByteArray>()
         serviceData[uuid] = testString
 
         val manufacturerData = "123".toByteArray()
 
-        return ScanInfo(deviceId = macAdress, name = deviceName,
-                rssi = rssi, serviceData = serviceData, manufacturerData = manufacturerData)
+        return ScanInfo(
+                deviceId = macAdress, name = deviceName,
+                rssi = rssi, serviceData = serviceData, manufacturerData = manufacturerData,
+                serviceUuids = listOf(serviceUuid),
+        )
     }
 
     private fun createCharacteristicRequest(deviceId: String, serviceUuid: UUID): pb.ReadCharacteristicRequest {
