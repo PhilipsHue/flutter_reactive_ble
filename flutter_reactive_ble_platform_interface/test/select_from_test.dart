@@ -1,4 +1,4 @@
-import 'package:flutter_reactive_ble/src/select_from.dart';
+import 'package:flutter_reactive_ble_platform_interface/src/select_from.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

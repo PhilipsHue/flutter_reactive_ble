@@ -11,6 +11,8 @@ dependencies:
   collection: ^1.15.0
   flutter:
     sdk: flutter
+  flutter_reactive_ble_platform_interface:
+    path: ../flutter_reactive_ble_platform_interface
   functional_data: ^1.0.0
   meta: ^1.3.0
   pedantic: ^1.11.0

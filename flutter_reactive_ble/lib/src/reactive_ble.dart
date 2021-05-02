@@ -6,20 +6,9 @@ import 'package:flutter_reactive_ble/src/debug_logger.dart';
 import 'package:flutter_reactive_ble/src/device_connector.dart';
 import 'package:flutter_reactive_ble/src/device_scanner.dart';
 import 'package:flutter_reactive_ble/src/discovered_devices_registry.dart';
-import 'package:flutter_reactive_ble/src/model/ble_status.dart';
-import 'package:flutter_reactive_ble/src/model/characteristic_value.dart';
-import 'package:flutter_reactive_ble/src/model/connection_priority.dart';
-import 'package:flutter_reactive_ble/src/model/connection_state_update.dart';
-import 'package:flutter_reactive_ble/src/model/discovered_device.dart';
-import 'package:flutter_reactive_ble/src/model/log_level.dart';
-import 'package:flutter_reactive_ble/src/model/qualified_characteristic.dart';
-import 'package:flutter_reactive_ble/src/model/scan_mode.dart';
-import 'package:flutter_reactive_ble/src/model/uuid.dart';
-import 'package:flutter_reactive_ble/src/plugin_controller.dart';
 import 'package:flutter_reactive_ble/src/rx_ext/repeater.dart';
+import 'package:flutter_reactive_ble_platform_interface/flutter_reactive_ble_platform_interface.dart';
 import 'package:meta/meta.dart';
-
-import 'model/discovered_service.dart';
 
 /// [FlutterReactiveBle] is the facade of the library. Its interface allows to
 /// perform all the supported BLE operations.
@@ -117,7 +106,7 @@ class FlutterReactiveBle {
         print,
       );
 
-      _pluginController = const PluginControllerFactory().create(_debugLogger);
+      _pluginController = const PluginControllerFactory().create();
       _bleOperationController = _pluginController;
 
       _initialization ??= _bleOperationController.initialize();

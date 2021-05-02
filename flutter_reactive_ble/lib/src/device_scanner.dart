@@ -1,15 +1,10 @@
 import 'dart:async';
 
 import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
-import 'package:flutter_reactive_ble/src/plugin_controller.dart';
 import 'package:flutter_reactive_ble/src/rx_ext/repeater.dart';
 import 'package:flutter_reactive_ble/src/rx_ext/serial_disposable.dart';
+import 'package:flutter_reactive_ble_platform_interface/flutter_reactive_ble_platform_interface.dart';
 import 'package:pedantic/pedantic.dart';
-
-import 'model/discovered_device.dart';
-import 'model/scan_mode.dart';
-import 'model/scan_session.dart';
-import 'model/uuid.dart';
 
 abstract class DeviceScanner {
   ScanSession? get currentScan;
