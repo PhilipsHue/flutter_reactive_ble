@@ -19,20 +19,19 @@ class FlutterReactiveBle {
 
   ///Create a new instance where injected depedencies are used.
   @visibleForTesting
-  FlutterReactiveBle.witDependencies({
-    required BleOperationController bleOperationController,
-    required DeviceScanner deviceScanner,
-    required DeviceConnector deviceConnector,
-    required ConnectedDeviceOperation connectedDeviceOperation,
-    required Logger debugLogger,
-    required Future<void> initialization,
-  }) {
-    _bleOperationController = bleOperationController;
+  FlutterReactiveBle.witDependencies(
+      {required DeviceScanner deviceScanner,
+      required DeviceConnector deviceConnector,
+      required ConnectedDeviceOperation connectedDeviceOperation,
+      required Logger debugLogger,
+      required Future<void> initialization,
+      required ReactiveBlePlatform reactiveBlePlatform}) {
     _deviceScanner = deviceScanner;
     _deviceConnector = deviceConnector;
     _connectedDeviceOperator = connectedDeviceOperation;
     _debugLogger = debugLogger;
     _initialization = initialization;
+    _blePlatform = reactiveBlePlatform;
     _trackStatus();
   }
 
@@ -73,14 +72,11 @@ class FlutterReactiveBle {
     yield* _connectedDeviceOperator.characteristicValueStream;
   }
 
-  late BleOperationController _bleOperationController;
-
-  late PluginController _pluginController;
+  late ReactiveBlePlatform _blePlatform;
 
   BleStatus _status = BleStatus.unknown;
 
-  Stream<BleStatus> get _statusStream =>
-      _bleOperationController.bleStatusStream;
+  Stream<BleStatus> get _statusStream => _blePlatform.bleStatusStream;
 
   Future<void> _trackStatus() async {
     await initialize();
@@ -106,16 +102,15 @@ class FlutterReactiveBle {
         print,
       );
 
-      _pluginController = const PluginControllerFactory().create();
-      _bleOperationController = _pluginController;
+      _blePlatform = ReactiveBlePlatform.instance;
 
-      _initialization ??= _bleOperationController.initialize();
+      _initialization ??= _blePlatform.initialize();
 
       _connectedDeviceOperator = ConnectedDeviceOperationImpl(
-        controller: _pluginController,
+        blePlatform: _blePlatform,
       );
       _deviceScanner = DeviceScannerImpl(
-        controller: _pluginController,
+        blePlatform: _blePlatform,
         platformIsAndroid: () => Platform.isAndroid,
         delayAfterScanCompletion: Future<void>.delayed(
           const Duration(milliseconds: 300),
@@ -124,7 +119,7 @@ class FlutterReactiveBle {
       );
 
       _deviceConnector = DeviceConnectorImpl(
-        controller: _pluginController,
+        blePlatform: _blePlatform,
         deviceIsDiscoveredRecently: scanRegistry.deviceIsDiscoveredRecently,
         deviceScanner: _deviceScanner,
         delayAfterScanFailure: const Duration(seconds: 10),
@@ -141,7 +136,7 @@ class FlutterReactiveBle {
   Future<void> deinitialize() async {
     if (_initialization != null) {
       _initialization = null;
-      await _bleOperationController.deinitialize();
+      await _blePlatform.deinitialize();
     }
   }
 
@@ -305,7 +300,7 @@ class FlutterReactiveBle {
   /// Always completes with an error on iOS, as there is no way (and no need) to perform this operation on iOS.
   ///
   /// The connection may need to be reestablished after successful GATT attribute cache clearing.
-  Future<void> clearGattCache(String deviceId) => _bleOperationController
+  Future<void> clearGattCache(String deviceId) => _blePlatform
       .clearGattCache(deviceId)
       .then((info) => info.dematerialize());
 

@@ -1,32 +1,27 @@
 import 'dart:async';
 
 import 'package:flutter_reactive_ble/src/connected_device_operation.dart';
-import 'package:flutter_reactive_ble/src/model/characteristic_value.dart';
-import 'package:flutter_reactive_ble/src/model/connection_priority.dart';
-import 'package:flutter_reactive_ble/src/model/connection_state_update.dart';
-import 'package:flutter_reactive_ble/src/model/generic_failure.dart';
-import 'package:flutter_reactive_ble/src/model/qualified_characteristic.dart';
-import 'package:flutter_reactive_ble/src/model/result.dart';
-import 'package:flutter_reactive_ble/src/model/unit.dart';
-import 'package:flutter_reactive_ble/src/model/uuid.dart';
-import 'package:flutter_reactive_ble/src/model/write_characteristic_info.dart';
-import 'package:flutter_reactive_ble/src/plugin_controller.dart';
+import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
+import 'package:flutter_reactive_ble/src/connected_device_operation.dart';
+import 'package:flutter_reactive_ble_platform_interface/flutter_reactive_ble_platform_interface.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 
 import 'connected_device_operation_test.mocks.dart';
 
-@GenerateMocks([DeviceOperationController])
+
+@GenerateMocks([ReactiveBlePlatform])
 void main() {
-  late MockDeviceOperationController _controller;
+  late ReactiveBlePlatform _blePlatform;
   late ConnectedDeviceOperation _sut;
 
   group('$ConnectedDeviceOperation', () {
     setUp(() {
-      _controller = MockDeviceOperationController();
+
+      _blePlatform = MockReactiveBlePlatform();
       _sut = ConnectedDeviceOperationImpl(
-        controller: _controller,
+        blePlatform: _blePlatform,
       );
     });
     group('Listen to char value updates', () {
@@ -42,7 +37,8 @@ void main() {
           result: const Result.success([1]),
         );
 
-        when(_controller.charValueUpdateStream)
+
+        when(_blePlatform.charValueUpdateStream)
             .thenAnswer((_) => Stream.fromIterable([valueUpdate!]));
       });
 
@@ -97,14 +93,16 @@ void main() {
           result: const Result.success([4]),
         );
 
-        when(_controller.readCharacteristic(any)).thenAnswer(
+
+        when(_blePlatform.readCharacteristic(charDevice)).thenAnswer(
           (_) => Stream.fromIterable([0]),
         );
       });
 
       group('Given multiple updates are received for specific device', () {
         setUp(() async {
-          when(_controller.charValueUpdateStream)
+
+          when(_blePlatform.charValueUpdateStream)
               .thenAnswer((_) => Stream.fromIterable([
                     valueUpdate!,
                     valueUpdateOtherDevice!,
@@ -123,7 +121,8 @@ void main() {
           'Given no updates are provide for characteristic of specific device',
           () {
         setUp(() async {
-          when(_controller.charValueUpdateStream)
+
+          when(_blePlatform.charValueUpdateStream)
               .thenAnswer((_) => Stream.fromIterable([
                     valueUpdateOtherDevice!,
                     valueUpdateSameDeviceOtherChar!,
@@ -161,7 +160,9 @@ void main() {
                   GenericFailure<WriteCharacteristicFailure>>.success(Unit()),
             );
 
-            when(_controller.writeCharacteristicWithResponse(any, any))
+
+            when(_blePlatform.writeCharacteristicWithResponse(
+                    characteristic, value))
                 .thenAnswer((_) async => info);
           });
 
@@ -184,7 +185,9 @@ void main() {
                 ),
               );
 
-              when(_controller.writeCharacteristicWithResponse(any, any))
+
+              when(_blePlatform.writeCharacteristicWithResponse(
+                      characteristic, value))
                   .thenAnswer((_) async => info);
             });
 
@@ -207,7 +210,8 @@ void main() {
                     GenericFailure<WriteCharacteristicFailure>>.success(Unit()),
               );
 
-              when(_controller.writeCharacteristicWithoutResponse(any, any))
+              when(_blePlatform.writeCharacteristicWithoutResponse(
+                      characteristic, value))
                   .thenAnswer((_) async => info);
             });
 
@@ -232,7 +236,9 @@ void main() {
                 ),
               );
 
-              when(_controller.writeCharacteristicWithoutResponse(any, any))
+
+              when(_blePlatform.writeCharacteristicWithoutResponse(
+                      characteristic, value))
                   .thenAnswer((_) async => info);
             });
 
@@ -299,16 +305,16 @@ void main() {
             result: const Result.success([4]),
           );
 
-          when(_controller.subscribeToNotifications(any))
+          when(_blePlatform.subscribeToNotifications(charDevice))
               .thenAnswer((_) => Stream.fromIterable([0]));
 
-          when(_controller.stopSubscribingToNotifications(any))
+          when(_blePlatform.stopSubscribingToNotifications(charDevice))
               .thenAnswer((_) async => 0);
         });
 
         group('Given multiple updates are received for specific device', () {
           setUp(() async {
-            when(_controller.charValueUpdateStream)
+            when(_blePlatform.charValueUpdateStream)
                 .thenAnswer((_) => Stream.fromIterable([
                       valueUpdate1,
                       valueUpdateOtherDevice,
@@ -336,7 +342,7 @@ void main() {
         int? result;
 
         setUp(() async {
-          when(_controller.requestMtuSize(any, any))
+          when(_blePlatform.requestMtuSize(deviceId, mtuSize))
               .thenAnswer((_) async => mtuSize);
 
           result = await _sut.requestMtu(deviceId, mtuSize);
@@ -357,7 +363,7 @@ void main() {
 
         group('Given request priority succeeds', () {
           setUp(() {
-            when(_controller.requestConnectionPriority(any, any))
+            when(_blePlatform.requestConnectionPriority(deviceId, priority))
                 .thenAnswer((_) async => const ConnectionPriorityInfo(
                       result: Result.success(Unit()),
                     ));
@@ -372,7 +378,7 @@ void main() {
 
         group('Given request priority fails', () {
           setUp(() async {
-            when(_controller.requestConnectionPriority(any, any))
+            when(_blePlatform.requestConnectionPriority(deviceId, priority))
                 .thenAnswer((_) async => const ConnectionPriorityInfo(
                       result: Result.failure(
                         GenericFailure<ConnectionPriorityFailure>(

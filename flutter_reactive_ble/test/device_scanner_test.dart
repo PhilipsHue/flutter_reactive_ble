@@ -1,26 +1,21 @@
 import 'dart:async';
 import 'dart:typed_data';
 
+import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
 import 'package:flutter_reactive_ble/src/device_scanner.dart';
-import 'package:flutter_reactive_ble/src/model/discovered_device.dart';
-import 'package:flutter_reactive_ble/src/model/generic_failure.dart';
-import 'package:flutter_reactive_ble/src/model/result.dart';
-import 'package:flutter_reactive_ble/src/model/scan_mode.dart';
-import 'package:flutter_reactive_ble/src/model/scan_session.dart';
-import 'package:flutter_reactive_ble/src/model/uuid.dart';
-import 'package:flutter_reactive_ble/src/plugin_controller.dart';
+import 'package:flutter_reactive_ble_platform_interface/flutter_reactive_ble_platform_interface.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 
 import 'device_scanner_test.mocks.dart';
 
-@GenerateMocks([ScanOperationController])
+@GenerateMocks([ReactiveBlePlatform])
 void main() {
   group('$DeviceScanner', () {
     DiscoveredDevice? _device1;
     DiscoveredDevice? _device2;
-    late MockScanOperationController _controller;
+    late ReactiveBlePlatform _blePlatform;
     late Completer<void> _delayAfterScanCompletion;
 
     late DeviceScannerImpl _sut;
@@ -30,21 +25,19 @@ void main() {
         id: '123',
         name: 'Test1',
         serviceData: const {},
-        serviceUuids: const [],
         manufacturerData: Uint8List.fromList([1]),
-        rssi: -40,
+        rssi: -40, serviceUuids: [],
       );
       _device2 = DiscoveredDevice(
         id: '456',
         name: 'Test2',
         serviceData: const {},
-        serviceUuids: const [],
         manufacturerData: Uint8List.fromList([0]),
-        rssi: -80,
+        rssi: -80, serviceUuids: [],
       );
 
       _delayAfterScanCompletion = Completer();
-      _controller = MockScanOperationController();
+      _blePlatform = MockReactiveBlePlatform();
     });
 
     group('Scan for devices', () {
@@ -59,11 +52,10 @@ void main() {
         locationEnabled = false;
         scanmode = ScanMode.lowLatency;
 
-        when(_controller.scanForDevices(
-          withServices: anyNamed('withServices'),
-          scanMode: anyNamed('scanMode'),
-          requireLocationServicesEnabled:
-              anyNamed('requireLocationServicesEnabled'),
+        when(_blePlatform.scanForDevices(
+          withServices: withServices,
+          scanMode: scanmode,
+          requireLocationServicesEnabled: locationEnabled,
         )).thenAnswer((_) => Stream.fromIterable([0]));
       });
 
@@ -80,14 +72,14 @@ void main() {
                     _device2),
           );
 
-          when(_controller.scanStream)
+          when(_blePlatform.scanStream)
               .thenAnswer((_) => Stream.fromIterable([result1, result2]));
         });
 
         group('And platform is not Android', () {
           setUp(() {
             _sut = DeviceScannerImpl(
-              controller: _controller,
+              blePlatform: _blePlatform,
               platformIsAndroid: () => false,
               delayAfterScanCompletion: _delayAfterScanCompletion.future,
               addToScanRegistry: (deviceId) {},
@@ -123,7 +115,7 @@ void main() {
         group('And platform is android', () {
           setUp(() {
             _sut = DeviceScannerImpl(
-              controller: _controller,
+              blePlatform: _blePlatform,
               platformIsAndroid: () => true,
               delayAfterScanCompletion: _delayAfterScanCompletion.future,
               addToScanRegistry: (deviceId) {},
@@ -170,11 +162,11 @@ void main() {
         Stream<DiscoveredDevice>? scanStream;
 
         setUp(() {
-          when(_controller.scanStream)
+          when(_blePlatform.scanStream)
               .thenAnswer((_) => Stream.fromIterable([resultFailure]));
 
           _sut = DeviceScannerImpl(
-            controller: _controller,
+            blePlatform: _blePlatform,
             platformIsAndroid: () => false,
             delayAfterScanCompletion: _delayAfterScanCompletion.future,
             addToScanRegistry: (deviceId) {},

@@ -32,14 +32,14 @@ abstract class ConnectedDeviceOperation {
 
 class ConnectedDeviceOperationImpl implements ConnectedDeviceOperation {
   ConnectedDeviceOperationImpl({
-    required DeviceOperationController controller,
-  }) : _controller = controller;
+    required ReactiveBlePlatform blePlatform
+  }) : _blePlatform = blePlatform;
 
-  final DeviceOperationController _controller;
+  final ReactiveBlePlatform _blePlatform;
 
   @override
   Stream<CharacteristicValue> get characteristicValueStream =>
-      _controller.charValueUpdateStream;
+      _blePlatform.charValueUpdateStream;
 
   @override
   Future<List<int>> readCharacteristic(QualifiedCharacteristic characteristic) {
@@ -47,7 +47,7 @@ class ConnectedDeviceOperationImpl implements ConnectedDeviceOperation {
         .where((update) => update.characteristic == characteristic)
         .map((update) => update.result.dematerialize());
 
-    return _controller
+    return _blePlatform
         .readCharacteristic(characteristic)
         .asyncExpand((_) => specificCharacteristicValueStream)
         .firstWhere((_) => true,
@@ -59,7 +59,7 @@ class ConnectedDeviceOperationImpl implements ConnectedDeviceOperation {
     QualifiedCharacteristic characteristic, {
     required List<int> value,
   }) async =>
-      _controller
+      _blePlatform
           .writeCharacteristicWithResponse(characteristic, value)
           .then((info) => info.result.dematerialize());
 
@@ -68,7 +68,7 @@ class ConnectedDeviceOperationImpl implements ConnectedDeviceOperation {
     QualifiedCharacteristic characteristic, {
     required List<int> value,
   }) async =>
-      _controller
+      _blePlatform
           .writeCharacteristicWithoutResponse(characteristic, value)
           .then((info) => info.result.dematerialize());
 
@@ -82,10 +82,10 @@ class ConnectedDeviceOperationImpl implements ConnectedDeviceOperation {
         .map((update) => update.result.dematerialize());
 
     final autosubscribingRepeater = Repeater<List<int>>.broadcast(
-      onListenEmitFrom: () => _controller
+      onListenEmitFrom: () => _blePlatform
           .subscribeToNotifications(characteristic)
           .asyncExpand((_) => specificCharacteristicValueStream),
-      onCancel: () => _controller
+      onCancel: () => _blePlatform
           .stopSubscribingToNotifications(characteristic)
           .catchError((Object e) =>
               print("Error unsubscribing from notifications: $e")),
@@ -98,16 +98,16 @@ class ConnectedDeviceOperationImpl implements ConnectedDeviceOperation {
 
   @override
   Future<int> requestMtu(String deviceId, int mtu) async =>
-      _controller.requestMtuSize(deviceId, mtu);
+      _blePlatform.requestMtuSize(deviceId, mtu);
 
   @override
   Future<List<DiscoveredService>> discoverServices(String deviceId) =>
-      _controller.discoverServices(deviceId);
+      _blePlatform.discoverServices(deviceId);
 
   @override
   Future<void> requestConnectionPriority(
           String deviceId, ConnectionPriority priority) async =>
-      _controller
+      _blePlatform
           .requestConnectionPriority(deviceId, priority)
           .then((message) => message.result.dematerialize());
 }

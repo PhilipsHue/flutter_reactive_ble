@@ -2,91 +2,10 @@ import 'package:flutter/services.dart';
 
 import 'converter/args_to_protubuf_converter.dart';
 import 'converter/protobuf_converter.dart';
-import 'model/ble_status.dart';
-import 'model/characteristic_value.dart';
-import 'model/clear_gatt_cache_error.dart';
-import 'model/connection_priority.dart';
-import 'model/connection_state_update.dart';
-import 'model/discovered_device.dart';
-import 'model/discovered_service.dart';
-import 'model/generic_failure.dart';
-import 'model/qualified_characteristic.dart';
-import 'model/result.dart';
-import 'model/scan_mode.dart';
-import 'model/unit.dart';
-import 'model/uuid.dart';
-import 'model/write_characteristic_info.dart';
+import 'models.dart';
+import 'reactive_ble_platform_interface.dart';
 
-abstract class DeviceOperationController {
-  Stream<CharacteristicValue> get charValueUpdateStream;
-
-  Future<List<DiscoveredService>> discoverServices(String deviceId);
-
-  Stream<void> readCharacteristic(QualifiedCharacteristic characteristic);
-
-  Future<WriteCharacteristicInfo> writeCharacteristicWithResponse(
-    QualifiedCharacteristic characteristic,
-    List<int> value,
-  );
-
-  Future<WriteCharacteristicInfo> writeCharacteristicWithoutResponse(
-    QualifiedCharacteristic characteristic,
-    List<int> value,
-  );
-
-  Stream<void> subscribeToNotifications(
-    QualifiedCharacteristic characteristic,
-  );
-
-  Future<void> stopSubscribingToNotifications(
-    QualifiedCharacteristic characteristic,
-  );
-
-  Future<int> requestMtuSize(String deviceId, int? mtu);
-
-  Future<ConnectionPriorityInfo> requestConnectionPriority(
-      String deviceId, ConnectionPriority priority);
-}
-
-abstract class ScanOperationController {
-  Stream<ScanResult> get scanStream;
-
-  Stream<void> scanForDevices({
-    required List<Uuid> withServices,
-    required ScanMode scanMode,
-    required bool requireLocationServicesEnabled,
-  });
-}
-
-abstract class DeviceConnectionController {
-  Stream<ConnectionStateUpdate> get connectionUpdateStream;
-
-  Stream<void> connectToDevice(
-    String id,
-    Map<Uuid, List<Uuid>>? servicesWithCharacteristicsToDiscover,
-    Duration? connectionTimeout,
-  );
-
-  Future<void> disconnectDevice(String deviceId);
-}
-
-abstract class BleOperationController {
-  Stream<BleStatus> get bleStatusStream;
-
-  Future<void> initialize();
-
-  Future<void> deinitialize();
-
-  Future<Result<Unit, GenericFailure<ClearGattCacheError>?>> clearGattCache(
-      String deviceId);
-}
-
-class PluginController
-    implements
-        DeviceOperationController,
-        ScanOperationController,
-        DeviceConnectionController,
-        BleOperationController {
+class PluginController extends ReactiveBlePlatform {
   PluginController({
     required ArgsToProtobufConverter argsToProtobufConverter,
     required ProtobufConverter protobufConverter,

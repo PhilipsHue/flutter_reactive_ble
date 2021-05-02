@@ -28,7 +28,6 @@ import 'package:mockito/mockito.dart';
 import 'plugin_controller_test.mocks.dart';
 
 @GenerateMocks([
-  Logger,
   ArgsToProtobufConverter,
   ProtobufConverter,
   MethodChannel,
@@ -54,12 +53,6 @@ void main() {
       _scanStreamController = StreamController();
       _statusStreamController = StreamController();
 
-      final logger = MockLogger();
-      when(logger.log(any)).thenAnswer((_) {});
-      when(_methodChannel.invokeMethod<void>(any, any)).thenAnswer(
-        (_) async => 0,
-      );
-
       _sut = PluginController(
         argsToProtobufConverter: _argsConverter,
         bleMethodChannel: _methodChannel,
@@ -68,7 +61,6 @@ void main() {
         charUpdateChannel: _argsStreamController.stream,
         bleDeviceScanChannel: _scanStreamController.stream,
         bleStatusChannel: _statusStreamController.stream,
-        debugLogger: logger,
       );
     });
 
