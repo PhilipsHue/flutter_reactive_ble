@@ -16,9 +16,9 @@ abstract class $DiscoveredService {
   List<Uuid> get characteristicIds;
   List<DiscoveredService> get includedServices;
   DiscoveredService copyWith(
-          {Uuid serviceId,
-          List<Uuid> characteristicIds,
-          List<DiscoveredService> includedServices}) =>
+          {Uuid? serviceId,
+          List<Uuid>? characteristicIds,
+          List<DiscoveredService>? includedServices}) =>
       DiscoveredService(
           serviceId: serviceId ?? this.serviceId,
           characteristicIds: characteristicIds ?? this.characteristicIds,
@@ -27,7 +27,8 @@ abstract class $DiscoveredService {
   String toString() =>
       "DiscoveredService(serviceId: $serviceId, characteristicIds: $characteristicIds, includedServices: $includedServices)";
   @override
-  bool operator ==(dynamic other) =>
+  bool operator ==(Object other) =>
+      other is DiscoveredService &&
       other.runtimeType == runtimeType &&
       serviceId == other.serviceId &&
       const DeepCollectionEquality()

@@ -4,13 +4,14 @@ import 'package:flutter_reactive_ble_example/src/ble/ble_scanner.dart';
 import 'package:provider/provider.dart';
 
 import '../widgets.dart';
-import 'device_detail_screen.dart';
+import 'device_detail/device_detail_screen.dart';
 
 class DeviceListScreen extends StatelessWidget {
   @override
-  Widget build(BuildContext context) => Consumer2<BleScanner, BleScannerState>(
+  Widget build(BuildContext context) => Consumer2<BleScanner, BleScannerState?>(
         builder: (_, bleScanner, bleScannerState, __) => _DeviceList(
-          scannerState: bleScannerState,
+          scannerState: bleScannerState ??
+              BleScannerState(discoveredDevices: [], scanIsInProgress: false),
           startScan: bleScanner.startScan,
           stopScan: bleScanner.stopScan,
         ),
@@ -19,12 +20,9 @@ class DeviceListScreen extends StatelessWidget {
 
 class _DeviceList extends StatefulWidget {
   const _DeviceList(
-      {@required this.scannerState,
-      @required this.startScan,
-      @required this.stopScan})
-      : assert(scannerState != null),
-        assert(startScan != null),
-        assert(stopScan != null);
+      {required this.scannerState,
+      required this.startScan,
+      required this.stopScan});
 
   final BleScannerState scannerState;
   final void Function(List<Uuid>) startScan;
@@ -35,7 +33,7 @@ class _DeviceList extends StatefulWidget {
 }
 
 class _DeviceListState extends State<_DeviceList> {
-  TextEditingController _uuidController;
+  late TextEditingController _uuidController;
 
   @override
   void initState() {

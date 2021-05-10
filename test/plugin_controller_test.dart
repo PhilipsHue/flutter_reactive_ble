@@ -26,14 +26,14 @@ import 'plugin_controller_test.mocks.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   group('$PluginController', () {
-    PluginController _sut;
-    MockMethodChannel _methodChannel;
-    MockArgsToProtobufConverter _argsConverter;
-    MockProtobufConverter _protobufConverter;
-    StreamController<List<int>> _connectedDeviceStreamController;
-    StreamController<List<int>> _argsStreamController;
-    StreamController<List<int>> _scanStreamController;
-    StreamController<List<int>> _statusStreamController;
+    late PluginController _sut;
+    late MockMethodChannel _methodChannel;
+    late MockArgsToProtobufConverter _argsConverter;
+    late MockProtobufConverter _protobufConverter;
+    late StreamController<List<int>> _connectedDeviceStreamController;
+    late StreamController<List<int>> _argsStreamController;
+    late StreamController<List<int>> _scanStreamController;
+    late StreamController<List<int>> _statusStreamController;
 
     setUp(() {
       _argsConverter = MockArgsToProtobufConverter();
@@ -45,7 +45,7 @@ void main() {
       _statusStreamController = StreamController();
 
       final logger = MockLogger();
-      when(logger.log(any)).thenReturn(null);
+      when(logger.log(any)).thenAnswer((_) {});
       when(_methodChannel.invokeMethod<void>(any, any)).thenAnswer(
         (_) async => 0,
       );
@@ -70,8 +70,8 @@ void main() {
     });
 
     group('connect to device', () {
-      pb.ConnectToDeviceRequest request;
-      StreamSubscription subscription;
+      late pb.ConnectToDeviceRequest request;
+      StreamSubscription? subscription;
       setUp(() {
         request = pb.ConnectToDeviceRequest();
         when(_argsConverter.createConnectToDeviceArgs(any, any, any))
@@ -98,7 +98,7 @@ void main() {
     });
 
     group('connect to device', () {
-      pb.DisconnectFromDeviceRequest request;
+      late pb.DisconnectFromDeviceRequest request;
       setUp(() async {
         request = pb.DisconnectFromDeviceRequest();
         when(_argsConverter.createDisconnectDeviceArgs(any))
@@ -125,7 +125,7 @@ void main() {
         failure: null,
       );
 
-      Stream<ConnectionStateUpdate> result;
+      Stream<ConnectionStateUpdate>? result;
 
       setUp(() {
         _connectedDeviceStreamController.addStream(
@@ -146,8 +146,8 @@ void main() {
     });
 
     group('Char update stream', () {
-      CharacteristicValue valueUpdate;
-      Stream<CharacteristicValue> result;
+      late CharacteristicValue valueUpdate;
+      late Stream<CharacteristicValue> result;
 
       setUp(() {
         valueUpdate = CharacteristicValue(
@@ -172,13 +172,13 @@ void main() {
       });
 
       test('It emits updates', () {
-        expect(result, emitsInOrder(<CharacteristicValue>[valueUpdate]));
+        expect(result, emitsInOrder(<CharacteristicValue?>[valueUpdate]));
       });
     });
 
     group('Read characteristic', () {
-      QualifiedCharacteristic characteristic;
-      pb.ReadCharacteristicRequest request;
+      late QualifiedCharacteristic characteristic;
+      late pb.ReadCharacteristicRequest request;
 
       setUp(() {
         request = pb.ReadCharacteristicRequest();
@@ -207,9 +207,9 @@ void main() {
     group('Write characteristic with response', () {
       QualifiedCharacteristic characteristic;
       const value = [0, 1];
-      pb.WriteCharacteristicRequest request;
-      WriteCharacteristicInfo expectedResult;
-      WriteCharacteristicInfo result;
+      late pb.WriteCharacteristicRequest request;
+      late WriteCharacteristicInfo expectedResult;
+      late WriteCharacteristicInfo result;
 
       setUp(() async {
         request = pb.WriteCharacteristicRequest();
@@ -223,7 +223,7 @@ void main() {
         expectedResult = WriteCharacteristicInfo(
             characteristic: characteristic, result: const Result.success(null));
 
-        when(_methodChannel.invokeMethod<void>(any, any)).thenAnswer(
+        when(_methodChannel.invokeMethod<List<int>?>(any, any)).thenAnswer(
           (_) async => [1],
         );
         when(_argsConverter.createWriteChacracteristicRequest(any, any))
@@ -236,7 +236,7 @@ void main() {
       });
 
       test('It invokes method channel with correct arguments', () {
-        verify(_methodChannel.invokeMethod<void>(
+        verify(_methodChannel.invokeMethod<List<int>?>(
                 'writeCharacteristicWithResponse', request.writeToBuffer()))
             .called(1);
       });
@@ -249,9 +249,9 @@ void main() {
     group('Write characteristic without response', () {
       QualifiedCharacteristic characteristic;
       const value = [0, 1];
-      pb.WriteCharacteristicRequest request;
-      WriteCharacteristicInfo expectedResult;
-      WriteCharacteristicInfo result;
+      late pb.WriteCharacteristicRequest request;
+      late WriteCharacteristicInfo expectedResult;
+      late WriteCharacteristicInfo result;
 
       setUp(() async {
         request = pb.WriteCharacteristicRequest();
@@ -262,9 +262,12 @@ void main() {
         );
 
         expectedResult = WriteCharacteristicInfo(
-            characteristic: characteristic, result: const Result.success(null));
+            // ignore: void_checks
+            characteristic: characteristic,
+            // ignore: void_checks
+            result: const Result.success(Unit()));
 
-        when(_methodChannel.invokeMethod<void>(any, any)).thenAnswer(
+        when(_methodChannel.invokeMethod<List<int>?>(any, any)).thenAnswer(
           (_) async => [1],
         );
         when(_argsConverter.createWriteChacracteristicRequest(any, any))
@@ -287,8 +290,8 @@ void main() {
     });
 
     group('Subscribe to notifications', () {
-      QualifiedCharacteristic characteristic;
-      pb.NotifyCharacteristicRequest request;
+      late QualifiedCharacteristic characteristic;
+      late pb.NotifyCharacteristicRequest request;
 
       setUp(() {
         request = pb.NotifyCharacteristicRequest();
@@ -321,7 +324,7 @@ void main() {
 
     group('Stop subscribe to notifications', () {
       QualifiedCharacteristic characteristic;
-      pb.NotifyNoMoreCharacteristicRequest request;
+      late pb.NotifyNoMoreCharacteristicRequest request;
 
       setUp(() async {
         request = pb.NotifyNoMoreCharacteristicRequest();
@@ -349,14 +352,14 @@ void main() {
     group('Request mtu size', () {
       const deviceId = '123';
       const mtuSize = 40;
-      pb.NegotiateMtuRequest request;
-      int result;
+      late pb.NegotiateMtuRequest request;
+      int? result;
 
       setUp(() async {
         request = pb.NegotiateMtuRequest();
         when(_argsConverter.createNegotiateMtuRequest(any, any))
             .thenReturn(request);
-        when(_methodChannel.invokeMethod<void>(any, any)).thenAnswer(
+        when(_methodChannel.invokeMethod<List<int>>(any, any)).thenAnswer(
           (_) async => [1],
         );
 
@@ -370,7 +373,7 @@ void main() {
 
       test('It invokes method channel with correct arguments', () {
         verify(
-          _methodChannel.invokeMethod<void>(
+          _methodChannel.invokeMethod<List<int>>(
             'negotiateMtuSize',
             request.writeToBuffer(),
           ),
@@ -381,15 +384,15 @@ void main() {
     group('Request connection priority', () {
       const deviceId = '123';
       ConnectionPriority priority;
-      pb.ChangeConnectionPriorityRequest request;
-      ConnectionPriorityInfo info;
-      ConnectionPriorityInfo result;
+      late pb.ChangeConnectionPriorityRequest request;
+      late ConnectionPriorityInfo info;
+      late ConnectionPriorityInfo result;
 
       setUp(() async {
         request = pb.ChangeConnectionPriorityRequest();
         priority = ConnectionPriority.highPerformance;
         info = const ConnectionPriorityInfo(result: Result.success(null));
-        when(_methodChannel.invokeMethod<void>(any, any)).thenAnswer(
+        when(_methodChannel.invokeMethod<List<int>>(any, any)).thenAnswer(
           (_) async => [1],
         );
         when(_argsConverter.createChangeConnectionPrioRequest(any, any))
@@ -406,7 +409,7 @@ void main() {
 
       test('It invokes method channel with correct arguments', () {
         verify(
-          _methodChannel.invokeMethod<void>(
+          _methodChannel.invokeMethod<List<int>>(
             'requestConnectionPriority',
             request.writeToBuffer(),
           ),
@@ -419,7 +422,7 @@ void main() {
       const locationEnabled = true;
       final withServices = [Uuid.parse('FEFF')];
 
-      pb.ScanForDevicesRequest request;
+      late pb.ScanForDevicesRequest request;
 
       setUp(() {
         request = pb.ScanForDevicesRequest();
@@ -464,11 +467,12 @@ void main() {
         name: 'Testdevice',
         rssi: -40,
         serviceData: const {},
+        serviceUuids: const [],
         manufacturerData: Uint8List.fromList([1]),
       );
-      ScanResult scanResult;
+      late ScanResult scanResult;
 
-      Stream<ScanResult> result;
+      Stream<ScanResult>? result;
       setUp(() {
         scanResult = ScanResult(result: Result.success(device));
 
@@ -483,7 +487,7 @@ void main() {
       });
 
       test('It emits correct values', () {
-        expect(result, emitsInOrder(<ScanResult>[scanResult]));
+        expect(result, emitsInOrder(<ScanResult?>[scanResult]));
       });
     });
 
@@ -509,17 +513,17 @@ void main() {
     group('Clear gatt cache', () {
       const deviceId = '123';
 
-      pb.ClearGattCacheRequest request;
-      Result<Unit, GenericFailure<ClearGattCacheError>> result;
+      late pb.ClearGattCacheRequest request;
+      Result<Unit, GenericFailure<ClearGattCacheError>?>? result;
 
-      Result<Unit, GenericFailure<ClearGattCacheError>> convertedResult;
+      late Result<Unit, GenericFailure<ClearGattCacheError>> convertedResult;
 
       setUp(() async {
         request = pb.ClearGattCacheRequest();
         convertedResult =
             const Result<Unit, GenericFailure<ClearGattCacheError>>.success(
                 Unit());
-        when(_methodChannel.invokeMethod<void>(any, any)).thenAnswer(
+        when(_methodChannel.invokeMethod<List<int>>(any, any)).thenAnswer(
           (_) async => [1],
         );
 
@@ -547,7 +551,7 @@ void main() {
       const status1 = BleStatus.poweredOff;
       const status2 = BleStatus.ready;
 
-      Stream<BleStatus> _bleStatusStream;
+      Stream<BleStatus>? _bleStatusStream;
 
       setUp(() {
         _statusStreamController.addStream(
@@ -570,7 +574,7 @@ void main() {
 
     group('Discover services', () {
       const deviceId = "testdevice";
-      pb.DiscoverServicesRequest request;
+      late pb.DiscoverServicesRequest request;
       final services = [
         DiscoveredService(
           serviceId: Uuid([0x01, 0x02]),
@@ -578,12 +582,12 @@ void main() {
           includedServices: const [],
         ),
       ];
-      List<DiscoveredService> result;
+      List<DiscoveredService>? result;
 
       setUp(() async {
         request = pb.DiscoverServicesRequest();
 
-        when(_methodChannel.invokeMethod<void>(any, any)).thenAnswer(
+        when(_methodChannel.invokeMethod<List<int>>(any, any)).thenAnswer(
           (_) async => [1],
         );
         when(_argsConverter.createDiscoverServicesRequest(any))

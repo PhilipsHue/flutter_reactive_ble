@@ -36,6 +36,7 @@ class ProtobufMessageConverter {
                     .setName(scanInfo.name)
                     .setRssi(scanInfo.rssi)
                     .addAllServiceData(createServiceDataEntry(scanInfo.serviceData))
+                    .addAllServiceUuids(createServiceUuids(scanInfo.serviceUuids))
                     .setManufacturerData(ByteString.copyFrom(scanInfo.manufacturerData))
                     .build()
 
@@ -211,6 +212,10 @@ class ProtobufMessageConverter {
         }
 
         return serviceDataEntries
+    }
+
+    private fun createServiceUuids(serviceUuids: List<UUID>): List<pb.Uuid> {
+        return serviceUuids.map { createUuidFromParcelUuid(it) }
     }
 
     private fun createUuidFromParcelUuid(uuid: UUID): pb.Uuid {

@@ -1,3 +1,14 @@
+# Main releases
+
+# 3.1.0
+
+* Add discoverable services to `ScanResult`. Kudos to @xvrh.
+
+## 3.0.0
+
+* Breaking: Migration to null-safety.
+* Improve example app by adding discover services, read, write and subscribe to characteristic. 
+
 ## 2.7.3
 
 * Upgrade Android dependencies to comply to newer Gradle distributions.

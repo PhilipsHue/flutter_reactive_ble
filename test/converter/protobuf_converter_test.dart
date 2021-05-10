@@ -18,11 +18,13 @@ void main() {
       const id = 'id';
       const name = 'name';
 
-      pb.ServiceDataEntry serviceDataEntry1;
-      pb.ServiceDataEntry serviceDataEntry2;
+      late pb.ServiceDataEntry serviceDataEntry1;
+      late pb.ServiceDataEntry serviceDataEntry2;
       pb.DeviceScanInfo message;
-      Uint8List manufacturerData;
-      ScanResult scanresult;
+      late pb.Uuid serviceUuid1;
+      late pb.Uuid serviceUuid2;
+      late Uint8List manufacturerData;
+      late ScanResult scanresult;
 
       setUp(() {
         serviceDataEntry1 = pb.ServiceDataEntry()
@@ -31,6 +33,8 @@ void main() {
         serviceDataEntry2 = pb.ServiceDataEntry()
           ..serviceUuid = (pb.Uuid()..data = [1])
           ..data = [4, 5, 6];
+        serviceUuid1 = pb.Uuid()..data = [2];
+        serviceUuid2 = pb.Uuid()..data = [3];
         manufacturerData = Uint8List.fromList([1, 2, 3]);
 
         message = pb.DeviceScanInfo()
@@ -38,6 +42,8 @@ void main() {
           ..name = name
           ..serviceData.add(serviceDataEntry1)
           ..serviceData.add(serviceDataEntry2)
+          ..serviceUuids.add(serviceUuid1)
+          ..serviceUuids.add(serviceUuid2)
           ..manufacturerData = manufacturerData;
 
         scanresult = sut.scanResultFrom(message.writeToBuffer());
@@ -70,6 +76,19 @@ void main() {
                     d.serviceData[Uuid(serviceDataEntry2.serviceUuid.data)],
                 failure: (_) => throw Exception()),
             serviceDataEntry2.data);
+      });
+
+      test('converts service uuids', () {
+        expect(
+            scanresult.result.iif(
+                success: (d) => d.serviceUuids[0].data,
+                failure: (_) => throw Exception()),
+            serviceUuid1.data);
+        expect(
+            scanresult.result.iif(
+                success: (d) => d.serviceUuids[1].data,
+                failure: (_) => throw Exception()),
+            serviceUuid2.data);
       });
 
       test('converts manufacturer data', () {
@@ -107,7 +126,7 @@ void main() {
           hasFailure: false,
           getFailure: () => throw Exception(),
           codes: <String>[],
-          fallback: (rawOrNull) => throw Exception(),
+          fallback: (int? rawOrNull) => throw Exception(),
         );
         expect(error, null);
       });
@@ -120,7 +139,7 @@ void main() {
           getFailure: () => pb.GenericFailure(),
           codes: <String>[fallbackCode],
           fallback: (_) => fallbackCode,
-        );
+        )!;
 
         expect(error.code, fallbackCode);
       });
@@ -134,7 +153,7 @@ void main() {
           getFailure: () => pb.GenericFailure()..code = unknownRawCode,
           codes: <String>[fallbackCode],
           fallback: (_) => fallbackCode,
-        );
+        )!;
 
         expect(error.code, fallbackCode);
       });
@@ -147,7 +166,7 @@ void main() {
           getFailure: () => pb.GenericFailure()..code = knownRawCode,
           codes: <String>[knownCode],
           fallback: (rawOrNull) => throw Exception(),
-        );
+        ) as GenericFailure<String>;
 
         expect(error.code, knownCode);
       });
@@ -160,7 +179,7 @@ void main() {
           getFailure: () => pb.GenericFailure()..code = knownRawCode,
           codes: <String>[knownCode],
           fallback: (rawOrNull) => throw Exception(),
-        );
+        ) as GenericFailure<String>;
 
         expect(error.message, "");
       });
@@ -176,7 +195,7 @@ void main() {
             ..message = message,
           codes: <String>[knownCode],
           fallback: (rawOrNull) => throw Exception(),
-        );
+        ) as GenericFailure<String>;
 
         expect(error.message, message);
       });
@@ -194,7 +213,7 @@ void main() {
 
       test("converts a value", () {
         const value = "value";
-        const String failure = null;
+        const String? failure = null;
         final result = sut.resultFrom(getValue: () => value, failure: failure);
 
         expect(
@@ -206,7 +225,7 @@ void main() {
       const id = 'id';
       const connectionState = 1;
 
-      List<int> message;
+      late List<int> message;
 
       group('given a message without a failure', () {
         setUp(() {
@@ -238,7 +257,7 @@ void main() {
         });
 
         test('failure is decoded', () {
-          final updateResult = sut.connectionStateUpdateFrom(message).failure;
+          final updateResult = sut.connectionStateUpdateFrom(message).failure!;
           expect(updateResult.message, "failure");
           expect(updateResult.code, ConnectionError.unknown);
         });
@@ -269,7 +288,7 @@ void main() {
 
         expect(
           result,
-          const Result<Unit, GenericFailure<ClearGattCacheError>>.success(
+          const Result<Unit, GenericFailure<ClearGattCacheError>?>.success(
               Unit()),
         );
       });
@@ -281,15 +300,15 @@ void main() {
             success: (_) => throw AssertionError("Not expected to succeed"),
             failure: (f) => f);
 
-        expect(result.code, ClearGattCacheError.unknown);
+        expect(result?.code, ClearGattCacheError.unknown);
       });
     });
 
     group("decoding ${pb.CharacteristicValueInfo}", () {
       const id = 'id';
       const value = [2, 3];
-      pb.CharacteristicValueInfo message;
-      pb.CharacteristicAddress characteristic;
+      late pb.CharacteristicValueInfo message;
+      late pb.CharacteristicAddress characteristic;
 
       setUp(() {
         characteristic = pb.CharacteristicAddress()
@@ -299,7 +318,7 @@ void main() {
       });
 
       group('given no error occurred', () {
-        CharacteristicValue result;
+        late CharacteristicValue result;
 
         setUp(() {
           message = pb.CharacteristicValueInfo()
@@ -331,7 +350,7 @@ void main() {
 
       group('given an error occurred', () {
         List<int> failureMessage;
-        String result;
+        String? result;
 
         setUp(() {
           failureMessage =
@@ -350,8 +369,8 @@ void main() {
     group("Decoding ${pb.WriteCharacteristicInfo}", () {
       const id = 'id';
 
-      List<int> data;
-      pb.CharacteristicAddress characteristic;
+      late List<int> data;
+      late pb.CharacteristicAddress characteristic;
 
       setUp(() {
         characteristic = pb.CharacteristicAddress()
@@ -398,9 +417,8 @@ void main() {
             .writeCharacteristicInfoFrom(failureMessage.writeToBuffer())
             .result
             .iif(
-              success: (_) => throw AssertionError("Not expected to succeed"),
-              failure: (f) => f,
-            );
+                success: (_) => throw AssertionError("Not expected to succeed"),
+                failure: (f) => f!);
         expect(result.code, WriteCharacteristicFailure.unknown);
       });
     });
@@ -408,7 +426,7 @@ void main() {
     group('decoding ${pb.ChangeConnectionPriorityInfo}', () {
       const id = 'id';
 
-      pb.ChangeConnectionPriorityInfo message;
+      late pb.ChangeConnectionPriorityInfo message;
 
       setUp(() {
         message = pb.ChangeConnectionPriorityInfo()..deviceId = id;
@@ -433,7 +451,7 @@ void main() {
             .result
             .iif(
                 success: (_) => throw AssertionError("Not expected to succeed"),
-                failure: (f) => f);
+                failure: (f) => f!);
         expect(result.code, ConnectionPriorityFailure.unknown);
       });
     });
@@ -452,7 +470,7 @@ void main() {
 
     group('Coverts MTU size', () {
       const size = 20;
-      int result;
+      int? result;
 
       setUp(() {
         final message = pb.NegotiateMtuInfo()..mtuSize = size;
@@ -468,7 +486,7 @@ void main() {
     group('decoding ${pb.DiscoveredService} ', () {
       const deviceId = "testDevice";
       pb.DiscoverServicesInfo message;
-      List<DiscoveredService> convertedResult;
+      List<DiscoveredService>? convertedResult;
 
       group('given a message without a failure', () {
         setUp(() {

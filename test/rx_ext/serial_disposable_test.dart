@@ -1,10 +1,11 @@
 import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
+import 'package:flutter_reactive_ble/src/model/unit.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('Serialdisposable', () {
-    SerialDisposable<int> sut;
-    _Disposer disposer;
+    late SerialDisposable<int> sut;
+    late _Disposer disposer;
 
     setUp(() {
       disposer = _Disposer();
@@ -48,8 +49,9 @@ void main() {
 
 class _Disposer {
   final _values = <int>[];
-  Future<void> dispose(int value) async {
+  Future<Unit> dispose(int value) async {
     _values.add(value);
+    return Unit();
   }
 
   List<int> get disposedValues => _values;

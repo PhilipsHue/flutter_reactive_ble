@@ -9,7 +9,7 @@ class GenericFailure<T> {
   /// String that provides additional context of the failure.
   final String message;
 
-  const GenericFailure({@required this.code, @required this.message});
+  const GenericFailure({required this.code, required this.message});
 
   @override
   String toString() => "$runtimeType(code: $code, message: \"$message\")";

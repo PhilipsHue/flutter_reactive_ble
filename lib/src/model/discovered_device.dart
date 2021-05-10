@@ -13,8 +13,8 @@ part 'discovered_device.g.dart';
 /// Result of a scan interval.
 @immutable
 class ScanResult {
-  final Result<DiscoveredDevice, GenericFailure<ScanFailure>> result;
-  const ScanResult({@required this.result});
+  final Result<DiscoveredDevice, GenericFailure<ScanFailure>?> result;
+  const ScanResult({required this.result});
 
   @override
   String toString() => "$ScanResult(result: $result)";
@@ -30,17 +30,21 @@ class DiscoveredDevice extends $DiscoveredDevice {
   @CustomEquality(DeepCollectionEquality())
   final Map<Uuid, Uint8List> serviceData;
 
+  @CustomEquality(DeepCollectionEquality())
+  final List<Uuid> serviceUuids;
+
   /// Manufacturer specific data. The first 2 bytes are the Company Identifier Codes.
   final Uint8List manufacturerData;
 
   final int rssi;
 
   const DiscoveredDevice({
-    @required this.id,
-    @required this.name,
-    @required this.serviceData,
-    @required this.manufacturerData,
-    @required this.rssi,
+    required this.id,
+    required this.name,
+    required this.serviceData,
+    required this.serviceUuids,
+    required this.manufacturerData,
+    required this.rssi,
   });
 }
 

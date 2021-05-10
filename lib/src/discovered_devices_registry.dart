@@ -1,7 +1,7 @@
 import 'package:meta/meta.dart';
 
 abstract class DiscoveredDevicesRegistry {
-  DiscoveredDevicesRegistry({@required this.getTimestamp});
+  DiscoveredDevicesRegistry({required this.getTimestamp});
 
   final DateTime Function() getTimestamp;
 
@@ -11,11 +11,12 @@ abstract class DiscoveredDevicesRegistry {
 
   bool isEmpty();
 
-  bool deviceIsDiscoveredRecently({String deviceId, Duration cacheValidity});
+  bool deviceIsDiscoveredRecently(
+      {required String deviceId, required Duration cacheValidity});
 }
 
 class DiscoveredDevicesRegistryImpl implements DiscoveredDevicesRegistry {
-  DiscoveredDevicesRegistryImpl({@required this.getTimestamp});
+  DiscoveredDevicesRegistryImpl({required this.getTimestamp});
 
   DiscoveredDevicesRegistryImpl.standard()
       : this(getTimestamp: () => DateTime.now());
@@ -40,8 +41,12 @@ class DiscoveredDevicesRegistryImpl implements DiscoveredDevicesRegistry {
   bool isEmpty() => discoveredDevices.isEmpty;
 
   @override
-  bool deviceIsDiscoveredRecently({String deviceId, Duration cacheValidity}) =>
+  bool deviceIsDiscoveredRecently({
+    required String deviceId,
+    required Duration cacheValidity,
+  }) =>
       discoveredDevices.containsKey(deviceId) &&
-      discoveredDevices[deviceId]
-          .isAfter(getTimestamp().subtract(cacheValidity));
+      (discoveredDevices[deviceId]
+              ?.isAfter(getTimestamp().subtract(cacheValidity)) ??
+          false);
 }

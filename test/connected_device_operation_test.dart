@@ -5,6 +5,7 @@ import 'package:flutter_reactive_ble/src/connected_device_operation.dart';
 import 'package:flutter_reactive_ble/src/model/characteristic_value.dart';
 import 'package:flutter_reactive_ble/src/model/qualified_characteristic.dart';
 import 'package:flutter_reactive_ble/src/model/result.dart';
+import 'package:flutter_reactive_ble/src/model/unit.dart';
 import 'package:flutter_reactive_ble/src/model/uuid.dart';
 import 'package:flutter_reactive_ble/src/model/write_characteristic_info.dart';
 import 'package:flutter_reactive_ble/src/plugin_controller.dart';
@@ -16,8 +17,8 @@ import 'connected_device_operation_test.mocks.dart';
 
 @GenerateMocks([DeviceOperationController])
 void main() {
-  MockDeviceOperationController _controller;
-  ConnectedDeviceOperation _sut;
+  late MockDeviceOperationController _controller;
+  late ConnectedDeviceOperation _sut;
 
   group('$ConnectedDeviceOperation', () {
     setUp(() {
@@ -27,7 +28,7 @@ void main() {
       );
     });
     group('Listen to char value updates', () {
-      CharacteristicValue valueUpdate;
+      CharacteristicValue? valueUpdate;
 
       setUp(() {
         valueUpdate = CharacteristicValue(
@@ -40,25 +41,25 @@ void main() {
         );
 
         when(_controller.charValueUpdateStream)
-            .thenAnswer((_) => Stream.fromIterable([valueUpdate]));
+            .thenAnswer((_) => Stream.fromIterable([valueUpdate!]));
       });
 
       test('It emits value updates received from plugincontroller', () {
         expect(
           _sut.characteristicValueStream,
-          emitsInOrder(<CharacteristicValue>[valueUpdate]),
+          emitsInOrder(<CharacteristicValue?>[valueUpdate]),
         );
       });
     });
 
     group('Read characteristic', () {
-      QualifiedCharacteristic charDevice;
+      late QualifiedCharacteristic charDevice;
       QualifiedCharacteristic charOtherSameDevice;
       QualifiedCharacteristic charOtherDevice;
-      CharacteristicValue valueUpdate;
-      CharacteristicValue valueUpdateOtherDevice;
-      CharacteristicValue valueUpdateSameDeviceOtherChar;
-      List<int> result;
+      CharacteristicValue? valueUpdate;
+      CharacteristicValue? valueUpdateOtherDevice;
+      CharacteristicValue? valueUpdateSameDeviceOtherChar;
+      List<int>? result;
 
       setUp(() {
         charDevice = QualifiedCharacteristic(
@@ -103,9 +104,9 @@ void main() {
         setUp(() async {
           when(_controller.charValueUpdateStream)
               .thenAnswer((_) => Stream.fromIterable([
-                    valueUpdate,
-                    valueUpdateOtherDevice,
-                    valueUpdateSameDeviceOtherChar,
+                    valueUpdate!,
+                    valueUpdateOtherDevice!,
+                    valueUpdateSameDeviceOtherChar!,
                   ]));
 
           result = await _sut.readCharacteristic(charDevice);
@@ -122,8 +123,8 @@ void main() {
         setUp(() async {
           when(_controller.charValueUpdateStream)
               .thenAnswer((_) => Stream.fromIterable([
-                    valueUpdateOtherDevice,
-                    valueUpdateSameDeviceOtherChar,
+                    valueUpdateOtherDevice!,
+                    valueUpdateSameDeviceOtherChar!,
                   ]));
         });
 
@@ -137,7 +138,7 @@ void main() {
     });
 
     group('Write characteristic', () {
-      QualifiedCharacteristic characteristic;
+      late QualifiedCharacteristic characteristic;
       WriteCharacteristicInfo info;
       const value = [1, 0];
 
@@ -154,8 +155,8 @@ void main() {
           setUp(() {
             info = WriteCharacteristicInfo(
               characteristic: characteristic,
-              result: const Result<void,
-                  GenericFailure<WriteCharacteristicFailure>>.success(null),
+              result: const Result<Unit,
+                  GenericFailure<WriteCharacteristicFailure>>.success(Unit()),
             );
 
             when(_controller.writeCharacteristicWithResponse(any, any))
@@ -172,7 +173,7 @@ void main() {
             setUp(() {
               info = WriteCharacteristicInfo(
                 characteristic: characteristic,
-                result: const Result<void,
+                result: const Result<Unit,
                     GenericFailure<WriteCharacteristicFailure>>.failure(
                   GenericFailure<WriteCharacteristicFailure>(
                     code: WriteCharacteristicFailure.unknown,
@@ -200,8 +201,8 @@ void main() {
             setUp(() {
               info = WriteCharacteristicInfo(
                 characteristic: characteristic,
-                result: const Result<void,
-                    GenericFailure<WriteCharacteristicFailure>>.success(null),
+                result: const Result<Unit,
+                    GenericFailure<WriteCharacteristicFailure>>.success(Unit()),
               );
 
               when(_controller.writeCharacteristicWithoutResponse(any, any))
@@ -220,7 +221,7 @@ void main() {
             setUp(() {
               info = WriteCharacteristicInfo(
                 characteristic: characteristic,
-                result: const Result<void,
+                result: const Result<Unit,
                     GenericFailure<WriteCharacteristicFailure>>.failure(
                   GenericFailure<WriteCharacteristicFailure>(
                     code: WriteCharacteristicFailure.unknown,
@@ -245,15 +246,15 @@ void main() {
       });
 
       group('Subscribe to characteristic', () {
-        QualifiedCharacteristic charDevice;
+        late QualifiedCharacteristic charDevice;
         QualifiedCharacteristic charOtherSameDevice;
         QualifiedCharacteristic charOtherDevice;
-        CharacteristicValue valueUpdate1;
-        CharacteristicValue valueUpdate2;
-        CharacteristicValue valueUpdateOtherDevice;
-        CharacteristicValue valueUpdateSameDeviceOtherChar;
-        Stream<List<int>> result;
-        Completer<ConnectionStateUpdate> terminateCompleter;
+        late CharacteristicValue valueUpdate1;
+        late CharacteristicValue valueUpdate2;
+        late CharacteristicValue valueUpdateOtherDevice;
+        late CharacteristicValue valueUpdateSameDeviceOtherChar;
+        late Stream<List<int>?> result;
+        late Completer<ConnectionStateUpdate> terminateCompleter;
 
         setUp(() {
           terminateCompleter = Completer();
@@ -330,7 +331,7 @@ void main() {
       group('Negotiate mtusize', () {
         const deviceId = '123';
         const mtuSize = 50;
-        int result;
+        int? result;
 
         setUp(() async {
           when(_controller.requestMtuSize(any, any))
@@ -346,7 +347,7 @@ void main() {
 
       group('Change connection priority', () {
         const deviceId = '123';
-        ConnectionPriority priority;
+        late ConnectionPriority priority;
 
         setUp(() {
           priority = ConnectionPriority.highPerformance;
@@ -356,7 +357,7 @@ void main() {
           setUp(() {
             when(_controller.requestConnectionPriority(any, any))
                 .thenAnswer((_) async => const ConnectionPriorityInfo(
-                      result: Result.success(null),
+                      result: Result.success(Unit()),
                     ));
           });
 

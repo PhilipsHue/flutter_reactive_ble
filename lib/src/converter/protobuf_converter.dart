@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_reactive_ble/src/generated/bledata.pb.dart' as pb;
 import 'package:flutter_reactive_ble/src/model/ble_status.dart';
 import 'package:flutter_reactive_ble/src/model/characteristic_value.dart';
@@ -15,7 +16,6 @@ import 'package:flutter_reactive_ble/src/model/unit.dart';
 import 'package:flutter_reactive_ble/src/model/uuid.dart';
 import 'package:flutter_reactive_ble/src/model/write_characteristic_info.dart';
 import 'package:flutter_reactive_ble/src/select_from.dart';
-import 'package:meta/meta.dart';
 
 abstract class ProtobufConverter {
   BleStatus bleStatusFrom(List<int> data);
@@ -24,7 +24,7 @@ abstract class ProtobufConverter {
 
   ConnectionStateUpdate connectionStateUpdateFrom(List<int> data);
 
-  Result<Unit, GenericFailure<ClearGattCacheError>> clearGattCacheResultFrom(
+  Result<Unit, GenericFailure<ClearGattCacheError>?> clearGattCacheResultFrom(
       List<int> data);
 
   CharacteristicValue characteristicValueFrom(List<int> data);
@@ -60,6 +60,9 @@ class ProtobufConverterImpl implements ProtobufConverter {
       message.serviceData.map((entry) => Uuid(entry.serviceUuid.data)),
       message.serviceData.map((entry) => Uint8List.fromList(entry.data)),
     );
+    final serviceUuids = message.serviceUuids
+        .map((entry) => Uuid(entry.data))
+        .toList(growable: false);
 
     return ScanResult(
       result: resultFrom(
@@ -67,6 +70,7 @@ class ProtobufConverterImpl implements ProtobufConverter {
           id: message.id,
           name: message.name,
           serviceData: serviceData,
+          serviceUuids: serviceUuids,
           manufacturerData: Uint8List.fromList(message.manufacturerData),
           rssi: message.rssi,
         ),
@@ -87,20 +91,19 @@ class ProtobufConverterImpl implements ProtobufConverter {
       connectionState: selectFrom(
         DeviceConnectionState.values,
         index: deviceInfo.connectionState,
-        fallback: (raw) => throw _InvalidConnectionState(raw),
+        fallback: (int? raw) => throw _InvalidConnectionState(raw),
       ),
       failure: genericFailureFrom(
         hasFailure: deviceInfo.hasFailure(),
         getFailure: () => deviceInfo.failure,
         codes: ConnectionError.values,
-        fallback: (rawOrNull) =>
-            rawOrNull == null ? null : ConnectionError.unknown,
+        fallback: (int? rawOrNull) => ConnectionError.unknown,
       ),
     );
   }
 
   @override
-  Result<Unit, GenericFailure<ClearGattCacheError>> clearGattCacheResultFrom(
+  Result<Unit, GenericFailure<ClearGattCacheError>?> clearGattCacheResultFrom(
       List<int> data) {
     final message = pb.ClearGattCacheInfo.fromBuffer(data);
     return resultFrom(
@@ -139,7 +142,7 @@ class ProtobufConverterImpl implements ProtobufConverter {
     return WriteCharacteristicInfo(
       characteristic: qualifiedCharacteristicFrom(message.characteristic),
       result: resultFrom(
-        getValue: () {},
+        getValue: () => Unit(),
         failure: genericFailureFrom(
           hasFailure: message.hasFailure(),
           getFailure: () => message.failure,
@@ -155,7 +158,7 @@ class ProtobufConverterImpl implements ProtobufConverter {
     final message = pb.ChangeConnectionPriorityInfo.fromBuffer(data);
     return ConnectionPriorityInfo(
       result: resultFrom(
-        getValue: () {},
+        getValue: () => Unit(),
         failure: genericFailureFrom(
           hasFailure: message.hasFailure(),
           getFailure: () => message.failure,
@@ -179,11 +182,11 @@ class ProtobufConverterImpl implements ProtobufConverter {
       );
 
   @visibleForTesting
-  GenericFailure<T> genericFailureFrom<T>({
-    @required bool hasFailure,
-    @required pb.GenericFailure Function() getFailure,
-    @required List<T> codes,
-    @required T Function(int rawOrNull) fallback,
+  GenericFailure<T>? genericFailureFrom<T>({
+    required bool hasFailure,
+    required pb.GenericFailure Function() getFailure,
+    required List<T> codes,
+    required T Function(int? rawOrNull) fallback,
   }) {
     if (hasFailure) {
       final error = getFailure();
@@ -216,14 +219,14 @@ class ProtobufConverterImpl implements ProtobufConverter {
 
   @visibleForTesting
   Result<Value, Failure> resultFrom<Value, Failure>(
-          {@required Value Function() getValue, @required Failure failure}) =>
+          {required Value Function() getValue, required Failure failure}) =>
       failure != null
           ? Result<Value, Failure>.failure(failure)
           : Result.success(getValue());
 }
 
 class _InvalidConnectionState extends Error {
-  final int rawValue;
+  final int? rawValue;
 
   _InvalidConnectionState(this.rawValue);
 
