@@ -70,8 +70,8 @@ class Repeater<T> {
 
   /// Closes the `stream`.
   Future<Unit> dispose() async {
-    _streamController?.close();
-    return Unit();
+    await _streamController?.close();
+    return const Unit();
   }
 
   Repeater({

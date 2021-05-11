@@ -142,7 +142,7 @@ class ProtobufConverterImpl implements ProtobufConverter {
     return WriteCharacteristicInfo(
       characteristic: qualifiedCharacteristicFrom(message.characteristic),
       result: resultFrom(
-        getValue: () => Unit(),
+        getValue: () => const Unit(),
         failure: genericFailureFrom(
           hasFailure: message.hasFailure(),
           getFailure: () => message.failure,
@@ -158,7 +158,7 @@ class ProtobufConverterImpl implements ProtobufConverter {
     final message = pb.ChangeConnectionPriorityInfo.fromBuffer(data);
     return ConnectionPriorityInfo(
       result: resultFrom(
-        getValue: () => Unit(),
+        getValue: () => const Unit(),
         failure: genericFailureFrom(
           hasFailure: message.hasFailure(),
           getFailure: () => message.failure,

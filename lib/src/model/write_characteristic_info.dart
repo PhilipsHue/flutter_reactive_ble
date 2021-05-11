@@ -20,7 +20,7 @@ class WriteCharacteristicInfo {
 
   @override
   int get hashCode =>
-      (((17 * 37) + characteristic.hashCode) * 37 + result.hashCode);
+      ((17 * 37) + characteristic.hashCode) * 37 + result.hashCode;
 
   @override
   bool operator ==(Object other) =>
