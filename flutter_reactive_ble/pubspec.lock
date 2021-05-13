@@ -194,7 +194,7 @@ packages:
       path: "../flutter_reactive_ble_platform_interface"
       relative: true
     source: path
-    version: "0.1.0"
+    version: "1.0.0"
   flutter_test:
     dependency: "direct dev"
     description: flutter
