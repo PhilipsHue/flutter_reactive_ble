@@ -1,9 +1,13 @@
 import 'dart:async';
 import 'dart:typed_data';
 
-import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
 import 'package:flutter_reactive_ble/src/device_scanner.dart';
+import 'package:flutter_reactive_ble/src/model/discovered_device.dart';
+import 'package:flutter_reactive_ble/src/model/generic_failure.dart';
+import 'package:flutter_reactive_ble/src/model/result.dart';
+import 'package:flutter_reactive_ble/src/model/scan_mode.dart';
 import 'package:flutter_reactive_ble/src/model/scan_session.dart';
+import 'package:flutter_reactive_ble/src/model/uuid.dart';
 import 'package:flutter_reactive_ble/src/plugin_controller.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';

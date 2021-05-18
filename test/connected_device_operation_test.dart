@@ -1,8 +1,13 @@
 import 'dart:async';
 
-import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
 import 'package:flutter_reactive_ble/src/connected_device_operation.dart';
+import 'package:flutter_reactive_ble/src/model/characteristic_value.dart';
+import 'package:flutter_reactive_ble/src/model/connection_priority.dart';
+import 'package:flutter_reactive_ble/src/model/connection_state_update.dart';
+import 'package:flutter_reactive_ble/src/model/generic_failure.dart';
+import 'package:flutter_reactive_ble/src/model/qualified_characteristic.dart';
 import 'package:flutter_reactive_ble/src/model/result.dart';
+import 'package:flutter_reactive_ble/src/model/unit.dart';
 import 'package:flutter_reactive_ble/src/model/uuid.dart';
 import 'package:flutter_reactive_ble/src/model/write_characteristic_info.dart';
 import 'package:flutter_reactive_ble/src/plugin_controller.dart';
