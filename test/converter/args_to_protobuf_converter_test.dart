@@ -1,7 +1,6 @@
 import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
 import 'package:flutter_reactive_ble/src/converter/args_to_protubuf_converter.dart';
 import 'package:flutter_reactive_ble/src/generated/bledata.pbserver.dart' as pb;
-import 'package:flutter_reactive_ble/src/model/uuid.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
