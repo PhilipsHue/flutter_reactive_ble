@@ -1,10 +1,16 @@
 import 'dart:typed_data';
 
-import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
 import 'package:flutter_reactive_ble/src/converter/protobuf_converter.dart';
 import 'package:flutter_reactive_ble/src/generated/bledata.pb.dart' as pb;
+import 'package:flutter_reactive_ble/src/model/ble_status.dart';
+import 'package:flutter_reactive_ble/src/model/characteristic_value.dart';
 import 'package:flutter_reactive_ble/src/model/clear_gatt_cache_error.dart';
+import 'package:flutter_reactive_ble/src/model/connection_priority.dart';
+import 'package:flutter_reactive_ble/src/model/connection_state_update.dart';
+import 'package:flutter_reactive_ble/src/model/discovered_device.dart';
 import 'package:flutter_reactive_ble/src/model/discovered_service.dart';
+import 'package:flutter_reactive_ble/src/model/generic_failure.dart';
+import 'package:flutter_reactive_ble/src/model/result.dart';
 import 'package:flutter_reactive_ble/src/model/unit.dart';
 import 'package:flutter_reactive_ble/src/model/uuid.dart';
 import 'package:flutter_reactive_ble/src/model/write_characteristic_info.dart';
