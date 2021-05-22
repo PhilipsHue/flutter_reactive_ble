@@ -2,10 +2,11 @@ group 'com.signify.hue.flutterreactiveblelib'
 version '1.0-SNAPSHOT'
 
 buildscript {
-    ext.detekt_version = '1.14.1'
-    ext.kotlin_version = '1.5.0-RC'
+    ext.detekt_version = '1.17.1'
+    ext.kotlin_version = '1.4.21'
     repositories {
         google()
+        mavenCentral()
         maven {
             url "https://plugins.gradle.org/m2/"
         }
@@ -16,13 +17,17 @@ buildscript {
         classpath 'com.google.protobuf:protobuf-gradle-plugin:0.8.14'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath "io.gitlab.arturbosch.detekt:detekt-gradle-plugin:$detekt_version"
-        classpath "de.mannodermaus.gradle.plugins:android-junit5:1.7.0.0"
+        classpath "de.mannodermaus.gradle.plugins:android-junit5:1.7.1.1"
     }
 }
 
 rootProject.allprojects {
     repositories {
         google()
+        mavenCentral()
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
     }
 }
 
@@ -50,6 +55,14 @@ android {
     }
     lintOptions {
         disable 'InvalidPackage'
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_1_8.toString()
     }
 }
 
@@ -86,6 +99,6 @@ dependencies {
 
     testImplementation "org.junit.jupiter:junit-jupiter-api:5.5.1"
     testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:5.5.1"
-    testImplementation "io.mockk:mockk:1.9.3"
+    testImplementation "io.mockk:mockk:1.11.0"
     testImplementation "com.google.truth:truth:1.0"
 }
