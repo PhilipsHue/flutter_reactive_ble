@@ -17,7 +17,7 @@ class BleDeviceInteractor {
     required void Function(String message) logMessage,
     required Stream<List<int>> Function(QualifiedCharacteristic characteristic)
         subscribeToCharacteristic,
-  })   : _bleDiscoverServices = bleDiscoverServices,
+  })  : _bleDiscoverServices = bleDiscoverServices,
         _readCharacteristic = readCharacteristic,
         _writeWithResponse = writeWithResponse,
         _writeWithoutResponse = writeWithOutResponse,
@@ -47,9 +47,9 @@ class BleDeviceInteractor {
       final result = await _bleDiscoverServices(deviceId);
       _logMessage('Discovering services finished');
       return result;
-    } on Error catch (e) {
+    } on Exception catch (e) {
       _logMessage('Error occured when discovering services: $e');
-      throw e;
+      rethrow;
     }
   }
 
@@ -60,12 +60,12 @@ class BleDeviceInteractor {
 
       _logMessage('Read ${characteristic.characteristicId}: value = $result');
       return result;
-    } on Error catch (e, s) {
+    } on Exception catch (e, s) {
       _logMessage(
         'Error occured when reading ${characteristic.characteristicId} : $e',
       );
       print(s);
-      throw e;
+      rethrow;
     }
   }
 
@@ -75,12 +75,12 @@ class BleDeviceInteractor {
       _logMessage(
           'Write with response value : $value to ${characteristic.characteristicId}');
       await _writeWithResponse(characteristic, value: value);
-    } on Error catch (e, s) {
+    } on Exception catch (e, s) {
       _logMessage(
         'Error occured when writing ${characteristic.characteristicId} : $e',
       );
       print(s);
-      throw e;
+      rethrow;
     }
   }
 
@@ -90,12 +90,12 @@ class BleDeviceInteractor {
       await _writeWithoutResponse(characteristic, value: value);
       _logMessage(
           'Write without response value: $value to ${characteristic.characteristicId}');
-    } on Error catch (e, s) {
+    } on Exception catch (e, s) {
       _logMessage(
         'Error occured when writing ${characteristic.characteristicId} : $e',
       );
       print(s);
-      throw e;
+      rethrow;
     }
   }
 

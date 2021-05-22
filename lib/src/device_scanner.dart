@@ -27,7 +27,7 @@ class DeviceScannerImpl implements DeviceScanner {
     required bool Function() platformIsAndroid,
     required Future<void> delayAfterScanCompletion,
     required this.addToScanRegistry,
-  })   : _controller = controller,
+  })  : _controller = controller,
         _platformIsAndroid = platformIsAndroid,
         _delayAfterScanCompletion = delayAfterScanCompletion;
 

@@ -51,7 +51,7 @@ class _Disposer {
   final _values = <int>[];
   Future<Unit> dispose(int value) async {
     _values.add(value);
-    return Unit();
+    return const Unit();
   }
 
   List<int> get disposedValues => _values;

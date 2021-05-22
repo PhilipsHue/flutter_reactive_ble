@@ -4,13 +4,11 @@ import 'package:provider/provider.dart';
 
 class DeviceLogTab extends StatelessWidget {
   @override
-  Widget build(BuildContext context) {
-    return Consumer<BleLogger>(
-      builder: (context, logger, _) => _DeviceLogTab(
-        messages: logger.messages,
-      ),
-    );
-  }
+  Widget build(BuildContext context) => Consumer<BleLogger>(
+        builder: (context, logger, _) => _DeviceLogTab(
+          messages: logger.messages,
+        ),
+      );
 }
 
 class _DeviceLogTab extends StatelessWidget {
@@ -22,13 +20,11 @@ class _DeviceLogTab extends StatelessWidget {
   final List<String> messages;
 
   @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.all(16.0),
-      child: ListView.builder(
-        itemBuilder: (context, index) => Text(messages[index]),
-        itemCount: messages.length,
-      ),
-    );
-  }
+  Widget build(BuildContext context) => Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: ListView.builder(
+          itemBuilder: (context, index) => Text(messages[index]),
+          itemCount: messages.length,
+        ),
+      );
 }

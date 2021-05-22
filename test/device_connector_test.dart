@@ -100,8 +100,8 @@ void main() {
         manufacturerData: Uint8List.fromList([0]),
         name: 'test',
         rssi: -39,
-        serviceData: {},
-        serviceUuids: [],
+        serviceData: const {},
+        serviceUuids: const [],
       );
 
       setUp(() {
