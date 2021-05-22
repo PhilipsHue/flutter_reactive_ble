@@ -1,5 +1,10 @@
 # Main releases
 
+# 3.1.1
+
+* Fixes to comply to new Dart linter.
+* Fix #277 be able to connect when in background mode.
+
 # 3.1.0
 
 * Add discoverable services to `ScanResult`. Kudos to @xvrh.
