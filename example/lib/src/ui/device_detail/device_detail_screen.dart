@@ -40,7 +40,7 @@ class _DeviceDetail extends StatelessWidget {
           child: Scaffold(
             appBar: AppBar(
               title: Text(device.name),
-              bottom: TabBar(
+              bottom: const TabBar(
                 tabs: [
                   Tab(
                     icon: Icon(

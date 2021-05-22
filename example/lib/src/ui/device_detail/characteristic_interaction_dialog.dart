@@ -13,17 +13,15 @@ class CharacteristicInteractionDialog extends StatelessWidget {
   final QualifiedCharacteristic characteristic;
 
   @override
-  Widget build(BuildContext context) {
-    return Consumer<BleDeviceInteractor>(builder: (context, interactor, _) {
-      return _CharacteristicInteractionDialog(
-        characteristic: characteristic,
-        readCharacteristic: interactor.readCharacteristic,
-        writeWithResponse: interactor.writeCharacterisiticWithResponse,
-        writeWithoutResponse: interactor.writeCharacterisiticWithoutResponse,
-        subscribeToCharacteristic: interactor.subScribeToCharacteristic,
-      );
-    });
-  }
+  Widget build(BuildContext context) => Consumer<BleDeviceInteractor>(
+      builder: (context, interactor, _) => _CharacteristicInteractionDialog(
+            characteristic: characteristic,
+            readCharacteristic: interactor.readCharacteristic,
+            writeWithResponse: interactor.writeCharacterisiticWithResponse,
+            writeWithoutResponse:
+                interactor.writeCharacterisiticWithoutResponse,
+            subscribeToCharacteristic: interactor.subScribeToCharacteristic,
+          ));
 }
 
 class _CharacteristicInteractionDialog extends StatefulWidget {
@@ -97,14 +95,12 @@ class _CharacteristicInteractionDialogState
     });
   }
 
-  List<int> _parseInput() {
-    return textEditingController.text
-        .split(',')
-        .map(
-          (value) => int.parse(value),
-        )
-        .toList();
-  }
+  List<int> _parseInput() => textEditingController.text
+      .split(',')
+      .map(
+        int.parse,
+      )
+      .toList();
 
   Future<void> writeCharacteristicWithResponse() async {
     await widget.writeWithResponse(widget.characteristic, _parseInput());
@@ -122,7 +118,7 @@ class _CharacteristicInteractionDialogState
 
   Widget sectionHeader(String text) => Text(
         text,
-        style: TextStyle(fontWeight: FontWeight.bold),
+        style: const TextStyle(fontWeight: FontWeight.bold),
       );
 
   List<Widget> get writeSection => [
@@ -131,11 +127,11 @@ class _CharacteristicInteractionDialogState
           padding: const EdgeInsets.symmetric(vertical: 8.0),
           child: TextField(
             controller: textEditingController,
-            decoration: InputDecoration(
+            decoration: const InputDecoration(
               border: OutlineInputBorder(),
               labelText: 'Value',
             ),
-            keyboardType: TextInputType.numberWithOptions(
+            keyboardType: const TextInputType.numberWithOptions(
               decimal: true,
               signed: false,
             ),
@@ -146,11 +142,11 @@ class _CharacteristicInteractionDialogState
           children: [
             ElevatedButton(
               onPressed: writeCharacteristicWithResponse,
-              child: Text('With response'),
+              child: const Text('With response'),
             ),
             ElevatedButton(
               onPressed: writeCharacteristicWithoutResponse,
-              child: Text('Without response'),
+              child: const Text('Without response'),
             ),
           ],
         ),
@@ -167,7 +163,7 @@ class _CharacteristicInteractionDialogState
           children: [
             ElevatedButton(
               onPressed: readCharacteristic,
-              child: Text('Read'),
+              child: const Text('Read'),
             ),
             Text('Output: $readOutput'),
           ],
@@ -181,55 +177,53 @@ class _CharacteristicInteractionDialogState
           children: [
             ElevatedButton(
               onPressed: subscribeCharacteristic,
-              child: Text('Subscribe'),
+              child: const Text('Subscribe'),
             ),
             Text('Output: $subscribeOutput'),
           ],
         ),
       ];
 
-  Widget get divider => Padding(
-        padding: const EdgeInsets.symmetric(vertical: 12.0),
+  Widget get divider => const Padding(
+        padding: EdgeInsets.symmetric(vertical: 12.0),
         child: Divider(thickness: 2.0),
       );
 
   @override
-  Widget build(BuildContext context) {
-    return Dialog(
-      child: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: ListView(
-          shrinkWrap: true,
-          children: [
-            Text(
-              'Select an operation',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
-              child: Text(
-                widget.characteristic.characteristicId.toString(),
+  Widget build(BuildContext context) => Dialog(
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: ListView(
+            shrinkWrap: true,
+            children: [
+              const Text(
+                'Select an operation',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
-            ),
-            divider,
-            ...readSection,
-            divider,
-            ...writeSection,
-            divider,
-            ...subscribeSection,
-            divider,
-            Align(
-              alignment: Alignment.bottomRight,
-              child: Padding(
-                padding: const EdgeInsets.only(top: 20.0),
-                child: ElevatedButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    child: Text('close')),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                child: Text(
+                  widget.characteristic.characteristicId.toString(),
+                ),
               ),
-            )
-          ],
+              divider,
+              ...readSection,
+              divider,
+              ...writeSection,
+              divider,
+              ...subscribeSection,
+              divider,
+              Align(
+                alignment: Alignment.bottomRight,
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 20.0),
+                  child: ElevatedButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      child: const Text('close')),
+                ),
+              )
+            ],
+          ),
         ),
-      ),
-    );
-  }
+      );
 }

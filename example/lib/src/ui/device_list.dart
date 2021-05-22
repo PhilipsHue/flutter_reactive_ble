@@ -11,7 +11,10 @@ class DeviceListScreen extends StatelessWidget {
   Widget build(BuildContext context) => Consumer2<BleScanner, BleScannerState?>(
         builder: (_, bleScanner, bleScannerState, __) => _DeviceList(
           scannerState: bleScannerState ??
-              BleScannerState(discoveredDevices: [], scanIsInProgress: false),
+              const BleScannerState(
+                discoveredDevices: [],
+                scanIsInProgress: false,
+              ),
           startScan: bleScanner.startScan,
           stopScan: bleScanner.stopScan,
         ),

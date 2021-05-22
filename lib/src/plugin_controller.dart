@@ -92,7 +92,7 @@ class PluginController
     required Stream<List<int>> bleDeviceScanChannel,
     required Stream<List<int>> bleStatusChannel,
     required Logger debugLogger,
-  })   : _argsToProtobufConverter = argsToProtobufConverter,
+  })  : _argsToProtobufConverter = argsToProtobufConverter,
         _protobufConverter = protobufConverter,
         _bleMethodChannel = bleMethodChannel,
         _connectedDeviceRawStream = connectedDeviceChannel,

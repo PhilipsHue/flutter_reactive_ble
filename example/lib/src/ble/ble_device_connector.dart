@@ -7,7 +7,7 @@ class BleDeviceConnector extends ReactiveState<ConnectionStateUpdate> {
   BleDeviceConnector({
     required FlutterReactiveBle ble,
     required Function(String message) logMessage,
-  })   : _ble = ble,
+  })  : _ble = ble,
         _logMessage = logMessage;
 
   final FlutterReactiveBle _ble;
@@ -29,7 +29,7 @@ class BleDeviceConnector extends ReactiveState<ConnectionStateUpdate> {
             'ConnectionState for device $deviceId : ${update.connectionState}');
         _deviceConnectionController.add(update);
       },
-      onError: (e) =>
+      onError: (Object e) =>
           _logMessage('Connecting to device $deviceId resulted in error $e'),
     );
   }

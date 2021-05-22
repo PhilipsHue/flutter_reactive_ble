@@ -8,7 +8,7 @@ class BleScanner implements ReactiveState<BleScannerState> {
   BleScanner({
     required FlutterReactiveBle ble,
     required Function(String message) logMessage,
-  })   : _ble = ble,
+  })  : _ble = ble,
         _logMessage = logMessage;
 
   final FlutterReactiveBle _ble;
@@ -34,7 +34,7 @@ class BleScanner implements ReactiveState<BleScannerState> {
         _devices.add(device);
       }
       _pushState();
-    }, onError: (e) => _logMessage('Device scan fails with error: $e'));
+    }, onError: (Object e) => _logMessage('Device scan fails with error: $e'));
     _pushState();
   }
 

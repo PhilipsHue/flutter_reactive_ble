@@ -240,7 +240,7 @@ void main() {
         manufacturerData: Uint8List.fromList([0]),
         name: 'test',
         rssi: -39,
-        serviceData: {},
+        serviceData: const {},
         serviceUuids: const [],
       );
       Stream<DiscoveredDevice>? deviceStream;

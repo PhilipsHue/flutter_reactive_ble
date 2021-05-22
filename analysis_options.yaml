@@ -3,12 +3,9 @@ analyzer:
     implicit-casts: false
     implicit-dynamic: false
   exclude:
-    - lib/**/*.g.dart
-    - lib/src/generated/**
-    - lib/**/*.gen.dart
-    - test/**.g.dart
-    - test/**/*.g.dart
-    - test/**/*.mocks.dart
+    - "**/*.g.dart"
+    - "**/*.mocks.dart"
+    - "**/generated/bledata.pb.dart"
 
 linter:
   rules:
@@ -103,7 +100,7 @@ linter:
     - prefer_const_constructors_in_immutables
     - prefer_const_declarations
     - prefer_const_literals_to_create_immutables
-    - prefer_constructors_over_static_methods
+    - prefer_constructors_over_static_methods 
     - prefer_contains
     # - prefer_double_quotes -- DISABLED: This rule is to be supported in a future Dart release
     - prefer_equal_for_default_values
