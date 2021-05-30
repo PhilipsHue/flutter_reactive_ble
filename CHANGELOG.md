@@ -1,5 +1,8 @@
 # Main releases
 
+# 3.1.1+1
+
+* Fix broken read/write subscribe operations in background mode.
 # 3.1.1
 
 * Fixes to comply to new Dart linter.
