@@ -13,8 +13,8 @@ extension QualifiedCharacteristic {
     init(_ characteristic: CBCharacteristic) {
         self.init(
             id: characteristic.uuid,
-            serviceID: characteristic.service.uuid,
-            peripheralID: characteristic.service.peripheral.identifier
+            serviceID: characteristic.service!.uuid,
+            peripheralID: characteristic.service!.peripheral!.identifier
         )
     }
 }

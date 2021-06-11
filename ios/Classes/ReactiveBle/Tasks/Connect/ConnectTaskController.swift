@@ -4,13 +4,13 @@ struct ConnectTaskController: PeripheralTaskController {
 
     typealias TaskSpec = ConnectTaskSpec
 
-    private let task: Task
+    private let task: PTask
 
-    init(_ task: Task) {
+    init(_ task: PTask) {
         self.task = task
     }
 
-    func connect(centralManager: CBCentralManager, peripheral: CBPeripheral) -> Task {
+    func connect(centralManager: CBCentralManager, peripheral: CBPeripheral) -> PTask {
         guard case .pending = task.state
         else {
             assert(false)
@@ -22,7 +22,7 @@ struct ConnectTaskController: PeripheralTaskController {
         return task.with(state: task.state.processing(.connecting))
     }
 
-    func handleConnectionChange(_ connectionChange: ConnectionChange) -> Task {
+    func handleConnectionChange(_ connectionChange: ConnectionChange) -> PTask {
         guard case .processing(since: _, .connecting) = task.state
         else {
             assert(false)
@@ -32,7 +32,7 @@ struct ConnectTaskController: PeripheralTaskController {
         return task.with(state: task.state.finished(connectionChange))
     }
 
-    func cancel(centralManager: CBCentralManager, peripheral: CBPeripheral, error: Error?) -> Task {
+    func cancel(centralManager: CBCentralManager, peripheral: CBPeripheral, error: Error?) -> PTask {
         switch task.state {
         case .pending:
             return task.with(state: task.state.finished(.failedToConnect(error)))

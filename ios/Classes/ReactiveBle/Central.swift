@@ -77,7 +77,7 @@ final class Central {
             },
             onCharacteristicsDiscovery: papply(weak: self) { central, service, error in
                 central.servicesWithCharacteristicsDiscoveryRegistry.updateTask(
-                    key: service.peripheral.identifier,
+                    key: service.peripheral!.identifier,
                     action: { $0.handleCharacteristicsDiscovery(service: service, error: error) }
                 )
             },
@@ -227,7 +227,7 @@ final class Central {
         guard characteristic.properties.contains(.read)
         else { throw Failure.notReadable(qualifiedCharacteristic) }
 
-        characteristic.service.peripheral.readValue(for: characteristic)
+        characteristic.service!.peripheral!.readValue(for: characteristic)
     }
 
     func writeWithResponse(
@@ -250,7 +250,7 @@ final class Central {
 
         characteristicWriteRegistry.updateTask(
             key: qualifiedCharacteristic,
-            action: { $0.start(peripheral: characteristic.service.peripheral) }
+            action: { $0.start(peripheral: characteristic.service!.peripheral!) }
         )
     }
     
@@ -263,7 +263,7 @@ final class Central {
         guard characteristic.properties.contains(.writeWithoutResponse)
         else { throw Failure.notWritable(qualifiedCharacteristic) }
         
-        characteristic.service.peripheral.writeValue(value, for: characteristic, type: .withoutResponse)
+        characteristic.service!.peripheral!.writeValue(value, for: characteristic, type: .withoutResponse)
     }
 
     func maximumWriteValueLength(for peripheral: PeripheralID, type: CBCharacteristicWriteType) throws -> Int {
