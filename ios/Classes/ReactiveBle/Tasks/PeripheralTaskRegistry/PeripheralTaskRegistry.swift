@@ -2,7 +2,7 @@ import Foundation
 
 final class PeripheralTaskRegistry<Controller: PeripheralTaskController> {
 
-    typealias CTask = Controller.PTask
+    typealias CTask = Controller.SubjectTask
     typealias TaskCompletionHandler = (CTask.Key, CTask.Params, CTask.Result) -> Void
 
     private var tasks = TaskQueue()

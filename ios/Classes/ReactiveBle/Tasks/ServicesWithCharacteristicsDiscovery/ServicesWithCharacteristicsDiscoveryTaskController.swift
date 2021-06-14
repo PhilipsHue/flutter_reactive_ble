@@ -4,13 +4,13 @@ struct ServicesWithCharacteristicsDiscoveryTaskController: PeripheralTaskControl
 
     typealias TaskSpec = ServicesWithCharacteristicsDiscoveryTaskSpec
 
-    private let task: PTask
+    private let task: SubjectTask
 
-    init(_ task: PTask) {
+    init(_ task: SubjectTask) {
         self.task = task
     }
 
-    func start(peripheral: CBPeripheral) -> PTask {
+    func start(peripheral: CBPeripheral) -> SubjectTask {
         guard case .pending = task.state
         else {
             return task
@@ -28,12 +28,12 @@ struct ServicesWithCharacteristicsDiscoveryTaskController: PeripheralTaskControl
         }
     }
 
-    func cancel(error: Error) -> PTask {
+    func cancel(error: Error) -> SubjectTask {
         return task
             .with(state: task.state.finished([error]))
     }
 
-    func handleServicesDiscovery(peripheral: CBPeripheral, error: Error?) -> PTask {
+    func handleServicesDiscovery(peripheral: CBPeripheral, error: Error?) -> SubjectTask {
         guard case .processing(since: _, .discoveringServices) = task.state
         else {
             return task
@@ -67,7 +67,7 @@ struct ServicesWithCharacteristicsDiscoveryTaskController: PeripheralTaskControl
     func handleCharacteristicsDiscovery(
         service: CBService,
         error: Error?
-    ) -> PTask {
+    ) -> SubjectTask {
         guard
             case .processing(since: _, .discoveringCharacteristics(let servicesLeft, let errors)) = task.state,
             task.params.servicesWithCharacteristicsToDiscover.services.map({ $0.contains(service.uuid) }) != false

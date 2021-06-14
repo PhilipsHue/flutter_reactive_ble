@@ -4,13 +4,13 @@ struct CharacteristicWriteTaskController: PeripheralTaskController {
 
     typealias TaskSpec = CharacteristicWriteTaskSpec
 
-    private let task: PTask
+    private let task: SubjectTask
 
-    init(_ task: PTask) {
+    init(_ task: SubjectTask) {
         self.task = task
     }
 
-    func start(peripheral: CBPeripheral) -> PTask {
+    func start(peripheral: CBPeripheral) -> SubjectTask {
         guard
             peripheral.state == .connected,
             let service = peripheral.services?.first(where: { $0.uuid == task.key.serviceID }),
@@ -25,11 +25,11 @@ struct CharacteristicWriteTaskController: PeripheralTaskController {
         return task.with(state: task.state.processing(.writing))
     }
 
-    func cancel(error: Error) -> PTask {
+    func cancel(error: Error) -> SubjectTask {
         return task.with(state: task.state.finished(error))
     }
 
-    func handleWrite(error: Error?) -> PTask {
+    func handleWrite(error: Error?) -> SubjectTask {
         return task.with(state: task.state.finished(error))
     }
 }
