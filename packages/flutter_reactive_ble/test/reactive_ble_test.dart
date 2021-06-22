@@ -240,6 +240,7 @@ void main() {
         rssi: -39,
         serviceData: const {},
         serviceUuids: const [],
+        rawScanRecordData: Uint8List.fromList([1]),
       );
       Stream<DiscoveredDevice>? deviceStream;
 

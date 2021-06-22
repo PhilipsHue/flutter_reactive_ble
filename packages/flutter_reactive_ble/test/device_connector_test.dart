@@ -100,6 +100,7 @@ void main() {
         name: 'test',
         rssi: -39,
         serviceData: const {},
+        rawScanRecordData: Uint8List.fromList([0]),
       );
 
       setUp(() {
