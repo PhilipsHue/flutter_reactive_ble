@@ -36,6 +36,9 @@ class DiscoveredDevice extends $DiscoveredDevice {
   /// Manufacturer specific data. The first 2 bytes are the Company Identifier Codes.
   final Uint8List manufacturerData;
 
+  /// Raw scan record
+  final Uint8List rawScanRecordData;
+
   final int rssi;
 
   const DiscoveredDevice({
@@ -45,6 +48,7 @@ class DiscoveredDevice extends $DiscoveredDevice {
     required this.serviceUuids,
     required this.manufacturerData,
     required this.rssi,
+    required this.rawScanRecordData,
   });
 }
 

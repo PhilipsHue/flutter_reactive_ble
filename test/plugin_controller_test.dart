@@ -469,6 +469,7 @@ void main() {
         serviceData: const {},
         serviceUuids: const [],
         manufacturerData: Uint8List.fromList([1]),
+        rawScanRecordData: Uint8List.fromList([1]),
       );
       late ScanResult scanResult;
 

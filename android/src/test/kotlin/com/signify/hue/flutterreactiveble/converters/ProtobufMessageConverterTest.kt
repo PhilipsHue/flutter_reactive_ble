@@ -93,6 +93,15 @@ class ProtobufMessageConverterTest {
 
             assertThat(result.manufacturerData.toByteArray()).isEqualTo(scanInfo.manufacturerData)
         }
+
+        @Test
+        fun `converts raw scan record data into message raw scan record data`() {
+            val scanInfo = createScanInfo()
+
+            val result = protobufConverter.convertScanInfo(scanInfo)
+
+            assertThat(result.rawScanRecordData.toByteArray()).isEqualTo(scanInfo.rawScanRecordData)
+        }
     }
 
     @Nested
@@ -194,11 +203,13 @@ class ProtobufMessageConverterTest {
 
         val manufacturerData = "123".toByteArray()
 
+        val rawScanRecord = "TEST_SCAN_RECORD".toByteArray()
+
         return ScanInfo(
                 deviceId = macAdress, name = deviceName,
                 rssi = rssi, serviceData = serviceData, manufacturerData = manufacturerData,
                 serviceUuids = listOf(serviceUuid),
-        )
+                rawScanRecordData = rawScanRecord)
     }
 
     private fun createCharacteristicRequest(deviceId: String, serviceUuid: UUID): pb.ReadCharacteristicRequest {

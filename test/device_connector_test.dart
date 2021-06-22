@@ -102,6 +102,7 @@ void main() {
         rssi: -39,
         serviceData: const {},
         serviceUuids: const [],
+        rawScanRecordData: Uint8List.fromList([0]),
       );
 
       setUp(() {

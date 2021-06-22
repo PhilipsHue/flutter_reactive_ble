@@ -17,6 +17,7 @@ abstract class $DiscoveredDevice {
   Map<Uuid, Uint8List> get serviceData;
   List<Uuid> get serviceUuids;
   Uint8List get manufacturerData;
+  Uint8List get rawScanRecordData;
   int get rssi;
   DiscoveredDevice copyWith(
           {String? id,
@@ -24,6 +25,7 @@ abstract class $DiscoveredDevice {
           Map<Uuid, Uint8List>? serviceData,
           List<Uuid>? serviceUuids,
           Uint8List? manufacturerData,
+          Uint8List? rawScanRecordData,
           int? rssi}) =>
       DiscoveredDevice(
           id: id ?? this.id,
@@ -31,10 +33,11 @@ abstract class $DiscoveredDevice {
           serviceData: serviceData ?? this.serviceData,
           serviceUuids: serviceUuids ?? this.serviceUuids,
           manufacturerData: manufacturerData ?? this.manufacturerData,
+          rawScanRecordData: rawScanRecordData ?? this.rawScanRecordData,
           rssi: rssi ?? this.rssi);
   @override
   String toString() =>
-      "DiscoveredDevice(id: $id, name: $name, serviceData: $serviceData, serviceUuids: $serviceUuids, manufacturerData: $manufacturerData, rssi: $rssi)";
+      "DiscoveredDevice(id: $id, name: $name, serviceData: $serviceData, serviceUuids: $serviceUuids, manufacturerData: $manufacturerData, rawScanRecordData: $rawScanRecordData, rssi: $rssi)";
   @override
   bool operator ==(Object other) =>
       other is DiscoveredDevice &&
@@ -44,6 +47,7 @@ abstract class $DiscoveredDevice {
       const DeepCollectionEquality().equals(serviceData, other.serviceData) &&
       const DeepCollectionEquality().equals(serviceUuids, other.serviceUuids) &&
       manufacturerData == other.manufacturerData &&
+      rawScanRecordData == other.rawScanRecordData &&
       rssi == other.rssi;
   @override
   int get hashCode {
@@ -53,6 +57,7 @@ abstract class $DiscoveredDevice {
     result = 37 * result + const DeepCollectionEquality().hash(serviceData);
     result = 37 * result + const DeepCollectionEquality().hash(serviceUuids);
     result = 37 * result + manufacturerData.hashCode;
+    result = 37 * result + rawScanRecordData.hashCode;
     result = 37 * result + rssi.hashCode;
     return result;
   }
@@ -73,6 +78,10 @@ class DiscoveredDevice$ {
       (s_) => s_.manufacturerData,
       (s_, manufacturerData) =>
           s_.copyWith(manufacturerData: manufacturerData));
+  static final rawScanRecordData = Lens<DiscoveredDevice, Uint8List>(
+      (s_) => s_.rawScanRecordData,
+      (s_, rawScanRecordData) =>
+          s_.copyWith(rawScanRecordData: rawScanRecordData));
   static final rssi = Lens<DiscoveredDevice, int>(
       (s_) => s_.rssi, (s_, rssi) => s_.copyWith(rssi: rssi));
 }

@@ -33,6 +33,7 @@ void main() {
         serviceUuids: const [],
         manufacturerData: Uint8List.fromList([1]),
         rssi: -40,
+        rawScanRecordData: Uint8List.fromList([1]),
       );
       _device2 = DiscoveredDevice(
         id: '456',
@@ -41,6 +42,7 @@ void main() {
         serviceUuids: const [],
         manufacturerData: Uint8List.fromList([0]),
         rssi: -80,
+        rawScanRecordData: Uint8List.fromList([1]),
       );
 
       _delayAfterScanCompletion = Completer();
