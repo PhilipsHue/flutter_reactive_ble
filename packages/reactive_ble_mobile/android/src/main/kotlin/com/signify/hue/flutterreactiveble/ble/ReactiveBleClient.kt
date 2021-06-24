@@ -87,8 +87,7 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
                     result.scanRecord.serviceData.mapKeys { it.key.uuid },
                     result.scanRecord.serviceUuids?.map { it.uuid } ?: emptyList(),
                     extractManufacturerData(result.scanRecord.manufacturerSpecificData),
-                    result.scanRecord.bytes,
-                )
+                    result.scanRecord.bytes)
             }
     }
 
