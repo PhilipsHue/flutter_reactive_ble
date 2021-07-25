@@ -208,7 +208,17 @@ final class PluginController {
         let timeout = args.timeoutInMs > 0 ? TimeInterval(args.timeoutInMs) / 1000 : nil
 
         completion(.success(nil))
-
+        
+        if let sink = connectedDeviceSink {
+            let message = DeviceInfo.with {
+                $0.id = args.deviceID
+                $0.connectionState = encode(.connecting)
+            }
+            sink.add(.success(message))
+        } else {
+            print("Warning! No event channel set up to report a connection update")
+        }
+        
         do {
             try central.connect(
                 to: deviceID,
