@@ -29,7 +29,7 @@ class DeviceConnectorImpl implements DeviceConnector {
         deviceIsDiscoveredRecently,
     required DeviceScanner deviceScanner,
     required Duration delayAfterScanFailure,
-  })   : _deviceIsDiscoveredRecently = deviceIsDiscoveredRecently,
+  })  : _deviceIsDiscoveredRecently = deviceIsDiscoveredRecently,
         _deviceScanner = deviceScanner,
         _blePlatform = blePlatform,
         _delayAfterScanFailure = delayAfterScanFailure;

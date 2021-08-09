@@ -1,5 +1,17 @@
 # Main releases
 
+# 3.1.1+1
+
+* Fix broken read/write subscribe operations in background mode.
+# 3.1.1
+
+* Fixes to comply to new Dart linter.
+* Fix #277 be able to connect when in background mode.
+
+# 3.1.0
+
+* Add discoverable services to `ScanResult`. Kudos to @xvrh.
+
 ## 3.0.0
 
 * Breaking: Migration to null-safety.

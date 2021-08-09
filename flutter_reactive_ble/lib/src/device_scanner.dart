@@ -22,7 +22,7 @@ class DeviceScannerImpl implements DeviceScanner {
     required bool Function() platformIsAndroid,
     required Future<void> delayAfterScanCompletion,
     required this.addToScanRegistry,
-  })   : _blePlatform = blePlatform,
+  })  : _blePlatform = blePlatform,
         _platformIsAndroid = platformIsAndroid,
         _delayAfterScanCompletion = delayAfterScanCompletion;
 

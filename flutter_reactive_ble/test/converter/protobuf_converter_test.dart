@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
 import 'package:flutter_reactive_ble/src/converter/protobuf_converter.dart';
 import 'package:flutter_reactive_ble/src/generated/bledata.pbserver.dart' as pb;
 import 'package:flutter_reactive_ble_platform_interface/src/model/ble_status.dart';

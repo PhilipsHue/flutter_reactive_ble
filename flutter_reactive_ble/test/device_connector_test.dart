@@ -96,10 +96,10 @@ void main() {
       final discoveredDevice = DiscoveredDevice(
         id: 'deviceId',
         manufacturerData: Uint8List.fromList([0]),
-        serviceUuids: [],
         name: 'test',
         rssi: -39,
-        serviceData: {},
+        serviceData: const {},
+        serviceUuids: const [],
       );
 
       setUp(() {

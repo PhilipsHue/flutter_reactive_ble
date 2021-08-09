@@ -247,10 +247,9 @@ class FlutterReactiveBle {
   /// Use [servicesWithCharacteristicsToDiscover] to scan only for the specific services mentioned in this map,
   /// this can improve the connection speed on iOS since no full service discovery will be executed. On Android
   /// this variable is ignored since partial discovery is not possible.
-  /// The [connectionTimeout] parameter can be used to emit a failure after a certain period in case the connection
-  /// is not established. The pending connection attempt will be cancelled. On Android when no timeout is specified
-  /// the `autoConnect` flag is set in the [connectGatt()](https://developer.android.com/reference/android/bluetooth/BluetoothDevice#connectGatt(android.content.Context,%20boolean,%20android.bluetooth.BluetoothGattCallback)) call, otherwise it's cleared.```
-
+  /// If [connectionTimeout] parameter is supplied and a connection is not established before [connectionTimeout] expires,
+  /// the pending connection attempt will be cancelled and a [TimeoutException] error will be emitted into the returned stream.
+  /// On Android when no timeout is specified the `autoConnect` flag is set in the [connectGatt()](https://developer.android.com/reference/android/bluetooth/BluetoothDevice#connectGatt(android.content.Context,%20boolean,%20android.bluetooth.BluetoothGattCallback)) call, otherwise it is cleared.
   Stream<ConnectionStateUpdate> connectToDevice({
     required String id,
     Map<Uuid, List<Uuid>>? servicesWithCharacteristicsToDiscover,
@@ -274,8 +273,9 @@ class FlutterReactiveBle {
   /// Use [servicesWithCharacteristicsToDiscover] to scan only for the specific services mentioned in this map,
   /// this can improve the connection speed on iOS since no full service discovery will be executed. On Android
   /// this variable is ignored since partial discovery is not possible.
-  /// The [connectionTimeout] parameter can be used to emit a failure after a certain period in case the connection
-  /// is not established. The pending connection attempt will be cancelled.
+  /// If [connectionTimeout] parameter is supplied and a connection is not established before [connectionTimeout] expires,
+  /// the pending connection attempt will be cancelled and a [TimeoutException] error will be emitted into the returned stream.
+  /// On Android when no timeout is specified the `autoConnect` flag is set in the [connectGatt()](https://developer.android.com/reference/android/bluetooth/BluetoothDevice#connectGatt(android.content.Context,%20boolean,%20android.bluetooth.BluetoothGattCallback)) call, otherwise it is cleared.
   Stream<ConnectionStateUpdate> connectToAdvertisingDevice({
     required String id,
     required List<Uuid> withServices,

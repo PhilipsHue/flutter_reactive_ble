@@ -3,12 +3,9 @@ analyzer:
     implicit-casts: false
     implicit-dynamic: false
   exclude:
-    - lib/**/*.g.dart
-    - lib/src/generated/**
-    - lib/**/*.gen.dart
-    - test/**.g.dart
-    - test/**/*.g.dart
-    - test/**/*.mocks.dart
+    - "**/*.g.dart"
+    - "**/*.mocks.dart"
+    - "**/generated/bledata.pb.dart"
 
 linter:
   rules:

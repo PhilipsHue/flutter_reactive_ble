@@ -45,7 +45,7 @@ class StreamSubscriptionSerialDisposable
     extends SerialDisposable<StreamSubscription> {
   StreamSubscriptionSerialDisposable()
       : super((StreamSubscription subscription) async {
-          subscription.cancel();
-          return Unit();
+          await subscription.cancel();
+          return const Unit();
         });
 }
