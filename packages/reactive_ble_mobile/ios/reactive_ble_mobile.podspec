@@ -1,5 +1,5 @@
 Pod::Spec.new do |s|
-  s.name             = 'flutter_reactive_ble'
+  s.name             = 'reactive_ble_mobile'
   s.version          = '0.0.1'
   s.summary          = 'Bluetooth Low Energy (BLE) Flutter plug-in'
   s.description      = <<-DESC

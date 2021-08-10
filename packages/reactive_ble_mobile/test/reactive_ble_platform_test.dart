@@ -2,29 +2,23 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:flutter/services.dart';
-import 'package:flutter_reactive_ble/src/converter/args_to_protubuf_converter.dart';
-import 'package:flutter_reactive_ble/src/converter/protobuf_converter.dart';
-import 'package:flutter_reactive_ble/src/generated/bledata.pb.dart' as pb;
-import 'package:flutter_reactive_ble/src/plugin_controller.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
-import 'package:reactive_ble_platform_interface/src/model/ble_status.dart';
+import 'package:reactive_ble_mobile/src/converter/args_to_protubuf_converter.dart';
+import 'package:reactive_ble_mobile/src/converter/protobuf_converter.dart';
+import 'package:reactive_ble_mobile/src/generated/bledata.pb.dart' as pb;
+import 'package:reactive_ble_mobile/src/reactive_ble_mobile_platform.dart';
+import 'package:reactive_ble_platform_interface/reactive_ble_platform_interface.dart';
 import 'package:reactive_ble_platform_interface/src/model/characteristic_value.dart';
-import 'package:reactive_ble_platform_interface/src/model/clear_gatt_cache_error.dart';
-import 'package:reactive_ble_platform_interface/src/model/connection_priority.dart';
 import 'package:reactive_ble_platform_interface/src/model/connection_state_update.dart';
-import 'package:reactive_ble_platform_interface/src/model/discovered_device.dart';
-import 'package:reactive_ble_platform_interface/src/model/discovered_service.dart';
-import 'package:reactive_ble_platform_interface/src/model/generic_failure.dart';
 import 'package:reactive_ble_platform_interface/src/model/qualified_characteristic.dart';
 import 'package:reactive_ble_platform_interface/src/model/result.dart';
-import 'package:reactive_ble_platform_interface/src/model/scan_mode.dart';
 import 'package:reactive_ble_platform_interface/src/model/unit.dart';
 import 'package:reactive_ble_platform_interface/src/model/uuid.dart';
 import 'package:reactive_ble_platform_interface/src/model/write_characteristic_info.dart';
 
-import 'plugin_controller_test.mocks.dart';
+import 'reactive_ble_platform_test.mocks.dart';
 // ignore_for_file: avoid_implementing_value_types
 
 @GenerateMocks([
@@ -34,11 +28,11 @@ import 'plugin_controller_test.mocks.dart';
 ])
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
-  group('$PluginController', () {
-    late PluginController _sut;
+  group('$ReactiveBleMobilePlatform', () {
+    late ReactiveBleMobilePlatform _sut;
     late MockMethodChannel _methodChannel;
-    late MockArgsToProtobufConverter _argsConverter;
-    late MockProtobufConverter _protobufConverter;
+    late ArgsToProtobufConverter _argsConverter;
+    late ProtobufConverter _protobufConverter;
     late StreamController<List<int>> _connectedDeviceStreamController;
     late StreamController<List<int>> _argsStreamController;
     late StreamController<List<int>> _scanStreamController;
@@ -57,7 +51,7 @@ void main() {
         (_) async => 0,
       );
 
-      _sut = PluginController(
+      _sut = ReactiveBleMobilePlatform(
         argsToProtobufConverter: _argsConverter,
         bleMethodChannel: _methodChannel,
         protobufConverter: _protobufConverter,
@@ -80,7 +74,7 @@ void main() {
       StreamSubscription? subscription;
       setUp(() {
         request = pb.ConnectToDeviceRequest();
-        when(_argsConverter.createConnectToDeviceArgs(any, any, any))
+        when(_argsConverter.createConnectToDeviceArgs('id', any, any))
             .thenReturn(request);
       });
 
@@ -107,7 +101,7 @@ void main() {
       late pb.DisconnectFromDeviceRequest request;
       setUp(() async {
         request = pb.DisconnectFromDeviceRequest();
-        when(_argsConverter.createDisconnectDeviceArgs(any))
+        when(_argsConverter.createDisconnectDeviceArgs('id'))
             .thenReturn(request);
         await _sut.disconnectDevice('id');
       });
@@ -141,7 +135,7 @@ void main() {
         );
 
         when(
-          _protobufConverter.connectionStateUpdateFrom(any),
+          _protobufConverter.connectionStateUpdateFrom([1, 2, 3]),
         ).thenReturn(update);
         result = _sut.connectionUpdateStream;
       });
@@ -171,7 +165,7 @@ void main() {
           ]),
         );
 
-        when(_protobufConverter.characteristicValueFrom(any))
+        when(_protobufConverter.characteristicValueFrom([0, 1]))
             .thenReturn(valueUpdate);
 
         result = _sut.charValueUpdateStream;
@@ -193,7 +187,7 @@ void main() {
           serviceId: Uuid.parse('FEFF'),
           deviceId: '123',
         );
-        when(_argsConverter.createReadCharacteristicRequest(any))
+        when(_argsConverter.createReadCharacteristicRequest(characteristic))
             .thenReturn(request);
       });
 
@@ -232,9 +226,9 @@ void main() {
         when(_methodChannel.invokeMethod<List<int>?>(any, any)).thenAnswer(
           (_) async => [1],
         );
-        when(_argsConverter.createWriteChacracteristicRequest(any, any))
-            .thenReturn(request);
-        when(_protobufConverter.writeCharacteristicInfoFrom(any))
+        when(_argsConverter.createWriteChacracteristicRequest(
+            characteristic, [0, 1])).thenReturn(request);
+        when(_protobufConverter.writeCharacteristicInfoFrom([1]))
             .thenReturn(expectedResult);
 
         result =
@@ -274,11 +268,12 @@ void main() {
             result: const Result.success(Unit()));
 
         when(_methodChannel.invokeMethod<List<int>?>(any, any)).thenAnswer(
-          (_) async => [1],
+          (_) async => value,
         );
-        when(_argsConverter.createWriteChacracteristicRequest(any, any))
+        when(_argsConverter.createWriteChacracteristicRequest(
+                characteristic, value))
             .thenReturn(request);
-        when(_protobufConverter.writeCharacteristicInfoFrom(any))
+        when(_protobufConverter.writeCharacteristicInfoFrom(value))
             .thenReturn(expectedResult);
         result = await _sut.writeCharacteristicWithoutResponse(
             characteristic, value);
@@ -307,7 +302,7 @@ void main() {
           deviceId: '123',
         );
 
-        when(_argsConverter.createNotifyCharacteristicRequest(any))
+        when(_argsConverter.createNotifyCharacteristicRequest(characteristic))
             .thenReturn(request);
       });
 
@@ -340,7 +335,8 @@ void main() {
           deviceId: '123',
         );
 
-        when(_argsConverter.createNotifyNoMoreCharacteristicRequest(any))
+        when(_argsConverter
+                .createNotifyNoMoreCharacteristicRequest(characteristic))
             .thenReturn(request);
         await _sut.stopSubscribingToNotifications(characteristic);
       });
@@ -363,13 +359,13 @@ void main() {
 
       setUp(() async {
         request = pb.NegotiateMtuRequest();
-        when(_argsConverter.createNegotiateMtuRequest(any, any))
+        when(_argsConverter.createNegotiateMtuRequest(deviceId, mtuSize))
             .thenReturn(request);
         when(_methodChannel.invokeMethod<List<int>>(any, any)).thenAnswer(
           (_) async => [1],
         );
 
-        when(_protobufConverter.mtuSizeFrom(any)).thenReturn(mtuSize);
+        when(_protobufConverter.mtuSizeFrom([1])).thenReturn(mtuSize);
         result = await _sut.requestMtuSize(deviceId, mtuSize);
       });
 
@@ -401,10 +397,11 @@ void main() {
         when(_methodChannel.invokeMethod<List<int>>(any, any)).thenAnswer(
           (_) async => [1],
         );
-        when(_argsConverter.createChangeConnectionPrioRequest(any, any))
+        when(_argsConverter.createChangeConnectionPrioRequest(
+                deviceId, priority))
             .thenReturn(request);
 
-        when(_protobufConverter.connectionPriorityInfoFrom(any))
+        when(_protobufConverter.connectionPriorityInfoFrom([1]))
             .thenReturn(info);
         result = await _sut.requestConnectionPriority(deviceId, priority);
       });
@@ -433,10 +430,9 @@ void main() {
       setUp(() {
         request = pb.ScanForDevicesRequest();
         when(_argsConverter.createScanForDevicesRequest(
-          withServices: anyNamed('withServices'),
-          scanMode: anyNamed('scanMode'),
-          requireLocationServicesEnabled:
-              anyNamed('requireLocationServicesEnabled'),
+          withServices: withServices,
+          scanMode: scanMode,
+          requireLocationServicesEnabled: locationEnabled,
         )).thenReturn(request);
       });
 
@@ -482,7 +478,7 @@ void main() {
       setUp(() {
         scanResult = ScanResult(result: Result.success(device));
 
-        when(_protobufConverter.scanResultFrom(any)).thenReturn(scanResult);
+        when(_protobufConverter.scanResultFrom([1])).thenReturn(scanResult);
 
         _scanStreamController.addStream(
           Stream<List<int>>.fromIterable([
@@ -533,10 +529,10 @@ void main() {
           (_) async => [1],
         );
 
-        when(_argsConverter.createClearGattCacheRequest(any))
+        when(_argsConverter.createClearGattCacheRequest(deviceId))
             .thenReturn(request);
 
-        when(_protobufConverter.clearGattCacheResultFrom(any))
+        when(_protobufConverter.clearGattCacheResultFrom([1]))
             .thenReturn(convertedResult);
         result = await _sut.clearGattCache(deviceId);
       });
@@ -596,9 +592,9 @@ void main() {
         when(_methodChannel.invokeMethod<List<int>>(any, any)).thenAnswer(
           (_) async => [1],
         );
-        when(_argsConverter.createDiscoverServicesRequest(any))
+        when(_argsConverter.createDiscoverServicesRequest(deviceId))
             .thenReturn(request);
-        when(_protobufConverter.discoveredServicesFrom(any))
+        when(_protobufConverter.discoveredServicesFrom([1]))
             .thenReturn(services);
 
         result = await _sut.discoverServices(deviceId);

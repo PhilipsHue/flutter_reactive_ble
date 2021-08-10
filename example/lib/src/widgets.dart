@@ -12,7 +12,7 @@ class BluetoothIcon extends StatelessWidget {
 }
 
 class StatusMessage extends StatelessWidget {
-  const StatusMessage({Key? key, required this.text}) : super(key: key);
+  const StatusMessage({required this.text, Key? key, }) : super(key: key);
 
   final String text;
 

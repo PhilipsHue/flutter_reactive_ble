@@ -1,11 +1,10 @@
 import 'package:flutter/services.dart';
 import 'package:reactive_ble_platform_interface/reactive_ble_platform_interface.dart';
+import 'converter/args_to_protubuf_converter.dart';
+import 'converter/protobuf_converter.dart';
 
-import './converter/args_to_protubuf_converter.dart';
-import './converter/protobuf_converter.dart';
-
-class PluginController extends ReactiveBlePlatform {
-  PluginController({
+class ReactiveBleMobilePlatform extends ReactiveBlePlatform {
+  ReactiveBleMobilePlatform({
     required ArgsToProtobufConverter argsToProtobufConverter,
     required ProtobufConverter protobufConverter,
     required MethodChannel bleMethodChannel,
@@ -230,10 +229,10 @@ class PluginController extends ReactiveBlePlatform {
           .then((data) => _protobufConverter.discoveredServicesFrom(data!));
 }
 
-class PluginControllerFactory {
-  const PluginControllerFactory();
+class ReactiveBleMobilePlatformFactory {
+  const ReactiveBleMobilePlatformFactory();
 
-  PluginController create() {
+  ReactiveBleMobilePlatform create() {
     const _bleMethodChannel = MethodChannel("flutter_reactive_ble_method");
 
     const connectedDeviceChannel =
@@ -242,7 +241,7 @@ class PluginControllerFactory {
     const scanEventChannel = EventChannel("flutter_reactive_ble_scan");
     const bleStatusChannel = EventChannel("flutter_reactive_ble_status");
 
-    return PluginController(
+    return ReactiveBleMobilePlatform(
       protobufConverter: const ProtobufConverterImpl(),
       argsToProtobufConverter: const ArgsToProtobufConverterImpl(),
       bleMethodChannel: _bleMethodChannel,

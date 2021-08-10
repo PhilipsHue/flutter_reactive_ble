@@ -70,7 +70,7 @@ packages:
       name: build_runner
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.1.0"
+    version: "2.1.1"
   build_runner_core:
     dependency: transitive
     description:
@@ -135,7 +135,7 @@ packages:
     source: hosted
     version: "4.1.0"
   collection:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: collection
       url: "https://pub.dartlang.org"
@@ -188,13 +188,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  flutter_lints:
-    dependency: "direct dev"
-    description:
-      name: flutter_lints
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "1.0.4"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -208,19 +201,12 @@ packages:
     source: hosted
     version: "2.1.0"
   functional_data:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: functional_data
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.0"
-  functional_data_generator:
-    dependency: "direct dev"
-    description:
-      name: functional_data_generator
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "1.1.2"
   glob:
     dependency: transitive
     description:
@@ -270,13 +256,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "4.0.1"
-  lints:
-    dependency: transitive
-    description:
-      name: lints
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "1.0.1"
   logging:
     dependency: transitive
     description:
@@ -292,7 +271,7 @@ packages:
     source: hosted
     version: "0.12.10"
   meta:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: meta
       url: "https://pub.dartlang.org"
@@ -327,7 +306,7 @@ packages:
     source: hosted
     version: "1.8.0"
   pedantic:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: pedantic
       url: "https://pub.dartlang.org"
@@ -348,7 +327,7 @@ packages:
     source: hosted
     version: "1.5.0"
   protobuf:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: protobuf
       url: "https://pub.dartlang.org"
@@ -368,13 +347,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.0"
-  reactive_ble_mobile:
-    dependency: "direct main"
-    description:
-      path: "../reactive_ble_mobile"
-      relative: true
-    source: path
-    version: "0.0.1"
   reactive_ble_platform_interface:
     dependency: "direct main"
     description:
