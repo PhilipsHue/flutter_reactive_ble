@@ -3,10 +3,10 @@ import 'dart:async';
 import 'package:flutter_reactive_ble/src/connected_device_operation.dart';
 import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
 import 'package:flutter_reactive_ble/src/connected_device_operation.dart';
-import 'package:flutter_reactive_ble_platform_interface/flutter_reactive_ble_platform_interface.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
+import 'package:reactive_ble_platform_interface/reactive_ble_platform_interface.dart';
 
 import 'connected_device_operation_test.mocks.dart';
 

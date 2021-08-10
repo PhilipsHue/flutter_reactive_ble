@@ -4,10 +4,10 @@
 
 import 'dart:async' as _i4;
 
-import 'package:flutter_reactive_ble_platform_interface/src/models.dart' as _i2;
-import 'package:flutter_reactive_ble_platform_interface/src/reactive_ble_platform_interface.dart'
-    as _i3;
 import 'package:mockito/mockito.dart' as _i1;
+import 'package:reactive_ble_platform_interface/src/models.dart' as _i2;
+import 'package:reactive_ble_platform_interface/src/reactive_ble_platform_interface.dart'
+    as _i3;
 
 // ignore_for_file: avoid_redundant_argument_values
 // ignore_for_file: avoid_setters_without_getters

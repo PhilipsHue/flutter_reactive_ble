@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:flutter_reactive_ble_platform_interface/flutter_reactive_ble_platform_interface.dart';
+import 'package:reactive_ble_platform_interface/reactive_ble_platform_interface.dart';
 
 /// [Repeater] sets an underlying stream up on the first subscription to
 /// the output [stream] and shuts it down when there are no more subscriptions.

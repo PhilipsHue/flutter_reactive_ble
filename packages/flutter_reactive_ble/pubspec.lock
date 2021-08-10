@@ -195,13 +195,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.4"
-  flutter_reactive_ble_platform_interface:
-    dependency: "direct main"
-    description:
-      path: "../flutter_reactive_ble_platform_interface"
-      relative: true
-    source: path
-    version: "1.0.0"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -374,6 +367,13 @@ packages:
       name: pubspec_parse
       url: "https://pub.dartlang.org"
     source: hosted
+    version: "1.0.0"
+  reactive_ble_platform_interface:
+    dependency: "direct main"
+    description:
+      path: "../reactive_ble_platform_interface"
+      relative: true
+    source: path
     version: "1.0.0"
   shelf:
     dependency: transitive

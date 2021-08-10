@@ -1,7 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
-import 'package:flutter_reactive_ble_platform_interface/flutter_reactive_ble_platform_interface.dart';
+import 'package:reactive_ble_platform_interface/reactive_ble_platform_interface.dart';
 
 import '../generated/bledata.pb.dart' as pb;
 import '../select_from.dart';

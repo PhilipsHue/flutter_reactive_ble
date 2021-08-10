@@ -1,4 +1,4 @@
-import 'package:flutter_reactive_ble_platform_interface/flutter_reactive_ble_platform_interface.dart';
+import 'package:reactive_ble_platform_interface/reactive_ble_platform_interface.dart';
 
 abstract class Logger {
   set logLevel(LogLevel logLevel);

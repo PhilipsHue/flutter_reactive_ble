@@ -209,13 +209,6 @@ packages:
       relative: true
     source: path
     version: "3.1.1+1"
-  flutter_reactive_ble_platform_interface:
-    dependency: transitive
-    description:
-      path: "../packages/flutter_reactive_ble_platform_interface"
-      relative: true
-    source: path
-    version: "1.0.0"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -410,6 +403,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.1.8"
+  reactive_ble_platform_interface:
+    dependency: transitive
+    description:
+      path: "../packages/reactive_ble_platform_interface"
+      relative: true
+    source: path
+    version: "1.0.0"
   shelf:
     dependency: transitive
     description:

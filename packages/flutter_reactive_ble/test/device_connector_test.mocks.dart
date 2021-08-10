@@ -8,8 +8,8 @@ import 'package:flutter_reactive_ble/flutter_reactive_ble.dart' as _i3;
 import 'package:flutter_reactive_ble/src/device_scanner.dart' as _i5;
 import 'package:flutter_reactive_ble/src/discovered_devices_registry.dart'
     as _i6;
-import 'package:flutter_reactive_ble_platform_interface/src/models.dart' as _i2;
 import 'package:mockito/mockito.dart' as _i1;
+import 'package:reactive_ble_platform_interface/src/models.dart' as _i2;
 
 // ignore_for_file: avoid_redundant_argument_values
 // ignore_for_file: avoid_setters_without_getters

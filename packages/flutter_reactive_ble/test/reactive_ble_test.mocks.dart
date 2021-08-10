@@ -9,10 +9,10 @@ import 'package:flutter_reactive_ble/src/connected_device_operation.dart'
 import 'package:flutter_reactive_ble/src/debug_logger.dart' as _i5;
 import 'package:flutter_reactive_ble/src/device_connector.dart' as _i7;
 import 'package:flutter_reactive_ble/src/device_scanner.dart' as _i8;
-import 'package:flutter_reactive_ble_platform_interface/flutter_reactive_ble_platform_interface.dart'
-    as _i3;
-import 'package:flutter_reactive_ble_platform_interface/src/models.dart' as _i2;
 import 'package:mockito/mockito.dart' as _i1;
+import 'package:reactive_ble_platform_interface/reactive_ble_platform_interface.dart'
+    as _i3;
+import 'package:reactive_ble_platform_interface/src/models.dart' as _i2;
 
 // ignore_for_file: avoid_redundant_argument_values
 // ignore_for_file: avoid_setters_without_getters

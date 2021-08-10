@@ -1,10 +1,10 @@
 import 'dart:typed_data';
 
 import 'package:collection/collection.dart';
-import 'package:flutter_reactive_ble_platform_interface/src/model/uuid.dart';
 import 'package:functional_data/functional_data.dart';
 import 'package:meta/meta.dart';
 
+import '../../reactive_ble_platform_interface.dart';
 import 'generic_failure.dart';
 import 'result.dart';
 

@@ -6,23 +6,23 @@ import 'package:flutter_reactive_ble/src/converter/args_to_protubuf_converter.da
 import 'package:flutter_reactive_ble/src/converter/protobuf_converter.dart';
 import 'package:flutter_reactive_ble/src/generated/bledata.pb.dart' as pb;
 import 'package:flutter_reactive_ble/src/plugin_controller.dart';
-import 'package:flutter_reactive_ble_platform_interface/src/model/ble_status.dart';
-import 'package:flutter_reactive_ble_platform_interface/src/model/characteristic_value.dart';
-import 'package:flutter_reactive_ble_platform_interface/src/model/clear_gatt_cache_error.dart';
-import 'package:flutter_reactive_ble_platform_interface/src/model/connection_priority.dart';
-import 'package:flutter_reactive_ble_platform_interface/src/model/connection_state_update.dart';
-import 'package:flutter_reactive_ble_platform_interface/src/model/discovered_device.dart';
-import 'package:flutter_reactive_ble_platform_interface/src/model/discovered_service.dart';
-import 'package:flutter_reactive_ble_platform_interface/src/model/generic_failure.dart';
-import 'package:flutter_reactive_ble_platform_interface/src/model/qualified_characteristic.dart';
-import 'package:flutter_reactive_ble_platform_interface/src/model/result.dart';
-import 'package:flutter_reactive_ble_platform_interface/src/model/scan_mode.dart';
-import 'package:flutter_reactive_ble_platform_interface/src/model/unit.dart';
-import 'package:flutter_reactive_ble_platform_interface/src/model/uuid.dart';
-import 'package:flutter_reactive_ble_platform_interface/src/model/write_characteristic_info.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
+import 'package:reactive_ble_platform_interface/src/model/ble_status.dart';
+import 'package:reactive_ble_platform_interface/src/model/characteristic_value.dart';
+import 'package:reactive_ble_platform_interface/src/model/clear_gatt_cache_error.dart';
+import 'package:reactive_ble_platform_interface/src/model/connection_priority.dart';
+import 'package:reactive_ble_platform_interface/src/model/connection_state_update.dart';
+import 'package:reactive_ble_platform_interface/src/model/discovered_device.dart';
+import 'package:reactive_ble_platform_interface/src/model/discovered_service.dart';
+import 'package:reactive_ble_platform_interface/src/model/generic_failure.dart';
+import 'package:reactive_ble_platform_interface/src/model/qualified_characteristic.dart';
+import 'package:reactive_ble_platform_interface/src/model/result.dart';
+import 'package:reactive_ble_platform_interface/src/model/scan_mode.dart';
+import 'package:reactive_ble_platform_interface/src/model/unit.dart';
+import 'package:reactive_ble_platform_interface/src/model/uuid.dart';
+import 'package:reactive_ble_platform_interface/src/model/write_characteristic_info.dart';
 
 import 'plugin_controller_test.mocks.dart';
 // ignore_for_file: avoid_implementing_value_types

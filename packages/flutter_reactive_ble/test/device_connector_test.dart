@@ -4,10 +4,10 @@ import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
 import 'package:flutter_reactive_ble/src/device_connector.dart';
 import 'package:flutter_reactive_ble/src/device_scanner.dart';
 import 'package:flutter_reactive_ble/src/discovered_devices_registry.dart';
-import 'package:flutter_reactive_ble_platform_interface/flutter_reactive_ble_platform_interface.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
+import 'package:reactive_ble_platform_interface/reactive_ble_platform_interface.dart';
 
 import 'device_connector_test.mocks.dart';
 

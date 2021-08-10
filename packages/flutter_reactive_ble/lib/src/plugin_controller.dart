@@ -1,5 +1,5 @@
 import 'package:flutter/services.dart';
-import 'package:flutter_reactive_ble_platform_interface/flutter_reactive_ble_platform_interface.dart';
+import 'package:reactive_ble_platform_interface/reactive_ble_platform_interface.dart';
 
 import './converter/args_to_protubuf_converter.dart';
 import './converter/protobuf_converter.dart';
@@ -13,7 +13,7 @@ class PluginController extends ReactiveBlePlatform {
     required Stream<List<int>> charUpdateChannel,
     required Stream<List<int>> bleDeviceScanChannel,
     required Stream<List<int>> bleStatusChannel,
-  })   : _argsToProtobufConverter = argsToProtobufConverter,
+  })  : _argsToProtobufConverter = argsToProtobufConverter,
         _protobufConverter = protobufConverter,
         _bleMethodChannel = bleMethodChannel,
         _connectedDeviceRawStream = connectedDeviceChannel,

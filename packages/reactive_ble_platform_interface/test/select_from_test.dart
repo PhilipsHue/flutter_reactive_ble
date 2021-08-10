@@ -1,5 +1,5 @@
-import 'package:flutter_reactive_ble_platform_interface/src/select_from.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:reactive_ble_platform_interface/src/select_from.dart';
 
 void main() {
   group("selectFrom", () {
