@@ -34,26 +34,24 @@ workflows:
           -keyalg 'RSA' \
           -keysize 2048 \
           -validity 10000
-      - |
-        # set up local properties
-        echo "flutter.sdk=$HOME/programs/flutter" > "$FCI_BUILD_DIR/flutter_reactive_ble/android/local.properties"
-      - name: Pub get platform interface
-        script: cd flutter_reactive_ble_platform_interface/ && flutter pub get
-      - name: Platform interface quality checks
-        script: cd flutter_reactive_ble_platform_interface/ && flutter analyze && flutter test  && flutter pub publish --dry-run
-      - name: Pub get reactive ble
-        script: cd flutter_reactive_ble/ && flutter pub get     
-      - name: Reactive ble  quality checks
-        script: cd flutter_reactive_ble/ && flutter analyze && flutter test  && flutter pub publish --dry-run
-      - |
-        #!/bin/bash -ex
-        cd flutter_reactive_ble/example/android && ls && ./gradlew detekt && ./gradlew testDebugUnitTest
+      - name: setup local properties
+        script: |
+          # set up local properties
+          echo "flutter.sdk=$HOME/programs/flutter" > "$FCI_BUILD_DIR/example/android/local.properties"
+      - name: Quality checks monorepo
+        script: |
+          ./bin/quality_checks.sh
+      - name: Android native tests
+        script: |
+          #!/bin/bash -ex
+          cd example/android && ls && ./gradlew detekt && ./gradlew testDebugUnitTest
       - name: Build android app
-        script: cd flutter_reactive_ble/example && flutter build apk --debug
+        script: cd example && flutter build apk --debug
       - name: Build iOS app
-        script: find . -name "Podfile" -execdir pod install \;
-      - cd flutter_reactive_ble/example && flutter build ios --debug --no-codesign
+        script: |
+          find . -name "Podfile" -execdir pod install \;
+          cd example && flutter build ios --debug --no-codesign
     artifacts:
-      - flutter_reactive_ble/build/**/outputs/**/*.apk
-      - flutter_reactive_ble/build/**/outputs/**/mapping.txt
-      - flutter_reactive_ble/build/ios/ipa/*.ipa
+      - example/build/**/outputs/**/*.apk
+      - example/build/**/outputs/**/mapping.txt
+      - example/build/ios/ipa/*.ipa

@@ -9,7 +9,6 @@ import 'package:reactive_ble_platform_interface/reactive_ble_platform_interface.
 
 import 'connected_device_operation_test.mocks.dart';
 
-
 @GenerateMocks([ReactiveBlePlatform])
 void main() {
   late ReactiveBlePlatform _blePlatform;
@@ -17,7 +16,6 @@ void main() {
 
   group('$ConnectedDeviceOperation', () {
     setUp(() {
-
       _blePlatform = MockReactiveBlePlatform();
       _sut = ConnectedDeviceOperationImpl(
         blePlatform: _blePlatform,
@@ -35,7 +33,6 @@ void main() {
           ),
           result: const Result.success([1]),
         );
-
 
         when(_blePlatform.charValueUpdateStream)
             .thenAnswer((_) => Stream.fromIterable([valueUpdate!]));
@@ -92,7 +89,6 @@ void main() {
           result: const Result.success([4]),
         );
 
-
         when(_blePlatform.readCharacteristic(charDevice)).thenAnswer(
           (_) => Stream.fromIterable([0]),
         );
@@ -100,7 +96,6 @@ void main() {
 
       group('Given multiple updates are received for specific device', () {
         setUp(() async {
-
           when(_blePlatform.charValueUpdateStream)
               .thenAnswer((_) => Stream.fromIterable([
                     valueUpdate!,
@@ -120,7 +115,6 @@ void main() {
           'Given no updates are provide for characteristic of specific device',
           () {
         setUp(() async {
-
           when(_blePlatform.charValueUpdateStream)
               .thenAnswer((_) => Stream.fromIterable([
                     valueUpdateOtherDevice!,
@@ -159,7 +153,6 @@ void main() {
                   GenericFailure<WriteCharacteristicFailure>>.success(Unit()),
             );
 
-
             when(_blePlatform.writeCharacteristicWithResponse(
                     characteristic, value))
                 .thenAnswer((_) async => info);
@@ -183,7 +176,6 @@ void main() {
                   ),
                 ),
               );
-
 
               when(_blePlatform.writeCharacteristicWithResponse(
                       characteristic, value))
@@ -234,7 +226,6 @@ void main() {
                   ),
                 ),
               );
-
 
               when(_blePlatform.writeCharacteristicWithoutResponse(
                       characteristic, value))

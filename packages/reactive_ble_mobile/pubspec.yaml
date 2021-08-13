@@ -1,6 +1,6 @@
 name: reactive_ble_mobile
 description: Official Android and iOS implementation for the flutter_reactive_ble plugin.
-version: 0.0.1
+version: 1.0.0
 homepage:
 
 environment:
