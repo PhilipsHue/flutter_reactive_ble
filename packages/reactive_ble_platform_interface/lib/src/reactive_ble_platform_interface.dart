@@ -8,7 +8,7 @@ import 'models.dart';
 // `reactive_ble`does not consider newly added methods to be breaking changes.
 // Extending this class (using `extends`) ensures that the subclass will get
 // the default implementation, while platform implementations that `implements`
-// this interface will be broken by newly added [InAppPurchasePlatform] methods.
+// this interface will be broken by newly added [ReactiveBlePlatform] methods.
 abstract class ReactiveBlePlatform extends PlatformInterface {
   ReactiveBlePlatform() : super(token: _token);
   static final Object _token = Object();
@@ -99,7 +99,7 @@ abstract class ReactiveBlePlatform extends PlatformInterface {
     throw UnimplementedError('connectToDevice has not been implemented.');
   }
 
-  /// Operstion that disconnects the host with the peripheral.
+  /// Operation that disconnects the host with the peripheral.
   Future<void> disconnectDevice(String deviceId) {
     throw UnimplementedError('disconnectDevice has not been implemented.');
   }
@@ -151,7 +151,7 @@ abstract class ReactiveBlePlatform extends PlatformInterface {
   /// Starts subscribing to notifications for a specificied characteristic.
   ///
   /// This stream only returns the result of the operation. Value updates should
-  /// be propagated to [charValueUpdateStream]
+  /// be propagated to [charValueUpdateStream].
   Stream<void> subscribeToNotifications(
     QualifiedCharacteristic characteristic,
   ) {

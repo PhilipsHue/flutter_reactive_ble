@@ -159,8 +159,10 @@ void main() {
           });
 
           test('It completes without error', () async {
-            await _sut.writeCharacteristicWithResponse(characteristic,
-                value: value);
+            await _sut.writeCharacteristicWithResponse(
+              characteristic,
+              value: value,
+            );
             expect(true, true);
           });
 

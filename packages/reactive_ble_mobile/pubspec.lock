@@ -353,7 +353,7 @@ packages:
       path: "../reactive_ble_platform_interface"
       relative: true
     source: path
-    version: "1.0.0"
+    version: "4.0.0"
   shelf:
     dependency: transitive
     description:

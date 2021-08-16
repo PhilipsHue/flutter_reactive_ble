@@ -1,3 +1,4 @@
-## 0.0.1
+## 4.0.0
 
-* TODO: Describe initial release.
+* Initial Open Source release.
+

@@ -19,6 +19,7 @@ class ReactiveBleMobilePlatform extends ReactiveBlePlatform {
         _charUpdateRawStream = charUpdateChannel,
         _bleStatusRawChannel = bleStatusChannel,
         _bleDeviceScanRawStream = bleDeviceScanChannel;
+
   final ArgsToProtobufConverter _argsToProtobufConverter;
   final ProtobufConverter _protobufConverter;
   final MethodChannel _bleMethodChannel;
