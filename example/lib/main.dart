@@ -63,18 +63,22 @@ void main() {
         title: 'Flutter Reactive BLE example',
         color: _themeColor,
         theme: ThemeData(primarySwatch: _themeColor),
-        home: HomeScreen(),
+        home: const HomeScreen(),
       ),
     ),
   );
 }
 
 class HomeScreen extends StatelessWidget {
+  const HomeScreen({
+    Key? key,
+  }) : super(key: key);
+
   @override
   Widget build(BuildContext context) => Consumer<BleStatus?>(
         builder: (_, status, __) {
           if (status == BleStatus.ready) {
-            return DeviceListScreen();
+            return const DeviceListScreen();
           } else {
             return BleStatusScreen(status: status ?? BleStatus.unknown);
           }

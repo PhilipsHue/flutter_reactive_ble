@@ -64,6 +64,7 @@ class BleDeviceInteractor {
       _logMessage(
         'Error occured when reading ${characteristic.characteristicId} : $e',
       );
+      // ignore: avoid_print
       print(s);
       rethrow;
     }
@@ -79,6 +80,7 @@ class BleDeviceInteractor {
       _logMessage(
         'Error occured when writing ${characteristic.characteristicId} : $e',
       );
+      // ignore: avoid_print
       print(s);
       rethrow;
     }
@@ -94,6 +96,7 @@ class BleDeviceInteractor {
       _logMessage(
         'Error occured when writing ${characteristic.characteristicId} : $e',
       );
+      // ignore: avoid_print
       print(s);
       rethrow;
     }

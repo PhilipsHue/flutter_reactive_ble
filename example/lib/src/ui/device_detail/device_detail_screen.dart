@@ -60,7 +60,7 @@ class _DeviceDetail extends StatelessWidget {
                 DeviceInteractionTab(
                   device: device,
                 ),
-                DeviceLogTab(),
+                const DeviceLogTab(),
               ],
             ),
           ),
