@@ -168,6 +168,17 @@ The Android OS maintains a table per device of the discovered service in cache. 
 await flutterReactiveBle.clearGattCache(foundDeviceId);
 ```
 
+### Contributing
+Feel free to open an new issue or a pull request to make this project better
+
+#### Setup
+
+This project uses melos to manage all the packages inside this repo.
+
+Install melos: `dart pub global activate melos`
+Setup melos to point to the dependencies in your local folder: `melos bootstrap`
+
+
 ### FAQ
 
 #### How to handle the BLE undeliverable exception
