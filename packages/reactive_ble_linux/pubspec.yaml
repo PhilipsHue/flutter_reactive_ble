@@ -1,0 +1,18 @@
+name: reactive_ble_linux
+description: Official Linux implementation for the flutter_reactive_ble plugin.
+version: 5.0.1
+homepage: https://github.com/PhilipsHue/flutter_reactive_ble
+
+environment:
+  sdk: ">=2.12.0 <3.0.0"
+  flutter: ">=2.0.0"
+
+dependencies:
+  bluez: ^0.7.3
+  flutter:
+    sdk: flutter
+  reactive_ble_platform_interface: ^5.0.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
