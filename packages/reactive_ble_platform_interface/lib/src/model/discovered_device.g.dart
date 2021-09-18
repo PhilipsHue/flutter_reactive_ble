@@ -6,36 +6,60 @@ part of 'discovered_device.dart';
 // FunctionalDataGenerator
 // **************************************************************************
 
-// ignore_for_file: join_return_with_assignment
-// ignore_for_file: avoid_classes_with_only_static_members
-// ignore_for_file: non_constant_identifier_names
-// ignore_for_file: avoid_equals_and_hash_code_on_mutable_classes
 abstract class $DiscoveredDevice {
   const $DiscoveredDevice();
+
   String get id;
   String get name;
   Map<Uuid, Uint8List> get serviceData;
   List<Uuid> get serviceUuids;
   Uint8List get manufacturerData;
   int get rssi;
-  DiscoveredDevice copyWith(
-          {String? id,
-          String? name,
-          Map<Uuid, Uint8List>? serviceData,
-          List<Uuid>? serviceUuids,
-          Uint8List? manufacturerData,
-          int? rssi}) =>
+
+  DiscoveredDevice copyWith({
+    String? id,
+    String? name,
+    Map<Uuid, Uint8List>? serviceData,
+    List<Uuid>? serviceUuids,
+    Uint8List? manufacturerData,
+    int? rssi,
+  }) =>
       DiscoveredDevice(
-          id: id ?? this.id,
-          name: name ?? this.name,
-          serviceData: serviceData ?? this.serviceData,
-          serviceUuids: serviceUuids ?? this.serviceUuids,
-          manufacturerData: manufacturerData ?? this.manufacturerData,
-          rssi: rssi ?? this.rssi);
+        id: id ?? this.id,
+        name: name ?? this.name,
+        serviceData: serviceData ?? this.serviceData,
+        serviceUuids: serviceUuids ?? this.serviceUuids,
+        manufacturerData: manufacturerData ?? this.manufacturerData,
+        rssi: rssi ?? this.rssi,
+      );
+
+  DiscoveredDevice copyUsing(
+      void Function(DiscoveredDevice$Change change) mutator) {
+    final change = DiscoveredDevice$Change._(
+      this.id,
+      this.name,
+      this.serviceData,
+      this.serviceUuids,
+      this.manufacturerData,
+      this.rssi,
+    );
+    mutator(change);
+    return DiscoveredDevice(
+      id: change.id,
+      name: change.name,
+      serviceData: change.serviceData,
+      serviceUuids: change.serviceUuids,
+      manufacturerData: change.manufacturerData,
+      rssi: change.rssi,
+    );
+  }
+
   @override
   String toString() =>
       "DiscoveredDevice(id: $id, name: $name, serviceData: $serviceData, serviceUuids: $serviceUuids, manufacturerData: $manufacturerData, rssi: $rssi)";
+
   @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
   bool operator ==(Object other) =>
       other is DiscoveredDevice &&
       other.runtimeType == runtimeType &&
@@ -45,7 +69,9 @@ abstract class $DiscoveredDevice {
       const DeepCollectionEquality().equals(serviceUuids, other.serviceUuids) &&
       manufacturerData == other.manufacturerData &&
       rssi == other.rssi;
+
   @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
   int get hashCode {
     var result = 17;
     result = 37 * result + id.hashCode;
@@ -58,21 +84,56 @@ abstract class $DiscoveredDevice {
   }
 }
 
+class DiscoveredDevice$Change {
+  DiscoveredDevice$Change._(
+    this.id,
+    this.name,
+    this.serviceData,
+    this.serviceUuids,
+    this.manufacturerData,
+    this.rssi,
+  );
+
+  String id;
+  String name;
+  Map<Uuid, Uint8List> serviceData;
+  List<Uuid> serviceUuids;
+  Uint8List manufacturerData;
+  int rssi;
+}
+
+// ignore: avoid_classes_with_only_static_members
 class DiscoveredDevice$ {
   static final id = Lens<DiscoveredDevice, String>(
-      (s_) => s_.id, (s_, id) => s_.copyWith(id: id));
+    (idContainer) => idContainer.id,
+    (idContainer, id) => idContainer.copyWith(id: id),
+  );
+
   static final name = Lens<DiscoveredDevice, String>(
-      (s_) => s_.name, (s_, name) => s_.copyWith(name: name));
+    (nameContainer) => nameContainer.name,
+    (nameContainer, name) => nameContainer.copyWith(name: name),
+  );
+
   static final serviceData = Lens<DiscoveredDevice, Map<Uuid, Uint8List>>(
-      (s_) => s_.serviceData,
-      (s_, serviceData) => s_.copyWith(serviceData: serviceData));
+    (serviceDataContainer) => serviceDataContainer.serviceData,
+    (serviceDataContainer, serviceData) =>
+        serviceDataContainer.copyWith(serviceData: serviceData),
+  );
+
   static final serviceUuids = Lens<DiscoveredDevice, List<Uuid>>(
-      (s_) => s_.serviceUuids,
-      (s_, serviceUuids) => s_.copyWith(serviceUuids: serviceUuids));
+    (serviceUuidsContainer) => serviceUuidsContainer.serviceUuids,
+    (serviceUuidsContainer, serviceUuids) =>
+        serviceUuidsContainer.copyWith(serviceUuids: serviceUuids),
+  );
+
   static final manufacturerData = Lens<DiscoveredDevice, Uint8List>(
-      (s_) => s_.manufacturerData,
-      (s_, manufacturerData) =>
-          s_.copyWith(manufacturerData: manufacturerData));
+    (manufacturerDataContainer) => manufacturerDataContainer.manufacturerData,
+    (manufacturerDataContainer, manufacturerData) =>
+        manufacturerDataContainer.copyWith(manufacturerData: manufacturerData),
+  );
+
   static final rssi = Lens<DiscoveredDevice, int>(
-      (s_) => s_.rssi, (s_, rssi) => s_.copyWith(rssi: rssi));
+    (rssiContainer) => rssiContainer.rssi,
+    (rssiContainer, rssi) => rssiContainer.copyWith(rssi: rssi),
+  );
 }
