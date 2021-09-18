@@ -1,6 +1,6 @@
+import 'package:flutter_test/flutter_test.dart';
 import 'package:reactive_ble_mobile/src/converter/args_to_protubuf_converter.dart';
 import 'package:reactive_ble_mobile/src/generated/bledata.pb.dart' as pb;
-import 'package:flutter_test/flutter_test.dart';
 import 'package:reactive_ble_platform_interface/src/model/connection_priority.dart';
 import 'package:reactive_ble_platform_interface/src/model/qualified_characteristic.dart';
 import 'package:reactive_ble_platform_interface/src/model/scan_mode.dart';
