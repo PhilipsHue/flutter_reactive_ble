@@ -7,7 +7,7 @@ workflows:
     max_build_duration: 60
     environment:
       flutter: stable
-      xcode: latest
+      xcode: 13.0
       cocoapods: default
     cache:
       cache_paths: []
