@@ -2,8 +2,8 @@ import Foundation
 
 final class PeripheralTaskRegistry<Controller: PeripheralTaskController> {
 
-    typealias Task = Controller.Task
-    typealias TaskCompletionHandler = (Task.Key, Task.Params, Task.Result) -> Void
+    typealias SubjectTask = Controller.SubjectTask
+    typealias TaskCompletionHandler = (SubjectTask.Key, SubjectTask.Params, SubjectTask.Result) -> Void
 
     private var tasks = TaskQueue()
     private var scheduledTimeouts = [TaskQueue.Record.UniqueID: Timer]()
@@ -11,12 +11,12 @@ final class PeripheralTaskRegistry<Controller: PeripheralTaskController> {
     var log: (String) -> Void = { _ in }
 
     func registerTask(
-        key: Task.Key,
-        params: Task.Params,
-        timeout: Task.Timeout? = nil,
-        completion: @escaping Task.CompletionHandler
+        key: SubjectTask.Key,
+        params: SubjectTask.Params,
+        timeout: SubjectTask.Timeout? = nil,
+        completion: @escaping SubjectTask.CompletionHandler
     ) {
-        let task = Task(
+        let task = SubjectTask(
             key: key,
             params: params,
             timeout: timeout,
@@ -27,8 +27,8 @@ final class PeripheralTaskRegistry<Controller: PeripheralTaskController> {
     }
 
     func updateTask(
-        key: Task.Key,
-        action: (Controller) -> Task
+        key: SubjectTask.Key,
+        action: (Controller) -> SubjectTask
     ) {
         guard let record = tasks.firstWith(key: key)
         else { return }
@@ -55,8 +55,8 @@ final class PeripheralTaskRegistry<Controller: PeripheralTaskController> {
     }
 
     func updateTasks(
-        in group: Task.Group,
-        action: (Controller) -> Task
+        in group: SubjectTask.Group,
+        action: (Controller) -> SubjectTask
     ) {
         tasks.update(where: { $0.isMember(of: group) }) { record in
             let taskController = Controller(record.task)
@@ -86,7 +86,7 @@ final class PeripheralTaskRegistry<Controller: PeripheralTaskController> {
         }
     }
 
-    private func scheduleTaskTimeout(_ uniqueID: TaskQueue.Record.UniqueID, _ timeout: Task.Timeout) {
+    private func scheduleTaskTimeout(_ uniqueID: TaskQueue.Record.UniqueID, _ timeout: SubjectTask.Timeout) {
         let timer = Timer.scheduledTimer(
             withTimeInterval: timeout.duration,
             repeats: false,
@@ -107,14 +107,14 @@ final class PeripheralTaskRegistry<Controller: PeripheralTaskController> {
         var count: Int { return records.count }
         var totalAdded: Int { return counter.value }
 
-        func add(_ task: Task) {
+        func add(_ task: SubjectTask) {
             records.append(Record(
                 uniqueID: counter.increment(),
                 task: task
             ))
         }
 
-        func firstWith(key: Task.Key) -> Record? {
+        func firstWith(key: SubjectTask.Key) -> Record? {
             return records.first(where: { $0.task.key == key })
         }
 
@@ -129,7 +129,7 @@ final class PeripheralTaskRegistry<Controller: PeripheralTaskController> {
             records[index] = record
         }
 
-        func update(where p: (Task) -> Bool, _ body: (Record) -> Void) {
+        func update(where p: (SubjectTask) -> Bool, _ body: (Record) -> Void) {
             Array(records)
                 .filter({ p($0.task) })
                 .forEach(body)
@@ -147,9 +147,9 @@ final class PeripheralTaskRegistry<Controller: PeripheralTaskController> {
             typealias UniqueID = Int
 
             let uniqueID: UniqueID
-            let task: Task
+            let task: SubjectTask
 
-            func with(task: Task) -> Record {
+            func with(task: SubjectTask) -> Record {
                 return .init(uniqueID: uniqueID, task: task)
             }
         }
