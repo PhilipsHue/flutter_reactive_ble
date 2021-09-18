@@ -77,7 +77,7 @@ final class Central {
             },
             onCharacteristicsDiscovery: papply(weak: self) { central, service, error in
                 central.servicesWithCharacteristicsDiscoveryRegistry.updateTask(
-                    key: service.peripheral.identifier,
+                    key: service.peripheral!.identifier,
                     action: { $0.handleCharacteristicsDiscovery(service: service, error: error) }
                 )
             },
@@ -226,8 +226,11 @@ final class Central {
 
         guard characteristic.properties.contains(.read)
         else { throw Failure.notReadable(qualifiedCharacteristic) }
-
-        characteristic.service.peripheral.readValue(for: characteristic)
+        
+        guard let value =  characteristic.service?.peripheral?.readValue(for: characteristic) else{
+            throw Failure.characteristicNotFound(qualifiedCharacteristic)
+        }
+        return value
     }
 
     func writeWithResponse(
@@ -247,10 +250,15 @@ final class Central {
                 completion(central, qualifiedCharacteristic, error)
             }
         )
+        
+        
+        guard let peripheral = characteristic.service?.peripheral else{
+            throw Failure.peripheralIsUnknown(qualifiedCharacteristic.peripheralID)
+        }
 
         characteristicWriteRegistry.updateTask(
             key: qualifiedCharacteristic,
-            action: { $0.start(peripheral: characteristic.service.peripheral) }
+            action: { $0.start(peripheral: peripheral) }
         )
     }
     
@@ -263,7 +271,11 @@ final class Central {
         guard characteristic.properties.contains(.writeWithoutResponse)
         else { throw Failure.notWritable(qualifiedCharacteristic) }
         
-        characteristic.service.peripheral.writeValue(value, for: characteristic, type: .withoutResponse)
+        guard let response = characteristic.service?.peripheral?.writeValue(value, for: characteristic, type: .withoutResponse) else{
+            throw Failure.characteristicNotFound(qualifiedCharacteristic)
+        }
+        
+        return response
     }
 
     func maximumWriteValueLength(for peripheral: PeripheralID, type: CBCharacteristicWriteType) throws -> Int {
