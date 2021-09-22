@@ -14,7 +14,7 @@ extension QualifiedCharacteristic {
         self.init(
             id: characteristic.uuid,
             serviceID: characteristic.service?.uuid ?? ServiceID(),
-            peripheralID: characteristic.service?.peripheral?.identifier ?? PeripheralID()
+            peripheralID: characteristic.service?.peripheral?.identifier ?? PeripheralID(uuid: (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
         )
     }
 }

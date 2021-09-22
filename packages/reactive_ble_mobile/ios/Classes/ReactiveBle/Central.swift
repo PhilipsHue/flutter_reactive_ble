@@ -227,10 +227,11 @@ final class Central {
         guard characteristic.properties.contains(.read)
         else { throw Failure.notReadable(qualifiedCharacteristic) }
         
-        guard let value =  characteristic.service?.peripheral?.readValue(for: characteristic) else{
-            throw Failure.characteristicNotFound(qualifiedCharacteristic)
-        }
-        return value
+        guard let peripheral = characteristic.service?.peripheral
+        else { throw Failure.peripheralIsUnknown(qualifiedCharacteristic.peripheralID) }
+        
+        peripheral.readValue(for: characteristic)
+
     }
 
     func writeWithResponse(
@@ -251,10 +252,8 @@ final class Central {
             }
         )
         
-        
-        guard let peripheral = characteristic.service?.peripheral else{
-            throw Failure.peripheralIsUnknown(qualifiedCharacteristic.peripheralID)
-        }
+        guard let peripheral = characteristic.service?.peripheral
+        else{ throw Failure.peripheralIsUnknown(qualifiedCharacteristic.peripheralID) }
 
         characteristicWriteRegistry.updateTask(
             key: qualifiedCharacteristic,
@@ -271,9 +270,8 @@ final class Central {
         guard characteristic.properties.contains(.writeWithoutResponse)
         else { throw Failure.notWritable(qualifiedCharacteristic) }
         
-        guard let response = characteristic.service?.peripheral?.writeValue(value, for: characteristic, type: .withoutResponse) else{
-            throw Failure.characteristicNotFound(qualifiedCharacteristic)
-        }
+        guard let response = characteristic.service?.peripheral?.writeValue(value, for: characteristic, type: .withoutResponse)
+        else { throw Failure.characteristicNotFound(qualifiedCharacteristic) }
         
         return response
     }
