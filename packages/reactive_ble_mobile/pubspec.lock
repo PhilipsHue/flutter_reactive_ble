@@ -350,9 +350,11 @@ packages:
   reactive_ble_platform_interface:
     dependency: "direct main"
     description:
-      name: reactive_ble_platform_interface
-      url: "https://pub.dartlang.org"
-    source: hosted
+      path: "packages/reactive_ble_platform_interface"
+      ref: "9a849f9e6246a73f7a36f8023c0d150a44c85833"
+      resolved-ref: "9a849f9e6246a73f7a36f8023c0d150a44c85833"
+      url: "https://github.com/LEMUSADR000/flutter_reactive_ble.git"
+    source: git
     version: "4.0.0"
   shelf:
     dependency: transitive

@@ -1,7 +1,6 @@
 name: reactive_ble_platform_interface
 description: Platform interface for the flutter_reactive_ble_project 
 version: 4.0.0
-homepage: https://github.com/PhilipsHue/flutter_reactive_ble
 
 environment:
   sdk: '>=2.12.0 <3.0.0'
