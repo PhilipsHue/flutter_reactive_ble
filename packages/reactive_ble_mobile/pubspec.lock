@@ -353,7 +353,7 @@ packages:
       name: reactive_ble_platform_interface
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "4.0.0"
+    version: "4.0.1"
   shelf:
     dependency: transitive
     description:
