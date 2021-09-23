@@ -374,14 +374,14 @@ packages:
       name: reactive_ble_mobile
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "4.0.0"
+    version: "4.0.1"
   reactive_ble_platform_interface:
     dependency: "direct main"
     description:
       name: reactive_ble_platform_interface
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "4.0.0"
+    version: "4.0.1"
   shelf:
     dependency: transitive
     description:
@@ -501,4 +501,4 @@ packages:
     version: "3.1.0"
 sdks:
   dart: ">=2.12.0 <3.0.0"
-  flutter: ">=1.20.0"
+  flutter: ">=2.0.0"
