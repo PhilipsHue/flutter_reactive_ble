@@ -178,6 +178,14 @@ This project uses melos to manage all the packages inside this repo.
 Install melos: `dart pub global activate melos`
 Setup melos to point to the dependencies in your local folder: `melos bootstrap`
 
+### Xcode 13 breaking changes
+
+Version `4.0.1` added breaking changes for Xcode 13 that are not backwards compatible with Xcode 12. Due to this all users that are not ready to upgrade to Xcode 13 are at adviced to add the following dependency override to the pubspec.yaml of your app untill you are ready to upgrade to the latest Xcode.
+
+```yaml
+dependency_overrides:
+  reactive_ble_mobile: '4.0.0'
+```
 
 ### FAQ
 
