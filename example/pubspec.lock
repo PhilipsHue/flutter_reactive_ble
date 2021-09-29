@@ -208,7 +208,7 @@ packages:
       path: "../packages/flutter_reactive_ble"
       relative: true
     source: path
-    version: "4.0.0"
+    version: "4.0.1"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -399,17 +399,17 @@ packages:
   reactive_ble_mobile:
     dependency: transitive
     description:
-      path: "../packages/reactive_ble_mobile"
-      relative: true
-    source: path
-    version: "4.0.0"
+      name: reactive_ble_mobile
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "4.0.1"
   reactive_ble_platform_interface:
     dependency: transitive
     description:
-      path: "../packages/reactive_ble_platform_interface"
-      relative: true
-    source: path
-    version: "4.0.0"
+      name: reactive_ble_platform_interface
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "4.0.1"
   shelf:
     dependency: transitive
     description:
