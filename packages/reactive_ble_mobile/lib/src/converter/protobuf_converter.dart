@@ -202,6 +202,16 @@ class ProtobufConverterImpl implements ProtobufConverter {
         characteristicIds: service.characteristicUuids
             .map((c) => Uuid(c.data))
             .toList(growable: false),
+        characteristics: service.characteristics
+            .map((c) => DiscoveredCharacteristic(
+                characteristicId: Uuid(c.characteristicId.data),
+                serviceId: Uuid(c.serviceId.data),
+                isReadable: c.isReadable,
+                isWritableWithResponse: c.isWritableWithResponse,
+                isWritableWithoutResponse: c.isWritableWithoutResponse,
+                isNotifiable: c.isNotifiable,
+                isIndicatable: c.isIndicatable))
+            .toList(growable: false),
         includedServices: service.includedServices
             .map(_convertService)
             .toList(growable: false),
