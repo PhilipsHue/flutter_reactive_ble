@@ -67,9 +67,14 @@ public class SwiftReactiveBlePlugin: NSObject, FlutterPlugin {
             context: context,
             onListen: { context, sink in
                 context.characteristicValueUpdateSink = sink
+                context.messageQueue.forEach { msg in
+                    sink.add(.success(msg))
+                }
+                context.messageQueue.removeAll()
                 return nil
             },
             onCancel: { context in
+                context.messageQueue.removeAll()
                 context.characteristicValueUpdateSink = nil
                 return nil
             }
