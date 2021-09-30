@@ -1,5 +1,6 @@
 package com.signify.hue.flutterreactiveble.converters
 
+import android.bluetooth.BluetoothGattCharacteristic
 import android.bluetooth.BluetoothGattService
 import com.google.protobuf.ByteString
 import com.polidea.rxandroidble2.RxBleDeviceServices
@@ -167,15 +168,33 @@ class ProtobufMessageConverter {
             services: RxBleDeviceServices
     ): pb.DiscoverServicesInfo {
         return pb.DiscoverServicesInfo.newBuilder()
-                        .setDeviceId(deviceId)
-                        .addAllServices(services.bluetoothGattServices.map { fromBluetoothGattService(it) })
-                        .build()
+                .setDeviceId(deviceId)
+                .addAllServices(services.bluetoothGattServices.map { fromBluetoothGattService(it) })
+                .build()
     }
 
     private fun fromBluetoothGattService(gattService: BluetoothGattService): pb.DiscoveredService {
         return pb.DiscoveredService.newBuilder()
                 .setServiceUuid(createUuidFromParcelUuid(gattService.uuid))
                 .addAllCharacteristicUuids(gattService.characteristics.map { createUuidFromParcelUuid(it.uuid) })
+                .addAllCharacteristics(gattService.characteristics.map {
+                    val prop = it.properties
+                    val readable = (prop and BluetoothGattCharacteristic.PROPERTY_READ) > 0
+                    val write = (prop and BluetoothGattCharacteristic.PROPERTY_WRITE) > 0
+                    val writeNoResp = (prop and BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE) > 0
+                    val notify = (prop and BluetoothGattCharacteristic.PROPERTY_NOTIFY) > 0
+                    val indicate = (prop and BluetoothGattCharacteristic.PROPERTY_INDICATE) > 0
+
+                    pb.DiscoveredCharacteristic.newBuilder()
+                            .setCharacteristicId(createUuidFromParcelUuid(it.uuid))
+                            .setServiceId(createUuidFromParcelUuid(it.service.uuid))
+                            .setIsReadable(readable)
+                            .setIsWritableWithResponse(write)
+                            .setIsWritableWithoutResponse(writeNoResp)
+                            .setIsNotifiable(notify)
+                            .setIsIndicatable(indicate)
+                            .build()
+                })
                 .addAllIncludedServices(gattService.includedServices.map { convertInternalService(it) })
                 .build()
     }

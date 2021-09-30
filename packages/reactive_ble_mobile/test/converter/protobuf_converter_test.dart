@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:reactive_ble_mobile/src/converter/protobuf_converter.dart';
 import 'package:reactive_ble_mobile/src/generated/bledata.pb.dart' as pb;
+import 'package:reactive_ble_platform_interface/reactive_ble_platform_interface.dart';
 import 'package:reactive_ble_platform_interface/src/model/ble_status.dart';
 import 'package:reactive_ble_platform_interface/src/model/characteristic_value.dart';
 import 'package:reactive_ble_platform_interface/src/model/clear_gatt_cache_error.dart';
@@ -503,11 +504,19 @@ void main() {
 
           final discoveredInternalServices = pb.DiscoveredService()
             ..serviceUuid = internalServiceUuid
+            ..characteristics.add(pb.DiscoveredCharacteristic(
+                characteristicId: internalCharUuid,
+                serviceId: internalServiceUuid,
+                isReadable: true))
             ..characteristicUuids.add(internalCharUuid);
 
           final discoveredService = pb.DiscoveredService()
             ..serviceUuid = serviceUuid
             ..characteristicUuids.add(charUuid)
+            ..characteristics.add(pb.DiscoveredCharacteristic(
+                characteristicId: charUuid,
+                serviceId: serviceUuid,
+                isWritableWithResponse: true))
             ..includedServices.add(discoveredInternalServices);
 
           message = pb.DiscoverServicesInfo()
@@ -526,11 +535,33 @@ void main() {
                 characteristicIds: [
                   Uuid([0, 1, 1])
                 ],
+                characteristics: [
+                  DiscoveredCharacteristic(
+                    characteristicId: Uuid([0, 1, 1]),
+                    serviceId: Uuid([0]),
+                    isReadable: false,
+                    isWritableWithResponse: true,
+                    isWritableWithoutResponse: false,
+                    isNotifiable: false,
+                    isIndicatable: false,
+                  ),
+                ],
                 includedServices: [
                   DiscoveredService(
                     serviceId: Uuid([1]),
                     characteristicIds: [
                       Uuid([1, 1])
+                    ],
+                    characteristics: [
+                      DiscoveredCharacteristic(
+                        characteristicId: Uuid([1, 1]),
+                        serviceId: Uuid([1]),
+                        isReadable: true,
+                        isWritableWithResponse: false,
+                        isWritableWithoutResponse: false,
+                        isNotifiable: false,
+                        isIndicatable: false,
+                      ),
                     ],
                     includedServices: [],
                   ),
