@@ -21,6 +21,7 @@ final class PluginController {
             }
         }
     }
+    var messageQueue: [CharacteristicValueInfo] = [];
     var connectedDeviceSink: EventSink?
     var characteristicValueUpdateSink: EventSink?
 
@@ -102,9 +103,6 @@ final class PluginController {
                 sink.add(.success(message))
             },
             onCharacteristicValueUpdate: papply(weak: self) { context, central, characteristic, value, error in
-                guard let sink = context.characteristicValueUpdateSink
-                else { assert(false); return }
-
                 let message = CharacteristicValueInfo.with {
                     $0.characteristic = CharacteristicAddress.with {
                         $0.characteristicUuid = Uuid.with { $0.data = characteristic.id.data }
@@ -121,7 +119,14 @@ final class PluginController {
                         }
                     }
                 }
-                sink.add(.success(message))
+                let sink = context.characteristicValueUpdateSink
+                if (sink != nil) {
+                    sink!.add(.success(message))
+                } else {
+                    // In case message arrives before sink is created
+                    context.messageQueue.append(message);
+                }
+
             }
         )
 
