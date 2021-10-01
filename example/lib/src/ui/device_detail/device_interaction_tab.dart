@@ -175,23 +175,24 @@ class _ServiceDiscoveryListState extends State<_ServiceDiscoveryList> {
   String _charactisticsSummary(DiscoveredCharacteristic c) {
     final props = <String>[];
     if (c.isReadable) {
-      props.add("r");
+      props.add("read");
     }
     if (c.isWritableWithoutResponse) {
-      props.add("wo");
+      props.add("write without response");
     }
     if (c.isWritableWithResponse) {
-      props.add("wr");
+      props.add("write with response");
     }
     if (c.isNotifiable) {
-      props.add("n");
+      props.add("notify");
     }
     if (c.isIndicatable) {
-      props.add("i");
+      props.add("indicate");
     }
 
-    return props.join(",");
+    return props.join("\n");
   }
+
   Widget _characteristicTile(
           DiscoveredCharacteristic characteristic, String deviceId) =>
       ListTile(

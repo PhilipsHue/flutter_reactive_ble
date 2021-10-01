@@ -40,6 +40,6 @@ class DiscoveredCharacteristic {
   @override
   bool operator ==(dynamic other) =>
       runtimeType == other.runtimeType &&
-          characteristicId == other.characteristicId &&
-          serviceId == other.serviceId;
+      characteristicId == other.characteristicId &&
+      serviceId == other.serviceId;
 }
