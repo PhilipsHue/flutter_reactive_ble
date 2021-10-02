@@ -128,6 +128,17 @@ message DiscoveredService {
     Uuid serviceUuid = 1;
     repeated Uuid characteristicUuids = 2;
     repeated DiscoveredService includedServices = 3;
+    repeated DiscoveredCharacteristic characteristics = 4;
+}
+
+message DiscoveredCharacteristic {
+    Uuid characteristicId = 1;
+    Uuid serviceId = 2;
+    bool isReadable = 3;
+    bool isWritableWithResponse = 4;
+    bool isWritableWithoutResponse = 5;
+    bool isNotifiable = 6;
+    bool isIndicatable = 7;
 }
 
 message Uuid {

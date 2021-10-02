@@ -21,6 +21,7 @@ final class PluginController {
             }
         }
     }
+    var messageQueue: [CharacteristicValueInfo] = [];
     var connectedDeviceSink: EventSink?
     var characteristicValueUpdateSink: EventSink?
 
@@ -102,9 +103,6 @@ final class PluginController {
                 sink.add(.success(message))
             },
             onCharacteristicValueUpdate: papply(weak: self) { context, central, characteristic, value, error in
-                guard let sink = context.characteristicValueUpdateSink
-                else { assert(false); return }
-
                 let message = CharacteristicValueInfo.with {
                     $0.characteristic = CharacteristicAddress.with {
                         $0.characteristicUuid = Uuid.with { $0.data = characteristic.id.data }
@@ -121,7 +119,14 @@ final class PluginController {
                         }
                     }
                 }
-                sink.add(.success(message))
+                let sink = context.characteristicValueUpdateSink
+                if (sink != nil) {
+                    sink!.add(.success(message))
+                } else {
+                    // In case message arrives before sink is created
+                    context.messageQueue.append(message);
+                }
+
             }
         )
 
@@ -282,6 +287,20 @@ final class PluginController {
                 $0.characteristicUuids = (service.characteristics ?? []).map { characteristic in
                     Uuid.with { $0.data = characteristic.uuid.data }
                 }
+                $0.characteristics = (service.characteristics ?? []).map { characteristic in
+                    DiscoveredCharacteristic.with{
+                        $0.characteristicID = Uuid.with{$0.data = characteristic.uuid.data}
+                        if characteristic.service?.uuid.data != nil {
+                            $0.serviceID = Uuid.with{$0.data = characteristic.service!.uuid.data}
+                        }
+                        $0.isReadable = characteristic.properties.contains(.read)
+                        $0.isWritableWithResponse = characteristic.properties.contains(.write)
+                        $0.isWritableWithoutResponse = characteristic.properties.contains(.writeWithoutResponse)
+                        $0.isNotifiable = characteristic.properties.contains(.notify)
+                        $0.isIndicatable = characteristic.properties.contains(.indicate)
+                    }
+                }
+ 
                 $0.includedServices = (service.includedServices ?? []).map(makeDiscoveredService)
             }
         }

@@ -172,15 +172,40 @@ class _ServiceDiscoveryListState extends State<_ServiceDiscoveryList> {
     super.initState();
   }
 
-  Widget _characteristicTile(QualifiedCharacteristic characteristic) =>
+  String _charactisticsSummary(DiscoveredCharacteristic c) {
+    final props = <String>[];
+    if (c.isReadable) {
+      props.add("read");
+    }
+    if (c.isWritableWithoutResponse) {
+      props.add("write without response");
+    }
+    if (c.isWritableWithResponse) {
+      props.add("write with response");
+    }
+    if (c.isNotifiable) {
+      props.add("notify");
+    }
+    if (c.isIndicatable) {
+      props.add("indicate");
+    }
+
+    return props.join("\n");
+  }
+
+  Widget _characteristicTile(
+          DiscoveredCharacteristic characteristic, String deviceId) =>
       ListTile(
         onTap: () => showDialog<void>(
             context: context,
             builder: (context) => CharacteristicInteractionDialog(
-                  characteristic: characteristic,
+                  characteristic: QualifiedCharacteristic(
+                      characteristicId: characteristic.characteristicId,
+                      serviceId: characteristic.serviceId,
+                      deviceId: deviceId),
                 )),
         title: Text(
-          '${characteristic.characteristicId}',
+          '${characteristic.characteristicId}\n(${_charactisticsSummary(characteristic)})',
           style: const TextStyle(
             fontSize: 14,
           ),
@@ -209,11 +234,8 @@ class _ServiceDiscoveryListState extends State<_ServiceDiscoveryList> {
                   ListView.builder(
                     shrinkWrap: true,
                     itemBuilder: (context, index) => _characteristicTile(
-                      QualifiedCharacteristic(
-                        characteristicId: service.characteristicIds[index],
-                        serviceId: service.serviceId,
-                        deviceId: widget.deviceId,
-                      ),
+                      service.characteristics[index],
+                      widget.deviceId,
                     ),
                     itemCount: service.characteristicIds.length,
                   ),
