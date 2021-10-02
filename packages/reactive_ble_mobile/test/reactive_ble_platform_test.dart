@@ -581,6 +581,7 @@ void main() {
         DiscoveredService(
           serviceId: Uuid([0x01, 0x02]),
           characteristicIds: const [],
+          characteristics: const [],
           includedServices: const [],
         ),
       ];

@@ -24,10 +24,17 @@ class ScanForDevicesRequest extends $pb.GeneratedMessage {
         protoName: 'serviceUuids',
         subBuilder: Uuid.create)
     ..a<$core.int>(
-        2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'scanMode', $pb.PbFieldType.O3,
+        2,
+        const $core.bool.fromEnvironment('protobuf.omit_field_names')
+            ? ''
+            : 'scanMode',
+        $pb.PbFieldType.O3,
         protoName: 'scanMode')
     ..aOB(
-        3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'requireLocationServicesEnabled',
+        3,
+        const $core.bool.fromEnvironment('protobuf.omit_field_names')
+            ? ''
+            : 'requireLocationServicesEnabled',
         protoName: 'requireLocationServicesEnabled')
     ..hasRequiredFields = false;
 
@@ -107,7 +114,10 @@ class ScanForDevicesRequest extends $pb.GeneratedMessage {
 }
 
 class DeviceScanInfo extends $pb.GeneratedMessage {
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'DeviceScanInfo',
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      const $core.bool.fromEnvironment('protobuf.omit_message_names')
+          ? ''
+          : 'DeviceScanInfo',
       createEmptyInstance: create)
     ..aOS(
         1,
@@ -119,11 +129,20 @@ class DeviceScanInfo extends $pb.GeneratedMessage {
         const $core.bool.fromEnvironment('protobuf.omit_field_names')
             ? ''
             : 'name')
-    ..aOM<GenericFailure>(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'failure',
+    ..aOM<GenericFailure>(
+        3,
+        const $core.bool.fromEnvironment('protobuf.omit_field_names')
+            ? ''
+            : 'failure',
         subBuilder: GenericFailure.create)
     ..pc<ServiceDataEntry>(
-        4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'serviceData', $pb.PbFieldType.PM,
-        protoName: 'serviceData', subBuilder: ServiceDataEntry.create)
+        4,
+        const $core.bool.fromEnvironment('protobuf.omit_field_names')
+            ? ''
+            : 'serviceData',
+        $pb.PbFieldType.PM,
+        protoName: 'serviceData',
+        subBuilder: ServiceDataEntry.create)
     ..a<$core.int>(
         5,
         const $core.bool.fromEnvironment('protobuf.omit_field_names')
@@ -131,10 +150,20 @@ class DeviceScanInfo extends $pb.GeneratedMessage {
             : 'rssi',
         $pb.PbFieldType.O3)
     ..a<$core.List<$core.int>>(
-        6, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'manufacturerData', $pb.PbFieldType.OY,
+        6,
+        const $core.bool.fromEnvironment('protobuf.omit_field_names')
+            ? ''
+            : 'manufacturerData',
+        $pb.PbFieldType.OY,
         protoName: 'manufacturerData')
-    ..pc<Uuid>(7, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'serviceUuids', $pb.PbFieldType.PM,
-        protoName: 'serviceUuids', subBuilder: Uuid.create)
+    ..pc<Uuid>(
+        7,
+        const $core.bool.fromEnvironment('protobuf.omit_field_names')
+            ? ''
+            : 'serviceUuids',
+        $pb.PbFieldType.PM,
+        protoName: 'serviceUuids',
+        subBuilder: Uuid.create)
     ..hasRequiredFields = false;
 
   DeviceScanInfo._() : super();
@@ -274,7 +303,10 @@ class ConnectToDeviceRequest extends $pb.GeneratedMessage {
           : 'ConnectToDeviceRequest',
       createEmptyInstance: create)
     ..aOS(
-        1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'deviceId',
+        1,
+        const $core.bool.fromEnvironment('protobuf.omit_field_names')
+            ? ''
+            : 'deviceId',
         protoName: 'deviceId')
     ..aOM<ServicesWithCharacteristics>(
         2,
@@ -285,7 +317,9 @@ class ConnectToDeviceRequest extends $pb.GeneratedMessage {
         subBuilder: ServicesWithCharacteristics.create)
     ..a<$core.int>(
         3,
-        const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'timeoutInMs',
+        const $core.bool.fromEnvironment('protobuf.omit_field_names')
+            ? ''
+            : 'timeoutInMs',
         $pb.PbFieldType.O3,
         protoName: 'timeoutInMs')
     ..hasRequiredFields = false;
@@ -915,8 +949,11 @@ class CharacteristicValueInfo extends $pb.GeneratedMessage {
             ? ''
             : 'value',
         $pb.PbFieldType.OY)
-    ..aOM<GenericFailure>(3,
-        const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'failure',
+    ..aOM<GenericFailure>(
+        3,
+        const $core.bool.fromEnvironment('protobuf.omit_field_names')
+            ? ''
+            : 'failure',
         subBuilder: GenericFailure.create)
     ..hasRequiredFields = false;
 
@@ -1285,7 +1322,10 @@ class NegotiateMtuInfo extends $pb.GeneratedMessage {
           : 'NegotiateMtuInfo',
       createEmptyInstance: create)
     ..aOS(
-        1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'deviceId',
+        1,
+        const $core.bool.fromEnvironment('protobuf.omit_field_names')
+            ? ''
+            : 'deviceId',
         protoName: 'deviceId')
     ..a<$core.int>(
         2,
@@ -1294,8 +1334,11 @@ class NegotiateMtuInfo extends $pb.GeneratedMessage {
             : 'mtuSize',
         $pb.PbFieldType.O3,
         protoName: 'mtuSize')
-    ..aOM<GenericFailure>(3,
-        const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'failure',
+    ..aOM<GenericFailure>(
+        3,
+        const $core.bool.fromEnvironment('protobuf.omit_field_names')
+            ? ''
+            : 'failure',
         subBuilder: GenericFailure.create)
     ..hasRequiredFields = false;
 
@@ -1455,13 +1498,11 @@ class ChangeConnectionPriorityRequest extends $pb.GeneratedMessage {
       createEmptyInstance: create)
     ..aOS(
         1,
-        const $core
-                .bool.fromEnvironment('protobuf.omit_field_names')
+        const $core.bool.fromEnvironment('protobuf.omit_field_names')
             ? ''
             : 'deviceId',
         protoName: 'deviceId')
-    ..a<
-            $core.int>(
+    ..a<$core.int>(
         2,
         const $core.bool.fromEnvironment('protobuf.omit_field_names')
             ? ''
@@ -1639,7 +1680,10 @@ class CharacteristicAddress extends $pb.GeneratedMessage {
           : 'CharacteristicAddress',
       createEmptyInstance: create)
     ..aOS(
-        1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'deviceId',
+        1,
+        const $core.bool.fromEnvironment('protobuf.omit_field_names')
+            ? ''
+            : 'deviceId',
         protoName: 'deviceId')
     ..aOM<Uuid>(
         2,
@@ -2052,8 +2096,7 @@ class DiscoverServicesInfo extends $pb.GeneratedMessage {
       createEmptyInstance: create)
     ..aOS(
         1,
-        const $core
-                .bool.fromEnvironment('protobuf.omit_field_names')
+        const $core.bool.fromEnvironment('protobuf.omit_field_names')
             ? ''
             : 'deviceId',
         protoName: 'deviceId')
@@ -2130,8 +2173,13 @@ class DiscoveredService extends $pb.GeneratedMessage {
           ? ''
           : 'DiscoveredService',
       createEmptyInstance: create)
-    ..aOM<Uuid>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'serviceUuid',
-        protoName: 'serviceUuid', subBuilder: Uuid.create)
+    ..aOM<Uuid>(
+        1,
+        const $core.bool.fromEnvironment('protobuf.omit_field_names')
+            ? ''
+            : 'serviceUuid',
+        protoName: 'serviceUuid',
+        subBuilder: Uuid.create)
     ..pc<Uuid>(
         2,
         const $core.bool.fromEnvironment('protobuf.omit_field_names')
@@ -2142,10 +2190,19 @@ class DiscoveredService extends $pb.GeneratedMessage {
         subBuilder: Uuid.create)
     ..pc<DiscoveredService>(
         3,
-        const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'includedServices',
+        const $core.bool.fromEnvironment('protobuf.omit_field_names')
+            ? ''
+            : 'includedServices',
         $pb.PbFieldType.PM,
         protoName: 'includedServices',
         subBuilder: DiscoveredService.create)
+    ..pc<DiscoveredCharacteristic>(
+        4,
+        const $core.bool.fromEnvironment('protobuf.omit_field_names')
+            ? ''
+            : 'characteristics',
+        $pb.PbFieldType.PM,
+        subBuilder: DiscoveredCharacteristic.create)
     ..hasRequiredFields = false;
 
   DiscoveredService._() : super();
@@ -2153,6 +2210,7 @@ class DiscoveredService extends $pb.GeneratedMessage {
     Uuid? serviceUuid,
     $core.Iterable<Uuid>? characteristicUuids,
     $core.Iterable<DiscoveredService>? includedServices,
+    $core.Iterable<DiscoveredCharacteristic>? characteristics,
   }) {
     final _result = create();
     if (serviceUuid != null) {
@@ -2163,6 +2221,9 @@ class DiscoveredService extends $pb.GeneratedMessage {
     }
     if (includedServices != null) {
       _result.includedServices.addAll(includedServices);
+    }
+    if (characteristics != null) {
+      _result.characteristics.addAll(characteristics);
     }
     return _result;
   }
@@ -2212,6 +2273,213 @@ class DiscoveredService extends $pb.GeneratedMessage {
 
   @$pb.TagNumber(3)
   $core.List<DiscoveredService> get includedServices => $_getList(2);
+
+  @$pb.TagNumber(4)
+  $core.List<DiscoveredCharacteristic> get characteristics => $_getList(3);
+}
+
+class DiscoveredCharacteristic extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      const $core.bool.fromEnvironment('protobuf.omit_message_names')
+          ? ''
+          : 'DiscoveredCharacteristic',
+      createEmptyInstance: create)
+    ..aOM<Uuid>(
+        1,
+        const $core.bool.fromEnvironment('protobuf.omit_field_names')
+            ? ''
+            : 'characteristicId',
+        protoName: 'characteristicId',
+        subBuilder: Uuid.create)
+    ..aOM<Uuid>(
+        2,
+        const $core.bool.fromEnvironment('protobuf.omit_field_names')
+            ? ''
+            : 'serviceId',
+        protoName: 'serviceId',
+        subBuilder: Uuid.create)
+    ..aOB(
+        3,
+        const $core.bool.fromEnvironment('protobuf.omit_field_names')
+            ? ''
+            : 'isReadable',
+        protoName: 'isReadable')
+    ..aOB(
+        4,
+        const $core.bool.fromEnvironment('protobuf.omit_field_names')
+            ? ''
+            : 'isWritableWithResponse',
+        protoName: 'isWritableWithResponse')
+    ..aOB(
+        5,
+        const $core.bool.fromEnvironment('protobuf.omit_field_names')
+            ? ''
+            : 'isWritableWithoutResponse',
+        protoName: 'isWritableWithoutResponse')
+    ..aOB(
+        6,
+        const $core.bool.fromEnvironment('protobuf.omit_field_names')
+            ? ''
+            : 'isNotifiable',
+        protoName: 'isNotifiable')
+    ..aOB(
+        7,
+        const $core.bool.fromEnvironment('protobuf.omit_field_names')
+            ? ''
+            : 'isIndicatable',
+        protoName: 'isIndicatable')
+    ..hasRequiredFields = false;
+
+  DiscoveredCharacteristic._() : super();
+  factory DiscoveredCharacteristic({
+    Uuid? characteristicId,
+    Uuid? serviceId,
+    $core.bool? isReadable,
+    $core.bool? isWritableWithResponse,
+    $core.bool? isWritableWithoutResponse,
+    $core.bool? isNotifiable,
+    $core.bool? isIndicatable,
+  }) {
+    final _result = create();
+    if (characteristicId != null) {
+      _result.characteristicId = characteristicId;
+    }
+    if (serviceId != null) {
+      _result.serviceId = serviceId;
+    }
+    if (isReadable != null) {
+      _result.isReadable = isReadable;
+    }
+    if (isWritableWithResponse != null) {
+      _result.isWritableWithResponse = isWritableWithResponse;
+    }
+    if (isWritableWithoutResponse != null) {
+      _result.isWritableWithoutResponse = isWritableWithoutResponse;
+    }
+    if (isNotifiable != null) {
+      _result.isNotifiable = isNotifiable;
+    }
+    if (isIndicatable != null) {
+      _result.isIndicatable = isIndicatable;
+    }
+    return _result;
+  }
+  factory DiscoveredCharacteristic.fromBuffer($core.List<$core.int> i,
+          [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromBuffer(i, r);
+  factory DiscoveredCharacteristic.fromJson($core.String i,
+          [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromJson(i, r);
+  @$core.Deprecated('Using this can add significant overhead to your binary. '
+      'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+      'Will be removed in next major version')
+  DiscoveredCharacteristic clone() =>
+      DiscoveredCharacteristic()..mergeFromMessage(this);
+  @$core.Deprecated('Using this can add significant overhead to your binary. '
+      'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+      'Will be removed in next major version')
+  DiscoveredCharacteristic copyWith(
+          void Function(DiscoveredCharacteristic) updates) =>
+      super.copyWith((message) => updates(message as DiscoveredCharacteristic))
+          as DiscoveredCharacteristic; // ignore: deprecated_member_use
+  $pb.BuilderInfo get info_ => _i;
+  @$core.pragma('dart2js:noInline')
+  static DiscoveredCharacteristic create() => DiscoveredCharacteristic._();
+  DiscoveredCharacteristic createEmptyInstance() => create();
+  static $pb.PbList<DiscoveredCharacteristic> createRepeated() =>
+      $pb.PbList<DiscoveredCharacteristic>();
+  @$core.pragma('dart2js:noInline')
+  static DiscoveredCharacteristic getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<DiscoveredCharacteristic>(create);
+  static DiscoveredCharacteristic? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  Uuid get characteristicId => $_getN(0);
+  @$pb.TagNumber(1)
+  set characteristicId(Uuid v) {
+    setField(1, v);
+  }
+
+  @$pb.TagNumber(1)
+  $core.bool hasCharacteristicId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearCharacteristicId() => clearField(1);
+  @$pb.TagNumber(1)
+  Uuid ensureCharacteristicId() => $_ensure(0);
+
+  @$pb.TagNumber(2)
+  Uuid get serviceId => $_getN(1);
+  @$pb.TagNumber(2)
+  set serviceId(Uuid v) {
+    setField(2, v);
+  }
+
+  @$pb.TagNumber(2)
+  $core.bool hasServiceId() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearServiceId() => clearField(2);
+  @$pb.TagNumber(2)
+  Uuid ensureServiceId() => $_ensure(1);
+
+  @$pb.TagNumber(3)
+  $core.bool get isReadable => $_getBF(2);
+  @$pb.TagNumber(3)
+  set isReadable($core.bool v) {
+    $_setBool(2, v);
+  }
+
+  @$pb.TagNumber(3)
+  $core.bool hasIsReadable() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearIsReadable() => clearField(3);
+
+  @$pb.TagNumber(4)
+  $core.bool get isWritableWithResponse => $_getBF(3);
+  @$pb.TagNumber(4)
+  set isWritableWithResponse($core.bool v) {
+    $_setBool(3, v);
+  }
+
+  @$pb.TagNumber(4)
+  $core.bool hasIsWritableWithResponse() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearIsWritableWithResponse() => clearField(4);
+
+  @$pb.TagNumber(5)
+  $core.bool get isWritableWithoutResponse => $_getBF(4);
+  @$pb.TagNumber(5)
+  set isWritableWithoutResponse($core.bool v) {
+    $_setBool(4, v);
+  }
+
+  @$pb.TagNumber(5)
+  $core.bool hasIsWritableWithoutResponse() => $_has(4);
+  @$pb.TagNumber(5)
+  void clearIsWritableWithoutResponse() => clearField(5);
+
+  @$pb.TagNumber(6)
+  $core.bool get isNotifiable => $_getBF(5);
+  @$pb.TagNumber(6)
+  set isNotifiable($core.bool v) {
+    $_setBool(5, v);
+  }
+
+  @$pb.TagNumber(6)
+  $core.bool hasIsNotifiable() => $_has(5);
+  @$pb.TagNumber(6)
+  void clearIsNotifiable() => clearField(6);
+
+  @$pb.TagNumber(7)
+  $core.bool get isIndicatable => $_getBF(6);
+  @$pb.TagNumber(7)
+  set isIndicatable($core.bool v) {
+    $_setBool(6, v);
+  }
+
+  @$pb.TagNumber(7)
+  $core.bool hasIsIndicatable() => $_has(6);
+  @$pb.TagNumber(7)
+  void clearIsIndicatable() => clearField(7);
 }
 
 class Uuid extends $pb.GeneratedMessage {

@@ -287,6 +287,20 @@ final class PluginController {
                 $0.characteristicUuids = (service.characteristics ?? []).map { characteristic in
                     Uuid.with { $0.data = characteristic.uuid.data }
                 }
+                $0.characteristics = (service.characteristics ?? []).map { characteristic in
+                    DiscoveredCharacteristic.with{
+                        $0.characteristicID = Uuid.with{$0.data = characteristic.uuid.data}
+                        if characteristic.service?.uuid.data != nil {
+                            $0.serviceID = Uuid.with{$0.data = characteristic.service!.uuid.data}
+                        }
+                        $0.isReadable = characteristic.properties.contains(.read)
+                        $0.isWritableWithResponse = characteristic.properties.contains(.write)
+                        $0.isWritableWithoutResponse = characteristic.properties.contains(.writeWithoutResponse)
+                        $0.isNotifiable = characteristic.properties.contains(.notify)
+                        $0.isIndicatable = characteristic.properties.contains(.indicate)
+                    }
+                }
+ 
                 $0.includedServices = (service.includedServices ?? []).map(makeDiscoveredService)
             }
         }

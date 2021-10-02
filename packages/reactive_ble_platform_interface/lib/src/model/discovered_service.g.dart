@@ -11,16 +11,19 @@ abstract class $DiscoveredService {
 
   Uuid get serviceId;
   List<Uuid> get characteristicIds;
+  List<DiscoveredCharacteristic> get characteristics;
   List<DiscoveredService> get includedServices;
 
   DiscoveredService copyWith({
     Uuid? serviceId,
     List<Uuid>? characteristicIds,
+    List<DiscoveredCharacteristic>? characteristics,
     List<DiscoveredService>? includedServices,
   }) =>
       DiscoveredService(
         serviceId: serviceId ?? this.serviceId,
         characteristicIds: characteristicIds ?? this.characteristicIds,
+        characteristics: characteristics ?? this.characteristics,
         includedServices: includedServices ?? this.includedServices,
       );
 
@@ -29,19 +32,21 @@ abstract class $DiscoveredService {
     final change = DiscoveredService$Change._(
       this.serviceId,
       this.characteristicIds,
+      this.characteristics,
       this.includedServices,
     );
     mutator(change);
     return DiscoveredService(
       serviceId: change.serviceId,
       characteristicIds: change.characteristicIds,
+      characteristics: change.characteristics,
       includedServices: change.includedServices,
     );
   }
 
   @override
   String toString() =>
-      "DiscoveredService(serviceId: $serviceId, characteristicIds: $characteristicIds, includedServices: $includedServices)";
+      "DiscoveredService(serviceId: $serviceId, characteristicIds: $characteristicIds, characteristics: $characteristics, includedServices: $includedServices)";
 
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
@@ -52,6 +57,8 @@ abstract class $DiscoveredService {
       const DeepCollectionEquality()
           .equals(characteristicIds, other.characteristicIds) &&
       const DeepCollectionEquality()
+          .equals(characteristics, other.characteristics) &&
+      const DeepCollectionEquality()
           .equals(includedServices, other.includedServices);
 
   @override
@@ -61,6 +68,7 @@ abstract class $DiscoveredService {
     result = 37 * result + serviceId.hashCode;
     result =
         37 * result + const DeepCollectionEquality().hash(characteristicIds);
+    result = 37 * result + const DeepCollectionEquality().hash(characteristics);
     result =
         37 * result + const DeepCollectionEquality().hash(includedServices);
     return result;
@@ -71,11 +79,13 @@ class DiscoveredService$Change {
   DiscoveredService$Change._(
     this.serviceId,
     this.characteristicIds,
+    this.characteristics,
     this.includedServices,
   );
 
   Uuid serviceId;
   List<Uuid> characteristicIds;
+  List<DiscoveredCharacteristic> characteristics;
   List<DiscoveredService> includedServices;
 }
 
@@ -93,6 +103,13 @@ class DiscoveredService$ {
     (characteristicIdsContainer, characteristicIds) =>
         characteristicIdsContainer.copyWith(
             characteristicIds: characteristicIds),
+  );
+
+  static final characteristics =
+      Lens<DiscoveredService, List<DiscoveredCharacteristic>>(
+    (characteristicsContainer) => characteristicsContainer.characteristics,
+    (characteristicsContainer, characteristics) =>
+        characteristicsContainer.copyWith(characteristics: characteristics),
   );
 
   static final includedServices =
