@@ -8,6 +8,7 @@ import 'package:flutter_reactive_ble/src/device_scanner.dart';
 import 'package:flutter_reactive_ble/src/discovered_devices_registry.dart';
 import 'package:flutter_reactive_ble/src/rx_ext/repeater.dart';
 import 'package:meta/meta.dart';
+import 'package:reactive_ble_macos/reactive_ble_macos.dart';
 import 'package:reactive_ble_mobile/reactive_ble_mobile.dart';
 import 'package:reactive_ble_platform_interface/reactive_ble_platform_interface.dart';
 
@@ -104,8 +105,17 @@ class FlutterReactiveBle {
         print,
       );
 
-      ReactiveBlePlatform.instance =
-          const ReactiveBleMobilePlatformFactory().create();
+      if (Platform.isIOS || Platform.isAndroid) {
+        ReactiveBlePlatform.instance =
+            const ReactiveBleMobilePlatformFactory().create();
+
+        _blePlatform = ReactiveBlePlatform.instance;
+      } else if (Platform.isMacOS) {
+        ReactiveBlePlatform.instance =
+            const ReactiveBleMacosPlatformFactory().create();
+
+        _blePlatform = ReactiveBlePlatform.instance;
+      }
 
       _blePlatform = ReactiveBlePlatform.instance;
 

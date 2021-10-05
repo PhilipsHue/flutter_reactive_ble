@@ -14,6 +14,8 @@ flutter:
         default_package: reactive_ble_mobile
       ios:
         default_package: reactive_ble_mobile
+      macos:
+        default_package: reactive_ble_mobile
 
 dependencies:
   collection: ^1.15.0
@@ -22,6 +24,8 @@ dependencies:
   functional_data: ^1.0.0
   meta: ^1.3.0
   reactive_ble_mobile: ^4.0.1
+  reactive_ble_macos:
+    path: ../reactive_ble_macos
   reactive_ble_platform_interface: ^4.0.1
 dev_dependencies:
   build_runner: ^2.1.2
