@@ -1,6 +1,6 @@
-import enum CoreBluetooth.CBManagerState
+import enum CoreBluetooth.CBCentralManagerState
 
-func encode(_ centralState: CBManagerState) -> Int32 {
+func encode(_ centralState: CBCentralManagerState) -> Int32 {
     switch (centralState) {
     case .unknown, .resetting:
         return 0

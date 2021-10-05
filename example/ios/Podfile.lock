@@ -1,7 +1,7 @@
 PODS:
   - Flutter (1.0.0)
-  - Protobuf (3.18.0)
-  - reactive_ble_mobile (0.0.1):
+  - Protobuf (3.17.0)
+  - reactive_ble_mobile (0.0.2):
     - Flutter
     - Protobuf (~> 3.5)
     - SwiftProtobuf (~> 1.0)
@@ -24,8 +24,8 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   Flutter: 50d75fe2f02b26cc09d224853bb45737f8b3214a
-  Protobuf: 1a37ebea1338949e9ac35a3f06e80b3f536eec8d
-  reactive_ble_mobile: 9ce6723d37ccf701dbffd202d487f23f5de03b4c
+  Protobuf: 7327d4444215b5f18e560a97f879ff5503c4581c
+  reactive_ble_mobile: 699e15b920c7360347f1332176acb62f8a134517
   SwiftProtobuf: 9c85136c6ba74b0a1b84279dbf0f6db8efb714e0
 
 PODFILE CHECKSUM: aafe91acc616949ddb318b77800a7f51bffa2a4c

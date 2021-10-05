@@ -85,20 +85,43 @@ final class PeripheralTaskRegistry<Controller: PeripheralTaskController> {
             timer.invalidate()
         }
     }
+    
+    private var subjectTimeout: SubjectTask.Timeout? = nil
+    private var id: TaskQueue.Record.UniqueID = 0
 
     private func scheduleTaskTimeout(_ uniqueID: TaskQueue.Record.UniqueID, _ timeout: SubjectTask.Timeout) {
-        let timer = Timer.scheduledTimer(
-            withTimeInterval: timeout.duration,
-            repeats: false,
-            block: papply(weak: self) { registry, _ in
-                registry.log("\(Controller.TaskSpec.tag) op timed out after \(timeout.duration) s, \(registry.tasks.count - 1) in queue")
-                timeout.handler()
-                registry.remove(uniqueID)
-            }
-        )
-        scheduledTimeouts[uniqueID] = timer
+        subjectTimeout = timeout
+        id = uniqueID
+        if #available(iOS 10.0, *) {
+            let timer = Timer.scheduledTimer(
+                withTimeInterval: timeout.duration,
+                repeats: false,
+                block: papply(weak: self) { registry, _ in
+                    registry.log("\(Controller.TaskSpec.tag) op timed out after \(timeout.duration) s, \(registry.tasks.count - 1) in queue")
+                    timeout.handler()
+                    registry.remove(uniqueID)
+                }
+            )
+            scheduledTimeouts[uniqueID] = timer
+        } else {
+            let timer = Timer.scheduledTimer(timeInterval: timeout.duration,
+                                       target: self,
+                                             selector: #selector(self.run(_:)),
+                                     userInfo: nil,
+                                      repeats: false)
+            scheduledTimeouts[uniqueID] = timer
+        }
+        
     }
 
+    @objc
+    func run(_ timer: Timer) {
+        // TODO: Figure out how to convert IOS 10 block to IOS 9 selector
+//        registry.log("\(Controller.TaskSpec.tag) op timed out after \(timeout.duration) s, \(registry.tasks.count - 1) in queue")
+        subjectTimeout?.handler()
+//        registry.remove(id)
+    }
+    
     private class TaskQueue {
 
         private let counter = Counter()

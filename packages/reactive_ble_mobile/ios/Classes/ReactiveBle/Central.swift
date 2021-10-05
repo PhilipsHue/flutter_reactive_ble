@@ -11,7 +11,7 @@ typealias AdvertisementData = [String: Any]
 
 final class Central {
 
-    typealias StateChangeHandler = (Central, CBManagerState) -> Void
+    typealias StateChangeHandler = (Central, CBCentralManagerState) -> Void
     typealias DiscoveryHandler = (Central, CBPeripheral, AdvertisementData, RSSI) -> Void
     typealias ConnectionChangeHandler = (Central, CBPeripheral, ConnectionChange) -> Void
     typealias ServicesWithCharacteristicsDiscoveryHandler = (Central, CBPeripheral, [Error]) -> Void
@@ -49,7 +49,7 @@ final class Central {
                         onConnectionChange(central, peripheral, .disconnected(error))
                     }
                 }
-                onStateChange(central, state)
+                onStateChange(central, CBCentralManagerState(rawValue: state.rawValue)!)
             },
             onDiscovery: papply(weak: self, onDiscovery),
             onConnectionChange: papply(weak: self) { central, peripheral, change in
@@ -103,7 +103,7 @@ final class Central {
         )
     }
 
-    var state: CBManagerState { return centralManager.state }
+    var state: CBCentralManagerState { return CBCentralManagerState(rawValue: centralManager.state.rawValue)! }
 
     func scanForDevices(with services: [ServiceID]?) {
         isScanning = true
@@ -330,7 +330,7 @@ final class Central {
 
     private enum Failure: Error, CustomStringConvertible {
 
-        case notPoweredOn(actualState: CBManagerState)
+        case notPoweredOn(actualState: CBCentralManagerState)
         case peripheralIsUnknown(PeripheralID)
         case peripheralIsNotConnected(PeripheralID)
         case serviceNotFound(ServiceID, PeripheralID)
