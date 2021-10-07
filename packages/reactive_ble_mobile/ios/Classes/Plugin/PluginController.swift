@@ -21,9 +21,25 @@ final class PluginController {
             }
         }
     }
-    var messageQueue: [CharacteristicValueInfo] = [];
+    var discoveryQueue: [PlatformMethodResult] = [];
     var connectedDeviceSink: EventSink?
+
+    var valueQueue: [PlatformMethodResult] = [];
     var characteristicValueUpdateSink: EventSink?
+
+    func flushQueue(sink: EventSink, queue: inout [PlatformMethodResult]) {
+        queue.forEach(sink.add)
+        queue.removeAll()
+    }
+
+    func sinkOrQueue(sink: EventSink?, queue: inout [PlatformMethodResult], value: PlatformMethodResult ) {
+        if let sink = sink {
+            flushQueue(sink: sink, queue: &queue)
+            sink.add(value)
+        } else {
+            queue.append(value)
+        }
+    }
 
     func initialize(name: String, completion: @escaping PlatformMethodCompletionHandler) {
         if let central = central {
@@ -83,12 +99,9 @@ final class PluginController {
                     }
                 }
 
-                context.connectedDeviceSink?.add(.success(message))
+                context.sinkOrQueue(sink: context.connectedDeviceSink, queue: &context.discoveryQueue, value: .success(message))
             },
             onServicesWithCharacteristicsInitialDiscovery: papply(weak: self) { context, central, peripheral, errors in
-                guard let sink = context.connectedDeviceSink
-                else { assert(false); return }
-
                 let message = DeviceInfo.with {
                     $0.id = peripheral.identifier.uuidString
                     $0.connectionState = encode(peripheral.state)
@@ -99,8 +112,7 @@ final class PluginController {
                         }
                     }
                 }
-
-                sink.add(.success(message))
+                context.sinkOrQueue(sink: context.connectedDeviceSink, queue: &context.discoveryQueue, value: .success(message))
             },
             onCharacteristicValueUpdate: papply(weak: self) { context, central, characteristic, value, error in
                 let message = CharacteristicValueInfo.with {
@@ -119,14 +131,7 @@ final class PluginController {
                         }
                     }
                 }
-                let sink = context.characteristicValueUpdateSink
-                if (sink != nil) {
-                    sink!.add(.success(message))
-                } else {
-                    // In case message arrives before sink is created
-                    context.messageQueue.append(message);
-                }
-
+                context.sinkOrQueue(sink: context.characteristicValueUpdateSink, queue: &context.valueQueue, value: .success(message))
             }
         )
 
@@ -213,16 +218,12 @@ final class PluginController {
         let timeout = args.timeoutInMs > 0 ? TimeInterval(args.timeoutInMs) / 1000 : nil
 
         completion(.success(nil))
-        
-        if let sink = connectedDeviceSink {
-            let message = DeviceInfo.with {
-                $0.id = args.deviceID
-                $0.connectionState = encode(.connecting)
-            }
-            sink.add(.success(message))
-        } else {
-            print("Warning! No event channel set up to report a connection update")
+
+        let message = DeviceInfo.with {
+            $0.id = args.deviceID
+            $0.connectionState = encode(.connecting)
         }
+        sinkOrQueue(sink: connectedDeviceSink, queue: &discoveryQueue, value: .success(message))
         
         do {
             try central.connect(
@@ -231,12 +232,6 @@ final class PluginController {
                 timeout: timeout
             )
         } catch {
-            guard let sink = connectedDeviceSink
-            else {
-                print("Warning! No event channel set up to report a connection failure: \(error)")
-                return
-            }
-
             let message = DeviceInfo.with {
                 $0.id = args.deviceID
                 $0.connectionState = encode(.disconnected)
@@ -245,8 +240,7 @@ final class PluginController {
                     $0.message = "\(error)"
                 }
             }
-
-            sink.add(.success(message))
+            sinkOrQueue(sink: connectedDeviceSink, queue: &discoveryQueue, value: .success(message))
         }
     }
 
