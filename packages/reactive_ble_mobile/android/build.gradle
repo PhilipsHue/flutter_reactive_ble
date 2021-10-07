@@ -38,7 +38,7 @@ apply plugin: "io.gitlab.arturbosch.detekt"
 apply plugin: "de.mannodermaus.android-junit5"
 
 android {
-    compileSdkVersion 30
+    compileSdkVersion 31
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
         test.java.srcDirs += 'src/test/kotlin'
@@ -48,14 +48,17 @@ android {
             }
         }
     }
+
     defaultConfig {
         minSdkVersion 21
-        targetSdkVersion 30
+        targetSdkVersion 31
         consumerProguardFiles 'proguard-rules.txt'
     }
+
     lintOptions {
         disable 'InvalidPackage'
     }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
@@ -92,7 +95,7 @@ protobuf {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation 'com.polidea.rxandroidble2:rxandroidble:1.12.1'
+    implementation 'com.polidea.rxandroidble2:rxandroidble:1.13.0'
     implementation 'com.google.protobuf:protobuf-javalite:3.11.0'
     implementation 'io.reactivex.rxjava2:rxkotlin:2.4.0'
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
