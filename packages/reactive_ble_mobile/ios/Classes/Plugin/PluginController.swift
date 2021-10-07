@@ -27,18 +27,14 @@ final class PluginController {
     var valueQueue: [PlatformMethodResult] = [];
     var characteristicValueUpdateSink: EventSink?
 
-    func flushQueue(sink: EventSink, queue: [PlatformMethodResult]) {
-        var queue = queue
-        queue.forEach { msg in
-            sink.add(msg)
-        }
+    func flushQueue(sink: EventSink, queue: inout [PlatformMethodResult]) {
+        queue.forEach(sink.add)
         queue.removeAll()
     }
 
-    func sinkOrQueue(sink: EventSink?, queue: [PlatformMethodResult], value: PlatformMethodResult ) {
-        var queue = queue
+    func sinkOrQueue(sink: EventSink?, queue: inout [PlatformMethodResult], value: PlatformMethodResult ) {
         if let sink = sink {
-            flushQueue(sink: sink, queue: queue)
+            flushQueue(sink: sink, queue: &queue)
             sink.add(value)
         } else {
             queue.append(value)
@@ -103,7 +99,7 @@ final class PluginController {
                     }
                 }
 
-                context.sinkOrQueue(sink: context.connectedDeviceSink, queue: context.discoveryQueue, value: .success(message))
+                context.sinkOrQueue(sink: context.connectedDeviceSink, queue: &context.discoveryQueue, value: .success(message))
             },
             onServicesWithCharacteristicsInitialDiscovery: papply(weak: self) { context, central, peripheral, errors in
                 let message = DeviceInfo.with {
@@ -116,7 +112,7 @@ final class PluginController {
                         }
                     }
                 }
-                context.sinkOrQueue(sink: context.connectedDeviceSink, queue: context.discoveryQueue, value: .success(message))
+                context.sinkOrQueue(sink: context.connectedDeviceSink, queue: &context.discoveryQueue, value: .success(message))
             },
             onCharacteristicValueUpdate: papply(weak: self) { context, central, characteristic, value, error in
                 let message = CharacteristicValueInfo.with {
@@ -135,7 +131,7 @@ final class PluginController {
                         }
                     }
                 }
-                context.sinkOrQueue(sink: context.characteristicValueUpdateSink, queue: context.valueQueue, value: .success(message))
+                context.sinkOrQueue(sink: context.characteristicValueUpdateSink, queue: &context.valueQueue, value: .success(message))
             }
         )
 
@@ -227,7 +223,7 @@ final class PluginController {
             $0.id = args.deviceID
             $0.connectionState = encode(.connecting)
         }
-        sinkOrQueue(sink: connectedDeviceSink, queue: discoveryQueue, value: .success(message))
+        sinkOrQueue(sink: connectedDeviceSink, queue: &discoveryQueue, value: .success(message))
         
         do {
             try central.connect(
@@ -244,7 +240,7 @@ final class PluginController {
                     $0.message = "\(error)"
                 }
             }
-            sinkOrQueue(sink: connectedDeviceSink, queue: discoveryQueue, value: .success(message))
+            sinkOrQueue(sink: connectedDeviceSink, queue: &discoveryQueue, value: .success(message))
         }
     }
 
