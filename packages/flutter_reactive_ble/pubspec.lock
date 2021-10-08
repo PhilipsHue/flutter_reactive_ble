@@ -374,14 +374,14 @@ packages:
       name: reactive_ble_mobile
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "4.1.0"
+    version: "5.0.0"
   reactive_ble_platform_interface:
     dependency: "direct main"
     description:
       name: reactive_ble_platform_interface
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "4.0.1"
+    version: "5.0.0"
   shelf:
     dependency: transitive
     description:
