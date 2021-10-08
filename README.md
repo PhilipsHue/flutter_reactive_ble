@@ -212,13 +212,24 @@ RxJavaPlugins.setErrorHandler { throwable ->
 #### Which permissions are needed?
 **Android**
 
-For android the library uses the following permissions:
-* ACCESS_FINE_LOCATION : this permission is needed because old Nexus devices need location services in order to provide reliable scan results
-* BLUETOOTH : allows apps to connect to a paired bluetooth device
-* BLUETOOTH_ADMIN: allows apps to discover and pair bluetooth devices
+For android the library uses the following permissions, depending on the SDK level:
 
-These permissions are already added in the manifest of the this library and thus should automatically merge
-into the manifest of your app. It is not needed to add the permissions in your manifest.
+Up to SDK 30 (Android 11):
+* ACCESS_FINE_LOCATION : this permission is needed because old Nexus devices need location services in order to provide reliable scan results
+* BLUETOOTH : allows apps to connect to a paired Bluetooth device
+* BLUETOOTH_ADMIN: allows apps to discover and pair Bluetooth devices
+
+SDK 31 and up (Android 12+):
+* BLUETOOTH_CONNECT: allows apps to connect to a Bluetooth device
+* BLUETOOTH_SCAN: allows apps to scan for Bluetooth devices
+
+These permissions are already added in the manifest of this library and thus should automatically merge
+into the manifest of your app. It is not needed to add the permissions in your manifest. 
+
+Only when using Android SDK 31 (Android 12) and higher please make sure you manifest is correctly setup 
+regarding `android:usesPermissionFlags="neverForLocation"` for the `android:name="android.permission.BLUETOOTH_SCAN"` permission, 
+depending on the use cases of your app. See [This link](https://developer.android.com/guide/topics/connectivity/bluetooth/permissions#declare-android12-or-higher) 
+for more information and [the manifest of the example app](https://github.com/PhilipsHue/flutter_reactive_ble/blob/master/example/android/app/src/main/AndroidManifest.xml) for an example usage.
 
 **iOS**
 
