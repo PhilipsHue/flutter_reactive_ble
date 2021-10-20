@@ -218,6 +218,14 @@ Up to SDK 30 (Android 11):
 * ACCESS_FINE_LOCATION : this permission is needed because old Nexus devices need location services in order to provide reliable scan results
 * BLUETOOTH : allows apps to connect to a paired Bluetooth device
 * BLUETOOTH_ADMIN: allows apps to discover and pair Bluetooth devices
+* BLUETOOTH_SCAN: add this permission with `tools:node="remove"` to remove it from the merged manifest.
+``` 
+<uses-permission
+            android:name="android.permission.BLUETOOTH_SCAN"
+            android:usesPermissionFlags="neverForLocation" tools:node="remove" />
+```
+This will prevent issues like [#410](https://github.com/PhilipsHue/flutter_reactive_ble/issues/410).
+
 
 SDK 31 and up (Android 12+):
 * BLUETOOTH_CONNECT: allows apps to connect to a Bluetooth device
