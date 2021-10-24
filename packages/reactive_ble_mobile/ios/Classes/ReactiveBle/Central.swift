@@ -109,7 +109,7 @@ final class Central {
         isScanning = true
         centralManager.scanForPeripherals(
             withServices: services,
-            options: [CBCentralManagerScanOptionAllowDuplicatesKey: true]
+            options: [CBCentralManagerScanOptionAllowDuplicatesKey: false]
         )
     }
 
