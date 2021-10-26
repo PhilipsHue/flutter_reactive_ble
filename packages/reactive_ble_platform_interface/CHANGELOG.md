@@ -1,3 +1,7 @@
+## 5.0.1
+
+* Bump protobuf so it includes binaries for Mac M1 #396.
+
 ## 5.0.0
 
 ** Breaking change **

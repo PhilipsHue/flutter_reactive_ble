@@ -1,6 +1,6 @@
 name: reactive_ble_platform_interface
 description: Platform interface for the flutter_reactive_ble_project 
-version: 5.0.0
+version: 5.0.1
 homepage: https://github.com/PhilipsHue/flutter_reactive_ble
 
 environment:
