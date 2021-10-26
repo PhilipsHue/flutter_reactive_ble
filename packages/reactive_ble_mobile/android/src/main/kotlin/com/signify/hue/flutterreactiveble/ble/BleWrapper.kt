@@ -51,6 +51,11 @@ sealed class RequestConnectionPriorityResult
 data class RequestConnectionPrioritySuccess(val deviceId: String) : RequestConnectionPriorityResult()
 data class RequestConnectionPriorityFailed(val deviceId: String, val errorMessage: String) : RequestConnectionPriorityResult()
 
+sealed class FetchConnectedDevicesResult
+data class FetchConnectedDevicesSuccess(val connectedDevices: List<ConnectedDevice>) : FetchConnectedDevicesResult()
+data class FetchConnectedDevicesFailure(val errorMessage: String) : FetchConnectedDevicesResult()
+data class ConnectedDevice(val deviceId: String, val name: String)
+
 enum class BleStatus(val code: Int) {
     UNKNOWN(code = 0),
     UNSUPPORTED(code = 1),

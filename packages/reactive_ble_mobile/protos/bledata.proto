@@ -149,3 +149,13 @@ message GenericFailure {
     int32 code = 1;
     string message = 2;
 }
+
+message ConnectedDevicesInfo {
+    repeated ConnectedDevice connectedDevices = 1;
+    GenericFailure failure = 2;
+}
+
+message ConnectedDevice {
+    string deviceId = 1;
+    string deviceName = 2;
+}

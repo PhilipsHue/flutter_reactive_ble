@@ -2,7 +2,10 @@ package com.signify.hue.flutterreactiveble.ble
 
 import android.bluetooth.BluetoothDevice.BOND_BONDING
 import android.bluetooth.BluetoothGattCharacteristic
+import android.bluetooth.BluetoothManager
+import android.bluetooth.BluetoothProfile
 import android.content.Context
+import android.content.Context.BLUETOOTH_SERVICE
 import android.os.Build
 import android.os.ParcelUuid
 import androidx.annotation.VisibleForTesting
@@ -32,7 +35,7 @@ import java.util.concurrent.TimeUnit
 import kotlin.collections.component1
 import kotlin.collections.component2
 
-@Suppress("TooManyFunctions")
+@Suppress("TooManyFunctions", "TooGenericExceptionCaught")
 open class ReactiveBleClient(private val context: Context) : BleClient {
     private val connectionQueue = ConnectionQueue()
     private val allConnections = CompositeDisposable()
@@ -91,28 +94,29 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
     }
 
     override fun connectToDevice(deviceId: String, timeout: Duration) {
-        allConnections.add(getConnection(deviceId, timeout)
-            .subscribe({ result ->
-                when (result) {
-                    is EstablishedConnection -> {
-                    }
-                    is EstablishConnectionFailure -> {
-                        connectionUpdateBehaviorSubject.onNext(
-                            ConnectionUpdateError(
-                                deviceId,
-                                result.errorMessage
+        allConnections.add(
+            getConnection(deviceId, timeout)
+                .subscribe({ result ->
+                    when (result) {
+                        is EstablishedConnection -> {
+                        }
+                        is EstablishConnectionFailure -> {
+                            connectionUpdateBehaviorSubject.onNext(
+                                ConnectionUpdateError(
+                                    deviceId,
+                                    result.errorMessage
+                                )
                             )
-                        )
+                        }
                     }
-                }
-            }, { error ->
-                connectionUpdateBehaviorSubject.onNext(
-                    ConnectionUpdateError(
-                        deviceId, error?.message
-                            ?: "unknown error"
+                }, { error ->
+                    connectionUpdateBehaviorSubject.onNext(
+                        ConnectionUpdateError(
+                            deviceId, error?.message
+                                ?: "unknown error"
+                        )
                     )
-                )
-            })
+                })
         )
     }
 
@@ -231,6 +235,24 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
     override fun observeBleStatus(): Observable<BleStatus> = rxBleClient.observeStateChanges()
         .startWith(rxBleClient.state)
         .map { it.toBleState() }
+
+    override fun getConnectedDevices(): Single<FetchConnectedDevicesResult> {
+
+        return try {
+            val btManager = context.getSystemService(BLUETOOTH_SERVICE) as BluetoothManager
+
+            Single.just(
+                FetchConnectedDevicesSuccess(
+                    btManager.getConnectedDevices(
+                        BluetoothProfile.GATT
+                    ).map {
+                        ConnectedDevice(it.address, it.name)
+                    })
+            )
+        } catch (e: Exception) {
+            Single.just(FetchConnectedDevicesFailure(e.message ?: "Undefined error"))
+        }
+    }
 
     @VisibleForTesting
     internal open fun createDeviceConnector(device: RxBleDevice, timeout: Duration) =
