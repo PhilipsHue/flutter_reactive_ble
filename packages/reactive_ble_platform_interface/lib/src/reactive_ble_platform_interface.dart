@@ -1,5 +1,6 @@
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
+import 'model/connected_device.dart';
 import 'models.dart';
 
 /// The interface that implementations of `reactive_ble` must implement.
@@ -180,5 +181,15 @@ abstract class ReactiveBlePlatform extends PlatformInterface {
       String deviceId, ConnectionPriority priority) {
     throw UnimplementedError(
         'requesConnectionPriority has not been implemented.');
+  }
+
+  /// Request a list of connected devices from the operating system.
+  ///
+  /// On Android only connected devices with profile `GATT` will be fetched so
+  /// it can be that the list is incomplete. Also on Android it returns and empty
+  /// list in case fetching connected devices is failing. Make sure to check the
+  /// deeper BLE logs in order to determine what went wrong.
+  Future<ConnectedDevicesInfo> getConnectedDevices() {
+    throw UnimplementedError('getConnectedDevices has not been implemented.');
   }
 }

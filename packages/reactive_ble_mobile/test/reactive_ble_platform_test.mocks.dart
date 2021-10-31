@@ -75,9 +75,12 @@ class _FakeWriteCharacteristicInfo_15 extends _i1.Fake
 class _FakeConnectionPriorityInfo_16 extends _i1.Fake
     implements _i3.ConnectionPriorityInfo {}
 
-class _FakeMethodCodec_17 extends _i1.Fake implements _i4.MethodCodec {}
+class _FakeConnectedDevicesInfo_17 extends _i1.Fake
+    implements _i3.ConnectedDevicesInfo {}
 
-class _FakeBinaryMessenger_18 extends _i1.Fake implements _i5.BinaryMessenger {}
+class _FakeMethodCodec_18 extends _i1.Fake implements _i4.MethodCodec {}
+
+class _FakeBinaryMessenger_19 extends _i1.Fake implements _i5.BinaryMessenger {}
 
 /// A class which mocks [ArgsToProtobufConverter].
 ///
@@ -239,6 +242,11 @@ class MockProtobufConverter extends _i1.Mock implements _i7.ProtobufConverter {
               returnValue: <_i3.DiscoveredService>[])
           as List<_i3.DiscoveredService>);
   @override
+  _i3.ConnectedDevicesInfo connectedDevicesFrom(List<int>? data) =>
+      (super.noSuchMethod(Invocation.method(#connectedDevicesFrom, [data]),
+              returnValue: _FakeConnectedDevicesInfo_17())
+          as _i3.ConnectedDevicesInfo);
+  @override
   String toString() => super.toString();
 }
 
@@ -255,11 +263,11 @@ class MockMethodChannel extends _i1.Mock implements _i8.MethodChannel {
       (super.noSuchMethod(Invocation.getter(#name), returnValue: '') as String);
   @override
   _i4.MethodCodec get codec => (super.noSuchMethod(Invocation.getter(#codec),
-      returnValue: _FakeMethodCodec_17()) as _i4.MethodCodec);
+      returnValue: _FakeMethodCodec_18()) as _i4.MethodCodec);
   @override
   _i5.BinaryMessenger get binaryMessenger =>
       (super.noSuchMethod(Invocation.getter(#binaryMessenger),
-          returnValue: _FakeBinaryMessenger_18()) as _i5.BinaryMessenger);
+          returnValue: _FakeBinaryMessenger_19()) as _i5.BinaryMessenger);
   @override
   _i9.Future<T?> invokeMethod<T>(String? method, [dynamic arguments]) =>
       (super.noSuchMethod(Invocation.method(#invokeMethod, [method, arguments]),

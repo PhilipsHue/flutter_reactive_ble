@@ -572,6 +572,59 @@ void main() {
         });
       });
     });
+
+    group('Decoding connecteddevices', () {
+      late pb.ConnectedDevicesInfo protoDevicesInfo;
+      late ConnectedDevicesInfo result;
+      group('given a message without  a failure', () {
+        setUp(() {
+          final device = pb.ConnectedDevice.create()
+            ..deviceId = '1'
+            ..deviceName = 'device1';
+
+          protoDevicesInfo = pb.ConnectedDevicesInfo.create()
+            ..connectedDevices.add(device);
+
+          result = sut.connectedDevicesFrom(protoDevicesInfo.writeToBuffer());
+        });
+
+        test('It converts message correctly', () {
+          expect(
+            result.result.iif(
+                success: (data) => data,
+                failure: (_) =>
+                    throw AssertionError('Not expected to have a failure')),
+            const [ConnectedDevice(deviceId: '1', deviceName: 'device1')],
+          );
+        });
+      });
+
+      group('When message has a failure', () {
+        setUp(() async {
+          final failure = pb.GenericFailure.create()
+            ..code = 0
+            ..message = 'whoops';
+
+          protoDevicesInfo = pb.ConnectedDevicesInfo.create()
+            ..failure = failure;
+
+          result = sut.connectedDevicesFrom(protoDevicesInfo.writeToBuffer());
+        });
+
+        test('It converts message correctly', () {
+          expect(
+            result.result.iif(
+              success: (_) => throw AssertionError('Not expected to succed'),
+              failure: (f) => f,
+            ),
+            const GenericFailure<FetchConnectedDeviceError>(
+              code: FetchConnectedDeviceError.unknown,
+              message: 'whoops',
+            ),
+          );
+        });
+      });
+    });
   });
 }
 

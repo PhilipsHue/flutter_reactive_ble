@@ -228,6 +228,11 @@ class ReactiveBleMobilePlatform extends ReactiveBlePlatform {
                 .writeToBuffer(),
           )
           .then((data) => _protobufConverter.discoveredServicesFrom(data!));
+
+  @override
+  Future<ConnectedDevicesInfo> getConnectedDevices() async => _bleMethodChannel
+        .invokeMethod<List<int>>('getConnectedDevices')
+        .then((data) => _protobufConverter.connectedDevicesFrom(data!));
 }
 
 class ReactiveBleMobilePlatformFactory {

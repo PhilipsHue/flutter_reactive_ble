@@ -26,6 +26,8 @@ abstract class ProtobufConverter {
       pb.NegotiateMtuInfo.fromBuffer(data).mtuSize;
 
   List<DiscoveredService> discoveredServicesFrom(List<int> data);
+
+  ConnectedDevicesInfo connectedDevicesFrom(List<int> data);
 }
 
 class ProtobufConverterImpl implements ProtobufConverter {
@@ -223,6 +225,29 @@ class ProtobufConverterImpl implements ProtobufConverter {
       failure != null
           ? Result<Value, Failure>.failure(failure)
           : Result.success(getValue());
+
+  @override
+  ConnectedDevicesInfo connectedDevicesFrom(List<int> data) {
+    final message = pb.ConnectedDevicesInfo.fromBuffer(data);
+
+    return ConnectedDevicesInfo(
+      result: resultFrom(
+        getValue: () =>
+            message.connectedDevices.map(_connectedDeviceFrom).toList(),
+        failure: genericFailureFrom(
+            hasFailure: message.hasFailure(),
+            getFailure: () => message.failure,
+            codes: FetchConnectedDeviceError.values,
+            fallback: (rawOrNull) => FetchConnectedDeviceError.unknown),
+      ),
+    );
+  }
+
+  ConnectedDevice _connectedDeviceFrom(pb.ConnectedDevice device) =>
+      ConnectedDevice(
+        deviceId: device.deviceId,
+        deviceName: device.deviceName,
+      );
 }
 
 class _InvalidConnectionState extends Error {

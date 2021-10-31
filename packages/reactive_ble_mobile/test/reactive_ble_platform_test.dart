@@ -611,5 +611,38 @@ void main() {
             .called(1);
       });
     });
+    group('getConnectedDevices', () {
+      const device = ConnectedDevice(deviceId: '1', deviceName: 'device1');
+
+      late ConnectedDevicesInfo result;
+
+      setUp(() async {
+        when(_methodChannel.invokeMethod<List<int>>('getConnectedDevices'))
+            .thenAnswer(
+          (_) => Future.value([1]),
+        );
+
+        when(_protobufConverter.connectedDevicesFrom([1]))
+            .thenReturn(const ConnectedDevicesInfo(
+          result: Result.success([device]),
+        ));
+
+        result = await _sut.getConnectedDevices();
+      });
+
+      test('It returns discovered services', () {
+        expect(
+          result,
+          const ConnectedDevicesInfo(
+            result: Result.success([device]),
+          ),
+        );
+      });
+
+      test('It invokes methodchannel with correct arguments', () {
+        verify(_methodChannel.invokeMethod<List<int>>('getConnectedDevices'))
+            .called(1);
+      });
+    });
   });
 }
