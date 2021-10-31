@@ -11,15 +11,12 @@ part 'connected_device.g.dart';
 class ConnectedDevicesInfo extends $ConnectedDevicesInfo {
   const ConnectedDevicesInfo({
     required this.result,
-    this.failure,
   });
 
-  /// List of BLE devices that are connected at the moment
+  /// Result of fetching the connected devices
   final Result<List<ConnectedDevice>,
       GenericFailure<FetchConnectedDeviceError>?> result;
 
-  /// Field `error` is null if there is no error reported.
-  final GenericFailure<FetchConnectedDeviceError>? failure;
 }
 
 @immutable

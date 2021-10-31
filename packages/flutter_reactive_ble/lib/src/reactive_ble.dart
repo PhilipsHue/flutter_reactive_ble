@@ -309,6 +309,16 @@ class FlutterReactiveBle {
       .clearGattCache(deviceId)
       .then((info) => info.dematerialize());
 
+  /// Request a list of connected devices from the operating system.
+  ///
+  /// On Android only connected devices with profile `GATT` will be fetched so
+  /// it can be that the list is incomplete. Also on Android it returns and empty
+  /// list in case fetching connected devices is failing. Make sure to check the
+  /// deeper BLE logs in order to determine what went wrong.
+  Future<List<ConnectedDevice>> getConnectedDevices() async => _blePlatform
+      .getConnectedDevices()
+      .then((info) => info.result.dematerialize());
+
   /// Subscribes to updates from the characteristic specified.
   ///
   /// This stream terminates automatically when the device is disconnected.

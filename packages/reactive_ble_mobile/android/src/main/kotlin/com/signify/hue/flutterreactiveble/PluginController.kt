@@ -1,6 +1,7 @@
 package com.signify.hue.flutterreactiveble
 
 import android.content.Context
+import android.util.Log
 import com.signify.hue.flutterreactiveble.ble.RequestConnectionPriorityFailed
 import com.signify.hue.flutterreactiveble.channelhandlers.BleStatusHandler
 import com.signify.hue.flutterreactiveble.channelhandlers.CharNotificationHandler
@@ -128,7 +129,7 @@ class PluginController {
     private fun getConnectedDevices(call: MethodCall, result: Result) {
         bleClient.getConnectedDevices().observeOn(AndroidSchedulers.mainThread())
             .subscribe { connectedDevices ->
-                result.success(protoConverter.convertedConnectedDevicesInfo(connectedDevices))
+                result.success(protoConverter.convertedConnectedDevicesInfo(connectedDevices).toByteArray())
             }.discard()
     }
 

@@ -5,6 +5,7 @@ import 'package:flutter_reactive_ble_example/src/ble/ble_device_interactor.dart'
 import 'package:flutter_reactive_ble_example/src/ble/ble_scanner.dart';
 import 'package:flutter_reactive_ble_example/src/ble/ble_status_monitor.dart';
 import 'package:flutter_reactive_ble_example/src/ui/ble_status_screen.dart';
+import 'package:flutter_reactive_ble_example/src/ui/connected_devices_screen.dart';
 import 'package:flutter_reactive_ble_example/src/ui/device_list.dart';
 import 'package:provider/provider.dart';
 
@@ -30,6 +31,7 @@ void main() {
     writeWithOutResponse: _ble.writeCharacteristicWithoutResponse,
     subscribeToCharacteristic: _ble.subscribeToCharacteristic,
     logMessage: _bleLogger.addToLog,
+    getConnectedDevices: _ble.getConnectedDevices,
   );
   runApp(
     MultiProvider(
@@ -78,10 +80,39 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) => Consumer<BleStatus?>(
         builder: (_, status, __) {
           if (status == BleStatus.ready) {
-            return const DeviceListScreen();
+            return const _ChoiceScreen();
           } else {
             return BleStatusScreen(status: status ?? BleStatus.unknown);
           }
         },
+      );
+}
+
+class _ChoiceScreen extends StatelessWidget {
+  const _ChoiceScreen({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) => Scaffold(
+        appBar: AppBar(
+          title: const Text('Menu'),
+        ),
+        body: Center(
+          child: Column(
+            children: [
+              ElevatedButton(
+                onPressed: () => Navigator.of(context).push<void>(
+                    MaterialPageRoute(
+                        builder: (context) => const DeviceListScreen())),
+                child: const Text('Scan for devices'),
+              ),
+              ElevatedButton(
+                onPressed: () => Navigator.of(context).push<void>(
+                    MaterialPageRoute(
+                        builder: (context) => const ConnectedDevicesScreen())),
+                child: const Text('Retieve connected devices'),
+              )
+            ],
+          ),
+        ),
       );
 }

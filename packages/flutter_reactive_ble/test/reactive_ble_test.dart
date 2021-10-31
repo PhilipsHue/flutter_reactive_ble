@@ -454,6 +454,34 @@ void main() {
         });
       });
     });
+
+    group('Connected devices', () {
+      late List<ConnectedDevice> result;
+      group('When get connected devices is sucess', () {
+        setUp(() async {
+          when(_blePlatform.getConnectedDevices()).thenAnswer(
+            (realInvocation) => Future.value(
+              const ConnectedDevicesInfo(
+                result: Result.success(
+                  [ConnectedDevice(deviceId: '1', deviceName: 'device1')],
+                ),
+              ),
+            ),
+          );
+
+          result = await _sut.getConnectedDevices();
+        });
+
+        test('It returns list of devices', () {
+          expect(
+            result,
+            const [
+              ConnectedDevice(deviceId: '1', deviceName: 'device1'),
+            ],
+          );
+        });
+      });
+    });
   });
 }
 
