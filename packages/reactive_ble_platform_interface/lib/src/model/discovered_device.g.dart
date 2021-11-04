@@ -67,7 +67,8 @@ abstract class $DiscoveredDevice {
       name == other.name &&
       const DeepCollectionEquality().equals(serviceData, other.serviceData) &&
       const DeepCollectionEquality().equals(serviceUuids, other.serviceUuids) &&
-      manufacturerData == other.manufacturerData &&
+      const DeepCollectionEquality()
+          .equals(manufacturerData, other.manufacturerData) &&
       rssi == other.rssi;
 
   @override
@@ -78,7 +79,8 @@ abstract class $DiscoveredDevice {
     result = 37 * result + name.hashCode;
     result = 37 * result + const DeepCollectionEquality().hash(serviceData);
     result = 37 * result + const DeepCollectionEquality().hash(serviceUuids);
-    result = 37 * result + manufacturerData.hashCode;
+    result =
+        37 * result + const DeepCollectionEquality().hash(manufacturerData);
     result = 37 * result + rssi.hashCode;
     return result;
   }

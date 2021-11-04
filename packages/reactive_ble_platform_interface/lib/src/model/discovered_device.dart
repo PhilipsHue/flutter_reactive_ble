@@ -37,6 +37,7 @@ class DiscoveredDevice extends $DiscoveredDevice {
   final List<Uuid> serviceUuids;
 
   /// Manufacturer specific data. The first 2 bytes are the Company Identifier Codes.
+  @CustomEquality(DeepCollectionEquality())
   final Uint8List manufacturerData;
 
   final int rssi;
