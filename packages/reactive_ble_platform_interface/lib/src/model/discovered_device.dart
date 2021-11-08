@@ -14,7 +14,8 @@ part 'discovered_device.g.dart';
 
 /// Result of a scan interval.
 @immutable
-class ScanResult {
+@FunctionalData()
+class ScanResult extends $ScanResult {
   final Result<DiscoveredDevice, GenericFailure<ScanFailure>?> result;
   const ScanResult({required this.result});
 

@@ -6,6 +6,62 @@ part of 'discovered_device.dart';
 // FunctionalDataGenerator
 // **************************************************************************
 
+abstract class $ScanResult {
+  const $ScanResult();
+
+  Result<DiscoveredDevice, GenericFailure<ScanFailure>?> get result;
+
+  ScanResult copyWith({
+    Result<DiscoveredDevice, GenericFailure<ScanFailure>?>? result,
+  }) =>
+      ScanResult(
+        result: result ?? this.result,
+      );
+
+  ScanResult copyUsing(void Function(ScanResult$Change change) mutator) {
+    final change = ScanResult$Change._(
+      this.result,
+    );
+    mutator(change);
+    return ScanResult(
+      result: change.result,
+    );
+  }
+
+  @override
+  String toString() => "ScanResult(result: $result)";
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) =>
+      other is ScanResult &&
+      other.runtimeType == runtimeType &&
+      result == other.result;
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode {
+    return result.hashCode;
+  }
+}
+
+class ScanResult$Change {
+  ScanResult$Change._(
+    this.result,
+  );
+
+  Result<DiscoveredDevice, GenericFailure<ScanFailure>?> result;
+}
+
+// ignore: avoid_classes_with_only_static_members
+class ScanResult$ {
+  static final result =
+      Lens<ScanResult, Result<DiscoveredDevice, GenericFailure<ScanFailure>?>>(
+    (resultContainer) => resultContainer.result,
+    (resultContainer, result) => resultContainer.copyWith(result: result),
+  );
+}
+
 abstract class $DiscoveredDevice {
   const $DiscoveredDevice();
 
