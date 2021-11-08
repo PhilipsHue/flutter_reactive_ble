@@ -27,6 +27,8 @@ dev_dependencies:
 dependency_overrides:
   flutter_reactive_ble:
     path: ../packages/flutter_reactive_ble
+  reactive_ble_linux:
+    path: ../packages/reactive_ble_linux
   reactive_ble_mobile:
     path: ../packages/reactive_ble_mobile
 
