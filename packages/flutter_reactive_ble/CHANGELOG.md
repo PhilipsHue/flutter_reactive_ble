@@ -1,3 +1,7 @@
+## 5.0.2
+
+* Revert Queue up messages on iOS until event channel is ready. Fix #439
+
 ## 5.0.1
 
 * Bump protobuf so it includes binaries for Mac M1 #396.
