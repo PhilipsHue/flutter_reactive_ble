@@ -14,7 +14,8 @@ part 'discovered_device.g.dart';
 
 /// Result of a scan interval.
 @immutable
-class ScanResult {
+@FunctionalData()
+class ScanResult extends $ScanResult {
   final Result<DiscoveredDevice, GenericFailure<ScanFailure>?> result;
   const ScanResult({required this.result});
 
@@ -37,6 +38,7 @@ class DiscoveredDevice extends $DiscoveredDevice {
   final List<Uuid> serviceUuids;
 
   /// Manufacturer specific data. The first 2 bytes are the Company Identifier Codes.
+  @CustomEquality(DeepCollectionEquality())
   final Uint8List manufacturerData;
 
   final int rssi;

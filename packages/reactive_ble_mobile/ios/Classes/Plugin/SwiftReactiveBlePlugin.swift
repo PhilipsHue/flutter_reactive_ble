@@ -52,12 +52,10 @@ public class SwiftReactiveBlePlugin: NSObject, FlutterPlugin {
             context: context,
             onListen: { context, sink in
                 context.connectedDeviceSink = sink
-                context.flushQueue(sink: sink, queue: &context.discoveryQueue)
                 return nil
             },
             onCancel: { context in
                 context.connectedDeviceSink = nil
-                context.discoveryQueue.removeAll()
                 return nil
             }
         )
@@ -69,11 +67,14 @@ public class SwiftReactiveBlePlugin: NSObject, FlutterPlugin {
             context: context,
             onListen: { context, sink in
                 context.characteristicValueUpdateSink = sink
-                context.flushQueue(sink: sink, queue: &context.valueQueue)
+                context.messageQueue.forEach { msg in
+                    sink.add(.success(msg))
+                }
+                context.messageQueue.removeAll()
                 return nil
             },
             onCancel: { context in
-                context.valueQueue.removeAll()
+                context.messageQueue.removeAll()
                 context.characteristicValueUpdateSink = nil
                 return nil
             }
