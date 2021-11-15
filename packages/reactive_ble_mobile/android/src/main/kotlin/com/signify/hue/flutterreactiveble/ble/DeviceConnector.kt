@@ -14,6 +14,7 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.functions.Function
 import io.reactivex.subjects.BehaviorSubject
 import java.util.concurrent.TimeUnit
+import android.bluetooth.BluetoothDevice.BOND_BONDED
 
 internal class DeviceConnector(
         private val device: RxBleDevice,
@@ -126,20 +127,45 @@ internal class DeviceConnector(
                         { throwable -> connectDeviceSubject.onError(throwable) })
     }
 
-    private fun connectDevice(rxBleDevice: RxBleDevice, shouldNotTimeout: Boolean): Observable<RxBleConnection> =
-            rxBleDevice.establishConnection(shouldNotTimeout)
+    private fun connectDevice(rxBleDevice: RxBleDevice, shouldNotTimeout: Boolean): Observable<RxBleConnection> {
+        var bondState: Int = rxBleDevice.getBluetoothDevice().getBondState()
+
+        println("bond state")
+        println(bondState)
+
+        if (bondState != BluetoothDevice.BOND_BONDED) {
+            println("create bond")
+            if (rxBleDevice.getBluetoothDevice().createBond()) {
+                return rxBleDevice.establishConnection(shouldNotTimeout)
                     .compose {
                         if (shouldNotTimeout) {
                             it
                         } else {
                             it.timeout(
-                                    Observable.timer(connectionTimeout.value, connectionTimeout.unit),
-                                    Function<RxBleConnection, Observable<Unit>> {
-                                        Observable.never<Unit>()
-                                    }
+                                Observable.timer(connectionTimeout.value, connectionTimeout.unit),
+                                Function<RxBleConnection, Observable<Unit>> {
+                                    Observable.never<Unit>()
+                                }
                             )
                         }
                     }
+            }
+        }
+        println("bond already created")
+        return rxBleDevice.establishConnection(shouldNotTimeout)
+            .compose {
+                if (shouldNotTimeout) {
+                    it
+                } else {
+                    it.timeout(
+                        Observable.timer(connectionTimeout.value, connectionTimeout.unit),
+                        Function<RxBleConnection, Observable<Unit>> {
+                            Observable.never<Unit>()
+                        }
+                    )
+                }
+            }
+    }
 
     internal fun clearGattCache(): Completable = currentConnection?.let { connection ->
         when (connection) {
