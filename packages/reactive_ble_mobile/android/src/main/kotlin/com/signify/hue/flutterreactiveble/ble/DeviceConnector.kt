@@ -14,7 +14,7 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.functions.Function
 import io.reactivex.subjects.BehaviorSubject
 import java.util.concurrent.TimeUnit
-import android.bluetooth.BluetoothDevice.BOND_BONDED
+import android.bluetooth.*
 
 internal class DeviceConnector(
         private val device: RxBleDevice,
