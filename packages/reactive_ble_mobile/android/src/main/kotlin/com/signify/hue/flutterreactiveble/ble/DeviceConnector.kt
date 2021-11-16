@@ -17,10 +17,10 @@ import java.util.concurrent.TimeUnit
 import android.bluetooth.*
 
 internal class DeviceConnector(
-        private val device: RxBleDevice,
-        private val connectionTimeout: Duration,
-        private val updateListeners: (update: ConnectionUpdate) -> Unit,
-        private val connectionQueue: ConnectionQueue
+    private val device: RxBleDevice,
+    private val connectionTimeout: Duration,
+    private val updateListeners: (update: ConnectionUpdate) -> Unit,
+    private val connectionQueue: ConnectionQueue
 ) {
 
     companion object {
@@ -28,6 +28,7 @@ internal class DeviceConnector(
         private const val delayMsAfterClearingCache = 300L
     }
 
+    private var bonded = false
     private val connectDeviceSubject = BehaviorSubject.create<EstablishConnectionResult>()
 
     private var timestampEstablishConnection: Long = 0
@@ -47,15 +48,41 @@ internal class DeviceConnector(
 
     private val connectionStatusUpdates by lazy {
         device.observeConnectionStateChanges()
-                .startWith(device.connectionState)
-                .map<ConnectionUpdate> { ConnectionUpdateSuccess(device.macAddress, it.toConnectionState().code) }
-                .onErrorReturn {
-                    ConnectionUpdateError(device.macAddress, it.message
-                            ?: "Unknown error")
+            .startWith(device.connectionState)
+            .map<ConnectionUpdate> {
+                ConnectionUpdateSuccess(device.macAddress, it.toConnectionState().code)
+            }
+            .onErrorReturn {
+                ConnectionUpdateError(device.macAddress, it.message
+                    ?: "Unknown error")
+            }
+            .subscribe {
+                if (it is ConnectionUpdateSuccess && it.connectionState == ConnectionState.CONNECTED.code) {
+                    if (device.getBluetoothDevice().getBondState() == BluetoothDevice.BOND_BONDED)
+                        updateListeners.invoke(it)
+                    else {
+                        val bondState: Int = device.getBluetoothDevice().getBondState()
+                        if (bondState != BluetoothDevice.BOND_BONDING) {
+                            device.getBluetoothDevice().createBond()
+                        }
+                        Observable.interval(5, TimeUnit.SECONDS)
+                            .take(3)
+                            .subscribe {
+                                if (!bonded && device.getBluetoothDevice()
+                                        .getBondState() == BluetoothDevice.BOND_BONDED
+                                ) {
+                                    bonded = true
+                                    updateListeners.invoke(
+                                        ConnectionUpdateSuccess(
+                                            device.macAddress,
+                                            ConnectionState.CONNECTED.code
+                                        )
+                                    )
+                                }
+                            }
+                    }
                 }
-                .subscribe {
-                    updateListeners.invoke(it)
-                }
+            }
     }
 
     internal fun disconnectDevice(deviceId: String) {
@@ -67,10 +94,10 @@ internal class DeviceConnector(
          */
         if (diff < DeviceConnector.Companion.minTimeMsBeforeDisconnectingIsAllowed) {
             Single.timer(DeviceConnector.Companion.minTimeMsBeforeDisconnectingIsAllowed - diff, TimeUnit.MILLISECONDS)
-                    .doFinally {
-                        sendDisconnectedUpdate(deviceId)
-                        disposeSubscriptions()
-                    }.subscribe()
+                .doFinally {
+                    sendDisconnectedUpdate(deviceId)
+                    disposeSubscriptions()
+                }.subscribe()
         } else {
             sendDisconnectedUpdate(deviceId)
             disposeSubscriptions()
@@ -95,63 +122,39 @@ internal class DeviceConnector(
         updateListeners(ConnectionUpdateSuccess(deviceId, ConnectionState.CONNECTING.code))
 
         return waitUntilFirstOfQueue(deviceId)
-                .switchMap { queue ->
-                    if (!queue.contains(deviceId)) {
-                        Observable.just(EstablishConnectionFailure(deviceId,
-                                "Device is not in queue"))
-                    } else {
-                        connectDevice(rxBleDevice, shouldNotTimeout)
-                                .map<EstablishConnectionResult> { EstablishedConnection(rxBleDevice.macAddress, it) }
-                    }
+            .switchMap { queue ->
+                if (!queue.contains(deviceId)) {
+                    Observable.just(EstablishConnectionFailure(deviceId,
+                        "Device is not in queue"))
+                } else {
+                    connectDevice(rxBleDevice, shouldNotTimeout)
+                        .map<EstablishConnectionResult> { EstablishedConnection(rxBleDevice.macAddress, it) }
                 }
-                .onErrorReturn { error ->
-                    EstablishConnectionFailure(rxBleDevice.macAddress,
-                            error.message ?: "Unknown error")
+            }
+            .onErrorReturn { error ->
+                EstablishConnectionFailure(rxBleDevice.macAddress,
+                    error.message ?: "Unknown error")
+            }
+            .doOnNext {
+                // Trigger side effect by calling the lazy initialization of this property so
+                // listening to changes starts.
+                connectionStatusUpdates
+                timestampEstablishConnection = System.currentTimeMillis()
+                connectionQueue.removeFromQueue(deviceId)
+                if (it is EstablishConnectionFailure) {
+                    updateListeners.invoke(ConnectionUpdateError(deviceId, it.errorMessage))
                 }
-                .doOnNext {
-                    // Trigger side effect by calling the lazy initialization of this property so
-                    // listening to changes starts.
-                    connectionStatusUpdates
-                    timestampEstablishConnection = System.currentTimeMillis()
-                    connectionQueue.removeFromQueue(deviceId)
-                    if (it is EstablishConnectionFailure) {
-                        updateListeners.invoke(ConnectionUpdateError(deviceId, it.errorMessage))
-                    }
-                }
-                .doOnError {
-                    connectionQueue.removeFromQueue(deviceId)
-                    updateListeners.invoke(ConnectionUpdateError(deviceId, it.message
-                            ?: "Unknown error"))
-                }
-                .subscribe({ connectDeviceSubject.onNext(it) },
-                        { throwable -> connectDeviceSubject.onError(throwable) })
+            }
+            .doOnError {
+                connectionQueue.removeFromQueue(deviceId)
+                updateListeners.invoke(ConnectionUpdateError(deviceId, it.message
+                    ?: "Unknown error"))
+            }
+            .subscribe({ connectDeviceSubject.onNext(it) },
+                { throwable -> connectDeviceSubject.onError(throwable) })
     }
 
     private fun connectDevice(rxBleDevice: RxBleDevice, shouldNotTimeout: Boolean): Observable<RxBleConnection> {
-        var bondState: Int = rxBleDevice.getBluetoothDevice().getBondState()
-
-        println("bond state")
-        println(bondState)
-
-        if (bondState != BluetoothDevice.BOND_BONDED) {
-            println("create bond")
-            if (rxBleDevice.getBluetoothDevice().createBond()) {
-                return rxBleDevice.establishConnection(shouldNotTimeout)
-                    .compose {
-                        if (shouldNotTimeout) {
-                            it
-                        } else {
-                            it.timeout(
-                                Observable.timer(connectionTimeout.value, connectionTimeout.unit),
-                                Function<RxBleConnection, Observable<Unit>> {
-                                    Observable.never<Unit>()
-                                }
-                            )
-                        }
-                    }
-            }
-        }
-        println("bond already created")
         return rxBleDevice.establishConnection(shouldNotTimeout)
             .compose {
                 if (shouldNotTimeout) {
@@ -192,7 +195,7 @@ internal class DeviceConnector(
                 val success = refreshMethod.invoke(bluetoothGatt) as Boolean
                 if (success) {
                     Observable.empty<Unit>()
-                            .delay(DeviceConnector.Companion.delayMsAfterClearingCache, TimeUnit.MILLISECONDS)
+                        .delay(DeviceConnector.Companion.delayMsAfterClearingCache, TimeUnit.MILLISECONDS)
                 } else {
                     val reason = "BluetoothGatt.refresh() returned false"
                     Observable.error(RuntimeException(reason))
@@ -205,9 +208,9 @@ internal class DeviceConnector(
     }
 
     private fun waitUntilFirstOfQueue(deviceId: String) =
-            connectionQueue.observeQueue()
-                    .filter { queue ->
-                        queue.firstOrNull() == deviceId || !queue.contains(deviceId)
-                    }
-                    .takeUntil { it.isEmpty() || it.first() == deviceId }
+        connectionQueue.observeQueue()
+            .filter { queue ->
+                queue.firstOrNull() == deviceId || !queue.contains(deviceId)
+            }
+            .takeUntil { it.isEmpty() || it.first() == deviceId }
 }
