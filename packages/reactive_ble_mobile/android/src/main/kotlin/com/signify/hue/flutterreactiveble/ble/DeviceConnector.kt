@@ -20,7 +20,8 @@ internal class DeviceConnector(
     private val device: RxBleDevice,
     private val connectionTimeout: Duration,
     private val updateListeners: (update: ConnectionUpdate) -> Unit,
-    private val connectionQueue: ConnectionQueue
+    private val connectionQueue: ConnectionQueue,
+    private val forcedBond: Boolean,
 ) {
 
     companion object {
@@ -53,35 +54,42 @@ internal class DeviceConnector(
                 ConnectionUpdateSuccess(device.macAddress, it.toConnectionState().code)
             }
             .onErrorReturn {
-                ConnectionUpdateError(device.macAddress, it.message
-                    ?: "Unknown error")
+                ConnectionUpdateError(
+                    device.macAddress, it.message
+                        ?: "Unknown error"
+                )
             }
             .subscribe {
-                if (it is ConnectionUpdateSuccess && it.connectionState == ConnectionState.CONNECTED.code) {
-                    if (device.getBluetoothDevice().getBondState() == BluetoothDevice.BOND_BONDED)
-                        updateListeners.invoke(it)
-                    else {
-                        val bondState: Int = device.getBluetoothDevice().getBondState()
-                        if (bondState != BluetoothDevice.BOND_BONDING) {
-                            device.getBluetoothDevice().createBond()
-                        }
-                        Observable.interval(5, TimeUnit.SECONDS)
-                            .take(3)
-                            .subscribe {
-                                if (!bonded && device.getBluetoothDevice()
-                                        .getBondState() == BluetoothDevice.BOND_BONDED
-                                ) {
-                                    bonded = true
-                                    updateListeners.invoke(
-                                        ConnectionUpdateSuccess(
-                                            device.macAddress,
-                                            ConnectionState.CONNECTED.code
-                                        )
-                                    )
-                                }
+                if (forcedBond) {
+                    if (it is ConnectionUpdateSuccess && it.connectionState == ConnectionState.CONNECTED.code) {
+                        if (device.getBluetoothDevice()
+                                .getBondState() == BluetoothDevice.BOND_BONDED
+                        )
+                            updateListeners.invoke(it)
+                        else {
+                            val bondState: Int = device.getBluetoothDevice().getBondState()
+                            if (bondState != BluetoothDevice.BOND_BONDING) {
+                                device.getBluetoothDevice().createBond()
                             }
+                            Observable.interval(5, TimeUnit.SECONDS)
+                                .take(3)
+                                .subscribe {
+                                    if (!bonded && device.getBluetoothDevice()
+                                            .getBondState() == BluetoothDevice.BOND_BONDED
+                                    ) {
+                                        bonded = true
+                                        updateListeners.invoke(
+                                            ConnectionUpdateSuccess(
+                                                device.macAddress,
+                                                ConnectionState.CONNECTED.code
+                                            )
+                                        )
+                                    }
+                                }
+                        }
                     }
-                }
+                } else
+                    updateListeners.invoke(it)
             }
     }
 
@@ -93,7 +101,10 @@ internal class DeviceConnector(
         disconnect to quickly after establishing connection. https://issuetracker.google.com/issues/37121223
          */
         if (diff < DeviceConnector.Companion.minTimeMsBeforeDisconnectingIsAllowed) {
-            Single.timer(DeviceConnector.Companion.minTimeMsBeforeDisconnectingIsAllowed - diff, TimeUnit.MILLISECONDS)
+            Single.timer(
+                DeviceConnector.Companion.minTimeMsBeforeDisconnectingIsAllowed - diff,
+                TimeUnit.MILLISECONDS
+            )
                 .doFinally {
                     sendDisconnectedUpdate(deviceId)
                     disposeSubscriptions()
@@ -124,16 +135,27 @@ internal class DeviceConnector(
         return waitUntilFirstOfQueue(deviceId)
             .switchMap { queue ->
                 if (!queue.contains(deviceId)) {
-                    Observable.just(EstablishConnectionFailure(deviceId,
-                        "Device is not in queue"))
+                    Observable.just(
+                        EstablishConnectionFailure(
+                            deviceId,
+                            "Device is not in queue"
+                        )
+                    )
                 } else {
                     connectDevice(rxBleDevice, shouldNotTimeout)
-                        .map<EstablishConnectionResult> { EstablishedConnection(rxBleDevice.macAddress, it) }
+                        .map<EstablishConnectionResult> {
+                            EstablishedConnection(
+                                rxBleDevice.macAddress,
+                                it
+                            )
+                        }
                 }
             }
             .onErrorReturn { error ->
-                EstablishConnectionFailure(rxBleDevice.macAddress,
-                    error.message ?: "Unknown error")
+                EstablishConnectionFailure(
+                    rxBleDevice.macAddress,
+                    error.message ?: "Unknown error"
+                )
             }
             .doOnNext {
                 // Trigger side effect by calling the lazy initialization of this property so
@@ -147,14 +169,21 @@ internal class DeviceConnector(
             }
             .doOnError {
                 connectionQueue.removeFromQueue(deviceId)
-                updateListeners.invoke(ConnectionUpdateError(deviceId, it.message
-                    ?: "Unknown error"))
+                updateListeners.invoke(
+                    ConnectionUpdateError(
+                        deviceId, it.message
+                            ?: "Unknown error"
+                    )
+                )
             }
             .subscribe({ connectDeviceSubject.onNext(it) },
                 { throwable -> connectDeviceSubject.onError(throwable) })
     }
 
-    private fun connectDevice(rxBleDevice: RxBleDevice, shouldNotTimeout: Boolean): Observable<RxBleConnection> {
+    private fun connectDevice(
+        rxBleDevice: RxBleDevice,
+        shouldNotTimeout: Boolean
+    ): Observable<RxBleConnection> {
         return rxBleDevice.establishConnection(shouldNotTimeout)
             .compose {
                 if (shouldNotTimeout) {
@@ -195,7 +224,10 @@ internal class DeviceConnector(
                 val success = refreshMethod.invoke(bluetoothGatt) as Boolean
                 if (success) {
                     Observable.empty<Unit>()
-                        .delay(DeviceConnector.Companion.delayMsAfterClearingCache, TimeUnit.MILLISECONDS)
+                        .delay(
+                            DeviceConnector.Companion.delayMsAfterClearingCache,
+                            TimeUnit.MILLISECONDS
+                        )
                 } else {
                     val reason = "BluetoothGatt.refresh() returned false"
                     Observable.error(RuntimeException(reason))

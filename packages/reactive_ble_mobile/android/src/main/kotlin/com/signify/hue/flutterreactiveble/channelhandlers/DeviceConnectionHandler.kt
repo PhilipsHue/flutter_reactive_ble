@@ -29,7 +29,8 @@ class DeviceConnectionHandler(private val bleClient: com.signify.hue.flutterreac
     fun connectToDevice(connectToDeviceMessage: pb.ConnectToDeviceRequest) {
         bleClient.connectToDevice(
                 connectToDeviceMessage.deviceId,
-                Duration(connectToDeviceMessage.timeoutInMs.toLong(), TimeUnit.MILLISECONDS)
+                Duration(connectToDeviceMessage.timeoutInMs.toLong(), TimeUnit.MILLISECONDS),
+                connectToDeviceMessage.forcedBond,
         )
     }
 

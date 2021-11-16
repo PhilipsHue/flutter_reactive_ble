@@ -17,7 +17,7 @@ interface BleClient {
 
     fun initializeClient()
     fun scanForDevices(services: List<ParcelUuid>, scanMode: ScanMode, requireLocationServicesEnabled: Boolean): Observable<com.signify.hue.flutterreactiveble.ble.ScanInfo>
-    fun connectToDevice(deviceId: String, timeout: Duration)
+    fun connectToDevice(deviceId: String, timeout: Duration, forcedBond: Boolean)
     fun disconnectDevice(deviceId: String)
     fun disconnectAllDevices()
     fun discoverServices(deviceId: String): Single<RxBleDeviceServices>

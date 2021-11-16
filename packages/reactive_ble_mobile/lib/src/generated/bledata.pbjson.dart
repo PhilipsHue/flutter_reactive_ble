@@ -44,11 +44,12 @@ const ConnectToDeviceRequest$json = const {
     const {'1': 'deviceId', '3': 1, '4': 1, '5': 9, '10': 'deviceId'},
     const {'1': 'servicesWithCharacteristicsToDiscover', '3': 2, '4': 1, '5': 11, '6': '.ServicesWithCharacteristics', '10': 'servicesWithCharacteristicsToDiscover'},
     const {'1': 'timeoutInMs', '3': 3, '4': 1, '5': 5, '10': 'timeoutInMs'},
+    const {'1': 'forcedBond', '3': 4, '4': 1, '5': 8, '10': 'forcedBond'},
   ],
 };
 
 /// Descriptor for `ConnectToDeviceRequest`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List connectToDeviceRequestDescriptor = $convert.base64Decode('ChZDb25uZWN0VG9EZXZpY2VSZXF1ZXN0EhoKCGRldmljZUlkGAEgASgJUghkZXZpY2VJZBJyCiVzZXJ2aWNlc1dpdGhDaGFyYWN0ZXJpc3RpY3NUb0Rpc2NvdmVyGAIgASgLMhwuU2VydmljZXNXaXRoQ2hhcmFjdGVyaXN0aWNzUiVzZXJ2aWNlc1dpdGhDaGFyYWN0ZXJpc3RpY3NUb0Rpc2NvdmVyEiAKC3RpbWVvdXRJbk1zGAMgASgFUgt0aW1lb3V0SW5Ncw==');
+final $typed_data.Uint8List connectToDeviceRequestDescriptor = $convert.base64Decode('ChZDb25uZWN0VG9EZXZpY2VSZXF1ZXN0EhoKCGRldmljZUlkGAEgASgJUghkZXZpY2VJZBJyCiVzZXJ2aWNlc1dpdGhDaGFyYWN0ZXJpc3RpY3NUb0Rpc2NvdmVyGAIgASgLMhwuU2VydmljZXNXaXRoQ2hhcmFjdGVyaXN0aWNzUiVzZXJ2aWNlc1dpdGhDaGFyYWN0ZXJpc3RpY3NUb0Rpc2NvdmVyEiAKC3RpbWVvdXRJbk1zGAMgASgFUgt0aW1lb3V0SW5NcxIeCgpmb3JjZWRCb25kGAQgASgIUgpmb3JjZWRCb25k');
 @$core.Deprecated('Use deviceInfoDescriptor instead')
 const DeviceInfo$json = const {
   '1': 'DeviceInfo',

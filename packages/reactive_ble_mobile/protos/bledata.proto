@@ -23,6 +23,7 @@ message ConnectToDeviceRequest {
     string deviceId = 1;
     ServicesWithCharacteristics servicesWithCharacteristicsToDiscover = 2;
     int32 timeoutInMs = 3;
+    bool forcedBond = 4;
 }
 
 message DeviceInfo {

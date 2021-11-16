@@ -95,6 +95,7 @@ abstract class ReactiveBlePlatform extends PlatformInterface {
     String id,
     Map<Uuid, List<Uuid>>? servicesWithCharacteristicsToDiscover,
     Duration? connectionTimeout,
+    bool? forcedBond,
   ) {
     throw UnimplementedError('connectToDevice has not been implemented.');
   }

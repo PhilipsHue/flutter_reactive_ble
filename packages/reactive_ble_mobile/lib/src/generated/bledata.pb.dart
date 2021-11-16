@@ -218,6 +218,7 @@ class ConnectToDeviceRequest extends $pb.GeneratedMessage {
     ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'deviceId', protoName: 'deviceId')
     ..aOM<ServicesWithCharacteristics>(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'servicesWithCharacteristicsToDiscover', protoName: 'servicesWithCharacteristicsToDiscover', subBuilder: ServicesWithCharacteristics.create)
     ..a<$core.int>(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'timeoutInMs', $pb.PbFieldType.O3, protoName: 'timeoutInMs')
+    ..aOB(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'forcedBond', protoName: 'forcedBond')
     ..hasRequiredFields = false
   ;
 
@@ -226,6 +227,7 @@ class ConnectToDeviceRequest extends $pb.GeneratedMessage {
     $core.String? deviceId,
     ServicesWithCharacteristics? servicesWithCharacteristicsToDiscover,
     $core.int? timeoutInMs,
+    $core.bool? forcedBond,
   }) {
     final _result = create();
     if (deviceId != null) {
@@ -236,6 +238,9 @@ class ConnectToDeviceRequest extends $pb.GeneratedMessage {
     }
     if (timeoutInMs != null) {
       _result.timeoutInMs = timeoutInMs;
+    }
+    if (forcedBond != null) {
+      _result.forcedBond = forcedBond;
     }
     return _result;
   }
@@ -288,6 +293,15 @@ class ConnectToDeviceRequest extends $pb.GeneratedMessage {
   $core.bool hasTimeoutInMs() => $_has(2);
   @$pb.TagNumber(3)
   void clearTimeoutInMs() => clearField(3);
+
+  @$pb.TagNumber(4)
+  $core.bool get forcedBond => $_getBF(3);
+  @$pb.TagNumber(4)
+  set forcedBond($core.bool v) { $_setBool(3, v); }
+  @$pb.TagNumber(4)
+  $core.bool hasForcedBond() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearForcedBond() => clearField(4);
 }
 
 class DeviceInfo extends $pb.GeneratedMessage {

@@ -36,6 +36,7 @@ import kotlin.collections.component2
 open class ReactiveBleClient(private val context: Context) : BleClient {
     private val connectionQueue = ConnectionQueue()
     private val allConnections = CompositeDisposable()
+    private var forcedBond = false
 
     companion object {
         // this needs to be in companion update since backgroundisolates respawn the eventchannels
@@ -92,7 +93,8 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
             }
     }
 
-    override fun connectToDevice(deviceId: String, timeout: Duration) {
+    override fun connectToDevice(deviceId: String, timeout: Duration, forcedBond: Boolean) {
+        this.forcedBond = forcedBond
         allConnections.add(getConnection(deviceId, timeout)
             .subscribe({ result ->
                 when (result) {
@@ -236,11 +238,11 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
 
     @VisibleForTesting
     internal open fun createDeviceConnector(device: RxBleDevice, timeout: Duration) =
-        DeviceConnector(device, timeout, connectionUpdateBehaviorSubject::onNext, connectionQueue)
+        DeviceConnector(device, timeout, connectionUpdateBehaviorSubject::onNext, connectionQueue, forcedBond)
 
     private fun getConnection(
         deviceId: String,
-        timeout: Duration = Duration(0, TimeUnit.MILLISECONDS)
+        timeout: Duration = Duration(0, TimeUnit.MILLISECONDS),
     ): Observable<EstablishConnectionResult> {
         val device = rxBleClient.getBleDevice(deviceId)
         val connector =

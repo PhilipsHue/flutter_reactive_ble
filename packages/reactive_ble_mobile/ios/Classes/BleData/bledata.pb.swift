@@ -89,6 +89,8 @@ struct ConnectToDeviceRequest {
 
   var timeoutInMs: Int32 = 0
 
+  var forcedBond: Bool = false
+
   var unknownFields = SwiftProtobuf.UnknownStorage()
 
   init() {}
@@ -745,6 +747,7 @@ extension ConnectToDeviceRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageI
     1: .same(proto: "deviceId"),
     2: .same(proto: "servicesWithCharacteristicsToDiscover"),
     3: .same(proto: "timeoutInMs"),
+    4: .same(proto: "forcedBond"),
   ]
 
   mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -756,6 +759,7 @@ extension ConnectToDeviceRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageI
       case 1: try { try decoder.decodeSingularStringField(value: &self.deviceID) }()
       case 2: try { try decoder.decodeSingularMessageField(value: &self._servicesWithCharacteristicsToDiscover) }()
       case 3: try { try decoder.decodeSingularInt32Field(value: &self.timeoutInMs) }()
+      case 4: try { try decoder.decodeSingularBoolField(value: &self.forcedBond) }()
       default: break
       }
     }
@@ -775,6 +779,9 @@ extension ConnectToDeviceRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageI
     if self.timeoutInMs != 0 {
       try visitor.visitSingularInt32Field(value: self.timeoutInMs, fieldNumber: 3)
     }
+    if self.forcedBond != false {
+      try visitor.visitSingularBoolField(value: self.forcedBond, fieldNumber: 4)
+    }
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -782,6 +789,7 @@ extension ConnectToDeviceRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageI
     if lhs.deviceID != rhs.deviceID {return false}
     if lhs._servicesWithCharacteristicsToDiscover != rhs._servicesWithCharacteristicsToDiscover {return false}
     if lhs.timeoutInMs != rhs.timeoutInMs {return false}
+    if lhs.forcedBond != rhs.forcedBond {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
