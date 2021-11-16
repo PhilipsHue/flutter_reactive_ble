@@ -41,6 +41,9 @@ class DiscoveredDevice extends $DiscoveredDevice {
   @CustomEquality(DeepCollectionEquality())
   final Uint8List manufacturerData;
 
+  @CustomEquality(DeepCollectionEquality())
+  final Uint8List rawData;
+
   final int rssi;
 
   const DiscoveredDevice({
@@ -50,6 +53,7 @@ class DiscoveredDevice extends $DiscoveredDevice {
     required this.manufacturerData,
     required this.rssi,
     required this.serviceUuids,
+    required this.rawData,
   });
 }
 

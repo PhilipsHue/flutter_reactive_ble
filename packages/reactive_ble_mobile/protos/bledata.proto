@@ -15,6 +15,7 @@ message DeviceScanInfo {
     repeated ServiceDataEntry serviceData = 4;
     bytes manufacturerData = 6;
     repeated Uuid serviceUuids = 7;
+    bytes rawData = 8;
     int32 rssi = 5;
 }
 

@@ -70,6 +70,7 @@ abstract class $DiscoveredDevice {
   Map<Uuid, Uint8List> get serviceData;
   List<Uuid> get serviceUuids;
   Uint8List get manufacturerData;
+  Uint8List get rawData;
   int get rssi;
 
   DiscoveredDevice copyWith({
@@ -78,6 +79,7 @@ abstract class $DiscoveredDevice {
     Map<Uuid, Uint8List>? serviceData,
     List<Uuid>? serviceUuids,
     Uint8List? manufacturerData,
+    Uint8List? rawData,
     int? rssi,
   }) =>
       DiscoveredDevice(
@@ -86,6 +88,7 @@ abstract class $DiscoveredDevice {
         serviceData: serviceData ?? this.serviceData,
         serviceUuids: serviceUuids ?? this.serviceUuids,
         manufacturerData: manufacturerData ?? this.manufacturerData,
+        rawData: rawData ?? this.rawData,
         rssi: rssi ?? this.rssi,
       );
 
@@ -97,6 +100,7 @@ abstract class $DiscoveredDevice {
       this.serviceData,
       this.serviceUuids,
       this.manufacturerData,
+      this.rawData,
       this.rssi,
     );
     mutator(change);
@@ -106,13 +110,14 @@ abstract class $DiscoveredDevice {
       serviceData: change.serviceData,
       serviceUuids: change.serviceUuids,
       manufacturerData: change.manufacturerData,
+      rawData: change.rawData,
       rssi: change.rssi,
     );
   }
 
   @override
   String toString() =>
-      "DiscoveredDevice(id: $id, name: $name, serviceData: $serviceData, serviceUuids: $serviceUuids, manufacturerData: $manufacturerData, rssi: $rssi)";
+      "DiscoveredDevice(id: $id, name: $name, serviceData: $serviceData, serviceUuids: $serviceUuids, manufacturerData: $manufacturerData, rawData: $rawData, rssi: $rssi)";
 
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
@@ -125,6 +130,7 @@ abstract class $DiscoveredDevice {
       const DeepCollectionEquality().equals(serviceUuids, other.serviceUuids) &&
       const DeepCollectionEquality()
           .equals(manufacturerData, other.manufacturerData) &&
+      const DeepCollectionEquality().equals(rawData, other.rawData) &&
       rssi == other.rssi;
 
   @override
@@ -137,6 +143,7 @@ abstract class $DiscoveredDevice {
     result = 37 * result + const DeepCollectionEquality().hash(serviceUuids);
     result =
         37 * result + const DeepCollectionEquality().hash(manufacturerData);
+    result = 37 * result + const DeepCollectionEquality().hash(rawData);
     result = 37 * result + rssi.hashCode;
     return result;
   }
@@ -149,6 +156,7 @@ class DiscoveredDevice$Change {
     this.serviceData,
     this.serviceUuids,
     this.manufacturerData,
+    this.rawData,
     this.rssi,
   );
 
@@ -157,6 +165,7 @@ class DiscoveredDevice$Change {
   Map<Uuid, Uint8List> serviceData;
   List<Uuid> serviceUuids;
   Uint8List manufacturerData;
+  Uint8List rawData;
   int rssi;
 }
 
@@ -188,6 +197,11 @@ class DiscoveredDevice$ {
     (manufacturerDataContainer) => manufacturerDataContainer.manufacturerData,
     (manufacturerDataContainer, manufacturerData) =>
         manufacturerDataContainer.copyWith(manufacturerData: manufacturerData),
+  );
+
+  static final rawData = Lens<DiscoveredDevice, Uint8List>(
+    (rawDataContainer) => rawDataContainer.rawData,
+    (rawDataContainer, rawData) => rawDataContainer.copyWith(rawData: rawData),
   );
 
   static final rssi = Lens<DiscoveredDevice, int>(
