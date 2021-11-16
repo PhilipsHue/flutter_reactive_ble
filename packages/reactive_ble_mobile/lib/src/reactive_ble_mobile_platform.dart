@@ -134,7 +134,7 @@ class ReactiveBleMobilePlatform extends ReactiveBlePlatform {
           .invokeMethod<List<int>>(
               "writeCharacteristicWithResponse",
               _argsToProtobufConverter
-                  .createWriteChacracteristicRequest(characteristic, value)
+                  .createWriteCharacteristicRequest(characteristic, value)
                   .writeToBuffer())
           .then(
               (data) => _protobufConverter.writeCharacteristicInfoFrom(data!));
@@ -148,7 +148,7 @@ class ReactiveBleMobilePlatform extends ReactiveBlePlatform {
           .invokeMethod<List<int>>(
             "writeCharacteristicWithoutResponse",
             _argsToProtobufConverter
-                .createWriteChacracteristicRequest(characteristic, value)
+                .createWriteCharacteristicRequest(characteristic, value)
                 .writeToBuffer(),
           )
           .then(
