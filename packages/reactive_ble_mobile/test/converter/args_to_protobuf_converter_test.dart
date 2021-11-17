@@ -3,6 +3,7 @@ import 'package:reactive_ble_mobile/src/converter/args_to_protubuf_converter.dar
 import 'package:reactive_ble_mobile/src/generated/bledata.pb.dart' as pb;
 import 'package:reactive_ble_platform_interface/src/model/connection_priority.dart';
 import 'package:reactive_ble_platform_interface/src/model/qualified_characteristic.dart';
+import 'package:reactive_ble_platform_interface/src/model/qualified_descriptor.dart';
 import 'package:reactive_ble_platform_interface/src/model/scan_mode.dart';
 import 'package:reactive_ble_platform_interface/src/model/uuid.dart';
 
@@ -117,7 +118,7 @@ void main() {
       });
     });
 
-    group('Create WriteRequest', () {
+    group('Create WriteCharacteristicRequest', () {
       late pb.WriteCharacteristicRequest result;
       const deviceId = '123';
       final serviceUuid = Uuid.parse('FEFF');
@@ -146,6 +147,48 @@ void main() {
 
       test('It converts char Uuid', () {
         expect(result.characteristic.characteristicUuid.data, [254, 239]);
+      });
+
+      test('It converts value', () {
+        expect(result.value, value);
+      });
+    });
+
+    group('Create WriteDescriptorRequest', () {
+      late pb.WriteDescriptorRequest result;
+      const deviceId = '123';
+      final serviceUuid = Uuid.parse('FEFF');
+      final charUuid = Uuid.parse('FEEF');
+      final descriptorUuid = Uuid.parse('FFEE');
+      QualifiedDescriptor descriptor;
+
+      const value = [0, 1];
+
+      setUp(() {
+        descriptor = QualifiedDescriptor(
+          characteristicId: charUuid,
+          serviceId: serviceUuid,
+          descriptorId: descriptorUuid,
+          deviceId: deviceId,
+        );
+
+        result = _sut.createWriteDescriptorRequest(descriptor, value);
+      });
+
+      test('It converts device Id ', () {
+        expect(result.descriptor.deviceId, deviceId);
+      });
+
+      test('It converts service Uuid', () {
+        expect(result.descriptor.serviceUuid.data, [254, 255]);
+      });
+
+      test('It converts descriptor Uuid', () {
+        expect(result.descriptor.descriptorUuid.data, [255, 238]);
+      });
+
+      test('It converts char Uuid', () {
+        expect(result.descriptor.characteristicUuid.data, [254, 239]);
       });
 
       test('It converts value', () {
