@@ -371,16 +371,16 @@ packages:
   reactive_ble_mobile:
     dependency: "direct main"
     description:
-      name: reactive_ble_mobile
-      url: "https://pub.dartlang.org"
-    source: hosted
+      path: "../reactive_ble_mobile"
+      relative: true
+    source: path
     version: "5.0.2"
   reactive_ble_platform_interface:
     dependency: "direct main"
     description:
-      name: reactive_ble_platform_interface
-      url: "https://pub.dartlang.org"
-    source: hosted
+      path: "../reactive_ble_platform_interface"
+      relative: true
+    source: path
     version: "5.0.2"
   shelf:
     dependency: transitive

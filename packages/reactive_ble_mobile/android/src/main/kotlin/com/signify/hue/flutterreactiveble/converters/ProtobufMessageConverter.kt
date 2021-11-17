@@ -122,6 +122,24 @@ class ProtobufMessageConverter {
         return builder.build()
     }
 
+    fun convertWriteDescriptorInfo(
+            request: pb.WriteDescriptorRequest,
+            error: String?
+    ): pb.WriteDescriptorInfo {
+        val builder = pb.WriteDescriptorInfo.newBuilder()
+                .setDescriptor(request.descriptor)
+
+        error?.let {
+            val failure = pb.GenericFailure.newBuilder()
+                    .setCode(CharacteristicErrorType.UNKNOWN.code)
+                    .setMessage(error)
+
+            builder.setFailure(failure)
+        }
+
+        return builder.build()
+    }
+
     fun convertNegotiateMtuInfo(result: MtuNegotiateResult): pb.NegotiateMtuInfo =
             when (result) {
                 is MtuNegotiateSuccesful -> pb.NegotiateMtuInfo.newBuilder()

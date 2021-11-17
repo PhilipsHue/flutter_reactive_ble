@@ -70,6 +70,16 @@ message WriteCharacteristicInfo {
     GenericFailure failure = 3;
 }
 
+message WriteDescriptorRequest {
+    DescriptorAddress descriptor = 1;
+    bytes value = 2;
+}
+
+message WriteDescriptorInfo {
+    DescriptorAddress descriptor = 1;
+    GenericFailure failure = 3;
+}
+
 message NegotiateMtuRequest {
     string deviceId = 1;
     int32 mtuSize = 2;
@@ -99,6 +109,13 @@ message CharacteristicAddress {
     string deviceId = 1;
     Uuid serviceUuid = 2;
     Uuid characteristicUuid = 3;
+}
+
+message DescriptorAddress {
+    string deviceId = 1;
+    Uuid serviceUuid = 2;
+    Uuid characteristicUuid = 3;
+    Uuid descriptorUuid = 4;
 }
 
 message ServiceDataEntry {

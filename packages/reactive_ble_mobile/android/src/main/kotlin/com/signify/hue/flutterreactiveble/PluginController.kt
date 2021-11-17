@@ -32,6 +32,7 @@ class PluginController {
             "readCharacteristic" to this::readCharacteristic,
             "writeCharacteristicWithResponse" to this::writeCharacteristicWithResponse,
             "writeCharacteristicWithoutResponse" to this::writeCharacteristicWithoutResponse,
+            "writeDescriptorWithoutResponse" to this::writeDescriptorWithoutResponse,
             "readNotifications" to this::readNotifications,
             "stopNotifications" to this::stopNotifications,
             "negotiateMtuSize" to this::negotiateMtuSize,
@@ -172,6 +173,35 @@ class PluginController {
 
     private fun writeCharacteristicWithoutResponse(call: MethodCall, result: Result) {
         executeWriteAndPropagateResultToChannel(call, result, com.signify.hue.flutterreactiveble.ble.BleClient::writeCharacteristicWithoutResponse)
+    }
+
+    private fun writeDescriptorWithoutResponse(call: MethodCall, result: Result) {
+        val writeDescriptorMessage = pb.WriteDescriptorRequest.parseFrom(call.arguments as ByteArray)
+        bleClient.writeDescriptorWithoutResponse(
+            writeDescriptorMessage.descriptor.deviceId,
+            uuidConverter.uuidFromByteArray(writeDescriptorMessage.descriptor.serviceUuid.data.toByteArray()),
+            uuidConverter.uuidFromByteArray(writeDescriptorMessage.descriptor.characteristicUuid.data.toByteArray()),
+            uuidConverter.uuidFromByteArray(writeDescriptorMessage.descriptor.descriptorUuid.data.toByteArray()),
+            writeDescriptorMessage.value.toByteArray())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({ operationResult ->
+                when (operationResult) {
+                    is com.signify.hue.flutterreactiveble.ble.CharOperationSuccessful -> {
+                        result.success(protoConverter.convertWriteDescriptorInfo(writeDescriptorMessage,
+                            null).toByteArray())
+                    }
+                    is com.signify.hue.flutterreactiveble.ble.CharOperationFailed -> {
+                        result.success(protoConverter.convertWriteDescriptorInfo(writeDescriptorMessage,
+                            operationResult.errorMessage).toByteArray())
+                    }
+                }
+            },
+                { throwable ->
+                    result.success(protoConverter.convertWriteDescriptorInfo(writeDescriptorMessage,
+                        throwable.message).toByteArray())
+                }
+            )
+            .discard()
     }
 
     private fun executeWriteAndPropagateResultToChannel(

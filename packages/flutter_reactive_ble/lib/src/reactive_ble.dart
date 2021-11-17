@@ -191,6 +191,17 @@ class FlutterReactiveBle {
     );
   }
 
+  Future<void> writeDescriptor(
+    QualifiedDescriptor descriptor, {
+    required List<int> value,
+  }) async {
+    await initialize();
+    return _connectedDeviceOperator.writeDescriptorWithoutResponse(
+      descriptor,
+      value: value,
+    );
+  }
+
   /// Request a specific MTU for a connected device.
   ///
   /// Returns the actual MTU negotiated.

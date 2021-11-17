@@ -20,6 +20,11 @@ abstract class ArgsToProtobufConverter {
     List<int> value,
   );
 
+  pb.WriteDescriptorRequest createWriteDescriptorRequest(
+    QualifiedDescriptor descriptor,
+    List<int> value,
+  );
+
   pb.NotifyCharacteristicRequest createNotifyCharacteristicRequest(
     QualifiedCharacteristic characteristic,
   );
@@ -111,6 +116,23 @@ class ArgsToProtobufConverterImpl implements ArgsToProtobufConverter {
         ..serviceUuid = (pb.Uuid()..data = characteristic.serviceId.data)
         ..characteristicUuid =
             (pb.Uuid()..data = characteristic.characteristicId.data))
+      ..value = value;
+
+    return args;
+  }
+
+  @override
+  pb.WriteDescriptorRequest createWriteDescriptorRequest(
+    QualifiedDescriptor descriptor,
+    List<int> value,
+  ) {
+    final args = pb.WriteDescriptorRequest()
+      ..descriptor = (pb.DescriptorAddress()
+        ..deviceId = descriptor.deviceId
+        ..serviceUuid = (pb.Uuid()..data = descriptor.serviceId.data)
+        ..characteristicUuid =
+            (pb.Uuid()..data = descriptor.characteristicId.data)
+        ..descriptorUuid = (pb.Uuid()..data = descriptor.descriptorId.data))
       ..value = value;
 
     return args;
