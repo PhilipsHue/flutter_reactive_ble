@@ -5,6 +5,8 @@ typealias RSSI = Int
 typealias PeripheralID = UUID
 typealias ServiceID = CBUUID
 typealias CharacteristicID = CBUUID
+typealias DescriptorID = CBUUID
+
 
 typealias ServiceData = [ServiceID: Data]
 typealias AdvertisementData = [String: Any]
@@ -275,6 +277,22 @@ final class Central {
         
         return response
     }
+    
+    func writeDescriptorWithoutResponse(
+        value: Data,
+        descriptor qualifiedDescriptor: QualifiedDescriptor
+    ) throws {
+        let descriptor = try resolve(descriptor: qualifiedDescriptor)
+        
+        guard let characteristic = descriptor.characteristic else {
+            throw Failure.descriptorNotFound(qualifiedDescriptor)
+        }
+
+        guard let response = characteristic.service?.peripheral?.writeValue(value, for: descriptor)
+        else { throw Failure.descriptorNotFound(qualifiedDescriptor) }
+        
+        return response
+    }
 
     func maximumWriteValueLength(for peripheral: PeripheralID, type: CBCharacteristicWriteType) throws -> Int {
         let peripheral = try resolve(connected: peripheral)
@@ -327,6 +345,22 @@ final class Central {
 
         return characteristic
     }
+    
+    private func resolve(descriptor qualifiedDescriptor: QualifiedDescriptor) throws -> CBDescriptor {
+        let peripheral = try resolve(connected: qualifiedDescriptor.peripheralID)
+
+        guard let service = peripheral.services?.first(where: { $0.uuid == qualifiedDescriptor.serviceID })
+        else { throw Failure.serviceNotFound(qualifiedDescriptor.serviceID, qualifiedDescriptor.peripheralID) }
+
+        guard let characteristic = service.characteristics?.first(where: { $0.uuid == qualifiedDescriptor.characteristicID })
+        else { throw Failure.descriptorNotFound(qualifiedDescriptor) }
+
+        guard let descriptor = characteristic.descriptors?.first(where: { $0.uuid == qualifiedDescriptor.id })
+        else { throw Failure.descriptorNotFound(qualifiedDescriptor) }
+
+        return descriptor
+    }
+
 
     private enum Failure: Error, CustomStringConvertible {
 
@@ -335,6 +369,7 @@ final class Central {
         case peripheralIsNotConnected(PeripheralID)
         case serviceNotFound(ServiceID, PeripheralID)
         case characteristicNotFound(QualifiedCharacteristic)
+        case descriptorNotFound(QualifiedDescriptor)
         case notificationsNotSupported(QualifiedCharacteristic)
         case notReadable(QualifiedCharacteristic)
         case notWritable(QualifiedCharacteristic)
@@ -351,6 +386,8 @@ final class Central {
                 return "A service \(serviceID) is not found in the peripheral \(peripheralID) (make sure it has been discovered)"
             case .characteristicNotFound(let qualifiedCharacteristic):
                 return "A characteristic \(qualifiedCharacteristic.id) is not found in the service \(qualifiedCharacteristic.serviceID) of the peripheral \(qualifiedCharacteristic.peripheralID) (make sure it has been discovered)"
+            case .descriptorNotFound(let qualifiedDescriptor):
+                return "A descriptor \(qualifiedDescriptor.id) is not found in the characteristic \(qualifiedDescriptor.characteristicID) in service \(qualifiedDescriptor.serviceID) of the peripheral \(qualifiedDescriptor.peripheralID) (make sure it has been discovered)"
             case .notificationsNotSupported(let qualifiedCharacteristic):
                 return "The characteristic \(qualifiedCharacteristic.id) of the service \(qualifiedCharacteristic.serviceID) of the peripheral \(qualifiedCharacteristic.peripheralID) does not support either notifications or indications"
             case .notReadable(let qualifiedCharacteristic):
