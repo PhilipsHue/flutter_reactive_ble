@@ -117,11 +117,11 @@ class MockArgsToProtobufConverter extends _i1.Mock
               _FakeReadCharacteristicRequest_2()) as _i2
           .ReadCharacteristicRequest);
   @override
-  _i2.WriteCharacteristicRequest createWriteChacracteristicRequest(
+  _i2.WriteCharacteristicRequest createWriteCharacteristicRequest(
           _i3.QualifiedCharacteristic? characteristic, List<int>? value) =>
       (super.noSuchMethod(
               Invocation.method(
-                  #createWriteChacracteristicRequest, [characteristic, value]),
+                  #createWriteCharacteristicRequest, [characteristic, value]),
               returnValue: _FakeWriteCharacteristicRequest_3())
           as _i2.WriteCharacteristicRequest);
   @override
