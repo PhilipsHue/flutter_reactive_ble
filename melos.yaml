@@ -1,0 +1,9 @@
+name: flutter_reactive_ble
+packages:
+  - /**
+scripts:
+  analyze: melos exec -- flutter analyze
+  format: melos exec -- flutter format .
+  get: melos exec -- flutter pub get
+  unittest: 
+    run: melos exec -- flutter test

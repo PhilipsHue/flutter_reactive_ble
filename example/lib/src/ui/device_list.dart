@@ -7,6 +7,8 @@ import '../widgets.dart';
 import 'device_detail/device_detail_screen.dart';
 
 class DeviceListScreen extends StatelessWidget {
+  const DeviceListScreen({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) => Consumer2<BleScanner, BleScannerState?>(
         builder: (_, bleScanner, bleScannerState, __) => _DeviceList(

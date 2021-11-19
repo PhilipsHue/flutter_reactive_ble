@@ -1,11 +1,15 @@
+include: package:flutter_lints/flutter.yaml
+
 analyzer:
   strong-mode:
     implicit-casts: false
     implicit-dynamic: false
   exclude:
+    - "bin/cache/**"
+    - "**/*.freezed.dart"
     - "**/*.g.dart"
     - "**/*.mocks.dart"
-    - "**/generated/bledata.pb.dart"
+    - "**/generated/**"
 
 linter:
   rules:

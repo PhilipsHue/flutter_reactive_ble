@@ -7,7 +7,7 @@ workflows:
     max_build_duration: 60
     environment:
       flutter: stable
-      xcode: latest
+      xcode: 13.0
       cocoapods: default
     cache:
       cache_paths: []
@@ -34,28 +34,24 @@ workflows:
           -keyalg 'RSA' \
           -keysize 2048 \
           -validity 10000
-      - |
-        # set up local properties
-        echo "flutter.sdk=$HOME/programs/flutter" > "$FCI_BUILD_DIR/android/local.properties"
-      - name: Pub get 
-        script: cd . && flutter pub get
-      - name: Flutter analyze
-        script: cd . && flutter analyze
-      - name: Flutter test
-        script: cd . && flutter test
-      - name: Dry run publish
-        script: cd . && flutter pub publish --dry-run
-      - |
-        #!/bin/bash -ex
-        cd example/android && ls && ./gradlew detekt && ./gradlew testDebugUnitTest
+      - name: setup local properties
+        script: |
+          # set up local properties
+          echo "flutter.sdk=$HOME/programs/flutter" > "$FCI_BUILD_DIR/example/android/local.properties"
+      - name: Quality checks monorepo
+        script: |
+          ./bin/quality_checks.sh
+      - name: Android native tests
+        script: |
+          #!/bin/bash -ex
+          cd example/android && ls && ./gradlew detekt && ./gradlew testDebugUnitTest
       - name: Build android app
         script: cd example && flutter build apk --debug
       - name: Build iOS app
-        script: find . -name "Podfile" -execdir pod install \;
-      - cd example && flutter build ios --debug --no-codesign
+        script: |
+          find . -name "Podfile" -execdir pod install \;
+          cd example && flutter build ios --debug --no-codesign
     artifacts:
-      - build/**/outputs/**/*.apk
-      - build/**/outputs/**/mapping.txt
-      - build/ios/ipa/*.ipa
-      - /tmp/xcodebuild_logs/*.log
-      - flutter_drive.log
+      - example/build/**/outputs/**/*.apk
+      - example/build/**/outputs/**/mapping.txt
+      - example/build/ios/ipa/*.ipa
