@@ -491,6 +491,41 @@ final class PluginController {
         completion(.success(result))
     }
 
+    func writeDescriptorWithoutResponse(name: String, args: WriteDescriptorRequest, completion: @escaping PlatformMethodCompletionHandler) {
+        guard let central = central
+        else {
+            completion(.failure(PluginError.notInitialized.asFlutterError))
+            return
+        }
+        
+        guard let descriptor = QualifiedDescriptorIDFactory().make(from: args.descriptor)
+        else {
+            completion(.failure(PluginError.invalidMethodCall(method: name, details: "descriptor, characteristic, service, and peripheral IDs are required").asFlutterError))
+            return
+        }
+        
+        let result: WriteDescriptorInfo
+        do {
+            try central.writeDescriptorWithoutResponse(
+                value: args.value,
+                descriptor: QualifiedDescriptor(id: descriptor.id, characteristicID: descriptor.characteristicID, serviceID: descriptor.serviceID, peripheralID: descriptor.peripheralID)
+            )
+            result = WriteDescriptorInfo.with {
+                $0.descriptor = args.descriptor
+            }
+        } catch {
+            result = WriteDescriptorInfo.with {
+                $0.descriptor = args.descriptor
+                $0.failure = GenericFailure.with {
+                    $0.code = Int32(WriteDescriptorFailure.unknown.rawValue)
+                    $0.message = "\(error)"
+                }
+            }
+        }
+
+        completion(.success(result))
+    }
+
     func reportMaximumWriteValueLength(name: String, args: NegotiateMtuRequest, completion: @escaping PlatformMethodCompletionHandler) {
         guard let central = central
         else {
