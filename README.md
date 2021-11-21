@@ -54,7 +54,7 @@ _ble.statusStream.listen((status) {
 
 Use ` _ble.status` to get the current status of the host device.
 
-See [BleStatus](https://github.com/PhilipsHue/flutter_reactive_ble/blob/master/lib/src/model/ble_status.dart) for
+See [BleStatus](https://github.com/PhilipsHue/flutter_reactive_ble/blob/master/packages/reactive_ble_platform_interface/lib/src/model/ble_status.dart) for
 more info about the meaning of the different statuses.
 
 ### Establishing connection

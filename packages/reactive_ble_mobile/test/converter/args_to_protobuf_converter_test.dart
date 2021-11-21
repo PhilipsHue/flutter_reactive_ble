@@ -134,7 +134,7 @@ void main() {
           deviceId: deviceId,
         );
 
-        result = _sut.createWriteChacracteristicRequest(characteristic, value);
+        result = _sut.createWriteCharacteristicRequest(characteristic, value);
       });
 
       test('It converts device Id ', () {

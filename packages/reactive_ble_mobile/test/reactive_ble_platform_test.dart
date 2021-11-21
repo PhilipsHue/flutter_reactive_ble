@@ -227,7 +227,7 @@ void main() {
         when(_methodChannel.invokeMethod<List<int>?>(any, any)).thenAnswer(
           (_) async => [1],
         );
-        when(_argsConverter.createWriteChacracteristicRequest(
+        when(_argsConverter.createWriteCharacteristicRequest(
             characteristic, [0, 1])).thenReturn(request);
         when(_protobufConverter.writeCharacteristicInfoFrom([1]))
             .thenReturn(expectedResult);
@@ -271,7 +271,7 @@ void main() {
         when(_methodChannel.invokeMethod<List<int>?>(any, any)).thenAnswer(
           (_) async => value,
         );
-        when(_argsConverter.createWriteChacracteristicRequest(
+        when(_argsConverter.createWriteCharacteristicRequest(
                 characteristic, value))
             .thenReturn(request);
         when(_protobufConverter.writeCharacteristicInfoFrom(value))
