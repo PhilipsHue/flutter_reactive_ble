@@ -97,6 +97,8 @@ final class Central {
                     key: QualifiedCharacteristic(characteristic),
                     action: { $0.handleWrite(error: error) }
                 )
+            },
+            onDescriptorsDiscovery: papply(weak: self) { central, peripheral, characteristic, error in   
             }
         )
         self.centralManager = CBCentralManager(

@@ -298,6 +298,12 @@ final class PluginController {
                         $0.isWritableWithoutResponse = characteristic.properties.contains(.writeWithoutResponse)
                         $0.isNotifiable = characteristic.properties.contains(.notify)
                         $0.isIndicatable = characteristic.properties.contains(.indicate)
+
+                        if let descriptors = characteristic.descriptors {
+                            for descriptor in descriptors {
+                                print("descriptor: \(descriptor.uuid): \(descriptor.value ?? "")")
+                            }
+                        }
                     }
                 }
  
@@ -502,6 +508,25 @@ final class PluginController {
         else {
             completion(.failure(PluginError.invalidMethodCall(method: name, details: "descriptor, characteristic, service, and peripheral IDs are required").asFlutterError))
             return
+        }
+        
+        guard let peripheral = central.activePeripherals[descriptor.peripheralID],
+              let service = peripheral.services?.first(where: { service in
+                  service == descriptor.serviceID
+              }),
+              let characteristic = service.characteristics?.first(where: { characteristic in
+                  characteristic == descriptor.characteristicID
+              }) else {
+            return
+        }
+        
+        let cbDescriptor = characteristic.descriptors?.first(where: { cbDescriptor in
+            return cbDescriptor.uuid == descriptor.id
+        })
+
+        if let _ = cbDescriptor {
+        } else {
+            peripheral.discoverDescriptors(for: characteristic)
         }
         
         let result: WriteDescriptorInfo
