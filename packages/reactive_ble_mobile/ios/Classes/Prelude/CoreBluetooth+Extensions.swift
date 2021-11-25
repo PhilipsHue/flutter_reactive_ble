@@ -1,3 +1,8 @@
+#if compiler(<5.5)
+import class CoreBluetooth.CBCharacteristic
+import class CoreBluetooth.CBService
+import class CoreBluetooth.CBPeripheral
+
 // Extensions below are supposed to backport API breaking changes
 // in CoreBluetooth framework which Apple introduced with Xcode 13:
 //
@@ -12,11 +17,6 @@
 //
 // - Note: This code compiles only when using Xcode 12 and below.
 // - SeeAlso: https://forums.swift.org/t/is-unowned-unsafe-t-weak-t-a-breaking-change/49917
-
-#if compiler(<5.5)
-import class CoreBluetooth.CBCharacteristic
-import class CoreBluetooth.CBService
-import class CoreBluetooth.CBPeripheral
 
 extension CBCharacteristic {
     @nonobjc
