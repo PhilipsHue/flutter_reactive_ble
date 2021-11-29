@@ -21,5 +21,5 @@ Bluetooth Low Energy (BLE) Flutter plug-in
     'DEFINES_MODULE' => 'YES',
     'VALID_ARCHS[sdk=iphonesimulator*]' => 'x86_64'
   }
-  s.swift_version = '5.5'
+  s.swift_version = '5.0'
 end
