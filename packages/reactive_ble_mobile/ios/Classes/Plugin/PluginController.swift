@@ -520,26 +520,34 @@ final class PluginController {
             return
         }
         
-        let cbDescriptor = characteristic.descriptors?.first(where: { cbDescriptor in
-            return cbDescriptor.uuid == descriptor.id
-        })
-
-        if let _ = cbDescriptor {
+        if let _ = characteristic.descriptors?.first(where: { $0.uuid == descriptor.id }) {
+            let result = performWriteDescriptorWithoutResponse(central: central, args: args, descriptor: descriptor)
+            completion(.success(result))
         } else {
-            peripheral.discoverDescriptors(for: characteristic)
+            do {
+                try central.discoverDescriptors(
+                    characteristic: QualifiedCharacteristic(characteristic),
+                    discover: .some([characteristic])) { central, characteristic, errors in
+                        let result = self.performWriteDescriptorWithoutResponse(central: central, args: args, descriptor: descriptor)
+                        completion(.success(result))
+                    }
+            } catch {
+                
+            }
         }
-        
-        let result: WriteDescriptorInfo
+    }
+    
+    private func performWriteDescriptorWithoutResponse(central: Central, args: WriteDescriptorRequest, descriptor: QualifiedDescriptor) -> WriteDescriptorInfo {
         do {
             try central.writeDescriptorWithoutResponse(
                 value: args.value,
                 descriptor: QualifiedDescriptor(id: descriptor.id, characteristicID: descriptor.characteristicID, serviceID: descriptor.serviceID, peripheralID: descriptor.peripheralID)
             )
-            result = WriteDescriptorInfo.with {
+            return WriteDescriptorInfo.with {
                 $0.descriptor = args.descriptor
             }
         } catch {
-            result = WriteDescriptorInfo.with {
+            return WriteDescriptorInfo.with {
                 $0.descriptor = args.descriptor
                 $0.failure = GenericFailure.with {
                     $0.code = Int32(WriteDescriptorFailure.unknown.rawValue)
@@ -547,8 +555,6 @@ final class PluginController {
                 }
             }
         }
-
-        completion(.success(result))
     }
 
     func reportMaximumWriteValueLength(name: String, args: NegotiateMtuRequest, completion: @escaping PlatformMethodCompletionHandler) {

@@ -17,6 +17,7 @@ final class Central {
     typealias DiscoveryHandler = (Central, CBPeripheral, AdvertisementData, RSSI) -> Void
     typealias ConnectionChangeHandler = (Central, CBPeripheral, ConnectionChange) -> Void
     typealias ServicesWithCharacteristicsDiscoveryHandler = (Central, CBPeripheral, [Error]) -> Void
+    typealias CharacteristicsWithDescriptorsDiscoveryHandler = (Central, CBCharacteristic, [Error]) -> Void
     typealias CharacteristicNotifyCompletionHandler = (Central, Error?) -> Void
     typealias CharacteristicValueUpdateHandler = (Central, QualifiedCharacteristic, Data?, Error?) -> Void
     typealias CharacteristicWriteCompletionHandler = (Central, QualifiedCharacteristic, Error?) -> Void
@@ -33,6 +34,7 @@ final class Central {
     private let servicesWithCharacteristicsDiscoveryRegistry = PeripheralTaskRegistry<ServicesWithCharacteristicsDiscoveryTaskController>()
     private let characteristicNotifyRegistry = PeripheralTaskRegistry<CharacteristicNotifyTaskController>()
     private let characteristicWriteRegistry = PeripheralTaskRegistry<CharacteristicWriteTaskController>()
+    private let characteristicsWithDescriptorsDiscoveryRegistry = PeripheralTaskRegistry<CharacteristicsWithDescriptorsDiscoveryTaskController>()
 
     init(
         onStateChange: @escaping StateChangeHandler,
@@ -98,7 +100,11 @@ final class Central {
                     action: { $0.handleWrite(error: error) }
                 )
             },
-            onDescriptorsDiscovery: papply(weak: self) { central, peripheral, characteristic, error in   
+            onDescriptorsDiscovery: papply(weak: self) { central, peripheral, characteristic, error in
+                let c: CharacteristicID = characteristic.uuid
+                central.characteristicsWithDescriptorsDiscoveryRegistry.updateTask(
+                    key: c,
+                    action: { $0.handleDiscovery(peripheral: peripheral, characteristic: characteristic, error: error) })
             }
         )
         self.centralManager = CBCentralManager(
@@ -201,6 +207,34 @@ final class Central {
         servicesWithCharacteristicsDiscoveryRegistry.updateTask(
             key: peripheral.identifier,
             action: { $0.start(peripheral: peripheral) }
+        )
+    }
+    
+    func discoverDescriptors(
+        characteristic: QualifiedCharacteristic,
+        discover characteristicsWithDescriptorsToDiscover: CharacteristicsWithDescriptorsToDiscover,
+        completion: @escaping CharacteristicsWithDescriptorsDiscoveryHandler
+    ) throws -> Void {
+        let resolved = try resolve(characteristic: characteristic)
+        
+        discoverDescriptors(
+            for: resolved,
+            discover: characteristicsWithDescriptorsToDiscover,
+            completion: completion
+        )
+    }
+    
+    private func discoverDescriptors(
+        for peripheral: CBCharacteristic,
+        discover characteristicsWithDescriptorsToDiscover: CharacteristicsWithDescriptorsToDiscover,
+        completion: @escaping CharacteristicsWithDescriptorsDiscoveryHandler
+    ) {
+        characteristicsWithDescriptorsDiscoveryRegistry.registerTask(
+            key: peripheral.uuid,
+            params: .init(characteristicsWithDescriptorsToDiscover: characteristicsWithDescriptorsToDiscover),
+            completion: papply(weak: self) { central, result in
+                completion(central, peripheral, result)
+            }
         )
     }
 
