@@ -178,6 +178,14 @@ This project uses melos to manage all the packages inside this repo.
 Install melos: `dart pub global activate melos`
 Setup melos to point to the dependencies in your local folder: `melos bootstrap`
 
+### Android
+
+Library requires kotlin version `1.5.31`.
+
+#### Update kotlin version
+
+To update the kotlin version open Android studio and go to `Tools > Kotlin > Configure Kotlin plugin updates` and update `Update channel` to `1.5.x`.
+
 ### FAQ
 
 #### How to handle the BLE undeliverable exception
