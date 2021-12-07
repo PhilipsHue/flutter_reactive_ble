@@ -137,6 +137,43 @@ class ProtobufMessageConverterTest {
     }
 
     @Nested
+    @DisplayName("Convert to WriteDescriptorInfo")
+    inner class WriteDescriptorInfoTest {
+
+        val result = createWriteDescriptorRequest("id", UUID.fromString("abcd"),
+        UUID.fromString("bcde"), UUID.fromString("cdef"))
+
+        @Test
+        fun `converts to WriteDescriptorInfo object`() {
+            assertThat(protobufConverter.convertWriteDescriptorInfo(result, null)).isInstanceOf(pb.WriteDescriptorInfo::class.java)
+        }
+
+        @Test
+        fun `converts deviceId`() {
+            assertThat(protobufConverter.convertWriteDescriptorInfo(result, null).descriptor.deviceId).isEqualTo(result.descriptor.deviceId)
+        }
+
+        @Test
+        fun `converts serviceId`() {
+            assertThat(protobufConverter.convertWriteDescriptorInfo(result, null).descriptor.serviceUuid).isEqualTo(result.descriptor.serviceUuid)
+        }
+
+        @Test
+        fun `converts characteristicId`() {
+            assertThat(protobufConverter.convertWriteDescriptorInfo(result, null).descriptor.characteristicUuid).isEqualTo(result.descriptor.characteristicUuid)
+        }
+
+        @Test
+        fun `converts descriptorId`() {
+            assertThat(protobufConverter.convertWriteDescriptorInfo(result, null).descriptor.descriptorUuid).isEqualTo(result.descriptor.descriptorUuid)
+        }
+
+
+        // TODO: Error cases.
+    }
+
+
+    @Nested
     @DisplayName("Convert to negotiatemtuinfo")
     inner class NegotiateMtuInfoTest {
 
@@ -215,5 +252,26 @@ class ProtobufMessageConverterTest {
                 .setCharacteristic(characteristicAddress)
                 .build()
     }
+
+    private fun createWriteDescriptorRequest(
+        deviceId: String, serviceUuid: UUID, characteristicUuid: UUID, descriptorUuid: UUID
+    ): pb.WriteDescriptorRequest {
+        val descriptorAddress = pb.DescriptorAddress.newBuilder()
+                .setDeviceId(deviceId)
+                .setServiceUuid(serviceUuid.toProtobuf())
+                .setCharacteristicUuid(characteristicUuid.toProtobuf())
+                .setDescriptorUuid(descriptorUuid.toProtobuf())
+
+        return pb.WriteDescriptorRequest.newBuilder()
+                .setDescriptor(descriptorAddress)
+                .build()
+    }
+}
+
+fun UUID.toProtobuf() : com.signify.hue.flutterreactiveble.ProtobufModel.Uuid.Builder? {
+    val uuidConverter = UuidConverter()
+    return pb.Uuid.newBuilder()
+        .setData(ByteString.copyFrom(uuidConverter.byteArrayFromUuid(this)))
+
 }
 

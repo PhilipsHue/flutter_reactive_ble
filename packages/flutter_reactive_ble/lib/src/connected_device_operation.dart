@@ -17,6 +17,11 @@ abstract class ConnectedDeviceOperation {
     required List<int> value,
   });
 
+  Future<void> writeDescriptorWithoutResponse(
+    QualifiedDescriptor descriptor, {
+    required List<int> value,
+  });
+
   Stream<List<int>> subscribeToCharacteristic(
     QualifiedCharacteristic characteristic,
     Future<void> isDisconnected,
@@ -69,6 +74,13 @@ class ConnectedDeviceOperationImpl implements ConnectedDeviceOperation {
   }) async =>
       _blePlatform
           .writeCharacteristicWithoutResponse(characteristic, value)
+          .then((info) => info.result.dematerialize());
+
+  @override
+  Future<void> writeDescriptorWithoutResponse(QualifiedDescriptor descriptor,
+          {required List<int> value}) =>
+      _blePlatform
+          .writeDescriptorWithoutResponse(descriptor, value)
           .then((info) => info.result.dematerialize());
 
   @override

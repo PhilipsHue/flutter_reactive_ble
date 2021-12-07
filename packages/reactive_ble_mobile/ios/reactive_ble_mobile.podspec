@@ -16,7 +16,10 @@ Bluetooth Low Energy (BLE) Flutter plug-in
   s.dependency 'SwiftProtobuf', '~> 1.0'
   s.ios.deployment_target = '11.0'
   s.osx.deployment_target = '10.13'
-  s.pod_target_xcconfig = { 'GCC_PREPROCESSOR_DEFINITIONS' => '$(inherited) GPB_USE_PROTOBUF_FRAMEWORK_IMPORTS=1' }
-  s.swift_version       = '4.2'
+  s.pod_target_xcconfig = {
+    'GCC_PREPROCESSOR_DEFINITIONS' => '$(inherited) GPB_USE_PROTOBUF_FRAMEWORK_IMPORTS=1',
+    'DEFINES_MODULE' => 'YES',
+    'VALID_ARCHS[sdk=iphonesimulator*]' => 'x86_64'
+  }
+  s.swift_version = '5.0'
 end
-

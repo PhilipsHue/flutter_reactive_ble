@@ -13,6 +13,7 @@ import 'package:reactive_ble_platform_interface/reactive_ble_platform_interface.
 import 'package:reactive_ble_platform_interface/src/model/characteristic_value.dart';
 import 'package:reactive_ble_platform_interface/src/model/connection_state_update.dart';
 import 'package:reactive_ble_platform_interface/src/model/qualified_characteristic.dart';
+import 'package:reactive_ble_platform_interface/src/model/qualified_descriptor.dart';
 import 'package:reactive_ble_platform_interface/src/model/result.dart';
 import 'package:reactive_ble_platform_interface/src/model/unit.dart';
 import 'package:reactive_ble_platform_interface/src/model/uuid.dart';
@@ -286,6 +287,49 @@ void main() {
       test('It invokes method channel with correct arguments', () {
         verify(_methodChannel.invokeMethod<void>(
                 'writeCharacteristicWithoutResponse', request.writeToBuffer()))
+            .called(1);
+      });
+    });
+
+    group('Write descriptor without response', () {
+      QualifiedDescriptor descriptor;
+      const value = [0, 1];
+      late pb.WriteDescriptorRequest request;
+      late WriteDescriptorInfo expectedResult;
+      late WriteDescriptorInfo result;
+
+      setUp(() async {
+        request = pb.WriteDescriptorRequest();
+        descriptor = QualifiedDescriptor(
+          characteristicId: Uuid.parse('FEFF'),
+          descriptorId: Uuid.parse('FEFF'),
+          serviceId: Uuid.parse('FEFF'),
+          deviceId: '123',
+        );
+
+        expectedResult = WriteDescriptorInfo(
+            // ignore: void_checks
+            descriptor: descriptor,
+            // ignore: void_checks
+            result: const Result.success(Unit()));
+
+        when(_methodChannel.invokeMethod<List<int>?>(any, any)).thenAnswer(
+          (_) async => value,
+        );
+        when(_argsConverter.createWriteDescriptorRequest(descriptor, value))
+            .thenReturn(request);
+        when(_protobufConverter.writeDescriptorInfoFrom(value))
+            .thenReturn(expectedResult);
+        result = await _sut.writeDescriptorWithoutResponse(descriptor, value);
+      });
+
+      test('It returns correct value', () async {
+        expect(result, expectedResult);
+      });
+
+      test('It invokes method channel with correct arguments', () {
+        verify(_methodChannel.invokeMethod<void>(
+                'writeDescriptorWithoutResponse', request.writeToBuffer()))
             .called(1);
       });
     });

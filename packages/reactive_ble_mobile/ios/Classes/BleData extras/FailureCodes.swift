@@ -19,6 +19,11 @@ enum WriteCharacteristicFailure: Int {
     case unknown
 }
 
+enum WriteDescriptorFailure: Int {
+
+    case unknown
+}
+
 enum MaximumWriteValueLengthRetrieval: Int {
 
     case unknown

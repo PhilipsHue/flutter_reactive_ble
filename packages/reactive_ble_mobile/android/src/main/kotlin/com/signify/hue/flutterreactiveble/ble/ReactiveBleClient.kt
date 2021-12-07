@@ -198,6 +198,33 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
             RxBleConnection::writeCharWithoutResponse
         )
 
+    override fun writeDescriptorWithoutResponse(
+        deviceId: String,
+        serviceId: UUID,
+        characteristic: UUID,
+        descriptor: UUID,
+        value: ByteArray
+    ): Single<CharOperationResult> {
+        return getConnection(deviceId)
+            .flatMapSingle<CharOperationResult> { connectionResult ->
+                when (connectionResult) {
+                    is EstablishedConnection -> {
+                        connectionResult.rxConnection.writeDescriptor(serviceId, characteristic, descriptor, value)
+                            .andThen(Single.just(CharOperationSuccessful(deviceId, value.asList())))
+                    }
+                    is EstablishConnectionFailure -> {
+                        Single.just(
+                            CharOperationFailed(
+                                deviceId,
+                                "failed to connect ${connectionResult.errorMessage}"
+                            )
+                        )
+                    }
+                }
+            }.first(CharOperationFailed(deviceId, "Writechar timed-out"))
+
+    }
+
     override fun setupNotification(deviceId: String, characteristic: UUID): Observable<ByteArray> {
         return getConnection(deviceId)
             .flatMap { deviceConnection ->

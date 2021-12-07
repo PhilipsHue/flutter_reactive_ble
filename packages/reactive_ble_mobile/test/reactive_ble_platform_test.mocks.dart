@@ -37,47 +37,53 @@ class _FakeReadCharacteristicRequest_2 extends _i1.Fake
 class _FakeWriteCharacteristicRequest_3 extends _i1.Fake
     implements _i2.WriteCharacteristicRequest {}
 
-class _FakeNotifyCharacteristicRequest_4 extends _i1.Fake
+class _FakeWriteDescriptorRequest_4 extends _i1.Fake
+    implements _i2.WriteDescriptorRequest {}
+
+class _FakeNotifyCharacteristicRequest_5 extends _i1.Fake
     implements _i2.NotifyCharacteristicRequest {}
 
-class _FakeNotifyNoMoreCharacteristicRequest_5 extends _i1.Fake
+class _FakeNotifyNoMoreCharacteristicRequest_6 extends _i1.Fake
     implements _i2.NotifyNoMoreCharacteristicRequest {}
 
-class _FakeNegotiateMtuRequest_6 extends _i1.Fake
+class _FakeNegotiateMtuRequest_7 extends _i1.Fake
     implements _i2.NegotiateMtuRequest {}
 
-class _FakeChangeConnectionPriorityRequest_7 extends _i1.Fake
+class _FakeChangeConnectionPriorityRequest_8 extends _i1.Fake
     implements _i2.ChangeConnectionPriorityRequest {}
 
-class _FakeScanForDevicesRequest_8 extends _i1.Fake
+class _FakeScanForDevicesRequest_9 extends _i1.Fake
     implements _i2.ScanForDevicesRequest {}
 
-class _FakeClearGattCacheRequest_9 extends _i1.Fake
+class _FakeClearGattCacheRequest_10 extends _i1.Fake
     implements _i2.ClearGattCacheRequest {}
 
-class _FakeDiscoverServicesRequest_10 extends _i1.Fake
+class _FakeDiscoverServicesRequest_11 extends _i1.Fake
     implements _i2.DiscoverServicesRequest {}
 
-class _FakeScanResult_11 extends _i1.Fake implements _i3.ScanResult {}
+class _FakeScanResult_12 extends _i1.Fake implements _i3.ScanResult {}
 
-class _FakeConnectionStateUpdate_12 extends _i1.Fake
+class _FakeConnectionStateUpdate_13 extends _i1.Fake
     implements _i3.ConnectionStateUpdate {}
 
-class _FakeResult_13<Value, Failure> extends _i1.Fake
+class _FakeResult_14<Value, Failure> extends _i1.Fake
     implements _i3.Result<Value, Failure> {}
 
-class _FakeCharacteristicValue_14 extends _i1.Fake
+class _FakeCharacteristicValue_15 extends _i1.Fake
     implements _i3.CharacteristicValue {}
 
-class _FakeWriteCharacteristicInfo_15 extends _i1.Fake
+class _FakeWriteCharacteristicInfo_16 extends _i1.Fake
     implements _i3.WriteCharacteristicInfo {}
 
-class _FakeConnectionPriorityInfo_16 extends _i1.Fake
+class _FakeConnectionPriorityInfo_17 extends _i1.Fake
     implements _i3.ConnectionPriorityInfo {}
 
-class _FakeMethodCodec_17 extends _i1.Fake implements _i4.MethodCodec {}
+class _FakeMethodCodec_18 extends _i1.Fake implements _i4.MethodCodec {}
 
-class _FakeBinaryMessenger_18 extends _i1.Fake implements _i5.BinaryMessenger {}
+class _FakeBinaryMessenger_19 extends _i1.Fake implements _i5.BinaryMessenger {}
+
+class _FakeWriteDescriptorInfo_20 extends _i1.Fake
+    implements _i3.WriteDescriptorInfo {}
 
 /// A class which mocks [ArgsToProtobufConverter].
 ///
@@ -125,12 +131,19 @@ class MockArgsToProtobufConverter extends _i1.Mock
               returnValue: _FakeWriteCharacteristicRequest_3())
           as _i2.WriteCharacteristicRequest);
   @override
+  _i2.WriteDescriptorRequest createWriteDescriptorRequest(
+          dynamic descriptor, List<int>? value) =>
+      (super.noSuchMethod(
+          Invocation.method(#createWriteDescriptorRequest, [descriptor, value]),
+          returnValue:
+              _FakeWriteDescriptorRequest_4()) as _i2.WriteDescriptorRequest);
+  @override
   _i2.NotifyCharacteristicRequest createNotifyCharacteristicRequest(
           _i3.QualifiedCharacteristic? characteristic) =>
       (super.noSuchMethod(
               Invocation.method(
                   #createNotifyCharacteristicRequest, [characteristic]),
-              returnValue: _FakeNotifyCharacteristicRequest_4())
+              returnValue: _FakeNotifyCharacteristicRequest_5())
           as _i2.NotifyCharacteristicRequest);
   @override
   _i2.NotifyNoMoreCharacteristicRequest createNotifyNoMoreCharacteristicRequest(
@@ -138,14 +151,14 @@ class MockArgsToProtobufConverter extends _i1.Mock
       (super.noSuchMethod(
               Invocation.method(
                   #createNotifyNoMoreCharacteristicRequest, [characteristic]),
-              returnValue: _FakeNotifyNoMoreCharacteristicRequest_5())
+              returnValue: _FakeNotifyNoMoreCharacteristicRequest_6())
           as _i2.NotifyNoMoreCharacteristicRequest);
   @override
   _i2.NegotiateMtuRequest createNegotiateMtuRequest(
           String? deviceId, int? mtu) =>
       (super.noSuchMethod(
               Invocation.method(#createNegotiateMtuRequest, [deviceId, mtu]),
-              returnValue: _FakeNegotiateMtuRequest_6())
+              returnValue: _FakeNegotiateMtuRequest_7())
           as _i2.NegotiateMtuRequest);
   @override
   _i2.ChangeConnectionPriorityRequest createChangeConnectionPrioRequest(
@@ -153,7 +166,7 @@ class MockArgsToProtobufConverter extends _i1.Mock
       (super.noSuchMethod(
               Invocation.method(
                   #createChangeConnectionPrioRequest, [deviceId, priority]),
-              returnValue: _FakeChangeConnectionPriorityRequest_7())
+              returnValue: _FakeChangeConnectionPriorityRequest_8())
           as _i2.ChangeConnectionPriorityRequest);
   @override
   _i2.ScanForDevicesRequest createScanForDevicesRequest(
@@ -166,19 +179,19 @@ class MockArgsToProtobufConverter extends _i1.Mock
                 #scanMode: scanMode,
                 #requireLocationServicesEnabled: requireLocationServicesEnabled
               }),
-              returnValue: _FakeScanForDevicesRequest_8())
+              returnValue: _FakeScanForDevicesRequest_9())
           as _i2.ScanForDevicesRequest);
   @override
   _i2.ClearGattCacheRequest createClearGattCacheRequest(String? deviceId) =>
       (super.noSuchMethod(
               Invocation.method(#createClearGattCacheRequest, [deviceId]),
-              returnValue: _FakeClearGattCacheRequest_9())
+              returnValue: _FakeClearGattCacheRequest_10())
           as _i2.ClearGattCacheRequest);
   @override
   _i2.DiscoverServicesRequest createDiscoverServicesRequest(String? deviceId) =>
       (super.noSuchMethod(
               Invocation.method(#createDiscoverServicesRequest, [deviceId]),
-              returnValue: _FakeDiscoverServicesRequest_10())
+              returnValue: _FakeDiscoverServicesRequest_11())
           as _i2.DiscoverServicesRequest);
   @override
   String toString() => super.toString();
@@ -199,35 +212,40 @@ class MockProtobufConverter extends _i1.Mock implements _i7.ProtobufConverter {
   @override
   _i3.ScanResult scanResultFrom(List<int>? data) =>
       (super.noSuchMethod(Invocation.method(#scanResultFrom, [data]),
-          returnValue: _FakeScanResult_11()) as _i3.ScanResult);
+          returnValue: _FakeScanResult_12()) as _i3.ScanResult);
   @override
   _i3.ConnectionStateUpdate connectionStateUpdateFrom(List<int>? data) =>
       (super.noSuchMethod(Invocation.method(#connectionStateUpdateFrom, [data]),
-              returnValue: _FakeConnectionStateUpdate_12())
+              returnValue: _FakeConnectionStateUpdate_13())
           as _i3.ConnectionStateUpdate);
   @override
   _i3.Result<_i3.Unit, _i3.GenericFailure<_i3.ClearGattCacheError>?>
       clearGattCacheResultFrom(List<int>? data) => (super.noSuchMethod(
           Invocation.method(#clearGattCacheResultFrom, [data]),
-          returnValue: _FakeResult_13<_i3.Unit,
+          returnValue: _FakeResult_14<_i3.Unit,
               _i3.GenericFailure<_i3.ClearGattCacheError>?>()) as _i3
           .Result<_i3.Unit, _i3.GenericFailure<_i3.ClearGattCacheError>?>);
   @override
   _i3.CharacteristicValue characteristicValueFrom(List<int>? data) =>
       (super.noSuchMethod(Invocation.method(#characteristicValueFrom, [data]),
-              returnValue: _FakeCharacteristicValue_14())
+              returnValue: _FakeCharacteristicValue_15())
           as _i3.CharacteristicValue);
   @override
   _i3.WriteCharacteristicInfo writeCharacteristicInfoFrom(List<int>? data) =>
       (super.noSuchMethod(
               Invocation.method(#writeCharacteristicInfoFrom, [data]),
-              returnValue: _FakeWriteCharacteristicInfo_15())
+              returnValue: _FakeWriteCharacteristicInfo_16())
           as _i3.WriteCharacteristicInfo);
+  @override
+  _i3.WriteDescriptorInfo writeDescriptorInfoFrom(List<int>? data) => (super
+          .noSuchMethod(Invocation.method(#writeCharacteristicInfoFrom, [data]),
+              returnValue: _FakeWriteDescriptorInfo_20())
+      as _i3.WriteDescriptorInfo);
   @override
   _i3.ConnectionPriorityInfo connectionPriorityInfoFrom(List<int>? data) =>
       (super.noSuchMethod(
               Invocation.method(#connectionPriorityInfoFrom, [data]),
-              returnValue: _FakeConnectionPriorityInfo_16())
+              returnValue: _FakeConnectionPriorityInfo_17())
           as _i3.ConnectionPriorityInfo);
   @override
   int mtuSizeFrom(List<int>? data) => (super
@@ -255,11 +273,11 @@ class MockMethodChannel extends _i1.Mock implements _i8.MethodChannel {
       (super.noSuchMethod(Invocation.getter(#name), returnValue: '') as String);
   @override
   _i4.MethodCodec get codec => (super.noSuchMethod(Invocation.getter(#codec),
-      returnValue: _FakeMethodCodec_17()) as _i4.MethodCodec);
+      returnValue: _FakeMethodCodec_18()) as _i4.MethodCodec);
   @override
   _i5.BinaryMessenger get binaryMessenger =>
       (super.noSuchMethod(Invocation.getter(#binaryMessenger),
-          returnValue: _FakeBinaryMessenger_18()) as _i5.BinaryMessenger);
+          returnValue: _FakeBinaryMessenger_19()) as _i5.BinaryMessenger);
   @override
   _i9.Future<T?> invokeMethod<T>(String? method, [dynamic arguments]) =>
       (super.noSuchMethod(Invocation.method(#invokeMethod, [method, arguments]),

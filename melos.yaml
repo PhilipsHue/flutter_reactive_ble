@@ -3,6 +3,7 @@ packages:
   - /**
 scripts:
   analyze: melos exec -- flutter analyze
+  generate: melos exec -c 1 -- flutter pub run build_runner build --delete-conflicting-outputs
   format: melos exec -- flutter format .
   get: melos exec -- flutter pub get
   unittest: 

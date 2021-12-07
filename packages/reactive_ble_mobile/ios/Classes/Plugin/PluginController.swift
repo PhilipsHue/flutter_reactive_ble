@@ -298,6 +298,12 @@ final class PluginController {
                         $0.isWritableWithoutResponse = characteristic.properties.contains(.writeWithoutResponse)
                         $0.isNotifiable = characteristic.properties.contains(.notify)
                         $0.isIndicatable = characteristic.properties.contains(.indicate)
+
+                        if let descriptors = characteristic.descriptors {
+                            for descriptor in descriptors {
+                                print("descriptor: \(descriptor.uuid): \(descriptor.value ?? "")")
+                            }
+                        }
                     }
                 }
  
@@ -489,6 +495,66 @@ final class PluginController {
         }
 
         completion(.success(result))
+    }
+
+    func writeDescriptorWithoutResponse(name: String, args: WriteDescriptorRequest, completion: @escaping PlatformMethodCompletionHandler) {
+        guard let central = central
+        else {
+            completion(.failure(PluginError.notInitialized.asFlutterError))
+            return
+        }
+        
+        guard let descriptor = QualifiedDescriptorIDFactory().make(from: args.descriptor)
+        else {
+            completion(.failure(PluginError.invalidMethodCall(method: name, details: "descriptor, characteristic, service, and peripheral IDs are required").asFlutterError))
+            return
+        }
+        
+        guard let peripheral = central.activePeripherals[descriptor.peripheralID],
+              let service = peripheral.services?.first(where: { service in
+                  service == descriptor.serviceID
+              }),
+              let characteristic = service.characteristics?.first(where: { characteristic in
+                  characteristic == descriptor.characteristicID
+              }) else {
+            return
+        }
+        
+        if let _ = characteristic.descriptors?.first(where: { $0.uuid == descriptor.id }) {
+            let result = performWriteDescriptorWithoutResponse(central: central, args: args, descriptor: descriptor)
+            completion(.success(result))
+        } else {
+            do {
+                try central.discoverDescriptors(
+                    characteristic: QualifiedCharacteristic(characteristic),
+                    discover: .some([characteristic])) { central, characteristic, errors in
+                        let result = self.performWriteDescriptorWithoutResponse(central: central, args: args, descriptor: descriptor)
+                        completion(.success(result))
+                    }
+            } catch {
+                
+            }
+        }
+    }
+    
+    private func performWriteDescriptorWithoutResponse(central: Central, args: WriteDescriptorRequest, descriptor: QualifiedDescriptor) -> WriteDescriptorInfo {
+        do {
+            try central.writeDescriptorWithoutResponse(
+                value: args.value,
+                descriptor: QualifiedDescriptor(id: descriptor.id, characteristicID: descriptor.characteristicID, serviceID: descriptor.serviceID, peripheralID: descriptor.peripheralID)
+            )
+            return WriteDescriptorInfo.with {
+                $0.descriptor = args.descriptor
+            }
+        } catch {
+            return WriteDescriptorInfo.with {
+                $0.descriptor = args.descriptor
+                $0.failure = GenericFailure.with {
+                    $0.code = Int32(WriteDescriptorFailure.unknown.rawValue)
+                    $0.message = "\(error)"
+                }
+            }
+        }
     }
 
     func reportMaximumWriteValueLength(name: String, args: NegotiateMtuRequest, completion: @escaping PlatformMethodCompletionHandler) {

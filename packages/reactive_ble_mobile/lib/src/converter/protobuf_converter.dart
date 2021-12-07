@@ -20,6 +20,8 @@ abstract class ProtobufConverter {
 
   WriteCharacteristicInfo writeCharacteristicInfoFrom(List<int> data);
 
+  WriteDescriptorInfo writeDescriptorInfoFrom(List<int> data);
+
   ConnectionPriorityInfo connectionPriorityInfoFrom(List<int> data);
 
   int mtuSizeFrom(List<int> data) =>
@@ -144,6 +146,24 @@ class ProtobufConverterImpl implements ProtobufConverter {
   }
 
   @override
+  WriteDescriptorInfo writeDescriptorInfoFrom(List<int> data) {
+    final message = pb.WriteDescriptorInfo.fromBuffer(data);
+
+    return WriteDescriptorInfo(
+      descriptor: qualifiedDescriptorFrom(message.descriptor),
+      result: resultFrom(
+        getValue: () => const Unit(),
+        failure: genericFailureFrom(
+          hasFailure: message.hasFailure(),
+          getFailure: () => message.failure,
+          codes: WriteDescriptorFailure.values,
+          fallback: (rawOrNull) => WriteDescriptorFailure.unknown,
+        ),
+      ),
+    );
+  }
+
+  @override
   ConnectionPriorityInfo connectionPriorityInfoFrom(List<int> data) {
     final message = pb.ChangeConnectionPriorityInfo.fromBuffer(data);
     return ConnectionPriorityInfo(
@@ -166,6 +186,14 @@ class ProtobufConverterImpl implements ProtobufConverter {
   QualifiedCharacteristic qualifiedCharacteristicFrom(
           pb.CharacteristicAddress message) =>
       QualifiedCharacteristic(
+        characteristicId: Uuid(message.characteristicUuid.data),
+        serviceId: Uuid(message.serviceUuid.data),
+        deviceId: message.deviceId,
+      );
+
+  QualifiedDescriptor qualifiedDescriptorFrom(pb.DescriptorAddress message) =>
+      QualifiedDescriptor(
+        descriptorId: Uuid(message.descriptorUuid.data),
         characteristicId: Uuid(message.characteristicUuid.data),
         serviceId: Uuid(message.serviceUuid.data),
         deviceId: message.deviceId,

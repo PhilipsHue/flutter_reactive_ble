@@ -155,6 +155,20 @@ class ReactiveBleMobilePlatform extends ReactiveBlePlatform {
               (data) => _protobufConverter.writeCharacteristicInfoFrom(data!));
 
   @override
+  Future<WriteDescriptorInfo> writeDescriptorWithoutResponse(
+    QualifiedDescriptor descriptor,
+    List<int> value,
+  ) async =>
+      _bleMethodChannel
+          .invokeMethod<List<int>>(
+            "writeDescriptorWithoutResponse",
+            _argsToProtobufConverter
+                .createWriteDescriptorRequest(descriptor, value)
+                .writeToBuffer(),
+          )
+          .then((data) => _protobufConverter.writeDescriptorInfoFrom(data!));
+
+  @override
   Stream<void> subscribeToNotifications(
     QualifiedCharacteristic characteristic,
   ) =>
