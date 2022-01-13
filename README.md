@@ -54,7 +54,7 @@ _ble.statusStream.listen((status) {
 
 Use ` _ble.status` to get the current status of the host device.
 
-See [BleStatus](https://github.com/PhilipsHue/flutter_reactive_ble/blob/master/lib/src/model/ble_status.dart) for
+See [BleStatus](https://github.com/PhilipsHue/flutter_reactive_ble/blob/master/packages/reactive_ble_platform_interface/lib/src/model/ble_status.dart) for
 more info about the meaning of the different statuses.
 
 ### Establishing connection
@@ -178,14 +178,13 @@ This project uses melos to manage all the packages inside this repo.
 Install melos: `dart pub global activate melos`
 Setup melos to point to the dependencies in your local folder: `melos bootstrap`
 
-### Xcode 13 breaking changes
+### Android
 
-Version `4.0.1` added breaking changes for Xcode 13 that are not backwards compatible with Xcode 12. Due to this all users that are not ready to upgrade to Xcode 13 are at adviced to add the following dependency override to the pubspec.yaml of your app untill you are ready to upgrade to the latest Xcode.
+Library requires kotlin version `1.5.31`.
 
-```yaml
-dependency_overrides:
-  reactive_ble_mobile: '4.0.0'
-```
+#### Update kotlin version
+
+To update the kotlin version open Android studio and go to `Tools > Kotlin > Configure Kotlin plugin updates` and update `Update channel` to `1.5.x`.
 
 ### FAQ
 
