@@ -71,6 +71,11 @@ class PluginController {
         bleStatusChannel.setStreamHandler(bleStatusHandler)
     }
 
+    internal fun deinitialize() {
+        scandevicesHandler.stopDeviceScan()
+        deviceConnectionHandler.disconnectAll()
+    }
+
     internal fun execute(call: MethodCall, result: Result) {
         pluginMethods[call.method]?.invoke(call, result) ?: result.notImplemented()
     }
@@ -81,8 +86,7 @@ class PluginController {
     }
 
     private fun deinitializeClient(call: MethodCall, result: Result) {
-        scandevicesHandler.stopDeviceScan()
-        deviceConnectionHandler.disconnectAll()
+        deinitialize()
         result.success(null)
     }
 

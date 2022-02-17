@@ -13,7 +13,7 @@ class ReactiveBlePlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
     }
 
     override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
-        // deinitalize logic
+        deinitalizePlugin()
     }
 
     companion object {
@@ -24,6 +24,11 @@ class ReactiveBlePlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
             channel.setMethodCallHandler(ReactiveBlePlugin())
             pluginController = PluginController()
             pluginController.initialize(messenger, context)
+        }
+
+        @JvmStatic
+        private fun deinitalizePlugin() {
+            pluginController.deinitialize()
         }
     }
 
