@@ -5,8 +5,6 @@ import 'package:functional_data/functional_data.dart';
 import 'package:meta/meta.dart';
 
 import '../../reactive_ble_platform_interface.dart';
-import 'generic_failure.dart';
-import 'result.dart';
 
 part 'discovered_device.g.dart';
 
