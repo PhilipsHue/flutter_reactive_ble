@@ -45,7 +45,7 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
 
         lateinit var rxBleClient: RxBleClient
             internal set
-        internal lateinit var activeConnections: MutableMap<String, DeviceConnector>
+        internal var activeConnections = mutableMapOf<String, DeviceConnector>()
     }
 
     override val connectionUpdateSubject: BehaviorSubject<ConnectionUpdate>
