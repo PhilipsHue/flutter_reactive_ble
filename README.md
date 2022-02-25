@@ -211,19 +211,6 @@ RxJavaPlugins.setErrorHandler { throwable ->
 #### Which permissions are needed?
 **Android**
 
-For android the library uses the following permissions, depending on the SDK level:
-
-Up to SDK 30 (Android 11):
-* ACCESS_FINE_LOCATION : this permission is needed because old Nexus devices need location services in order to provide reliable scan results
-* BLUETOOTH : allows apps to connect to a paired Bluetooth device
-* BLUETOOTH_ADMIN: allows apps to discover and pair Bluetooth devices
-* BLUETOOTH_SCAN: add this permission with `tools:node="remove"` to remove it from the merged manifest.
-
-
-SDK 31 and up (Android 12+):
-* BLUETOOTH_CONNECT: allows apps to connect to a Bluetooth device
-* BLUETOOTH_SCAN: allows apps to scan for Bluetooth devices
-
 You need to add the following permissions to your AndroidManifest.xml file:
 ```xml
 <uses-permission android:name="android.permission.BLUETOOTH_SCAN" android:usesPermissionFlags="neverForLocation" />
