@@ -54,7 +54,7 @@ _ble.statusStream.listen((status) {
 
 Use ` _ble.status` to get the current status of the host device.
 
-See [BleStatus](https://github.com/PhilipsHue/flutter_reactive_ble/blob/master/lib/src/model/ble_status.dart) for
+See [BleStatus](https://github.com/PhilipsHue/flutter_reactive_ble/blob/master/packages/reactive_ble_platform_interface/lib/src/model/ble_status.dart) for
 more info about the meaning of the different statuses.
 
 ### Establishing connection
@@ -193,13 +193,17 @@ RxJavaPlugins.setErrorHandler { throwable ->
 #### Which permissions are needed?
 **Android**
 
-For android the library uses the following permissions:
-* ACCESS_FINE_LOCATION : this permission is needed because old Nexus devices need location services in order to provide reliable scan results
-* BLUETOOTH : allows apps to connect to a paired bluetooth device
-* BLUETOOTH_ADMIN: allows apps to discover and pair bluetooth devices
+You need to add the following permissions to your AndroidManifest.xml file:
+```xml
+<uses-permission android:name="android.permission.BLUETOOTH_SCAN" android:usesPermissionFlags="neverForLocation" />
+<uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" android:maxSdkVersion="30" />
+<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" android:maxSdkVersion="30" />
+```
 
-These permissions are already added in the manifest of the this library and thus should automatically merge
-into the manifest of your app. It is not needed to add the permissions in your manifest.
+If you use `BLUETOOTH_SCAN` to determine location, remove `android:usesPermissionFlags="neverForLocation"`
+
+If you use location services in your app, remove `android:maxSdkVersion="30"` from the location permission tags
 
 **iOS**
 
