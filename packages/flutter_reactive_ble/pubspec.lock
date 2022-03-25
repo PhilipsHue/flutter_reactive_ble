@@ -291,6 +291,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.12.11"
+  material_color_utilities:
+    dependency: transitive
+    description:
+      name: material_color_utilities
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.1.3"
   meta:
     dependency: "direct main"
     description:
@@ -371,16 +378,16 @@ packages:
   reactive_ble_mobile:
     dependency: "direct main"
     description:
-      path: "../reactive_ble_mobile"
-      relative: true
-    source: path
+      name: reactive_ble_mobile
+      url: "https://pub.dartlang.org"
+    source: hosted
     version: "5.0.2"
   reactive_ble_platform_interface:
     dependency: "direct main"
     description:
-      path: "../reactive_ble_platform_interface"
-      relative: true
-    source: path
+      name: reactive_ble_platform_interface
+      url: "https://pub.dartlang.org"
+    source: hosted
     version: "5.0.2"
   shelf:
     dependency: transitive
@@ -456,7 +463,7 @@ packages:
       name: test_api
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.4.3"
+    version: "0.4.8"
   timing:
     dependency: transitive
     description:
