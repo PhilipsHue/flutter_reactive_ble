@@ -249,6 +249,17 @@ Before you are able to execute BLE operations the BLE-stack of the device makes 
 
 This will prevent issues like [#147](https://github.com/PhilipsHue/flutter_reactive_ble/issues/147).
 
+#### Using location permission in Android 12+ (SDK 31+) apps
+
+This library includes a max-SDK bound restriction to include location permissions on Android SDKs <30. If an SDK 31+ app needs location permissions separate from bluetooth, add the following to your `AndroidManifest.xml`
+
+```xml
+<uses-permission-sdk-23 android:name="android.permission.ACCESS_FINE_LOCATION" android:maxSdkVersion="31" tools:node="replace"/>
+<uses-permission-sdk-23 android:name="android.permission.ACCESS_COARSE_LOCATION" android:maxSdkVersion="31" tools:node="replace"/>
+```
+In addition, the following needs to be added to the `<manifest>` declaration:
+`xmlns:tools="http://schemas.android.com/tools"`
+
 #### Unofficial example apps
 
 Example implementation UART over BLE:[link](https://github.com/wolfc01/flutter_reactive_ble_uart_example)
