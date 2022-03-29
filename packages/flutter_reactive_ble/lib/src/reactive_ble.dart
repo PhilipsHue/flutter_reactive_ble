@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_reactive_ble/src/connected_device_operation.dart';
 import 'package:flutter_reactive_ble/src/debug_logger.dart';
 import 'package:flutter_reactive_ble/src/device_connector.dart';
@@ -10,6 +11,7 @@ import 'package:flutter_reactive_ble/src/rx_ext/repeater.dart';
 import 'package:meta/meta.dart';
 import 'package:reactive_ble_mobile/reactive_ble_mobile.dart';
 import 'package:reactive_ble_platform_interface/reactive_ble_platform_interface.dart';
+import 'package:reactive_ble_web/reactive_ble_web.dart';
 
 /// [FlutterReactiveBle] is the facade of the library. Its interface allows to
 /// perform all the supported BLE operations.
@@ -104,8 +106,9 @@ class FlutterReactiveBle {
         print,
       );
 
-      ReactiveBlePlatform.instance =
-          const ReactiveBleMobilePlatformFactory().create();
+      ReactiveBlePlatform.instance = kIsWeb
+          ? const ReactiveBleWebPlatformFactory().create()
+          : const ReactiveBleMobilePlatformFactory().create();
 
       _blePlatform = ReactiveBlePlatform.instance;
 
@@ -116,7 +119,7 @@ class FlutterReactiveBle {
       );
       _deviceScanner = DeviceScannerImpl(
         blePlatform: _blePlatform,
-        platformIsAndroid: () => Platform.isAndroid,
+        platformIsAndroid: () => !kIsWeb && Platform.isAndroid,
         delayAfterScanCompletion: Future<void>.delayed(
           const Duration(milliseconds: 300),
         ),
