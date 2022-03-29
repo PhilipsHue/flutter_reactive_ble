@@ -10,22 +10,21 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  flutter_web_plugins:
-    sdk: flutter
-  flutter_web_bluetooth: ^0.0.6+2
+  flutter_web_bluetooth: ^0.0.7
+  # flutter_web_plugins:
+  #   sdk: flutter
   protobuf: ^2.0.0
-  rxdart: ^0.27.3
   reactive_ble_platform_interface: ^5.0.2
+  rxdart: ^0.27.3
 
 dev_dependencies:
   build_runner: ^2.1.2
   flutter_test:
     sdk: flutter
   mockito: ^5.0.14
-
-flutter:
-  plugin:
-    platforms:
-      web:
-        pluginClass: ReactiveBleWebPlatform
-        fileName: reactive_ble_web.dart
+# flutter:
+#   plugin:
+#     platforms:
+#       web:
+#         pluginClass: ReactiveBleWebPlatform
+#         fileName: reactive_ble_web.dart

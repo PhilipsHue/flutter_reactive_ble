@@ -2,14 +2,12 @@ import 'dart:async';
 import 'dart:typed_data';
 import 'package:collection/collection.dart';
 import 'package:flutter_web_bluetooth/flutter_web_bluetooth.dart';
-import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 import 'package:reactive_ble_platform_interface/reactive_ble_platform_interface.dart';
 import 'package:reactive_ble_web/src/model/connectedDeviceStreams.dart';
 import 'package:reactive_ble_web/src/model/notifyingCharacteristicStream.dart';
 import 'package:rxdart/rxdart.dart';
 
 class ReactiveBleWebPlatform extends ReactiveBlePlatform {
-  static void registerWith(Registrar registrar) {}
 
   ReactiveBleWebPlatform();
 
