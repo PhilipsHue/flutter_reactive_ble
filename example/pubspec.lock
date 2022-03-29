@@ -221,11 +221,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.0.7"
-  flutter_web_plugins:
-    dependency: transitive
-    description: flutter
-    source: sdk
-    version: "0.0.0"
   frontend_server_client:
     dependency: transitive
     description:
