@@ -10,17 +10,12 @@ class ReactiveBleDesktopPlatform extends ReactiveBlePlatform {
   ///`Streams`
   StreamController<ConnectionStateUpdate> connectionStreamController =
       StreamController.broadcast();
-  StreamController<ConnectionStateUpdate> scanStreamController =
-      StreamController.broadcast();
   StreamController<CharacteristicValue> charValueUpdateStreamController =
       StreamController.broadcast();
 
   ///[Implemented Methods]
   @override
   Future<void> initialize() async {
-    scanStreamController.onListen = () {};
-    scanStreamController.onCancel = () {};
-
     ///add connection
     QuickBlue.setConnectionHandler((deviceId, state) {
       connectionStreamController.add(ConnectionStateUpdate(
@@ -98,8 +93,11 @@ class ReactiveBleDesktopPlatform extends ReactiveBlePlatform {
   @override
   Future<List<DiscoveredService>> discoverServices(String deviceId) async {
     QuickBlue.discoverServices(deviceId);
+    //not available for windows , but we can perform all tasks related to services
+    // ignore: prefer_final_locals
     var discoveredServices = <DiscoveredService>[];
     QuickBlue.setServiceHandler((String device, String serviceId) {
+      print('serviceId: $serviceId');
       if (device == deviceId) {
         discoveredServices.add(DiscoveredService(
             serviceId: Uuid.parse(serviceId),
