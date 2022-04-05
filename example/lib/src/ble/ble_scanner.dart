@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
 import 'package:flutter_reactive_ble_example/src/ble/reactive_state.dart';
 import 'package:meta/meta.dart';
@@ -25,8 +26,17 @@ class BleScanner implements ReactiveState<BleScannerState> {
     _logMessage('Start ble discovery');
     _devices.clear();
     _subscription?.cancel();
-    _subscription =
-        _ble.scanForDevices(withServices: serviceIds).listen((device) {
+    _subscription = _ble
+        .scanForDevices(
+            withServices:
+                //pass services which we want to work with , after connection
+                kIsWeb
+                    ? [
+                        Uuid.parse('0000180a-0000-1000-8000-00805f9b34fb'),
+                        Uuid.parse('00001800-0000-1000-8000-00805f9b34fb'),
+                      ]
+                    : serviceIds)
+        .listen((device) {
       final knownDeviceIndex = _devices.indexWhere((d) => d.id == device.id);
       if (knownDeviceIndex >= 0) {
         _devices[knownDeviceIndex] = device;
