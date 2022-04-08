@@ -251,4 +251,5 @@ This will prevent issues like [#147](https://github.com/PhilipsHue/flutter_react
 
 #### Unofficial example apps
 
-Example implementation UART over BLE:[link](https://github.com/wolfc01/flutter_reactive_ble_uart_example)
+- Example implementation UART over BLE:[link](https://github.com/wolfc01/flutter_reactive_ble_uart_example)
+- Example implementation subscription to characteristic using StreamProvider: [repo](https://github.com/ubiqueIoT/flutter-reactive-ble-example), [tutorial](https://www.ubiqueiot.com/posts/flutter-ble-streamprovider)
