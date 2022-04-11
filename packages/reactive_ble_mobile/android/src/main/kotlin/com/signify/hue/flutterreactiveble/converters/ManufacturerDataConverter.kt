@@ -2,10 +2,10 @@ package com.signify.hue.flutterreactiveble.converters
 
 import android.util.SparseArray
 
-fun extractManufacturerData(manufacturerData: SparseArray<ByteArray>): ByteArray {
+fun extractManufacturerData(manufacturerData: SparseArray<ByteArray>?): ByteArray {
     val rawData = mutableListOf<Byte>()
 
-    if (manufacturerData.size() > 0) {
+    if (manufacturerData != null && manufacturerData.size() > 0) {
         val companyId = manufacturerData.keyAt(0)
         rawData.add((companyId.toByte()))
         rawData.add(((companyId.shr(Byte.SIZE_BITS)).toByte()))
