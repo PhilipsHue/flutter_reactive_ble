@@ -4,7 +4,7 @@
 
 Flutter library that handles BLE operations for multiple devices.
 
-## Usage
+## Features
 
 The reactive BLE lib supports the following:
 
@@ -18,6 +18,41 @@ The reactive BLE lib supports the following:
 - Clear GATT cache
 - Negotiate MTU size
 
+## Getting Started
+### Android
+
+You need to add the following permissions to your AndroidManifest.xml file:
+```xml
+<uses-permission android:name="android.permission.BLUETOOTH_SCAN" android:usesPermissionFlags="neverForLocation" />
+<uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" android:maxSdkVersion="30" />
+<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" android:maxSdkVersion="30" />
+```
+
+If you use `BLUETOOTH_SCAN` to determine location, remove `android:usesPermissionFlags="neverForLocation"`
+
+If you use location services in your app, remove `android:maxSdkVersion="30"` from the location permission tags
+
+### Android ProGuard rules
+In case you are using ProGuard add the following snippet to your `proguard-rules.pro` file:
+
+```
+-keep class com.signify.hue.** { *; }
+```
+
+This will prevent issues like [#131](https://github.com/PhilipsHue/flutter_reactive_ble/issues/131).
+
+### iOS
+
+For iOS it is required you add the following entries to the `Info.plist` file of your app. It is not allowed to access Core BLuetooth without this. See [our example app](https://github.com/PhilipsHue/flutter_reactive_ble/blob/master/example/ios/Runner/Info.plist) on how to implement this. For more indepth details: [Blog post on iOS bluetooth permissions](https://medium.com/flawless-app-stories/handling-ios-13-bluetooth-permissions-26c6a8cbb816)
+
+iOS13 and higher
+* NSBluetoothAlwaysUsageDescription
+
+iOS12 and lower
+* NSBluetoothPeripheralUsageDescription
+
+## Usage
 ### Initialization
 
 Initializing the library should be done the following:
@@ -54,7 +89,7 @@ _ble.statusStream.listen((status) {
 
 Use ` _ble.status` to get the current status of the host device.
 
-See [BleStatus](https://github.com/PhilipsHue/flutter_reactive_ble/blob/master/lib/src/model/ble_status.dart) for
+See [BleStatus](https://github.com/PhilipsHue/flutter_reactive_ble/blob/master/packages/reactive_ble_platform_interface/lib/src/model/ble_status.dart) for
 more info about the meaning of the different statuses.
 
 ### Establishing connection
@@ -189,37 +224,6 @@ RxJavaPlugins.setErrorHandler { throwable ->
   }
 }
 ```
-
-#### Which permissions are needed?
-**Android**
-
-For android the library uses the following permissions:
-* ACCESS_FINE_LOCATION : this permission is needed because old Nexus devices need location services in order to provide reliable scan results
-* BLUETOOTH : allows apps to connect to a paired bluetooth device
-* BLUETOOTH_ADMIN: allows apps to discover and pair bluetooth devices
-
-These permissions are already added in the manifest of the this library and thus should automatically merge
-into the manifest of your app. It is not needed to add the permissions in your manifest.
-
-**iOS**
-
-For iOS it is required you add the following entries to the `Info.plist` file of your app. It is not allowed to access Core BLuetooth without this. See [our example app](https://github.com/PhilipsHue/flutter_reactive_ble/blob/master/example/ios/Runner/Info.plist) on how to implement this. For more indepth details: [Blog post on iOS bluetooth permissions](https://medium.com/flawless-app-stories/handling-ios-13-bluetooth-permissions-26c6a8cbb816)
-
-iOS13 and higher
-* NSBluetoothAlwaysUsageDescription
-
-iOS12 and lower
-* NSBluetoothPeripheralUsageDescription
-
-#### How to adjust ProGuard (Android)
-
-In case you are using ProGuard add the following snippet to your `proguard-rules.pro` file:
-
-```
--keep class com.signify.hue.** { *; }
-```
-
-This will prevent issues like [#131](https://github.com/PhilipsHue/flutter_reactive_ble/issues/131).
 
 #### Why doesn't the BLE stack directly connect to my peripheral
 
