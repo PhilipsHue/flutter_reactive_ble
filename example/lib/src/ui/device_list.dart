@@ -2,9 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
 import 'package:flutter_reactive_ble_example/src/ble/ble_scanner.dart';
 import 'package:provider/provider.dart';
+import 'dart:typed_data';
 
 import '../widgets.dart';
 import 'device_detail/device_detail_screen.dart';
+
+DiscoveredDevice _sampleDevice = DiscoveredDevice(
+  id: 'EB:B1:88:2B:5C:FE',
+  name: 'iNetBox',
+  serviceUuids: const [],
+  serviceData: const {},
+  manufacturerData: Uint8List.fromList([1]) ,
+  rssi: -40,);
 
 class DeviceListScreen extends StatelessWidget {
   const DeviceListScreen({Key? key}) : super(key: key);
@@ -16,9 +25,12 @@ class DeviceListScreen extends StatelessWidget {
               const BleScannerState(
                 discoveredDevices: [],
                 scanIsInProgress: false,
+                advertiseIsInProgress: false
               ),
           startScan: bleScanner.startScan,
           stopScan: bleScanner.stopScan,
+          startAdvertising: bleScanner.startAdvertising,
+          stopAdvertising: bleScanner.stopAdvertising,
         ),
       );
 }
@@ -27,11 +39,15 @@ class _DeviceList extends StatefulWidget {
   const _DeviceList(
       {required this.scannerState,
       required this.startScan,
-      required this.stopScan});
+      required this.stopScan,
+      required this.startAdvertising,
+      required this.stopAdvertising });
 
   final BleScannerState scannerState;
   final void Function(List<Uuid>) startScan;
   final VoidCallback stopScan;
+  final VoidCallback startAdvertising;
+  final VoidCallback stopAdvertising;
 
   @override
   _DeviceListState createState() => _DeviceListState();
@@ -73,6 +89,21 @@ class _DeviceListState extends State<_DeviceList> {
     widget.startScan(text.isEmpty ? [] : [Uuid.parse(_uuidController.text)]);
   }
 
+  void _startAdvertising()
+  {
+    widget.startAdvertising();
+  }
+
+  void _stopAdvertising()
+  {
+    widget.stopAdvertising();
+  }
+
+  void _connectExample()
+  {
+
+  }
+
   @override
   Widget build(BuildContext context) => Scaffold(
         appBar: AppBar(
@@ -80,6 +111,43 @@ class _DeviceListState extends State<_DeviceList> {
         ),
         body: Column(
           children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 16),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        ElevatedButton(
+                          child: const Text('Advertise'),
+                          onPressed: !widget.scannerState.scanIsInProgress && !widget.scannerState.advertiseIsInProgress
+                              ? _startAdvertising
+                              : null,
+                        ),
+                        ElevatedButton(
+                          child: const Text('Stop'),
+                          onPressed: widget.scannerState.advertiseIsInProgress
+                              ? _stopAdvertising
+                              : null,
+                        ),
+                        ElevatedButton(
+                          child: const Text('Connect'),
+                          onPressed: () async {
+                            widget.stopScan();
+                            await Navigator.push<void>(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (_) =>
+                                        DeviceDetailScreen(device: _sampleDevice)));
+                          },
+                        ),
+                      ],
+                    ),
+                  ],
+              ),
+            ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Column(

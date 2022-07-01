@@ -36,7 +36,13 @@ class PluginController {
             "stopNotifications" to this::stopNotifications,
             "negotiateMtuSize" to this::negotiateMtuSize,
             "requestConnectionPriority" to this::requestConnectionPriority,
-            "discoverServices" to this::discoverServices
+            "discoverServices" to this::discoverServices,
+            "startAdvertising" to this::startAdvertising,
+            "stopAdvertising" to this::stopAdvertising,
+            "addGattService" to this::addGattService,
+            "addGattCharacteristic" to this::addGattCharacteristic,
+            "startGattServer" to this::startGattServer,
+            "stopGattServer" to this::stopGattServer,
     )
 
     lateinit var bleClient: com.signify.hue.flutterreactiveble.ble.BleClient
@@ -221,6 +227,36 @@ class PluginController {
     private fun stopNotifications(call: MethodCall, result: Result) {
         val request = pb.NotifyNoMoreCharacteristicRequest.parseFrom(call.arguments as ByteArray)
         charNotificationHandler.unsubscribeFromNotifications(request)
+        result.success(null)
+    }
+
+    private fun startAdvertising(call: MethodCall, result: Result) {
+        bleClient.startAdvertising()
+        result.success(null)
+    }
+
+    private fun stopAdvertising(call: MethodCall, result: Result) {
+        bleClient.stopAdvertising()
+        result.success(null)
+    }
+
+    private fun startGattServer(call: MethodCall, result: Result) {
+        bleClient.startGattServer()
+        result.success(null)
+    }
+
+    private fun stopGattServer(call: MethodCall, result: Result) {
+        bleClient.stopGattServer()
+        result.success(null)
+    }
+
+    private fun addGattService(call: MethodCall, result: Result) {
+        bleClient.addGattService()
+        result.success(null)
+    }
+
+    private fun addGattCharacteristic(call: MethodCall, result: Result) {
+        bleClient.addGattCharacteristic()
         result.success(null)
     }
 

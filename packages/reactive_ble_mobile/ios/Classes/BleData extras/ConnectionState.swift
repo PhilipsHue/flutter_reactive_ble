@@ -10,5 +10,7 @@ func encode(_ connectionState: CBPeripheralState) -> Int32 {
         return 1
     case .disconnecting:
         return 2
+    default:
+        return 255
     }
 }

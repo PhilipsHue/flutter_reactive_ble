@@ -38,4 +38,11 @@ interface BleClient {
     fun observeBleStatus(): Observable<BleStatus>
     fun requestConnectionPriority(deviceId: String, priority: ConnectionPriority):
             Single<RequestConnectionPriorityResult>
+    fun startAdvertising()
+    fun stopAdvertising()
+    fun addGattService()
+    fun addGattCharacteristic()
+    fun startGattServer()
+    fun stopGattServer()
+    fun startAdvertisingWaitDeviceConnect()//: Observable<com.signify.hue.flutterreactiveble.ble.ScanInfo>
 }

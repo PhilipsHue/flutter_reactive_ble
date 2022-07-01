@@ -32,6 +32,16 @@ import java.util.concurrent.TimeUnit
 import kotlin.collections.component1
 import kotlin.collections.component2
 
+import android.bluetooth.BluetoothAdapter
+import android.bluetooth.BluetoothManager
+import android.bluetooth.le.*
+import android.bluetooth.*
+import android.util.Log
+
+private const val tag : String = "ReactiveBleClient"
+
+private lateinit var mBluetoothGattServer: BluetoothGattServer
+
 @Suppress("TooManyFunctions")
 open class ReactiveBleClient(private val context: Context) : BleClient {
     private val connectionQueue = ConnectionQueue()
@@ -46,6 +56,9 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
         lateinit var rxBleClient: RxBleClient
             internal set
         internal var activeConnections = mutableMapOf<String, DeviceConnector>()
+        lateinit var ctx : Context
+
+        internal var gattServices = mutableMapOf<String, BluetoothGattService>()
     }
 
     override val connectionUpdateSubject: BehaviorSubject<ConnectionUpdate>
@@ -54,6 +67,9 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
     override fun initializeClient() {
         activeConnections = mutableMapOf()
         rxBleClient = RxBleClient.create(context)
+        ctx = context
+
+        gattServices = mutableMapOf()
     }
 
     /*yes spread operator is not performant but after kotlin v1.60 it is less bad and it is also the
@@ -227,6 +243,432 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
                     )
             }
         }.first(MtuNegotiateFailed(deviceId, "negotiate mtu timed out"))
+
+    override fun startAdvertisingWaitDeviceConnect()
+    {
+
+    }
+
+    override fun startAdvertising() {
+        val bluetoothManager = ctx.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
+        val bluetoothAdapter: BluetoothAdapter = bluetoothManager.adapter
+        val advertiser: BluetoothLeAdvertiser = bluetoothAdapter.getBluetoothLeAdvertiser()
+
+        val advertiseSettings = AdvertiseSettings.Builder()
+            .setAdvertiseMode(AdvertiseSettings.ADVERTISE_MODE_BALANCED)
+            .setConnectable(true)
+            .setTimeout(0)
+            .setTxPowerLevel(AdvertiseSettings.ADVERTISE_TX_POWER_MEDIUM).build()
+
+        val SERVICE_UUID = "61808880-b7b3-11E4-b3a4-0002a5d5c51b"
+
+        val isNameChanged: Boolean = bluetoothAdapter.setName("Truma App")
+
+        val advertiseData: AdvertiseData = AdvertiseData.Builder()
+            .addServiceUuid(ParcelUuid.fromString(SERVICE_UUID))
+            .build()
+
+        val scanResponse: AdvertiseData = AdvertiseData.Builder()
+            .setIncludeDeviceName(true)
+            .build()
+
+        val advertiseCallback: AdvertiseCallback =  object : AdvertiseCallback() {
+            override fun onStartSuccess(settingsInEffect: AdvertiseSettings) {
+                Log.d("adv", "success")
+                super.onStartSuccess(settingsInEffect)
+            }
+
+            override fun onStartFailure(errorCode: Int) {
+                Log.d("adv", errorCode.toString())
+                super.onStartFailure(errorCode)
+            }
+        }
+
+        advertiser.startAdvertising(advertiseSettings, advertiseData, scanResponse, advertiseCallback)
+
+        addExampleGattService()
+    }
+
+    private fun addExampleGattService() {
+        val bluetoothManager: BluetoothManager = ctx.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
+        //lateinit var mBluetoothGattServer: BluetoothGattServer
+        var mBluetoothGatt: BluetoothGatt? = null
+        var mBluetoothDevice: BluetoothDevice? = null
+
+        var CccdUUID : String = "00002902-0000-1000-8000-00805f9b34fb"
+
+        var SrvUUID1 : String = "d0611e78-bbb4-4591-a5f8-487910ae4366"
+        var SrvUUID2 : String = "ad0badb1-5b99-43cd-917a-a77bc549e3cc"
+        var SrvUUID3 : String = "73a58d00-c5a1-4f8e-8f55-1def871ddc81"
+
+        var CharUUID1 : String = "8667556c-9a37-4c91-84ed-54ee27d90049"
+        var CharUUID2 : String = "af0badb1-5b99-43cd-917a-a77bc549e3cc"
+        var CharUUID3 : String = "73a58d01-c5a1-4f8e-8f55-1def871ddc81"
+
+        val Characteristic1 : BluetoothGattCharacteristic = BluetoothGattCharacteristic(
+            UUID.fromString(CharUUID1),
+            BluetoothGattCharacteristic.PROPERTY_WRITE + BluetoothGattCharacteristic.PROPERTY_NOTIFY,
+            BluetoothGattCharacteristic.PERMISSION_WRITE,
+        )
+
+        val Characteristic2 : BluetoothGattCharacteristic = BluetoothGattCharacteristic(
+            UUID.fromString(CharUUID2),
+            BluetoothGattCharacteristic.PROPERTY_WRITE or BluetoothGattCharacteristic.PROPERTY_NOTIFY,
+            BluetoothGattCharacteristic.PERMISSION_WRITE,
+        )
+
+        val Characteristic3 : BluetoothGattCharacteristic = BluetoothGattCharacteristic(
+            UUID.fromString(CharUUID3),
+            BluetoothGattCharacteristic.PROPERTY_READ or BluetoothGattCharacteristic.PROPERTY_NOTIFY,
+            BluetoothGattCharacteristic.PERMISSION_READ,
+        )
+
+        val CCCD1 : BluetoothGattDescriptor = BluetoothGattDescriptor(
+            UUID.fromString(CccdUUID),
+            BluetoothGattDescriptor.PERMISSION_READ or BluetoothGattDescriptor.PERMISSION_WRITE
+        )
+
+        val CCCD2 : BluetoothGattDescriptor = BluetoothGattDescriptor(
+            UUID.fromString(CccdUUID),
+            BluetoothGattDescriptor.PERMISSION_READ or BluetoothGattDescriptor.PERMISSION_WRITE
+        )
+
+        val CCCD3 : BluetoothGattDescriptor = BluetoothGattDescriptor(
+            UUID.fromString(CccdUUID),
+            BluetoothGattDescriptor.PERMISSION_READ or BluetoothGattDescriptor.PERMISSION_WRITE
+        )
+
+        val service1 = BluetoothGattService(
+            UUID.fromString(SrvUUID1),
+            BluetoothGattService.SERVICE_TYPE_PRIMARY,
+        )
+
+        val service2 = BluetoothGattService(
+            UUID.fromString(SrvUUID2),
+            BluetoothGattService.SERVICE_TYPE_PRIMARY,
+        )
+
+        val service3 = BluetoothGattService(
+            UUID.fromString(SrvUUID3),
+            BluetoothGattService.SERVICE_TYPE_PRIMARY,
+        )
+
+        val gattCallback = object : BluetoothGattCallback() {
+            @Override
+            override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int) {
+                super.onConnectionStateChange(gatt, status, newState)
+                Log.i(tag, "onConnectionStateChange")
+            }
+
+            @Override
+            override fun onServicesDiscovered(gatt: BluetoothGatt?, status: Int) {
+                super.onServicesDiscovered(gatt, status)
+                Log.i(tag, "onServicesDiscovered")
+            }
+
+            @Override
+            override fun onCharacteristicRead(
+                gatt: BluetoothGatt?,
+                characteristic: BluetoothGattCharacteristic?,
+                status: Int
+            ) {
+                super.onCharacteristicRead(gatt, characteristic, status)
+                Log.i(tag, "onCharacteristicRead")
+            }
+
+            @Override
+            override fun onCharacteristicWrite(
+                gatt: BluetoothGatt,
+                characteristic: BluetoothGattCharacteristic,
+                status: Int
+            ) {
+                super.onCharacteristicWrite(gatt, characteristic, status)
+                Log.i(tag, "onCharacteristicWrite")
+            }
+
+            @Override
+            override fun onCharacteristicChanged(
+                gatt: BluetoothGatt?,
+                characteristic: BluetoothGattCharacteristic?
+            ) {
+                super.onCharacteristicChanged(gatt, characteristic)
+                Log.i(tag, "onCharacteristicChanged")
+            }
+
+            @Override
+            override fun onDescriptorRead(
+                gatt: BluetoothGatt?,
+                descriptor: BluetoothGattDescriptor?,
+                status: Int
+            ) {
+                super.onDescriptorRead(gatt, descriptor, status)
+                Log.i(tag, "onDescriptorRead")
+            }
+
+            @Override
+            override fun onDescriptorWrite(
+                gatt: BluetoothGatt?,
+                descriptor: BluetoothGattDescriptor?,
+                status: Int
+            ) {
+                super.onDescriptorWrite(gatt, descriptor, status)
+                Log.i(tag, "onDescriptorWrite")
+            }
+
+            @Override
+            override fun onReliableWriteCompleted(gatt: BluetoothGatt?, status: Int) {
+                super.onReliableWriteCompleted(gatt, status)
+                Log.i(tag, "onReliableWriteCompleted")
+            }
+
+            @Override
+            override fun onReadRemoteRssi(gatt: BluetoothGatt?, rssi: Int, status: Int) {
+                super.onReadRemoteRssi(gatt, rssi, status)
+                Log.i(tag, "onReadRemoteRssi")
+            }
+
+            @Override
+            override fun onMtuChanged(gatt: BluetoothGatt?, mtu: Int, status: Int) {
+                super.onMtuChanged(gatt, mtu, status)
+                Log.i(tag, "onMtuChanged")
+            }
+        }
+
+        val serverCallback = object : BluetoothGattServerCallback() {
+
+            @Override
+            override fun onConnectionStateChange(device: BluetoothDevice?, status: Int, newState: Int) {
+                super.onConnectionStateChange(device, status, newState)
+                Log.i(tag, "onConnectionStateChange")
+
+                Log.i(tag, "Device adress:"+ device?.getAddress() + " bondingstate:" + device?.getBondState())
+
+                val deviceAdressString : String = device?.getAddress().toString();
+
+                /* sample code
+                if (!deviceAdressString.isNullOrEmpty()) {
+                    connectToDevice(deviceAdressString, Duration(5000, TimeUnit.MILLISECONDS))
+                    Log.i(tag, "called connectToDevice")
+                }
+                */
+
+                /*
+                result ->
+                ScanInfo(device?.getAddress(), device?.getName() ?: result.bleDevice.name ?: "",
+                    50,
+                    emptyMap(),
+                    emptyList(),
+                    emptyList(),)
+                */
+            }
+
+            @Override
+            override fun onServiceAdded(status: Int, service: BluetoothGattService?) {
+                super.onServiceAdded(status, service)
+                Log.i(tag, "onServiceAdded")
+
+                //TODO initialise next service
+                var ServiceUuid : String = service?.getUuid().toString()
+                Log.i(tag, ServiceUuid)
+                if (ServiceUuid.equals(SrvUUID1)) {
+                    while (!mBluetoothGattServer.addService(gattServices.get(SrvUUID2)));
+                }
+
+                if (ServiceUuid.equals(SrvUUID2)) {
+                    while (!mBluetoothGattServer.addService(gattServices.get(SrvUUID3)));
+                }
+
+                if (ServiceUuid.equals(SrvUUID3)) {
+                    Log.i(tag, "all gatt services initialised")
+                }
+            }
+
+            @Override
+            override fun onCharacteristicReadRequest(
+                device: BluetoothDevice?,
+                requestId: Int,
+                offset: Int,
+                characteristic: BluetoothGattCharacteristic?
+            ) {
+                super.onCharacteristicReadRequest(device, requestId, offset, characteristic)
+                Log.i(tag, "onCharacteristicReadRequest")
+
+                mBluetoothGattServer.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, offset,
+                    characteristic?.getValue());
+            }
+
+            @Override
+            override fun onCharacteristicWriteRequest(
+                device: BluetoothDevice?,
+                requestId: Int,
+                characteristic: BluetoothGattCharacteristic?,
+                preparedWrite: Boolean,
+                responseNeeded: Boolean,
+                offset: Int,
+                value: ByteArray?
+            ) {
+                super.onCharacteristicWriteRequest(
+                    device,
+                    requestId,
+                    characteristic,
+                    preparedWrite,
+                    responseNeeded,
+                    offset,
+                    value
+                )
+
+                Log.i(tag, "onCharacteristicWriteRequest")
+
+                if (responseNeeded) {
+                    Log.i(tag, "BLE Write Request - Response")
+                    mBluetoothGattServer.sendResponse(
+                        device,
+                        requestId,
+                        BluetoothGatt.GATT_SUCCESS,
+                        0,
+                        null
+                    )
+                }
+            }
+
+            @Override
+            override fun onDescriptorWriteRequest(
+                device: BluetoothDevice?,
+                requestId: Int,
+                descriptor: BluetoothGattDescriptor?,
+                preparedWrite: Boolean,
+                responseNeeded: Boolean,
+                offset: Int,
+                value: ByteArray?
+            ) {
+                super.onDescriptorWriteRequest(
+                    device,
+                    requestId,
+                    descriptor,
+                    preparedWrite,
+                    responseNeeded,
+                    offset,
+                    value
+                )
+                Log.i(tag, "onDescriptorWriteRequest")
+
+                descriptor?.setValue(value);
+
+                var descriptorUuid : String = descriptor?.getUuid().toString()
+
+                if (descriptorUuid.equals(CccdUUID)) {
+                    mBluetoothGattServer.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, 0, null);
+                }
+            }
+
+            @Override
+            override fun onDescriptorReadRequest(
+                device: BluetoothDevice?,
+                requestId: Int,
+                offset: Int,
+                descriptor: BluetoothGattDescriptor?
+            ) {
+                super.onDescriptorReadRequest(device, requestId, offset, descriptor)
+                Log.i(tag, "onDescriptorReadRequest")
+
+                Log.d(tag, "Device tried to read descriptor: " + descriptor?.getUuid());
+                if (offset != 0) {
+                    mBluetoothGattServer.sendResponse(device, requestId, BluetoothGatt.GATT_INVALID_OFFSET, offset,
+                        /* value (optional) */ null);
+                    return;
+                }
+                mBluetoothGattServer.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, offset,
+                    descriptor?.getValue());
+            }
+
+            @Override
+            override fun onNotificationSent(device: BluetoothDevice?, status: Int) {
+                super.onNotificationSent(device, status)
+                Log.i(tag, "onNotificationSent")
+            }
+
+            @Override
+            override fun onMtuChanged(device: BluetoothDevice?, mtu: Int) {
+                super.onMtuChanged(device, mtu)
+                Log.i(tag, "onMtuChanged")
+            }
+
+            @Override
+            override fun onExecuteWrite(device: BluetoothDevice?, requestId: Int, execute: Boolean) {
+                super.onExecuteWrite(device, requestId, execute)
+                Log.i(tag, "onExecuteWrite")
+            }
+        }
+
+        CCCD1.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE)
+        Characteristic1.addDescriptor(CCCD1);
+
+        CCCD2.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE)
+        Characteristic2.addDescriptor(CCCD2);
+
+        CCCD3.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE)
+        Characteristic3.addDescriptor(CCCD3);
+
+        // add characterisitic to a service
+        while (!service1.addCharacteristic(Characteristic1));
+        while (!service2.addCharacteristic(Characteristic2));
+        while (!service3.addCharacteristic(Characteristic3));
+
+        mBluetoothGattServer = bluetoothManager.openGattServer(context, serverCallback)//.also { it.addService(service1service) }
+
+        // add service to a local mutable key value map
+        gattServices.put(SrvUUID1, service1)
+        gattServices.put(SrvUUID2, service2)
+        gattServices.put(SrvUUID3, service3)
+
+
+        // add first service to the gattserver
+        while (!mBluetoothGattServer.addService(service1));
+    }
+
+    override fun stopAdvertising() {
+        val bluetoothManager: BluetoothManager = ctx.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
+        val bluetoothAdapter: BluetoothAdapter = bluetoothManager.adapter
+        val advertiser: BluetoothLeAdvertiser = bluetoothAdapter.getBluetoothLeAdvertiser()
+
+        val advertiseCallback: AdvertiseCallback =  object : AdvertiseCallback() {
+            override fun onStartSuccess(settingsInEffect: AdvertiseSettings) {
+                Log.d("adv stop", "success")
+                super.onStartSuccess(settingsInEffect)
+            }
+
+            override fun onStartFailure(errorCode: Int) {
+                Log.d("adv stop", errorCode.toString())
+                super.onStartFailure(errorCode)
+            }
+        }
+
+        advertiser.stopAdvertising(advertiseCallback)
+
+        // clear and close gatt server after advertising stopped
+        mBluetoothGattServer.clearServices()
+        mBluetoothGattServer.close()
+    }
+
+    override fun startGattServer() {
+        // TODO Move from addExampleGattService to startGattServer
+    }
+
+    override fun stopGattServer() {
+        // clear and close gatt server after advertising stopped
+        mBluetoothGattServer.clearServices()
+        mBluetoothGattServer.close()
+    }
+
+    override fun addGattService() {
+        // TODO Move from addExampleGattService to addGattService
+        // Note: Only add one Service add the time and wait for the onServiceAdded event.
+        //       After receiving onServiceAdded add next service
+    }
+
+    override fun addGattCharacteristic() {
+        // TODO Move from addExampleGattService to addGattCharacteristic
+    }
 
     override fun observeBleStatus(): Observable<BleStatus> = rxBleClient.observeStateChanges()
         .startWith(rxBleClient.state)

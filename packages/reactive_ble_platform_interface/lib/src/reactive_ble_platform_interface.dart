@@ -181,4 +181,36 @@ abstract class ReactiveBlePlatform extends PlatformInterface {
     throw UnimplementedError(
         'requesConnectionPriority has not been implemented.');
   }
+
+  Future<void> startAdvertising() {
+    throw UnimplementedError('startAdvertising has not been implemented.');
+  }
+
+  Future<void> stopAdvertising() {
+    throw UnimplementedError('stopAdvertising has not been implemented.');
+  }
+
+  Future<void> startGattServer() {
+    throw UnimplementedError('startGattServer has not been implemented.');
+  }
+
+  Future<void> stopGattServer() {
+    throw UnimplementedError('stopGattServer has not been implemented.');
+  }
+
+  Future<void> addGattService() {
+    throw UnimplementedError('addGattService has not been implemented.');
+  }
+
+  Future<void> addGattCharacteristic() {
+    throw UnimplementedError('addGattCharacteristic has not been implemented.');
+  }
+
+  Future<int> getPermissions() {
+    throw UnimplementedError('getPermissions has not been implemented.');
+  }
+
+  Future<int> setPermissions() {
+    throw UnimplementedError('setPermissions has not been implemented.');
+  }
 }

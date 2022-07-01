@@ -138,6 +138,25 @@ public class SwiftReactiveBlePlugin: NSObject, FlutterPlugin {
         AnyPlatformMethod(UnaryPlatformMethod(name: "negotiateMtuSize") { (name, context, args: NegotiateMtuRequest, completion) in
             context.reportMaximumWriteValueLength(name: name, args: args, completion: completion)
         }),
+        AnyPlatformMethod(NullaryPlatformMethod(name: "startAdvertising") { (name, context, completion) in
+            context.startAdvertising(name: name, completion: completion)
+        }),
+        AnyPlatformMethod(NullaryPlatformMethod(name: "stopAdvertising") { (name, context, completion) in
+            context.stopAdvertising(name: name, completion: completion)
+        }),
+        AnyPlatformMethod(NullaryPlatformMethod(name: "startGattServer") { (name, context, completion) in
+            context.startGattServer(name: name, completion: completion)
+        }),
+        AnyPlatformMethod(NullaryPlatformMethod(name: "stopGattServer") { (name, context, completion) in
+            context.stopGattServer(name: name, completion: completion)
+        }),
+        AnyPlatformMethod(NullaryPlatformMethod(name: "addGattService") { (name, context, completion) in
+            context.addGattService(name: name, completion: completion)
+        }),
+        AnyPlatformMethod(NullaryPlatformMethod(name: "addGattCharacteristic") { (name, context, completion) in
+            context.addGattCharacteristic(name: name, completion: completion)
+        }),
+
     ])
 
     public func handle(_ call: FlutterMethodCall, result completion: @escaping FlutterResult) {

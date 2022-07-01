@@ -184,6 +184,90 @@ class ReactiveBleMobilePlatform extends ReactiveBlePlatform {
           );
 
   @override
+  Future<void> startAdvertising() =>
+      _bleMethodChannel
+          .invokeMethod<void>(
+        "startAdvertising"/*,
+        _argsToProtobufConverter
+            .createNotifyNoMoreCharacteristicRequest(characteristic)
+            .writeToBuffer(),*/
+      )
+          .catchError(
+        // ignore: avoid_print
+            (Object e) => print("Error starting advertising: $e"),
+      );
+
+  @override
+  Future<void> stopAdvertising() =>
+      _bleMethodChannel
+          .invokeMethod<void>(
+          "stopAdvertising"/*,
+        _argsToProtobufConverter
+            .createNotifyNoMoreCharacteristicRequest(characteristic)
+            .writeToBuffer(),*/
+      )
+          .catchError(
+        // ignore: avoid_print
+            (Object e) => print("Error stopping advertising: $e"),
+      );
+
+  @override
+  Future<void> startGattServer() =>
+      _bleMethodChannel
+          .invokeMethod<void>(
+          "startGattServer"/*,
+        _argsToProtobufConverter
+            .createNotifyNoMoreCharacteristicRequest(characteristic)
+            .writeToBuffer(),*/
+      )
+          .catchError(
+        // ignore: avoid_print
+            (Object e) => print("Error starting gattserver: $e"),
+      );
+
+  @override
+  Future<void> stopGattServer() =>
+      _bleMethodChannel
+          .invokeMethod<void>(
+          "stopGattServer"/*,
+        _argsToProtobufConverter
+            .createNotifyNoMoreCharacteristicRequest(characteristic)
+            .writeToBuffer(),*/
+      )
+          .catchError(
+        // ignore: avoid_print
+            (Object e) => print("Error stopping gattserver: $e"),
+      );
+
+  @override
+  Future<void> addGattService() =>
+      _bleMethodChannel
+          .invokeMethod<void>(
+          "addGattService"/*,
+        _argsToProtobufConverter
+            .createNotifyNoMoreCharacteristicRequest(characteristic)
+            .writeToBuffer(),*/
+      )
+          .catchError(
+        // ignore: avoid_print
+            (Object e) => print("Error adding gattservice: $e"),
+      );
+
+  @override
+  Future<void> addGattCharacteristic() =>
+      _bleMethodChannel
+          .invokeMethod<void>(
+          "addGattCharacteristic"/*,
+        _argsToProtobufConverter
+            .createNotifyNoMoreCharacteristicRequest(characteristic)
+            .writeToBuffer(),*/
+      )
+          .catchError(
+        // ignore: avoid_print
+            (Object e) => print("Error adding gattcharacteristic: $e"),
+      );
+
+  @override
   Future<int> requestMtuSize(String deviceId, int? mtu) async =>
       _bleMethodChannel
           .invokeMethod<List<int>>(

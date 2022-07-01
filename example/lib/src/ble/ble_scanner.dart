@@ -18,8 +18,25 @@ class BleScanner implements ReactiveState<BleScannerState> {
 
   final _devices = <DiscoveredDevice>[];
 
+  bool _advertiseIsInProgress = false;
+
   @override
   Stream<BleScannerState> get state => _stateStreamController.stream;
+
+  void startAdvertising() {
+    _logMessage('Start ble advertising');
+    _ble.startAdvertising();
+        //.listen(device) {_connectedDevice = device; };
+    _advertiseIsInProgress = true;
+    _pushState();
+  }
+
+  void stopAdvertising() {
+    _logMessage('Stop ble advertising');
+    _ble.stopAdvertising();
+    _advertiseIsInProgress = false;
+    _pushState();
+  }
 
   void startScan(List<Uuid> serviceIds) {
     _logMessage('Start ble discovery');
@@ -43,6 +60,7 @@ class BleScanner implements ReactiveState<BleScannerState> {
       BleScannerState(
         discoveredDevices: _devices,
         scanIsInProgress: _subscription != null,
+        advertiseIsInProgress: _advertiseIsInProgress,
       ),
     );
   }
@@ -67,8 +85,10 @@ class BleScannerState {
   const BleScannerState({
     required this.discoveredDevices,
     required this.scanIsInProgress,
+    required this.advertiseIsInProgress,
   });
 
   final List<DiscoveredDevice> discoveredDevices;
   final bool scanIsInProgress;
+  final bool advertiseIsInProgress;
 }

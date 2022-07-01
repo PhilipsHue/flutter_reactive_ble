@@ -44,6 +44,7 @@ void main() {
           initialData: const BleScannerState(
             discoveredDevices: [],
             scanIsInProgress: false,
+            advertiseIsInProgress: false,
           ),
         ),
         StreamProvider<BleStatus?>(

@@ -134,6 +134,38 @@ class FlutterReactiveBle {
     }
   }
 
+  Future<void> startAdvertising() async {
+    await _blePlatform.startAdvertising();
+  }
+
+  /* sample
+  Stream<DiscoveredDevice> startAdvertisingWaitingForDeviceConnect() async* {
+    await initialize();
+
+    yield* _deviceAdvertiser.startAdvertisingWaitingForDeviceConnect();
+  }
+  */
+
+  Future<void> stopAdvertising() async {
+    await _blePlatform.stopAdvertising();
+  }
+
+  Future<void> startGattServer() async {
+    await _blePlatform.startGattServer();
+  }
+
+  Future<void> stopGattServer() async {
+    await _blePlatform.stopGattServer();
+  }
+
+  Future<void> addGattService() async {
+    await _blePlatform.addGattService();
+  }
+
+  Future<void> addGattCharacteristic() async {
+    await _blePlatform.addGattCharacteristic();
+  }
+
   /// Deinitializes this [FlutterReactiveBle] instance and its platform-specific
   /// counterparts.
   ///

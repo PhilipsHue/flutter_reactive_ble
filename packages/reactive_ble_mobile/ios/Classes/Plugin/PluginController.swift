@@ -162,6 +162,30 @@ final class PluginController {
         completion(.success(nil))
     }
 
+    func startAdvertising(name: String, completion: @escaping PlatformMethodCompletionHandler) {
+        guard let central = central
+        else {
+            completion(.failure(PluginError.notInitialized.asFlutterError))
+            return
+        }
+
+        central.startAdvertising()
+
+        completion(.success(nil))
+    }
+
+    func stopAdvertising(name: String, completion: @escaping PlatformMethodCompletionHandler) {
+        guard let central = central
+                else {
+                    completion(.failure(PluginError.notInitialized.asFlutterError))
+                    return
+                }
+
+        central.stopAdvertising()
+        
+        completion(.success(nil))
+    }
+
     func startScanning(sink: EventSink) -> FlutterError? {
         guard let central = central
         else { return PluginError.notInitialized.asFlutterError }

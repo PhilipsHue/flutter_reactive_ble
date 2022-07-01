@@ -12,5 +12,7 @@ func encode(_ centralState: CBManagerState) -> Int32 {
         return 3
     case .poweredOn:
         return 5
+    default:
+        return 0
     }
 }

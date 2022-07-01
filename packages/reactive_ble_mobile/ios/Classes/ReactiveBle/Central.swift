@@ -25,6 +25,9 @@ final class Central {
     private var centralManagerDelegate: CentralManagerDelegate!
     private var centralManager: CBCentralManager!
 
+    private var peripheralManager: CBPeripheralManager!
+    private var peripheralManagerDelegate: PeripheralManagerDelegate!
+
     private(set) var isScanning = false
     private(set) var activePeripherals = [PeripheralID: CBPeripheral]()
     private(set) var connectRegistry = PeripheralTaskRegistry<ConnectTaskController>()
@@ -39,6 +42,7 @@ final class Central {
         onServicesWithCharacteristicsInitialDiscovery: @escaping ServicesWithCharacteristicsDiscoveryHandler,
         onCharacteristicValueUpdate: @escaping CharacteristicValueUpdateHandler
     ) {
+        self.peripheralManager = CBPeripheralManager(delegate: peripheralManagerDelegate, queue: nil)
         self.onServicesWithCharacteristicsInitialDiscovery = onServicesWithCharacteristicsInitialDiscovery
         self.centralManagerDelegate = CentralManagerDelegate(
             onStateChange: papply(weak: self) { central, state in
@@ -116,6 +120,18 @@ final class Central {
     func stopScan() {
         centralManager.stopScan()
         isScanning = false
+    }
+
+    func startAdvertising(){
+        let SERVICE_UUID: String = "61808880-B7B3-11E4-B3A4-0002A5D5C51B"//: UUID = UUID.parse("61808880-B7B3-11E4-B3A4-0002A5D5C51B")
+        //CBAdvertisementDataServiceUUIDsKey: SERVICE_UUID,
+        peripheralManager.startAdvertising([CBAdvertisementDataLocalNameKey: "Truma App",
+                                            //CBAdvertisementDataIsConnectable: true])
+                                            CBAdvertisementDataServiceUUIDsKey: [CBUUID(string: SERVICE_UUID)]])
+    }
+    
+    func stopAdvertising(){
+        peripheralManager.stopAdvertising()
     }
 
     func connect(to peripheralID: PeripheralID, discover servicesWithCharacteristicsToDiscover: ServicesWithCharacteristicsToDiscover, timeout: TimeInterval?) throws {
@@ -360,4 +376,14 @@ final class Central {
             }
         }
     }
+    
+    func peripheralManagerDidUpdateState(_ peripheral: CBPeripheralManager) {
+           if peripheral.state == .poweredOn {
+               print("POWERED ON")
+               //peripheralManager.startAdvertising(beaconPeripheralData as? [String: Any])
+           } else if peripheral.state == .poweredOff {
+               print("POWERED OFF")
+               //peripheralManager.stopAdvertising()
+           }
+       }
 }
