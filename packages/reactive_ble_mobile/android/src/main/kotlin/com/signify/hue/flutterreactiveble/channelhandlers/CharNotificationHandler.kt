@@ -36,7 +36,14 @@ class CharNotificationHandler(private val bleClient: com.signify.hue.flutterreac
             .subscribe({ value ->
                 handleNotificationValue(request.characteristic, value)
             }, {
-                handleNotificationError(request.characteristic, it)
+                when (it) {
+                    is BleDisconnectedException -> {
+                        (subscriptionMap[request.characteristic])?.dispose()
+                    }
+                    else -> {
+                        handleNotificationError(request.characteristic, it)
+                    }
+                }
             })
         subscriptionMap[request.characteristic] = subscription
     }
