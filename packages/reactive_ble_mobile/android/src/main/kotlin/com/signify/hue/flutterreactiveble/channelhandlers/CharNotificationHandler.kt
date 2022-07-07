@@ -1,5 +1,6 @@
 package com.signify.hue.flutterreactiveble.channelhandlers
 
+import com.polidea.rxandroidble2.exceptions.BleDisconnectedException
 import com.signify.hue.flutterreactiveble.ProtobufModel as pb
 import com.signify.hue.flutterreactiveble.converters.ProtobufMessageConverter
 import com.signify.hue.flutterreactiveble.converters.UuidConverter
