@@ -43,6 +43,7 @@ struct ServicesWithCharacteristicsDiscoveryTaskController: PeripheralTaskControl
         }
 
         if let error = error {
+            print("error: ", error)
             return task
                 .with(state: task.state.finished([error]))
         } else {
@@ -51,6 +52,7 @@ struct ServicesWithCharacteristicsDiscoveryTaskController: PeripheralTaskControl
                     with: peripheral.services
                 ) { service, characteristicsToDiscover in
                     peripheral.discoverCharacteristics(characteristicsToDiscover.characteristics, for: service)
+                    print("=>", service)
                 }
 
             return task

@@ -53,6 +53,7 @@ final class Central {
                         onConnectionChange(central, peripheral, .disconnected(error))
                     }
                 }
+                print("ConnectionState: ", state)
                 onStateChange(central, state)
             },
             onDiscovery: papply(weak: self, onDiscovery),
@@ -68,7 +69,7 @@ final class Central {
                 case .failedToConnect(let error), .disconnected(let error):
                     central.eject(peripheral, error: error ?? PluginError.connectionLost)
                 }
-
+                print("onConnectionChange2: ", change)
                 onConnectionChange(central, peripheral, change)
             }
         )
@@ -123,22 +124,148 @@ final class Central {
     }
 
     func startAdvertising(){
+        print("startAdvertising")
+        addExampleGattService()
+        
         let SERVICE_UUID: String = "61808880-B7B3-11E4-B3A4-0002A5D5C51B"//: UUID = UUID.parse("61808880-B7B3-11E4-B3A4-0002A5D5C51B")
         //CBAdvertisementDataServiceUUIDsKey: SERVICE_UUID,
-        peripheralManager.startAdvertising([CBAdvertisementDataLocalNameKey: "Truma App",
+        
+        peripheralManager.startAdvertising([CBAdvertisementDataLocalNameKey: "Truma Ben",
                                             //CBAdvertisementDataIsConnectable: true])
                                             CBAdvertisementDataServiceUUIDsKey: [CBUUID(string: SERVICE_UUID)]])
     }
     
     func stopAdvertising(){
+        print("stopAdvertising")
         peripheralManager.stopAdvertising()
+        peripheralManager.removeAllServices()
+    }
+
+    func addExampleGattService() {
+        //let CccdUID: String = "00002902-0000-1000-8000-00805f9b34fb"
+
+        let SrvUUID1: String = "d0611e78-bbb4-4591-a5f8-487910ae4366"
+        let SrvUUID2: String = "ad0badb1-5b99-43cd-917a-a77bc549e3cc"
+        let SrvUUID3: String = "73a58d00-c5a1-4f8e-8f55-1def871ddc81"
+
+        let CharUUID1: String = "8667556c-9a37-4c91-84ed-54ee27d90049"
+        let CharUUID2: String = "af0badb1-5b99-43cd-917a-a77bc549e3cc"
+        let CharUUID3: String = "73a58d01-c5a1-4f8e-8f55-1def871ddc81"
+
+        var Properties1 = CBCharacteristicProperties.write
+        Properties1.formUnion(CBCharacteristicProperties.notify)
+        
+        var Properties2 = CBCharacteristicProperties.write;
+        Properties2.formUnion(CBCharacteristicProperties.notify)
+        
+        var Properties3 = CBCharacteristicProperties.read;
+        Properties3.formUnion(CBCharacteristicProperties.notify)
+
+        /*
+        let CCCD1: CBMutableDescriptor = CBMutableDescriptor(
+            type: CBUUID(string: CccdUID),
+            value: 0)
+
+        let CCCD2: CBMutableDescriptor = CBMutableDescriptor(
+            type: CBUUID(string: CccdUID),
+            value: 0)
+
+        let CCCD3: CBMutableDescriptor = CBMutableDescriptor(
+            type: CBUUID(string: CccdUID),
+            value: 0)*/
+        
+        let Characteristic1: CBMutableCharacteristic = CBMutableCharacteristic(
+            type: CBUUID(string: CharUUID1),
+            properties: Properties1,
+            value: nil,
+            permissions: CBAttributePermissions.writeable)
+
+        let Characteristic2: CBMutableCharacteristic = CBMutableCharacteristic(
+            type: CBUUID(string: CharUUID2),
+            properties: Properties2,
+            value: nil,
+            permissions: CBAttributePermissions.writeable)
+
+        let Characteristic3: CBMutableCharacteristic = CBMutableCharacteristic(
+            type: CBUUID(string: CharUUID3),
+            properties: Properties3,
+            value: nil,
+            permissions: CBAttributePermissions.readable)
+        
+        //CBUUID.init(CBUUIDCharacteristicUserDescriptionString)
+        
+        //Characteristic1.descriptors = [CCCD1];
+        //Characteristic2.descriptors = [CCCD2];
+        //Characteristic3.descriptors = [CCCD3];
+        
+        let service1 = CBMutableService(
+            type: CBUUID(string: SrvUUID1),
+             primary: true)
+
+        let service2 = CBMutableService(
+            type: CBUUID(string: SrvUUID2),
+            primary: true)
+
+        let service3 = CBMutableService(
+            type: CBUUID(string: SrvUUID3),
+            primary: true)
+        
+        service1.characteristics = [Characteristic1]
+        service2.characteristics = [Characteristic2]
+        service3.characteristics = [Characteristic3]
+        
+        peripheralManager.add(service1)
+        peripheralManager.add(service2)
+        peripheralManager.add(service3)
+    }
+
+    func startGattServer() {
+        // TODO Move from addExampleGattService to startGattServer
+    }
+
+    func stopGattServer() {
+        // clear and close gatt server after advertising stopped
+        peripheralManager.removeAllServices()
+    }
+
+    func addGattService() {
+        // TODO Move from addExampleGattService to addGattService
+        // Note: Only add one Service add the time and wait for the onServiceAdded event.
+        //       After receiving onServiceAdded add next service
+
+        /*
+        CBUUID *serviceUUID = [CBUUID UUIDWithString:kServiceUUID];
+        CBMutableService *service;
+        service = [[CBMutableService alloc] initWithType:serviceUUID primary:YES];
+
+        peripheralManager.addService(service)
+        */
+    }
+
+    func addGattCharacteristic() {
+        // TODO Move from addExampleGattService to addGattCharacteristic
+        /*
+        let characteristicUUID = CBUUID(string: kCharacteristicUUID)
+        let properties: CBCharacteristicProperties = [.Notify, .Read, .Write]
+        let permissions: CBAttributePermissions = [.Readable, .Writeable]
+        let characteristic = CBMutableCharacteristic(type: characteristicUUID, properties: properties, value: nil, permissions: permissions)
+
+        service.characteristics = [characteristic1, characteristic2]
+         */
     }
 
     func connect(to peripheralID: PeripheralID, discover servicesWithCharacteristicsToDiscover: ServicesWithCharacteristicsToDiscover, timeout: TimeInterval?) throws {
+        print("connect")
         let peripheral = try resolve(known: peripheralID)
 
         peripheral.delegate = peripheralDelegate
         activePeripherals[peripheral.identifier] = peripheral
+
+        /*
+        if(peripheral.state == .connected){
+            onConnectionChange(central, peripheral, peripheral.state)
+        }
+        */
 
         connectRegistry.registerTask(
             key: peripheralID,
@@ -162,6 +289,7 @@ final class Central {
                 case .failedToConnect(_), .disconnected(_):
                     break
                 }
+                print("connectionChange: ", connectionChange)
             }
         )
 
@@ -172,6 +300,7 @@ final class Central {
     }
 
     func disconnect(from peripheralID: PeripheralID) {
+        print("disconnect")
         guard let peripheral = try? resolve(known: peripheralID)
         else { return }
 
@@ -179,6 +308,7 @@ final class Central {
     }
 
     func disconnectAll() {
+        print("disconnect all")
         activePeripherals
             .values
             .forEach(centralManager.cancelPeripheralConnection)
@@ -189,6 +319,7 @@ final class Central {
         discover servicesWithCharacteristicsToDiscover: ServicesWithCharacteristicsToDiscover,
         completion: @escaping ServicesWithCharacteristicsDiscoveryHandler
     ) throws -> Void {
+        print("discoverServicesWithCharacteristics")
         let peripheral = try resolve(connected: peripheralID)
 
         discoverServicesWithCharacteristics(
@@ -203,6 +334,7 @@ final class Central {
         discover servicesWithCharacteristicsToDiscover: ServicesWithCharacteristicsToDiscover,
         completion: @escaping ServicesWithCharacteristicsDiscoveryHandler
     ) -> Void {
+        print("discoverServicesWithCharacteristics")
         servicesWithCharacteristicsDiscoveryRegistry.registerTask(
             key: peripheral.identifier,
             params: .init(servicesWithCharacteristicsToDiscover: servicesWithCharacteristicsToDiscover),
@@ -298,6 +430,7 @@ final class Central {
     }
 
     private func eject(_ peripheral: CBPeripheral, error: Error) {
+        print("eject")
         peripheral.delegate = nil
         activePeripherals[peripheral.identifier] = nil
 
@@ -316,6 +449,7 @@ final class Central {
     }
 
     private func resolve(known peripheralID: PeripheralID) throws -> CBPeripheral {
+        print("resolve known PeripheralID")
         guard let peripheral = centralManager.retrievePeripherals(withIdentifiers: [peripheralID]).first
         else { throw Failure.peripheralIsUnknown(peripheralID) }
 
@@ -323,16 +457,24 @@ final class Central {
     }
 
     private func resolve(connected peripheralID: PeripheralID) throws -> CBPeripheral {
+        print("resolve connected PeripheralID")
         guard let peripheral = activePeripherals[peripheralID]
-        else { throw Failure.peripheralIsUnknown(peripheralID) }
+        else {
+            print("peripheral is unknown")
+            throw Failure.peripheralIsUnknown(peripheralID)
+        }
 
         guard peripheral.state == .connected
-        else { throw Failure.peripheralIsNotConnected(peripheralID) }
+        else {
+            print("peripheral is not connected")
+            throw Failure.peripheralIsNotConnected(peripheralID)
+        }
 
         return peripheral
     }
 
     private func resolve(characteristic qualifiedCharacteristic: QualifiedCharacteristic) throws -> CBCharacteristic {
+        print("resolve qualifiedCharacteristic")
         let peripheral = try resolve(connected: qualifiedCharacteristic.peripheralID)
 
         guard let service = peripheral.services?.first(where: { $0.uuid == qualifiedCharacteristic.serviceID })
@@ -376,14 +518,4 @@ final class Central {
             }
         }
     }
-    
-    func peripheralManagerDidUpdateState(_ peripheral: CBPeripheralManager) {
-           if peripheral.state == .poweredOn {
-               print("POWERED ON")
-               //peripheralManager.startAdvertising(beaconPeripheralData as? [String: Any])
-           } else if peripheral.state == .poweredOff {
-               print("POWERED OFF")
-               //peripheralManager.stopAdvertising()
-           }
-       }
 }

@@ -63,7 +63,7 @@ final class PluginController {
             },
             onConnectionChange: papply(weak: self) { context, central, peripheral, change in
                 let failure: (code: ConnectionFailure, message: String)?
-
+                print("onConnectionChange1: ", change)
                 switch change {
                 case .connected:
                     // Wait for services & characteristics to be discovered
@@ -80,15 +80,17 @@ final class PluginController {
                             $0.code = Int32(error.code.rawValue)
                             $0.message = error.message
                         }
+                        print("error: ", error)
                     }
                 }
+                print("86 =>", message)
 
                 context.connectedDeviceSink?.add(.success(message))
             },
             onServicesWithCharacteristicsInitialDiscovery: papply(weak: self) { context, central, peripheral, errors in
                 guard let sink = context.connectedDeviceSink
                 else { assert(false); return }
-
+                print("onServicesWithCharacteristicsInitialDiscovery")
                 let message = DeviceInfo.with {
                     $0.id = peripheral.identifier.uuidString
                     $0.connectionState = encode(peripheral.state)
@@ -97,8 +99,10 @@ final class PluginController {
                             $0.code = Int32(ConnectionFailure.unknown.rawValue)
                             $0.message = errors.map(String.init(describing:)).joined(separator: "\n")
                         }
+                        print("error: ", errors)
                     }
                 }
+                print("105 =>", message)
 
                 sink.add(.success(message))
             },
@@ -119,6 +123,8 @@ final class PluginController {
                         }
                     }
                 }
+                print("onCharacteristicValueUpdate")
+                print("=>", message)
                 let sink = context.characteristicValueUpdateSink
                 if (sink != nil) {
                     sink!.add(.success(message))
@@ -129,7 +135,7 @@ final class PluginController {
 
             }
         )
-
+        print("completion!")
         completion(.success(nil))
     }
 
@@ -186,6 +192,54 @@ final class PluginController {
         completion(.success(nil))
     }
 
+    func startGattServer(name: String, completion: @escaping PlatformMethodCompletionHandler){
+        guard let central = central
+        else {
+            completion(.failure(PluginError.notInitialized.asFlutterError))
+            return
+        }
+
+        central.startGattServer()
+        
+        completion(.success(nil))
+    }
+    
+    func stopGattServer(name: String, completion: @escaping PlatformMethodCompletionHandler){
+        guard let central = central
+        else {
+            completion(.failure(PluginError.notInitialized.asFlutterError))
+            return
+        }
+
+        central.stopGattServer()
+        
+        completion(.success(nil))
+    }
+    
+    func addGattService(name: String, completion: @escaping PlatformMethodCompletionHandler){
+        guard let central = central
+        else {
+            completion(.failure(PluginError.notInitialized.asFlutterError))
+            return
+        }
+
+        central.addGattService()
+        
+        completion(.success(nil))
+    }
+    
+    func addGattCharacteristic(name: String, completion: @escaping PlatformMethodCompletionHandler){
+        guard let central = central
+        else {
+            completion(.failure(PluginError.notInitialized.asFlutterError))
+            return
+        }
+
+        central.addGattCharacteristic()
+        
+        completion(.success(nil))
+    }
+
     func startScanning(sink: EventSink) -> FlutterError? {
         guard let central = central
         else { return PluginError.notInitialized.asFlutterError }
@@ -238,11 +292,15 @@ final class PluginController {
 
         completion(.success(nil))
         
+        //print("currentState:", args.connectionState)
+        
         if let sink = connectedDeviceSink {
             let message = DeviceInfo.with {
                 $0.id = args.deviceID
-                $0.connectionState = encode(.connecting)
+                $0.connectionState = encode(.connected) //encode(.connecting)
+                //TODO ensure if connection is already established
             }
+            print("300 =>", message)
             sink.add(.success(message))
         } else {
             print("Warning! No event channel set up to report a connection update")
@@ -269,6 +327,8 @@ final class PluginController {
                     $0.message = "\(error)"
                 }
             }
+
+            print("328 =>", message)
 
             sink.add(.success(message))
         }
@@ -326,6 +386,7 @@ final class PluginController {
                 }
  
                 $0.includedServices = (service.includedServices ?? []).map(makeDiscoveredService)
+                print("=>", service)
             }
         }
 

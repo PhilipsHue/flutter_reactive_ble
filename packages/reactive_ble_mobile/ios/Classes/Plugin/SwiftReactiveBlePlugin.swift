@@ -156,7 +156,6 @@ public class SwiftReactiveBlePlugin: NSObject, FlutterPlugin {
         AnyPlatformMethod(NullaryPlatformMethod(name: "addGattCharacteristic") { (name, context, completion) in
             context.addGattCharacteristic(name: name, completion: completion)
         }),
-
     ])
 
     public func handle(_ call: FlutterMethodCall, result completion: @escaping FlutterResult) {

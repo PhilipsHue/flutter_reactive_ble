@@ -29,22 +29,28 @@ final class PeripheralDelegate: NSObject, CBPeripheralDelegate {
     }
 
     func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?) {
+        print("peripheral didDiscoverServices")
         onServicesDiscovery(peripheral, error)
     }
 
     func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?) {
+        print("peripheral didDiscoverCharacteristicsFor")
+        print("=>", service)
         onCharacteristicsDiscovery(service, error)
     }
 
     func peripheral(_ peripheral: CBPeripheral, didUpdateNotificationStateFor characteristic: CBCharacteristic, error: Error?) {
+        print("peripheral didUpdateNotificationStateFor")
         onCharacteristicNotificationStateUpdate(characteristic, error)
     }
 
     func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
+        print("peripheral didUpdateValueFor")
         onCharacteristicValueUpdate(characteristic, error)
     }
 
     func peripheral(_ peripheral: CBPeripheral, didWriteValueFor characteristic: CBCharacteristic, error: Error?) {
+        print("peripheral didWriteValueFor")
         onCharacteristicValueWrite(characteristic, error)
     }
 }
