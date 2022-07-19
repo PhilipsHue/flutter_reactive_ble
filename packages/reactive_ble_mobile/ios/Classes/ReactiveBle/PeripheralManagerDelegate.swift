@@ -3,17 +3,16 @@ import CoreBluetooth
 
 final class PeripheralManagerDelegate: NSObject, CBPeripheralManagerDelegate {
     
-    typealias CharacteristicSubscribedByCentralHandler = (CBCentral, CBCharacteristic) -> Void
+    typealias SubChangeHandler = (CBCharacteristic) -> Void
 
-    private let onCharacteristicSubscribedByCentral: CharacteristicSubscribedByCentralHandler
+    private let onSubChange: SubChangeHandler
 
     init(
-        onCharacteristicSubscribedByCentral: @escaping CharacteristicSubscribedByCentralHandler
+        onSubChange: @escaping SubChangeHandler
     ) {
-        self.onCharacteristicSubscribedByCentral = onCharacteristicSubscribedByCentral
+        self.onSubChange = onSubChange
     }
 
-    
     func peripheralManagerDidUpdateState(_ peripheral: CBPeripheralManager) {
         if peripheral.state == .poweredOn {
             print("POWERED ON")
@@ -81,12 +80,13 @@ final class PeripheralManagerDelegate: NSObject, CBPeripheralManagerDelegate {
     func peripheralManager(_ peripheral: CBPeripheralManager, central: CBCentral, didSubscribeTo characteristic: CBCharacteristic)
     {
         print("peripheralManager: didSubscribeTo")
-        onCharacteristicSubscribedByCentral(central, characteristic)
+        onSubChange(characteristic)
     }
 
     // Callback received unsubscribe
     func peripheralManager(_ peripheral: CBPeripheralManager, central: CBCentral, didUnsubscribeFrom characteristic: CBCharacteristic)
     {
-        print("peripheralManager: didUnsubscribeFrom)")
+        print("peripheralManager: didUnsubscribeFrom")
+        onSubChange(characteristic)
     }
 }

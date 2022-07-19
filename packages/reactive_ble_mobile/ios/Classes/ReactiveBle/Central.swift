@@ -18,6 +18,8 @@ final class Central {
     typealias CharacteristicNotifyCompletionHandler = (Central, Error?) -> Void
     typealias CharacteristicValueUpdateHandler = (Central, QualifiedCharacteristic, Data?, Error?) -> Void
     typealias CharacteristicWriteCompletionHandler = (Central, QualifiedCharacteristic, Error?) -> Void
+    typealias CharacteristicSubscribedByCentralHandler = (Central, CBCentral, CBCharacteristic) -> Void
+    typealias SubChangeHandler = (Central, CBCharacteristic) -> Void
 
     private let onServicesWithCharacteristicsInitialDiscovery: ServicesWithCharacteristicsDiscoveryHandler
 
@@ -36,14 +38,20 @@ final class Central {
     private let characteristicWriteRegistry = PeripheralTaskRegistry<CharacteristicWriteTaskController>()
 
     init(
+        onSubChange: @escaping SubChangeHandler,
         onStateChange: @escaping StateChangeHandler,
         onDiscovery: @escaping DiscoveryHandler,
         onConnectionChange: @escaping ConnectionChangeHandler,
         onServicesWithCharacteristicsInitialDiscovery: @escaping ServicesWithCharacteristicsDiscoveryHandler,
-        onCharacteristicValueUpdate: @escaping CharacteristicValueUpdateHandler
+        onCharacteristicValueUpdate: @escaping CharacteristicValueUpdateHandler,
+        onCharacteristicSubscribedByCentral: @escaping CharacteristicSubscribedByCentralHandler
     ) {
-        self.peripheralManager = CBPeripheralManager(delegate: peripheralManagerDelegate, queue: nil)
         self.onServicesWithCharacteristicsInitialDiscovery = onServicesWithCharacteristicsInitialDiscovery
+        self.peripheralManagerDelegate = PeripheralManagerDelegate(
+            onSubChange: papply(weak: self) { central, characteristic in
+                print("characteristic: ", characteristic)
+                onSubChange(central, characteristic)
+        })
         self.centralManagerDelegate = CentralManagerDelegate(
             onStateChange: papply(weak: self) { central, state in
                 if state != .poweredOn {
@@ -102,6 +110,9 @@ final class Central {
                 )
             }
         )
+        self.peripheralManager = CBPeripheralManager(
+            delegate: peripheralManagerDelegate,
+            queue: nil)
         self.centralManager = CBCentralManager(
             delegate: centralManagerDelegate,
             queue: nil

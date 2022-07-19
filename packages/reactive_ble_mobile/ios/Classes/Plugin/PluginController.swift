@@ -5,6 +5,7 @@ import var CoreBluetooth.CBAdvertisementDataServiceDataKey
 import var CoreBluetooth.CBAdvertisementDataServiceUUIDsKey
 import var CoreBluetooth.CBAdvertisementDataManufacturerDataKey
 import var CoreBluetooth.CBAdvertisementDataLocalNameKey
+import class CoreBluetooth.CBCharacteristic
 
 final class PluginController {
 
@@ -32,6 +33,9 @@ final class PluginController {
         }
 
         central = Central(
+            onSubChange: papply(weak: self) { context, _, characteristic in
+                context.reportSub(characteristic)
+            },
             onStateChange: papply(weak: self) { context, _, state in
                 context.reportState(state)
             },
@@ -133,6 +137,8 @@ final class PluginController {
                     context.messageQueue.append(message);
                 }
 
+            }, onCharacteristicSubscribedByCentral: papply(weak: self) { context, central, cbCentral, characteristic in
+                print("Success")
             }
         )
         print("completion!")
@@ -617,5 +623,18 @@ final class PluginController {
         let message = BleStatusInfo.with { $0.status = encode(stateToReport) }
 
         sink.add(.success(message))
+    }
+    
+    private func reportSub(_ knownSub: CBCharacteristic? = nil) {
+        print("reportSub: ", knownSub as Any)
+        /*
+        guard let sink = stateSink
+        else { return }
+
+        let stateToReport = knownState ?? central?.state ?? .unknown
+        let message = BleStatusInfo.with { $0.status = encode(stateToReport) }
+
+        sink.add(.success(message))
+        */
     }
 }
