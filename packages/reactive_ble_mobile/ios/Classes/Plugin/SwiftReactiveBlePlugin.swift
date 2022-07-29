@@ -16,6 +16,8 @@ public class SwiftReactiveBlePlugin: NSObject, FlutterPlugin {
             .setStreamHandler(plugin.connectedDeviceStreamHandler)
         FlutterEventChannel(name: "flutter_reactive_ble_char_update", binaryMessenger: registrar.messenger())
             .setStreamHandler(plugin.characteristicValueUpdateStreamHandler)
+        FlutterEventChannel(name: "flutter_reactive_ble_connected_central", binaryMessenger: registrar.messenger())
+            .setStreamHandler(plugin.connectedCentralStreamHandler)
     }
 
     var statusStreamHandler: StreamHandler<PluginController> {
@@ -56,6 +58,21 @@ public class SwiftReactiveBlePlugin: NSObject, FlutterPlugin {
             },
             onCancel: { context in
                 context.connectedDeviceSink = nil
+                return nil
+            }
+        )
+    }
+
+    var connectedCentralStreamHandler: StreamHandler<PluginController> {
+        return StreamHandler(
+            name: "connected central stream handler",
+            context: context,
+            onListen: { context, sink in
+                context.connectedCentralSink = sink
+                return nil
+            },
+            onCancel: { context in
+                context.connectedCentralSink = nil
                 return nil
             }
         )

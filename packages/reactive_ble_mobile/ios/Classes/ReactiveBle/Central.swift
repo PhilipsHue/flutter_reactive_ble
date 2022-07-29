@@ -19,7 +19,7 @@ final class Central {
     typealias CharacteristicValueUpdateHandler = (Central, QualifiedCharacteristic, Data?, Error?) -> Void
     typealias CharacteristicWriteCompletionHandler = (Central, QualifiedCharacteristic, Error?) -> Void
     typealias CharacteristicSubscribedByCentralHandler = (Central, CBCentral, CBCharacteristic) -> Void
-    typealias SubChangeHandler = (Central, CBCharacteristic) -> Void
+    typealias SubChangeHandler = (Central, CBCentral, CBCharacteristic) -> Void
 
     private let onServicesWithCharacteristicsInitialDiscovery: ServicesWithCharacteristicsDiscoveryHandler
 
@@ -48,9 +48,9 @@ final class Central {
     ) {
         self.onServicesWithCharacteristicsInitialDiscovery = onServicesWithCharacteristicsInitialDiscovery
         self.peripheralManagerDelegate = PeripheralManagerDelegate(
-            onSubChange: papply(weak: self) { central, characteristic in
+            onSubChange: papply(weak: self) { central, connectedCentral, characteristic in
                 print("characteristic: ", characteristic)
-                onSubChange(central, characteristic)
+                onSubChange(central, connectedCentral, characteristic)
         })
         self.centralManagerDelegate = CentralManagerDelegate(
             onStateChange: papply(weak: self) { central, state in
@@ -163,6 +163,19 @@ final class Central {
         let CharUUID2: String = "af0badb1-5b99-43cd-917a-a77bc549e3cc"
         let CharUUID3: String = "73a58d01-c5a1-4f8e-8f55-1def871ddc81"
 
+        let UartSrvUUID    : String = "6E400001-B5A3-F393-E0A9-E50E24DCCA9E"
+        let UartCharRxUUID : String = "6E400002-B5A3-F393-E0A9-E50E24DCCA9E"
+        let UartCharTxUUID : String = "6E400003-B5A3-F393-E0A9-E50E24DCCA9E"
+
+        let uartproperties: CBCharacteristicProperties = [.notify, .read, .write]
+        let uartpermissions: CBAttributePermissions = [.readable, .writeable]
+
+        var UartCharRxProperties = CBCharacteristicProperties.read;
+        UartCharRxProperties.formUnion(CBCharacteristicProperties.notify)
+        
+        var UartCharTxProperties = CBCharacteristicProperties.write;//notify;
+        UartCharTxProperties.formUnion(CBCharacteristicProperties.writeWithoutResponse)
+        
         var Properties1 = CBCharacteristicProperties.write
         Properties1.formUnion(CBCharacteristicProperties.notify)
         
@@ -203,6 +216,19 @@ final class Central {
             value: nil,
             permissions: CBAttributePermissions.readable)
         
+        let UartCharRx: CBMutableCharacteristic = CBMutableCharacteristic(
+                    type: CBUUID(string: UartCharRxUUID),
+                    properties: UartCharRxProperties,//UartCharRxProperties,
+                    value: nil,
+                    permissions: uartpermissions)//CBAttributePermissions.writeable)
+
+        let UartCharTx: CBMutableCharacteristic = CBMutableCharacteristic(
+                    type: CBUUID(string: UartCharTxUUID),
+                    properties: UartCharTxProperties,//UartCharTxProperties,
+                    value: nil,
+                    permissions: uartpermissions)//CBAttributePermissions.writeable)//readable)
+
+        
         //CBUUID.init(CBUUIDCharacteristicUserDescriptionString)
         
         //Characteristic1.descriptors = [CCCD1];
@@ -221,13 +247,20 @@ final class Central {
             type: CBUUID(string: SrvUUID3),
             primary: true)
         
+        let uartService = CBMutableService(
+            type: CBUUID(string: UartSrvUUID),
+            primary: true)
+        
         service1.characteristics = [Characteristic1]
         service2.characteristics = [Characteristic2]
         service3.characteristics = [Characteristic3]
+        uartService.characteristics = [UartCharRx, UartCharTx]
+
         
         peripheralManager.add(service1)
         peripheralManager.add(service2)
         peripheralManager.add(service3)
+        peripheralManager.add(uartService)
     }
 
     func startGattServer() {

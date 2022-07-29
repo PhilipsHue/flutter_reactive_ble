@@ -3,7 +3,7 @@ import CoreBluetooth
 
 final class PeripheralManagerDelegate: NSObject, CBPeripheralManagerDelegate {
     
-    typealias SubChangeHandler = (CBCharacteristic) -> Void
+    typealias SubChangeHandler = (CBCentral, CBCharacteristic) -> Void
 
     private let onSubChange: SubChangeHandler
 
@@ -80,13 +80,13 @@ final class PeripheralManagerDelegate: NSObject, CBPeripheralManagerDelegate {
     func peripheralManager(_ peripheral: CBPeripheralManager, central: CBCentral, didSubscribeTo characteristic: CBCharacteristic)
     {
         print("peripheralManager: didSubscribeTo")
-        onSubChange(characteristic)
+        onSubChange(central, characteristic)
     }
 
     // Callback received unsubscribe
     func peripheralManager(_ peripheral: CBPeripheralManager, central: CBCentral, didUnsubscribeFrom characteristic: CBCharacteristic)
     {
         print("peripheralManager: didUnsubscribeFrom")
-        onSubChange(characteristic)
+        onSubChange(central, characteristic)
     }
 }

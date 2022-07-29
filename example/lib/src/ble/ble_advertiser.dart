@@ -3,9 +3,48 @@ import 'dart:typed_data';
 
 import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
 import 'package:flutter_reactive_ble_example/src/ble/reactive_state.dart';
-import 'package:meta/meta.dart';
 
+class BleAdvertiser implements ReactiveState<ConnectionStateUpdate> {
+  BleAdvertiser({
+    required FlutterReactiveBle ble,
+    required Function(String message) logMessage,
+  })  : _ble = ble,
+        _logMessage = logMessage;
+
+  final FlutterReactiveBle _ble;
+  final void Function(String message) _logMessage;
+
+  @override
+  Stream<ConnectionStateUpdate> get state =>
+      _centralConnectionController.stream;
+
+  final _centralConnectionController =
+      StreamController<ConnectionStateUpdate>();
+
+  late StreamSubscription<ConnectionStateUpdate> _connection;
+
+  /*
+  Future<void> startAdvertise() async {
+    _logMessage('Start advertising');
+
+    _connection = _ble.startAdvertising().listen(
+      (update) {
+        _logMessage('ConnectionState for central: ${update.connectionState}');
+        _centralConnectionController.add(update);
+      },
+      onError: (Object e) => _logMessage(
+          'Advertising / Connecting to central resulted in error $e'),
+    );
+  }
+  */
+
+  Future<void> dispose() async {
+    await _centralConnectionController.close();
+  }
+}
+/*
 class BleAdvertiser implements ReactiveState<BleAdvertiserState> {
+
   BleAdvertiser({
     required FlutterReactiveBle ble,
     required Function(String message) logMessage,
@@ -87,4 +126,4 @@ class BleAdvertiserState {
 
   final DiscoveredDevice connectedDevice;
   final bool advertiseIsInProgress;
-}
+}*/

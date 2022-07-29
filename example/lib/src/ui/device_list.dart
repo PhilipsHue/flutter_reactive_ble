@@ -8,12 +8,15 @@ import '../widgets.dart';
 import 'device_detail/device_detail_screen.dart';
 
 DiscoveredDevice _sampleDevice = DiscoveredDevice(
-  id: 'EB:B1:88:2B:5C:FE',
+  //id: "\x95\xea\xb4rh\x82\U00000003He\x87\U00000006N\xbc\U00000016,\xa0",
+  //id: '95eab472-6882-0348-6587-064ebc162ca0',//'EB:B1:88:2B:5C:FE',9A6F21BD-3DF6-4C29-EDEC-9B9E111309F4
+  id: '68:9E:19:37:0C:30', //'17C3069C-4D6B-BF21-6B47-ED9826BF95A0',
   name: 'iNetBox',
   serviceUuids: const [],
   serviceData: const {},
   manufacturerData: Uint8List.fromList([1]) ,
-  rssi: -40,);
+  rssi: -40,
+);
 
 class DeviceListScreen extends StatelessWidget {
   const DeviceListScreen({Key? key}) : super(key: key);
@@ -25,8 +28,7 @@ class DeviceListScreen extends StatelessWidget {
               const BleScannerState(
                 discoveredDevices: [],
                 scanIsInProgress: false,
-                advertiseIsInProgress: false
-              ),
+                  advertiseIsInProgress: false),
           startScan: bleScanner.startScan,
           stopScan: bleScanner.stopScan,
           startAdvertising: bleScanner.startAdvertising,
@@ -89,19 +91,12 @@ class _DeviceListState extends State<_DeviceList> {
     widget.startScan(text.isEmpty ? [] : [Uuid.parse(_uuidController.text)]);
   }
 
-  void _startAdvertising()
-  {
+  void _startAdvertising() {
     widget.startAdvertising();
   }
 
-  void _stopAdvertising()
-  {
+  void _stopAdvertising() {
     widget.stopAdvertising();
-  }
-
-  void _connectExample()
-  {
-
   }
 
   @override
@@ -122,7 +117,8 @@ class _DeviceListState extends State<_DeviceList> {
                       children: [
                         ElevatedButton(
                           child: const Text('Advertise'),
-                          onPressed: !widget.scannerState.scanIsInProgress && !widget.scannerState.advertiseIsInProgress
+                        onPressed: !widget.scannerState.scanIsInProgress &&
+                                !widget.scannerState.advertiseIsInProgress
                               ? _startAdvertising
                               : null,
                         ),
@@ -139,8 +135,8 @@ class _DeviceListState extends State<_DeviceList> {
                             await Navigator.push<void>(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (_) =>
-                                        DeviceDetailScreen(device: _sampleDevice)));
+                                  builder: (_) => DeviceDetailScreen(
+                                      device: _sampleDevice)));
                           },
                         ),
                       ],

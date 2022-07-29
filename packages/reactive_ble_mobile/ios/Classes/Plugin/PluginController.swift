@@ -6,6 +6,7 @@ import var CoreBluetooth.CBAdvertisementDataServiceUUIDsKey
 import var CoreBluetooth.CBAdvertisementDataManufacturerDataKey
 import var CoreBluetooth.CBAdvertisementDataLocalNameKey
 import class CoreBluetooth.CBCharacteristic
+import class CoreBluetooth.CBCentral
 
 final class PluginController {
 
@@ -25,6 +26,7 @@ final class PluginController {
     var messageQueue: [CharacteristicValueInfo] = [];
     var connectedDeviceSink: EventSink?
     var characteristicValueUpdateSink: EventSink?
+    var connectedCentralSink: EventSink?
 
     func initialize(name: String, completion: @escaping PlatformMethodCompletionHandler) {
         if let central = central {
@@ -33,8 +35,8 @@ final class PluginController {
         }
 
         central = Central(
-            onSubChange: papply(weak: self) { context, _, characteristic in
-                context.reportSub(characteristic)
+            onSubChange: papply(weak: self) { context, _, connectedCentral, characteristic in
+                context.reportSub(connectedCentral, changedSub: characteristic)
             },
             onStateChange: papply(weak: self) { context, _, state in
                 context.reportState(state)
@@ -625,16 +627,14 @@ final class PluginController {
         sink.add(.success(message))
     }
     
-    private func reportSub(_ knownSub: CBCharacteristic? = nil) {
-        print("reportSub: ", knownSub as Any)
-        /*
-        guard let sink = stateSink
+    private func reportSub(_ connectedCentral: CBCentral, changedSub: CBCharacteristic) {
+        print("reportSub: ", changedSub as Any)
+        
+        guard let sink = connectedCentralSink
         else { return }
 
-        let stateToReport = knownState ?? central?.state ?? .unknown
-        let message = BleStatusInfo.with { $0.status = encode(stateToReport) }
+        let message = DeviceInfo.with { $0.id = connectedCentral.identifier.uuidString} //TODO add DeviceID
 
         sink.add(.success(message))
-        */
     }
 }

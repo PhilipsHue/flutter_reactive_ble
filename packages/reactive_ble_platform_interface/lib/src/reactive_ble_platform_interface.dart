@@ -24,6 +24,15 @@ abstract class ReactiveBlePlatform extends PlatformInterface {
     _instance = instance;
   }
 
+  /// Stream providing ble connected central update.
+  ///
+  /// It is important to subscribe to this stream before waiting for central to be connected
+  /// since it can happen that some results are missed.
+  Stream<ConnectionStateUpdate> get connectionCentralStream {
+    throw UnimplementedError(
+        'connectionCentralStream has not been implemented.');
+  }
+
   /// Stream providing ble scan results.
   ///
   /// It is important to subscribe to this stream before scanning for devices

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
+import 'package:flutter_reactive_ble_example/src/ble/ble_advertiser.dart';
 import 'package:flutter_reactive_ble_example/src/ble/ble_device_connector.dart';
 import 'package:flutter_reactive_ble_example/src/ble/ble_device_interactor.dart';
 import 'package:flutter_reactive_ble_example/src/ble/ble_scanner.dart';
@@ -19,10 +20,8 @@ void main() {
   final _ble = FlutterReactiveBle();
   final _scanner = BleScanner(ble: _ble, logMessage: _bleLogger.addToLog);
   final _monitor = BleStatusMonitor(_ble);
-  final _connector = BleDeviceConnector(
-    ble: _ble,
-    logMessage: _bleLogger.addToLog,
-  );
+  final _connector =
+      BleDeviceConnector(ble: _ble, logMessage: _bleLogger.addToLog);
   final _serviceDiscoverer = BleDeviceInteractor(
     bleDiscoverServices: _ble.discoverServices,
     readCharacteristic: _ble.readCharacteristic,
@@ -31,6 +30,7 @@ void main() {
     subscribeToCharacteristic: _ble.subscribeToCharacteristic,
     logMessage: _bleLogger.addToLog,
   );
+  final _advertiser = BleAdvertiser(ble: _ble, logMessage: _bleLogger.addToLog);
   runApp(
     MultiProvider(
       providers: [
@@ -53,6 +53,14 @@ void main() {
         ),
         StreamProvider<ConnectionStateUpdate>(
           create: (_) => _connector.state,
+          initialData: const ConnectionStateUpdate(
+            deviceId: 'Unknown device',
+            connectionState: DeviceConnectionState.disconnected,
+            failure: null,
+          ),
+        ),
+        StreamProvider<ConnectionStateUpdate>(
+          create: (_) => _advertiser.state,
           initialData: const ConnectionStateUpdate(
             deviceId: 'Unknown device',
             connectionState: DeviceConnectionState.disconnected,

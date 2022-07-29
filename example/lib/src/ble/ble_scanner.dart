@@ -25,8 +25,7 @@ class BleScanner implements ReactiveState<BleScannerState> {
 
   void startAdvertising() {
     _logMessage('Start ble advertising');
-    _ble.startAdvertising();
-        //.listen(device) {_connectedDevice = device; };
+    _ble.startAdvertising(); //.listen(update) {};
     _advertiseIsInProgress = true;
     _pushState();
   }

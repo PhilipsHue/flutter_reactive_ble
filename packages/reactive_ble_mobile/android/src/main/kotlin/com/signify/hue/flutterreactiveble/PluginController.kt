@@ -6,6 +6,7 @@ import com.signify.hue.flutterreactiveble.channelhandlers.BleStatusHandler
 import com.signify.hue.flutterreactiveble.channelhandlers.CharNotificationHandler
 import com.signify.hue.flutterreactiveble.channelhandlers.DeviceConnectionHandler
 import com.signify.hue.flutterreactiveble.channelhandlers.ScanDevicesHandler
+import com.signify.hue.flutterreactiveble.channelhandlers.CentralConnectionHandler
 import com.signify.hue.flutterreactiveble.converters.ProtobufMessageConverter
 import com.signify.hue.flutterreactiveble.converters.UuidConverter
 import com.signify.hue.flutterreactiveble.model.ClearGattCacheErrorType
@@ -50,10 +51,12 @@ class PluginController {
     lateinit var scanchannel: EventChannel
     lateinit var deviceConnectionChannel: EventChannel
     lateinit var charNotificationChannel: EventChannel
+    lateinit var centralConnectionChannel: EventChannel
 
     lateinit var scandevicesHandler: ScanDevicesHandler
     lateinit var deviceConnectionHandler: DeviceConnectionHandler
     lateinit var charNotificationHandler: CharNotificationHandler
+    lateinit var centralConnectionHandler: CentralConnectionHandler
 
     private val uuidConverter = UuidConverter()
     private val protoConverter = ProtobufMessageConverter()
@@ -65,16 +68,19 @@ class PluginController {
         deviceConnectionChannel = EventChannel(messenger, "flutter_reactive_ble_connected_device")
         charNotificationChannel = EventChannel(messenger, "flutter_reactive_ble_char_update")
         val bleStatusChannel = EventChannel(messenger, "flutter_reactive_ble_status")
+        centralConnectionChannel = EventChannel(messenger, "flutter_reactive_ble_connected_central")
 
         scandevicesHandler = ScanDevicesHandler(bleClient)
         deviceConnectionHandler = DeviceConnectionHandler(bleClient)
         charNotificationHandler = CharNotificationHandler(bleClient)
         val bleStatusHandler = BleStatusHandler(bleClient)
+        centralConnectionHandler = CentralConnectionHandler(bleClient)
 
         scanchannel.setStreamHandler(scandevicesHandler)
         deviceConnectionChannel.setStreamHandler(deviceConnectionHandler)
         charNotificationChannel.setStreamHandler(charNotificationHandler)
         bleStatusChannel.setStreamHandler(bleStatusHandler)
+        centralConnectionChannel.setStreamHandler(centralConnectionHandler)
     }
 
     internal fun deinitialize() {

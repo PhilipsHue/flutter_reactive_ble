@@ -10,6 +10,10 @@ import 'package:flutter_reactive_ble/src/rx_ext/repeater.dart';
 import 'package:meta/meta.dart';
 import 'package:reactive_ble_mobile/reactive_ble_mobile.dart';
 import 'package:reactive_ble_platform_interface/reactive_ble_platform_interface.dart';
+//import 'package:flutter_reactive_ble/src/device_advertiser.dart';
+import 'package:flutter_reactive_ble/src/central_connector.dart';
+
+import 'central_connector.dart';
 
 /// [FlutterReactiveBle] is the facade of the library. Its interface allows to
 /// perform all the supported BLE operations.
@@ -27,6 +31,7 @@ class FlutterReactiveBle {
     required Logger debugLogger,
     required Future<void> initialization,
     required ReactiveBlePlatform reactiveBlePlatform,
+    required CentralConnector centralConnector,
   }) {
     _deviceScanner = deviceScanner;
     _deviceConnector = deviceConnector;
@@ -34,11 +39,14 @@ class FlutterReactiveBle {
     _debugLogger = debugLogger;
     _initialization = initialization;
     _blePlatform = reactiveBlePlatform;
+    _centralConnector = centralConnector;
     _trackStatus();
+    _trackCentralConnected();
   }
 
   FlutterReactiveBle._() {
     _trackStatus();
+    _trackCentralConnected();
   }
 
   /// Registry that keeps track of all BLE devices found during a BLE scan.
@@ -66,6 +74,13 @@ class FlutterReactiveBle {
       }).stream.asBroadcastStream()
         ..listen((_) {});
 
+  /// A stream providing connection updates for all the connected BLE devices.
+  Stream<ConnectionStateUpdate> get connectedCentralStream =>
+      Repeater(onListenEmitFrom: () async* {
+        await initialize();
+        yield* _centralConnectionStateUpdateStream;
+      }).stream;
+
   /// A stream providing value updates for all the connected BLE devices.
   ///
   /// The updates include read responses as well as notifications.
@@ -77,6 +92,11 @@ class FlutterReactiveBle {
   late ReactiveBlePlatform _blePlatform;
 
   BleStatus _status = BleStatus.unknown;
+  ConnectionStateUpdate _update = ConnectionStateUpdate(
+    deviceId: '',
+    connectionState: DeviceConnectionState.disconnected,
+    failure: null,
+  );
 
   Stream<BleStatus> get _statusStream => _blePlatform.bleStatusStream;
 
@@ -85,12 +105,21 @@ class FlutterReactiveBle {
     _statusStream.listen((status) => _status = status);
   }
 
+  Stream<ConnectionStateUpdate> get _centralConnectionStateUpdateStream =>
+      _centralConnector.centralConnectionStateUpdateStream;
+
+  Future<void> _trackCentralConnected() async {
+    await initialize();
+    _centralConnectionStateUpdateStream.listen((update) => _update = update);
+  }
+
   Future<void>? _initialization;
 
   late DeviceConnector _deviceConnector;
   late ConnectedDeviceOperation _connectedDeviceOperator;
   late DeviceScanner _deviceScanner;
   late Logger _debugLogger;
+  late CentralConnector _centralConnector;
 
   /// Initializes this [FlutterReactiveBle] instance and its platform-specific
   /// counterparts.
@@ -130,12 +159,18 @@ class FlutterReactiveBle {
         delayAfterScanFailure: const Duration(seconds: 10),
       );
 
+      _centralConnector = CentralConnectorImpl(
+        blePlatform: _blePlatform,
+      );
+
       await _initialization;
     }
   }
 
   Future<void> startAdvertising() async {
     await _blePlatform.startAdvertising();
+    //connectedCentralStream.listen((update) => _update = update);
+    //yield* _deviceAdvertiser.startAdvert;
   }
 
   /* sample
