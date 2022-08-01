@@ -92,6 +92,7 @@ class ReactiveBleMobilePlatform extends ReactiveBlePlatform {
     Map<Uuid, List<Uuid>>? servicesWithCharacteristicsToDiscover,
     Duration? connectionTimeout,
     bool? forcedBond,
+    bool? autoConnect,
   ) =>
       _bleMethodChannel
           .invokeMethod<void>(
@@ -102,6 +103,7 @@ class ReactiveBleMobilePlatform extends ReactiveBlePlatform {
                   servicesWithCharacteristicsToDiscover,
                   connectionTimeout,
                   forcedBond ?? false,
+                  autoConnect ?? false,
                 )
                 .writeToBuffer(),
           )
