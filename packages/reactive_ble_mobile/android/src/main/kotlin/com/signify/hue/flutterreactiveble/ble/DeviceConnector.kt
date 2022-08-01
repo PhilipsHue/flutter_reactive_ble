@@ -184,7 +184,7 @@ internal class DeviceConnector(
         rxBleDevice: RxBleDevice,
         shouldNotTimeout: Boolean
     ): Observable<RxBleConnection> {
-        return rxBleDevice.establishConnection(false)
+        return rxBleDevice.establishConnection(!forcedBond)
             .compose {
                 if (shouldNotTimeout) {
                     it
