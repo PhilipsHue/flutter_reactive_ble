@@ -3,7 +3,7 @@
 //  source: bledata.proto
 //
 // @dart = 2.12
-// ignore_for_file: annotate_overrides,camel_case_types,unnecessary_const,non_constant_identifier_names,library_prefixes,unused_import,unused_shown_name,return_of_invalid_type,unnecessary_this,prefer_final_fields
+// ignore_for_file: annotate_overrides,camel_case_types,constant_identifier_names,directives_ordering,library_prefixes,non_constant_identifier_names,prefer_final_fields,return_of_invalid_type,unnecessary_const,unnecessary_import,unnecessary_this,unused_import,unused_shown_name
 
 import 'dart:core' as $core;
 
@@ -219,6 +219,7 @@ class ConnectToDeviceRequest extends $pb.GeneratedMessage {
     ..aOM<ServicesWithCharacteristics>(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'servicesWithCharacteristicsToDiscover', protoName: 'servicesWithCharacteristicsToDiscover', subBuilder: ServicesWithCharacteristics.create)
     ..a<$core.int>(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'timeoutInMs', $pb.PbFieldType.O3, protoName: 'timeoutInMs')
     ..aOB(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'forcedBond', protoName: 'forcedBond')
+    ..aOB(5, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'autoConnect', protoName: 'autoConnect')
     ..hasRequiredFields = false
   ;
 
@@ -228,6 +229,7 @@ class ConnectToDeviceRequest extends $pb.GeneratedMessage {
     ServicesWithCharacteristics? servicesWithCharacteristicsToDiscover,
     $core.int? timeoutInMs,
     $core.bool? forcedBond,
+    $core.bool? autoConnect,
   }) {
     final _result = create();
     if (deviceId != null) {
@@ -241,6 +243,9 @@ class ConnectToDeviceRequest extends $pb.GeneratedMessage {
     }
     if (forcedBond != null) {
       _result.forcedBond = forcedBond;
+    }
+    if (autoConnect != null) {
+      _result.autoConnect = autoConnect;
     }
     return _result;
   }
@@ -302,6 +307,15 @@ class ConnectToDeviceRequest extends $pb.GeneratedMessage {
   $core.bool hasForcedBond() => $_has(3);
   @$pb.TagNumber(4)
   void clearForcedBond() => clearField(4);
+
+  @$pb.TagNumber(5)
+  $core.bool get autoConnect => $_getBF(4);
+  @$pb.TagNumber(5)
+  set autoConnect($core.bool v) { $_setBool(4, v); }
+  @$pb.TagNumber(5)
+  $core.bool hasAutoConnect() => $_has(4);
+  @$pb.TagNumber(5)
+  void clearAutoConnect() => clearField(5);
 }
 
 class DeviceInfo extends $pb.GeneratedMessage {

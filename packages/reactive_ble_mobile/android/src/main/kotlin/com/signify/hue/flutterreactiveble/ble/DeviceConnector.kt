@@ -1,5 +1,7 @@
 package com.signify.hue.flutterreactiveble.ble
 
+import android.annotation.SuppressLint
+import android.bluetooth.BluetoothDevice
 import androidx.annotation.VisibleForTesting
 import com.polidea.rxandroidble2.RxBleConnection
 import com.polidea.rxandroidble2.RxBleCustomOperation
@@ -11,17 +13,17 @@ import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.disposables.Disposable
-import io.reactivex.functions.Function
 import io.reactivex.subjects.BehaviorSubject
 import java.util.concurrent.TimeUnit
-import android.bluetooth.*
 
+@SuppressLint("MissingPermission")
 internal class DeviceConnector(
     private val device: RxBleDevice,
     private val connectionTimeout: Duration,
     private val updateListeners: (update: ConnectionUpdate) -> Unit,
     private val connectionQueue: ConnectionQueue,
     private val forcedBond: Boolean,
+    private val autoConnect: Boolean,
 ) {
 
     companion object {
@@ -62,20 +64,20 @@ internal class DeviceConnector(
             .subscribe {
                 if (forcedBond) {
                     if (it is ConnectionUpdateSuccess && it.connectionState == ConnectionState.CONNECTED.code) {
-                        if (device.getBluetoothDevice()
-                                .getBondState() == BluetoothDevice.BOND_BONDED
+                        if (device.bluetoothDevice
+                                .bondState == BluetoothDevice.BOND_BONDED
                         )
                             updateListeners.invoke(it)
                         else {
-                            val bondState: Int = device.getBluetoothDevice().getBondState()
+                            val bondState: Int = device.bluetoothDevice.bondState
                             if (bondState != BluetoothDevice.BOND_BONDING) {
-                                device.getBluetoothDevice().createBond()
+                                device.bluetoothDevice.createBond()
                             }
                             Observable.interval(5, TimeUnit.SECONDS)
                                 .take(3)
                                 .subscribe {
-                                    if (!bonded && device.getBluetoothDevice()
-                                            .getBondState() == BluetoothDevice.BOND_BONDED
+                                    if (!bonded && device.bluetoothDevice
+                                            .bondState == BluetoothDevice.BOND_BONDED
                                     ) {
                                         bonded = true
                                         updateListeners.invoke(
@@ -100,9 +102,9 @@ internal class DeviceConnector(
         in order to prevent Android from ignoring disconnects we add a delay when we try to
         disconnect to quickly after establishing connection. https://issuetracker.google.com/issues/37121223
          */
-        if (diff < DeviceConnector.Companion.minTimeMsBeforeDisconnectingIsAllowed) {
+        if (diff < minTimeMsBeforeDisconnectingIsAllowed) {
             Single.timer(
-                DeviceConnector.Companion.minTimeMsBeforeDisconnectingIsAllowed - diff,
+                minTimeMsBeforeDisconnectingIsAllowed - diff,
                 TimeUnit.MILLISECONDS
             )
                 .doFinally {
@@ -184,17 +186,16 @@ internal class DeviceConnector(
         rxBleDevice: RxBleDevice,
         shouldNotTimeout: Boolean
     ): Observable<RxBleConnection> {
-        return rxBleDevice.establishConnection(!forcedBond)
+        return rxBleDevice.establishConnection(autoConnect)
             .compose {
                 if (shouldNotTimeout) {
                     it
                 } else {
                     it.timeout(
-                        Observable.timer(connectionTimeout.value, connectionTimeout.unit),
-                        Function<RxBleConnection, Observable<Unit>> {
-                            Observable.never<Unit>()
-                        }
-                    )
+                        Observable.timer(connectionTimeout.value, connectionTimeout.unit)
+                    ) {
+                        Observable.never<Unit>()
+                    }
                 }
             }
     }
@@ -218,14 +219,14 @@ internal class DeviceConnector(
      * Known to work up to Android Q beta 2.
      */
     private fun clearGattCache(connection: RxBleConnection): Completable {
-        val operation = RxBleCustomOperation<Unit> { bluetoothGatt, _, _ ->
+        val operation = RxBleCustomOperation { bluetoothGatt, _, _ ->
             try {
                 val refreshMethod = bluetoothGatt.javaClass.getMethod("refresh")
                 val success = refreshMethod.invoke(bluetoothGatt) as Boolean
                 if (success) {
                     Observable.empty<Unit>()
                         .delay(
-                            DeviceConnector.Companion.delayMsAfterClearingCache,
+                            delayMsAfterClearingCache,
                             TimeUnit.MILLISECONDS
                         )
                 } else {
@@ -233,7 +234,7 @@ internal class DeviceConnector(
                     Observable.error(RuntimeException(reason))
                 }
             } catch (e: ReflectiveOperationException) {
-                Observable.error<Unit>(e)
+                Observable.error(e)
             }
         }
         return connection.queue(operation).ignoreElements()

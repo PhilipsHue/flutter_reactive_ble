@@ -255,6 +255,7 @@ class FlutterReactiveBle {
     Map<Uuid, List<Uuid>>? servicesWithCharacteristicsToDiscover,
     Duration? connectionTimeout,
     bool? forcedBond,
+    bool? autoConnect,
   }) =>
       initialize().asStream().asyncExpand(
             (_) => _deviceConnector.connect(
@@ -263,6 +264,7 @@ class FlutterReactiveBle {
                   servicesWithCharacteristicsToDiscover,
               connectionTimeout: connectionTimeout,
               forcedBond: forcedBond,
+              autoConnect: autoConnect,
             ),
           );
 

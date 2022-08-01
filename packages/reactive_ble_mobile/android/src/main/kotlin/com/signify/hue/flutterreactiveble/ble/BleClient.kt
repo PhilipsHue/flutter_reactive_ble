@@ -13,11 +13,22 @@ import java.util.UUID
 @Suppress("TooManyFunctions")
 interface BleClient {
 
-    val connectionUpdateSubject: BehaviorSubject<com.signify.hue.flutterreactiveble.ble.ConnectionUpdate>
+    val connectionUpdateSubject: BehaviorSubject<ConnectionUpdate>
 
     fun initializeClient()
-    fun scanForDevices(services: List<ParcelUuid>, scanMode: ScanMode, requireLocationServicesEnabled: Boolean): Observable<com.signify.hue.flutterreactiveble.ble.ScanInfo>
-    fun connectToDevice(deviceId: String, timeout: Duration, forcedBond: Boolean)
+    fun scanForDevices(
+        services: List<ParcelUuid>,
+        scanMode: ScanMode,
+        requireLocationServicesEnabled: Boolean,
+    ): Observable<ScanInfo>
+
+    fun connectToDevice(
+        deviceId: String,
+        timeout: Duration,
+        forcedBond: Boolean,
+        autoConnect: Boolean
+    )
+
     fun disconnectDevice(deviceId: String)
     fun disconnectAllDevices()
     fun discoverServices(deviceId: String): Single<RxBleDeviceServices>
@@ -27,13 +38,15 @@ interface BleClient {
     fun writeCharacteristicWithResponse(
         deviceId: String,
         characteristic: UUID,
-        value: ByteArray
+        value: ByteArray,
     ): Single<CharOperationResult>
+
     fun writeCharacteristicWithoutResponse(
         deviceId: String,
         characteristic: UUID,
-        value: ByteArray
+        value: ByteArray,
     ): Single<CharOperationResult>
+
     fun negotiateMtuSize(deviceId: String, size: Int): Single<MtuNegotiateResult>
     fun observeBleStatus(): Observable<BleStatus>
     fun requestConnectionPriority(deviceId: String, priority: ConnectionPriority):

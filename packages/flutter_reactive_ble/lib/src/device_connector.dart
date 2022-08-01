@@ -11,6 +11,7 @@ abstract class DeviceConnector {
     Map<Uuid, List<Uuid>>? servicesWithCharacteristicsToDiscover,
     Duration? connectionTimeout,
     bool? forcedBond,
+    bool? autoConnect,
   });
 
   Stream<ConnectionStateUpdate> connectToAdvertisingDevice({
@@ -55,6 +56,7 @@ class DeviceConnectorImpl implements DeviceConnector {
     Map<Uuid, List<Uuid>>? servicesWithCharacteristicsToDiscover,
     Duration? connectionTimeout,
     bool? forcedBond,
+    bool? autoConnect,
   }) {
     final specificConnectedDeviceStream = deviceConnectionStateUpdateStream
         .where((update) => update.deviceId == id)
@@ -72,6 +74,7 @@ class DeviceConnectorImpl implements DeviceConnector {
             servicesWithCharacteristicsToDiscover,
             connectionTimeout,
             forcedBond,
+            autoConnect,
           )
           .asyncExpand((_) => specificConnectedDeviceStream),
       onCancel: () => _blePlatform.disconnectDevice(id),

@@ -91,6 +91,8 @@ struct ConnectToDeviceRequest {
 
   var forcedBond: Bool = false
 
+  var autoConnect: Bool = false
+
   var unknownFields = SwiftProtobuf.UnknownStorage()
 
   init() {}
@@ -617,6 +619,37 @@ struct GenericFailure {
   init() {}
 }
 
+#if swift(>=5.5) && canImport(_Concurrency)
+extension ScanForDevicesRequest: @unchecked Sendable {}
+extension DeviceScanInfo: @unchecked Sendable {}
+extension ConnectToDeviceRequest: @unchecked Sendable {}
+extension DeviceInfo: @unchecked Sendable {}
+extension DisconnectFromDeviceRequest: @unchecked Sendable {}
+extension ClearGattCacheRequest: @unchecked Sendable {}
+extension ClearGattCacheInfo: @unchecked Sendable {}
+extension NotifyCharacteristicRequest: @unchecked Sendable {}
+extension NotifyNoMoreCharacteristicRequest: @unchecked Sendable {}
+extension ReadCharacteristicRequest: @unchecked Sendable {}
+extension CharacteristicValueInfo: @unchecked Sendable {}
+extension WriteCharacteristicRequest: @unchecked Sendable {}
+extension WriteCharacteristicInfo: @unchecked Sendable {}
+extension NegotiateMtuRequest: @unchecked Sendable {}
+extension NegotiateMtuInfo: @unchecked Sendable {}
+extension BleStatusInfo: @unchecked Sendable {}
+extension ChangeConnectionPriorityRequest: @unchecked Sendable {}
+extension ChangeConnectionPriorityInfo: @unchecked Sendable {}
+extension CharacteristicAddress: @unchecked Sendable {}
+extension ServiceDataEntry: @unchecked Sendable {}
+extension ServicesWithCharacteristics: @unchecked Sendable {}
+extension ServiceWithCharacteristics: @unchecked Sendable {}
+extension DiscoverServicesRequest: @unchecked Sendable {}
+extension DiscoverServicesInfo: @unchecked Sendable {}
+extension DiscoveredService: @unchecked Sendable {}
+extension DiscoveredCharacteristic: @unchecked Sendable {}
+extension Uuid: @unchecked Sendable {}
+extension GenericFailure: @unchecked Sendable {}
+#endif  // swift(>=5.5) && canImport(_Concurrency)
+
 // MARK: - Code below here is support for the SwiftProtobuf runtime.
 
 extension ScanForDevicesRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
@@ -748,6 +781,7 @@ extension ConnectToDeviceRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageI
     2: .same(proto: "servicesWithCharacteristicsToDiscover"),
     3: .same(proto: "timeoutInMs"),
     4: .same(proto: "forcedBond"),
+    5: .same(proto: "autoConnect"),
   ]
 
   mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -760,6 +794,7 @@ extension ConnectToDeviceRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageI
       case 2: try { try decoder.decodeSingularMessageField(value: &self._servicesWithCharacteristicsToDiscover) }()
       case 3: try { try decoder.decodeSingularInt32Field(value: &self.timeoutInMs) }()
       case 4: try { try decoder.decodeSingularBoolField(value: &self.forcedBond) }()
+      case 5: try { try decoder.decodeSingularBoolField(value: &self.autoConnect) }()
       default: break
       }
     }
@@ -782,6 +817,9 @@ extension ConnectToDeviceRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageI
     if self.forcedBond != false {
       try visitor.visitSingularBoolField(value: self.forcedBond, fieldNumber: 4)
     }
+    if self.autoConnect != false {
+      try visitor.visitSingularBoolField(value: self.autoConnect, fieldNumber: 5)
+    }
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -790,6 +828,7 @@ extension ConnectToDeviceRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageI
     if lhs._servicesWithCharacteristicsToDiscover != rhs._servicesWithCharacteristicsToDiscover {return false}
     if lhs.timeoutInMs != rhs.timeoutInMs {return false}
     if lhs.forcedBond != rhs.forcedBond {return false}
+    if lhs.autoConnect != rhs.autoConnect {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }

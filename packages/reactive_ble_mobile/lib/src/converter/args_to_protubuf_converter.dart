@@ -8,6 +8,7 @@ abstract class ArgsToProtobufConverter {
     Map<Uuid, List<Uuid>>? servicesWithCharacteristicsToDiscover,
     Duration? connectionTimeout,
     bool? forcedBond,
+    bool? autoConnect,
   );
 
   pb.DisconnectFromDeviceRequest createDisconnectDeviceArgs(String deviceId);
@@ -59,10 +60,12 @@ class ArgsToProtobufConverterImpl implements ArgsToProtobufConverter {
     Map<Uuid, List<Uuid>>? servicesWithCharacteristicsToDiscover,
     Duration? connectionTimeout,
     bool? forcedBond,
+    bool? autoConnect,
   ) {
     final args = pb.ConnectToDeviceRequest()
       ..deviceId = id
-      ..forcedBond = forcedBond ?? false;
+      ..forcedBond = forcedBond ?? false
+      ..autoConnect = autoConnect ?? false;
 
     if (connectionTimeout != null) {
       args.timeoutInMs = connectionTimeout.inMilliseconds;

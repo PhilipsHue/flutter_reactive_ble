@@ -3,7 +3,7 @@
 //  source: bledata.proto
 //
 // @dart = 2.12
-// ignore_for_file: annotate_overrides,camel_case_types,unnecessary_const,non_constant_identifier_names,library_prefixes,unused_import,unused_shown_name,return_of_invalid_type,unnecessary_this,prefer_final_fields,deprecated_member_use_from_same_package
+// ignore_for_file: annotate_overrides,camel_case_types,constant_identifier_names,deprecated_member_use_from_same_package,directives_ordering,library_prefixes,non_constant_identifier_names,prefer_final_fields,return_of_invalid_type,unnecessary_const,unnecessary_import,unnecessary_this,unused_import,unused_shown_name
 
 import 'dart:core' as $core;
 import 'dart:convert' as $convert;
@@ -45,11 +45,12 @@ const ConnectToDeviceRequest$json = const {
     const {'1': 'servicesWithCharacteristicsToDiscover', '3': 2, '4': 1, '5': 11, '6': '.ServicesWithCharacteristics', '10': 'servicesWithCharacteristicsToDiscover'},
     const {'1': 'timeoutInMs', '3': 3, '4': 1, '5': 5, '10': 'timeoutInMs'},
     const {'1': 'forcedBond', '3': 4, '4': 1, '5': 8, '10': 'forcedBond'},
+    const {'1': 'autoConnect', '3': 5, '4': 1, '5': 8, '10': 'autoConnect'},
   ],
 };
 
 /// Descriptor for `ConnectToDeviceRequest`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List connectToDeviceRequestDescriptor = $convert.base64Decode('ChZDb25uZWN0VG9EZXZpY2VSZXF1ZXN0EhoKCGRldmljZUlkGAEgASgJUghkZXZpY2VJZBJyCiVzZXJ2aWNlc1dpdGhDaGFyYWN0ZXJpc3RpY3NUb0Rpc2NvdmVyGAIgASgLMhwuU2VydmljZXNXaXRoQ2hhcmFjdGVyaXN0aWNzUiVzZXJ2aWNlc1dpdGhDaGFyYWN0ZXJpc3RpY3NUb0Rpc2NvdmVyEiAKC3RpbWVvdXRJbk1zGAMgASgFUgt0aW1lb3V0SW5NcxIeCgpmb3JjZWRCb25kGAQgASgIUgpmb3JjZWRCb25k');
+final $typed_data.Uint8List connectToDeviceRequestDescriptor = $convert.base64Decode('ChZDb25uZWN0VG9EZXZpY2VSZXF1ZXN0EhoKCGRldmljZUlkGAEgASgJUghkZXZpY2VJZBJyCiVzZXJ2aWNlc1dpdGhDaGFyYWN0ZXJpc3RpY3NUb0Rpc2NvdmVyGAIgASgLMhwuU2VydmljZXNXaXRoQ2hhcmFjdGVyaXN0aWNzUiVzZXJ2aWNlc1dpdGhDaGFyYWN0ZXJpc3RpY3NUb0Rpc2NvdmVyEiAKC3RpbWVvdXRJbk1zGAMgASgFUgt0aW1lb3V0SW5NcxIeCgpmb3JjZWRCb25kGAQgASgIUgpmb3JjZWRCb25kEiAKC2F1dG9Db25uZWN0GAUgASgIUgthdXRvQ29ubmVjdA==');
 @$core.Deprecated('Use deviceInfoDescriptor instead')
 const DeviceInfo$json = const {
   '1': 'DeviceInfo',

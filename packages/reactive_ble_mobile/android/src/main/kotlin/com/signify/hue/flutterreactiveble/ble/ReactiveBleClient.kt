@@ -37,6 +37,7 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
     private val connectionQueue = ConnectionQueue()
     private val allConnections = CompositeDisposable()
     private var forcedBond = false
+    private var autoConnect = true
 
     companion object {
         // this needs to be in companion update since backgroundisolates respawn the eventchannels
@@ -82,8 +83,10 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
             *filters
         )
             .map { result ->
-                ScanInfo(result.bleDevice.macAddress, result.scanRecord.deviceName
-                    ?: result.bleDevice.name ?: "",
+                ScanInfo(
+                    result.bleDevice.macAddress,
+                    result.scanRecord.deviceName
+                        ?: result.bleDevice.name ?: "",
                     result.rssi,
                     result.scanRecord.serviceData.mapKeys { it.key.uuid },
                     result.scanRecord.serviceUuids?.map { it.uuid } ?: emptyList(),
@@ -93,30 +96,37 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
             }
     }
 
-    override fun connectToDevice(deviceId: String, timeout: Duration, forcedBond: Boolean) {
+    override fun connectToDevice(
+        deviceId: String,
+        timeout: Duration,
+        forcedBond: Boolean,
+        autoConnect: Boolean,
+    ) {
         this.forcedBond = forcedBond
-        allConnections.add(getConnection(deviceId, timeout)
-            .subscribe({ result ->
-                when (result) {
-                    is EstablishedConnection -> {
-                    }
-                    is EstablishConnectionFailure -> {
-                        connectionUpdateBehaviorSubject.onNext(
-                            ConnectionUpdateError(
-                                deviceId,
-                                result.errorMessage
+        this.autoConnect = forcedBond
+        allConnections.add(
+            getConnection(deviceId, timeout)
+                .subscribe({ result ->
+                    when (result) {
+                        is EstablishedConnection -> {
+                        }
+                        is EstablishConnectionFailure -> {
+                            connectionUpdateBehaviorSubject.onNext(
+                                ConnectionUpdateError(
+                                    deviceId,
+                                    result.errorMessage
+                                )
                             )
-                        )
+                        }
                     }
-                }
-            }, { error ->
-                connectionUpdateBehaviorSubject.onNext(
-                    ConnectionUpdateError(
-                        deviceId, error?.message
-                            ?: "unknown error"
+                }, { error ->
+                    connectionUpdateBehaviorSubject.onNext(
+                        ConnectionUpdateError(
+                            deviceId, error?.message
+                                ?: "unknown error"
+                        )
                     )
-                )
-            })
+                })
         )
     }
 
@@ -153,7 +163,7 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
         deviceId: String,
         characteristic: UUID
     ): Single<CharOperationResult> =
-        getConnection(deviceId).flatMapSingle<CharOperationResult> { connectionResult ->
+        getConnection(deviceId).flatMapSingle { connectionResult ->
             when (connectionResult) {
                 is EstablishedConnection ->
                     connectionResult.rxConnection.readCharacteristic(characteristic)
@@ -238,7 +248,14 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
 
     @VisibleForTesting
     internal open fun createDeviceConnector(device: RxBleDevice, timeout: Duration) =
-        DeviceConnector(device, timeout, connectionUpdateBehaviorSubject::onNext, connectionQueue, forcedBond)
+        DeviceConnector(
+            device,
+            timeout,
+            connectionUpdateBehaviorSubject::onNext,
+            connectionQueue,
+            forcedBond,
+            autoConnect,
+        )
 
     private fun getConnection(
         deviceId: String,
@@ -258,7 +275,7 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
         bleOperation: RxBleConnection.(characteristic: UUID, value: ByteArray) -> Single<ByteArray>
     ): Single<CharOperationResult> {
         return getConnection(deviceId)
-            .flatMapSingle<CharOperationResult> { connectionResult ->
+            .flatMapSingle { connectionResult ->
                 when (connectionResult) {
                     is EstablishedConnection -> {
                         connectionResult.rxConnection.bleOperation(characteristic, value)
@@ -283,7 +300,6 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
 
         when (deviceConnection) {
             is EstablishedConnection -> {
-
                 if (rxBleClient.getBleDevice(deviceConnection.deviceId).bluetoothDevice.bondState == BOND_BONDING) {
                     Observable.error(Exception("Bonding is in progress wait for bonding to be finished before executing more operations on the device"))
                 } else {
@@ -316,7 +332,7 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
         deviceId: String,
         priority: ConnectionPriority
     ): Single<RequestConnectionPriorityResult> =
-        getConnection(deviceId).switchMapSingle<RequestConnectionPriorityResult> { connectionResult ->
+        getConnection(deviceId).switchMapSingle { connectionResult ->
             when (connectionResult) {
                 is EstablishedConnection ->
                     connectionResult.rxConnection.requestConnectionPriority(
