@@ -103,7 +103,7 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
         autoConnect: Boolean,
     ) {
         this.forcedBond = forcedBond
-        this.autoConnect = forcedBond
+        this.autoConnect = autoConnect
         allConnections.add(
             getConnection(deviceId, timeout)
                 .subscribe({ result ->
