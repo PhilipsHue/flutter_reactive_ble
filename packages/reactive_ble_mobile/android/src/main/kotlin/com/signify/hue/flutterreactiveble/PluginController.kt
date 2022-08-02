@@ -5,8 +5,8 @@ import com.signify.hue.flutterreactiveble.ble.RequestConnectionPriorityFailed
 import com.signify.hue.flutterreactiveble.channelhandlers.BleStatusHandler
 import com.signify.hue.flutterreactiveble.channelhandlers.CharNotificationHandler
 import com.signify.hue.flutterreactiveble.channelhandlers.DeviceConnectionHandler
-import com.signify.hue.flutterreactiveble.channelhandlers.ScanDevicesHandler
 import com.signify.hue.flutterreactiveble.channelhandlers.CentralConnectionHandler
+import com.signify.hue.flutterreactiveble.channelhandlers.ScanDevicesHandler
 import com.signify.hue.flutterreactiveble.converters.ProtobufMessageConverter
 import com.signify.hue.flutterreactiveble.converters.UuidConverter
 import com.signify.hue.flutterreactiveble.model.ClearGattCacheErrorType

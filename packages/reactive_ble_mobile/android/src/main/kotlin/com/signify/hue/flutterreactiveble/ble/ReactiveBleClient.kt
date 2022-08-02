@@ -61,8 +61,9 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
     companion object {
         // this needs to be in companion update since backgroundisolates respawn the eventchannels
         // Fix for https://github.com/PhilipsHue/flutter_reactive_ble/issues/277
-        private val connectionUpdateBehaviorSubject: BehaviorSubject<ConnectionUpdate> =
-            BehaviorSubject.create()
+        private val connectionUpdateBehaviorSubject: BehaviorSubject<ConnectionUpdate> = BehaviorSubject.create()
+
+        private val centralConnectionUpdateBehaviorSubject: BehaviorSubject<ConnectionUpdate> = BehaviorSubject.create()
 
         lateinit var rxBleClient: RxBleClient
             internal set
@@ -74,6 +75,9 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
 
     override val connectionUpdateSubject: BehaviorSubject<ConnectionUpdate>
         get() = connectionUpdateBehaviorSubject
+
+    override val centralConnectionUpdateSubject: BehaviorSubject<ConnectionUpdate>
+        get() = centralConnectionUpdateBehaviorSubject
 
     override fun initializeClient() {
         activeConnections = mutableMapOf()
@@ -255,11 +259,6 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
             }
         }.first(MtuNegotiateFailed(deviceId, "negotiate mtu timed out"))
 
-    override fun startAdvertisingWaitDeviceConnect()
-    {
-
-    }
-
     override fun startAdvertising() {
         val bluetoothManager = ctx.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
         val bluetoothAdapter: BluetoothAdapter = bluetoothManager.adapter
@@ -313,7 +312,7 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
         var UartCharTxUUID : String = "6E400003-B5A3-F393-E0A9-E50E24DCCA9E"
 
         var CccdUUID : String = "00002902-0000-1000-8000-00805f9b34fb"
-
+        //https://medium.com/@martijn.van.welie/making-android-ble-work-part-4-72a0b85cb442
         var SrvUUID1 : String = "d0611e78-bbb4-4591-a5f8-487910ae4366"
         var SrvUUID2 : String = "ad0badb1-5b99-43cd-917a-a77bc549e3cc"
         var SrvUUID3 : String = "73a58d00-c5a1-4f8e-8f55-1def871ddc81"
@@ -590,6 +589,8 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
                         null
                     )
                 }
+
+                // TODO sent event to flutter with received write request
             }
 
             @Override
@@ -619,6 +620,17 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
 
                 if (descriptorUuid.equals(CccdUUID)) {
                     mBluetoothGattServer.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, 0, null);
+
+                    // TODO sent event to flutter with central connetion changed
+                    var deviceID : String =  device?.getAddress().toString()
+
+                    Log.i(tag, "centralConnectionUpdateBehaviorSubject.onNext" + centralConnectionUpdateBehaviorSubject + " deviceID=" + deviceID)
+                    centralConnectionUpdateBehaviorSubject.onNext(
+                        ConnectionUpdateSuccess(
+                            deviceID,
+                            2 /*CONNECTED*/
+                        )
+                    )
                 }
             }
 
