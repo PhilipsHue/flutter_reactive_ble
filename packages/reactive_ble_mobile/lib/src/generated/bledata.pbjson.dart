@@ -308,6 +308,26 @@ const DiscoveredCharacteristic$json = const {
 
 /// Descriptor for `DiscoveredCharacteristic`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List discoveredCharacteristicDescriptor = $convert.base64Decode('ChhEaXNjb3ZlcmVkQ2hhcmFjdGVyaXN0aWMSMQoQY2hhcmFjdGVyaXN0aWNJZBgBIAEoCzIFLlV1aWRSEGNoYXJhY3RlcmlzdGljSWQSIwoJc2VydmljZUlkGAIgASgLMgUuVXVpZFIJc2VydmljZUlkEh4KCmlzUmVhZGFibGUYAyABKAhSCmlzUmVhZGFibGUSNgoWaXNXcml0YWJsZVdpdGhSZXNwb25zZRgEIAEoCFIWaXNXcml0YWJsZVdpdGhSZXNwb25zZRI8Chlpc1dyaXRhYmxlV2l0aG91dFJlc3BvbnNlGAUgASgIUhlpc1dyaXRhYmxlV2l0aG91dFJlc3BvbnNlEiIKDGlzTm90aWZpYWJsZRgGIAEoCFIMaXNOb3RpZmlhYmxlEiQKDWlzSW5kaWNhdGFibGUYByABKAhSDWlzSW5kaWNhdGFibGUSOgoYY2hhcmFjdGVyaXN0aWNJbnN0YW5jZUlkGAggASgJUhhjaGFyYWN0ZXJpc3RpY0luc3RhbmNlSWQ=');
+@$core.Deprecated('Use readRssiRequestDescriptor instead')
+const ReadRssiRequest$json = const {
+  '1': 'ReadRssiRequest',
+  '2': const [
+    const {'1': 'deviceId', '3': 1, '4': 1, '5': 9, '10': 'deviceId'},
+  ],
+};
+
+/// Descriptor for `ReadRssiRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List readRssiRequestDescriptor = $convert.base64Decode('Cg9SZWFkUnNzaVJlcXVlc3QSGgoIZGV2aWNlSWQYASABKAlSCGRldmljZUlk');
+@$core.Deprecated('Use readRssiResultDescriptor instead')
+const ReadRssiResult$json = const {
+  '1': 'ReadRssiResult',
+  '2': const [
+    const {'1': 'rssi', '3': 1, '4': 1, '5': 5, '10': 'rssi'},
+  ],
+};
+
+/// Descriptor for `ReadRssiResult`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List readRssiResultDescriptor = $convert.base64Decode('Cg5SZWFkUnNzaVJlc3VsdBISCgRyc3NpGAEgASgFUgRyc3Np');
 @$core.Deprecated('Use uuidDescriptor instead')
 const Uuid$json = const {
   '1': 'Uuid',

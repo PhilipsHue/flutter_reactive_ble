@@ -176,6 +176,12 @@ class ProtobufMessageConverter {
                 .build()
     }
 
+    fun convertReadRssiResult(rssi: Int): pb.ReadRssiResult {
+        return pb.ReadRssiResult.newBuilder()
+                .setRssi(rssi)
+                .build()
+    }
+
     private fun fromBluetoothGattService(gattService: BluetoothGattService): pb.DiscoveredService {
         return pb.DiscoveredService.newBuilder()
                 .setServiceUuid(createUuidFromParcelUuid(gattService.uuid))

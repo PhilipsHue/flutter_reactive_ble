@@ -33,6 +33,7 @@ final class Central {
     private let servicesWithCharacteristicsDiscoveryRegistry = PeripheralTaskRegistry<ServicesWithCharacteristicsDiscoveryTaskController>()
     private let characteristicNotifyRegistry = PeripheralTaskRegistry<CharacteristicNotifyTaskController>()
     private let characteristicWriteRegistry = PeripheralTaskRegistry<CharacteristicWriteTaskController>()
+    private let readRssiRegistry = PeripheralTaskRegistry<ReadRssiTaskController>()
 
     init(
         onStateChange: @escaping StateChangeHandler,
@@ -111,6 +112,12 @@ final class Central {
                 central.characteristicWriteRegistry.updateTask(
                     key: q,
                     action: { $0.handleWrite(error: error) }
+                )
+            },
+            onReadRssi: papply(weak: self) { central, peripheral, rssi, error in
+                central.readRssiRegistry.updateTask(
+                    key: peripheral.identifier,
+                    action: { $0.handleReadRssi(rssi: rssi, error: error) }
                 )
             }
         )
@@ -301,6 +308,26 @@ final class Central {
     func maximumWriteValueLength(for peripheral: PeripheralID, type: CBCharacteristicWriteType) throws -> Int {
         let peripheral = try resolve(connected: peripheral)
         return peripheral.maximumWriteValueLength(for: type)
+    }
+
+    
+    func readRssi(for peripheralId: PeripheralID, completion: @escaping (Failable<Int>) -> Void) throws {
+        let peripheral = try resolve(connected: peripheralId)
+
+        // register task, completion goes straight to the caller
+        readRssiRegistry.registerTask(
+            key: peripheralId,
+            params: .init(),
+            completion: completion
+        )
+
+        // update task to kick things off
+        readRssiRegistry.updateTask(
+            key: peripheralId,
+            action: {
+                $0.start(peripheral: peripheral)
+            }
+        )
     }
 
     private func eject(_ peripheral: CBPeripheral, error: Error) {
