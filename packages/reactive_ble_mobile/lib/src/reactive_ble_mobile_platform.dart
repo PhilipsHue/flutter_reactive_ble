@@ -219,6 +219,16 @@ class ReactiveBleMobilePlatform extends ReactiveBlePlatform {
           .then((data) => _protobufConverter.clearGattCacheResultFrom(data!));
 
   @override
+  Future<int> readRssi(String deviceId) async => _bleMethodChannel
+      .invokeMethod<List<int>>(
+        "readRssi",
+        _argsToProtobufConverter
+            .createReadRssiRequest(deviceId)
+            .writeToBuffer(),
+      )
+      .then((data) => _protobufConverter.readRssiResultFrom(data!));
+
+  @override
   Future<List<DiscoveredService>> discoverServices(String deviceId) async =>
       _bleMethodChannel
           .invokeMethod<List<int>>(

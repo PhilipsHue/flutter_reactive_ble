@@ -26,6 +26,8 @@ abstract class ProtobufConverter {
       pb.NegotiateMtuInfo.fromBuffer(data).mtuSize;
 
   List<DiscoveredService> discoveredServicesFrom(List<int> data);
+
+  int readRssiResultFrom(List<int> data);
 }
 
 class ProtobufConverterImpl implements ProtobufConverter {
@@ -195,6 +197,10 @@ class ProtobufConverterImpl implements ProtobufConverter {
     final message = pb.DiscoverServicesInfo.fromBuffer(data);
     return message.services.map(_convertService).toList(growable: false);
   }
+
+  @override
+  int readRssiResultFrom(List<int> data) =>
+      pb.ReadRssiResult.fromBuffer(data).rssi;
 
   DiscoveredService _convertService(pb.DiscoveredService service) =>
       DiscoveredService(

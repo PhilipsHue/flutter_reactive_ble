@@ -309,6 +309,12 @@ class FlutterReactiveBle {
       .clearGattCache(deviceId)
       .then((info) => info.dematerialize());
 
+  /// Reads the RSSI of the of the peripheral with the given device ID. 
+  /// The peripheral must be connected, otherwise a [PlatformException] will be
+  /// thrown
+  Future<int> readRssi(String deviceId) async =>
+      _blePlatform.readRssi(deviceId);
+
   /// Subscribes to updates from the characteristic specified.
   ///
   /// This stream terminates automatically when the device is disconnected.

@@ -6,64 +6,126 @@ part of 'device_interaction_tab.dart';
 // FunctionalDataGenerator
 // **************************************************************************
 
-// ignore_for_file: join_return_with_assignment
-// ignore_for_file: avoid_classes_with_only_static_members
-// ignore_for_file: non_constant_identifier_names
-// ignore_for_file: avoid_equals_and_hash_code_on_mutable_classes
 abstract class $DeviceInteractionViewModel {
   const $DeviceInteractionViewModel();
+
   String get deviceId;
   DeviceConnectionState get connectionStatus;
   BleDeviceConnector get deviceConnector;
   Future<List<DiscoveredService>> Function() get discoverServices;
-  DeviceInteractionViewModel copyWith(
-          {String? deviceId,
-          DeviceConnectionState? connectionStatus,
-          BleDeviceConnector? deviceConnector,
-          Future<List<DiscoveredService>> Function()? discoverServices}) =>
+  Future<int> Function() get readRssi;
+
+  DeviceInteractionViewModel copyWith({
+    String? deviceId,
+    DeviceConnectionState? connectionStatus,
+    BleDeviceConnector? deviceConnector,
+    Future<List<DiscoveredService>> Function()? discoverServices,
+    Future<int> Function()? readRssi,
+  }) =>
       DeviceInteractionViewModel(
-          deviceId: deviceId ?? this.deviceId,
-          connectionStatus: connectionStatus ?? this.connectionStatus,
-          deviceConnector: deviceConnector ?? this.deviceConnector,
-          discoverServices: discoverServices ?? this.discoverServices);
+        deviceId: deviceId ?? this.deviceId,
+        connectionStatus: connectionStatus ?? this.connectionStatus,
+        deviceConnector: deviceConnector ?? this.deviceConnector,
+        discoverServices: discoverServices ?? this.discoverServices,
+        readRssi: readRssi ?? this.readRssi,
+      );
+
+  DeviceInteractionViewModel copyUsing(
+      void Function(DeviceInteractionViewModel$Change change) mutator) {
+    final change = DeviceInteractionViewModel$Change._(
+      this.deviceId,
+      this.connectionStatus,
+      this.deviceConnector,
+      this.discoverServices,
+      this.readRssi,
+    );
+    mutator(change);
+    return DeviceInteractionViewModel(
+      deviceId: change.deviceId,
+      connectionStatus: change.connectionStatus,
+      deviceConnector: change.deviceConnector,
+      discoverServices: change.discoverServices,
+      readRssi: change.readRssi,
+    );
+  }
+
   @override
   String toString() =>
-      "DeviceInteractionViewModel(deviceId: $deviceId, connectionStatus: $connectionStatus, deviceConnector: $deviceConnector, discoverServices: $discoverServices)";
+      "DeviceInteractionViewModel(deviceId: $deviceId, connectionStatus: $connectionStatus, deviceConnector: $deviceConnector, discoverServices: $discoverServices, readRssi: $readRssi)";
+
   @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
   bool operator ==(Object other) =>
       other is DeviceInteractionViewModel &&
       other.runtimeType == runtimeType &&
       deviceId == other.deviceId &&
       connectionStatus == other.connectionStatus &&
       deviceConnector == other.deviceConnector &&
-      const Ignore().equals(discoverServices, other.discoverServices);
+      const Ignore().equals(discoverServices, other.discoverServices) &&
+      readRssi == other.readRssi;
+
   @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
   int get hashCode {
     var result = 17;
     result = 37 * result + deviceId.hashCode;
     result = 37 * result + connectionStatus.hashCode;
     result = 37 * result + deviceConnector.hashCode;
     result = 37 * result + const Ignore().hash(discoverServices);
+    result = 37 * result + readRssi.hashCode;
     return result;
   }
 }
 
+class DeviceInteractionViewModel$Change {
+  DeviceInteractionViewModel$Change._(
+    this.deviceId,
+    this.connectionStatus,
+    this.deviceConnector,
+    this.discoverServices,
+    this.readRssi,
+  );
+
+  String deviceId;
+  DeviceConnectionState connectionStatus;
+  BleDeviceConnector deviceConnector;
+  Future<List<DiscoveredService>> Function() discoverServices;
+  Future<int> Function() readRssi;
+}
+
+// ignore: avoid_classes_with_only_static_members
 class DeviceInteractionViewModel$ {
   static final deviceId = Lens<DeviceInteractionViewModel, String>(
-      (s_) => s_.deviceId, (s_, deviceId) => s_.copyWith(deviceId: deviceId));
+    (deviceIdContainer) => deviceIdContainer.deviceId,
+    (deviceIdContainer, deviceId) =>
+        deviceIdContainer.copyWith(deviceId: deviceId),
+  );
+
   static final connectionStatus =
       Lens<DeviceInteractionViewModel, DeviceConnectionState>(
-          (s_) => s_.connectionStatus,
-          (s_, connectionStatus) =>
-              s_.copyWith(connectionStatus: connectionStatus));
+    (connectionStatusContainer) => connectionStatusContainer.connectionStatus,
+    (connectionStatusContainer, connectionStatus) =>
+        connectionStatusContainer.copyWith(connectionStatus: connectionStatus),
+  );
+
   static final deviceConnector =
       Lens<DeviceInteractionViewModel, BleDeviceConnector>(
-          (s_) => s_.deviceConnector,
-          (s_, deviceConnector) =>
-              s_.copyWith(deviceConnector: deviceConnector));
+    (deviceConnectorContainer) => deviceConnectorContainer.deviceConnector,
+    (deviceConnectorContainer, deviceConnector) =>
+        deviceConnectorContainer.copyWith(deviceConnector: deviceConnector),
+  );
+
   static final discoverServices = Lens<DeviceInteractionViewModel,
-          Future<List<DiscoveredService>> Function()>(
-      (s_) => s_.discoverServices,
-      (s_, discoverServices) =>
-          s_.copyWith(discoverServices: discoverServices));
+      Future<List<DiscoveredService>> Function()>(
+    (discoverServicesContainer) => discoverServicesContainer.discoverServices,
+    (discoverServicesContainer, discoverServices) =>
+        discoverServicesContainer.copyWith(discoverServices: discoverServices),
+  );
+
+  static final readRssi =
+      Lens<DeviceInteractionViewModel, Future<int> Function()>(
+    (readRssiContainer) => readRssiContainer.readRssi,
+    (readRssiContainer, readRssi) =>
+        readRssiContainer.copyWith(readRssi: readRssi),
+  );
 }

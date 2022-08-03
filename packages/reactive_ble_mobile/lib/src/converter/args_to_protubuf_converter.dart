@@ -47,6 +47,8 @@ abstract class ArgsToProtobufConverter {
   pb.ClearGattCacheRequest createClearGattCacheRequest(String deviceId);
 
   pb.DiscoverServicesRequest createDiscoverServicesRequest(String deviceId);
+
+  pb.ReadRssiRequest createReadRssiRequest(String deviceId);
 }
 
 class ArgsToProtobufConverterImpl implements ArgsToProtobufConverter {
@@ -196,6 +198,12 @@ class ArgsToProtobufConverterImpl implements ArgsToProtobufConverter {
   @override
   pb.DiscoverServicesRequest createDiscoverServicesRequest(String deviceId) {
     final args = pb.DiscoverServicesRequest()..deviceId = deviceId;
+    return args;
+  }
+
+  @override
+  pb.ReadRssiRequest createReadRssiRequest(String deviceId) {
+    final args = pb.ReadRssiRequest()..deviceId = deviceId;
     return args;
   }
 }

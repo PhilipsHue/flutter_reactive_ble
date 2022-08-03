@@ -25,11 +25,13 @@ class DeviceInteractionTab extends StatelessWidget {
                 __) =>
             _DeviceInteractionTab(
           viewModel: DeviceInteractionViewModel(
-              deviceId: device.id,
-              connectionStatus: connectionStateUpdate.connectionState,
-              deviceConnector: deviceConnector,
-              discoverServices: () =>
-                  serviceDiscoverer.discoverServices(device.id)),
+            deviceId: device.id,
+            connectionStatus: connectionStateUpdate.connectionState,
+            deviceConnector: deviceConnector,
+            discoverServices: () =>
+                serviceDiscoverer.discoverServices(device.id),
+            readRssi: () => serviceDiscoverer.readRssi(device.id),
+          ),
         ),
       );
 }
@@ -42,6 +44,7 @@ class DeviceInteractionViewModel extends $DeviceInteractionViewModel {
     required this.connectionStatus,
     required this.deviceConnector,
     required this.discoverServices,
+    required this.readRssi,
   });
 
   final String deviceId;
@@ -49,6 +52,7 @@ class DeviceInteractionViewModel extends $DeviceInteractionViewModel {
   final BleDeviceConnector deviceConnector;
   @CustomEquality(Ignore())
   final Future<List<DiscoveredService>> Function() discoverServices;
+  final Future<int> Function() readRssi;
 
   bool get deviceConnected =>
       connectionStatus == DeviceConnectionState.connected;
@@ -77,6 +81,8 @@ class _DeviceInteractionTab extends StatefulWidget {
 class _DeviceInteractionTabState extends State<_DeviceInteractionTab> {
   late List<DiscoveredService> discoveredServices;
 
+  int _rssi = 0;
+
   @override
   void initState() {
     discoveredServices = [];
@@ -87,6 +93,13 @@ class _DeviceInteractionTabState extends State<_DeviceInteractionTab> {
     final result = await widget.viewModel.discoverServices();
     setState(() {
       discoveredServices = result;
+    });
+  }
+
+  Future<void> readRssi() async {
+    final rssi = await widget.viewModel.readRssi();
+    setState(() {
+      _rssi = rssi;
     });
   }
 
@@ -112,9 +125,16 @@ class _DeviceInteractionTabState extends State<_DeviceInteractionTab> {
                   ),
                 ),
                 Padding(
+                  padding: const EdgeInsetsDirectional.only(start: 16.0),
+                  child: Text(
+                    "Rssi: $_rssi dB",
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
+                Padding(
                   padding: const EdgeInsets.only(top: 16.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  child: Wrap(
+                    alignment: WrapAlignment.spaceEvenly,
                     children: <Widget>[
                       ElevatedButton(
                         onPressed: !widget.viewModel.deviceConnected
@@ -133,6 +153,12 @@ class _DeviceInteractionTabState extends State<_DeviceInteractionTab> {
                             ? discoverServices
                             : null,
                         child: const Text("Discover Services"),
+                      ),
+                      ElevatedButton(
+                        onPressed: widget.viewModel.deviceConnected
+                            ? readRssi
+                            : null,
+                        child: const Text("Get RSSI"),
                       ),
                     ],
                   ),

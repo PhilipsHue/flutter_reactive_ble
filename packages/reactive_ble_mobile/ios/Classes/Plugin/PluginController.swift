@@ -523,6 +523,50 @@ final class PluginController {
 
         completion(.success(result))
     }
+    
+    func readRssi(name: String, args: ReadRssiRequest, completion: @escaping PlatformMethodCompletionHandler) {
+        guard let central = central
+        else {
+            completion(.failure(PluginError.notInitialized.asFlutterError))
+            return
+        }
+        
+        guard let peripheralID = UUID(uuidString: args.deviceID)
+        else {
+            completion(.failure(PluginError.invalidMethodCall(method: name, details: "peripheral ID is required").asFlutterError))
+            return
+        }
+
+        do {
+            try central.readRssi(
+                for: peripheralID,
+                completion: papply(weak: self) { context, result in
+                    result.iif(
+                        success: { rssi in
+                            let result: ReadRssiResult = ReadRssiResult.with {
+                                $0.rssi = Int32(rssi)
+                            }
+                            completion(.success(result))
+                        },
+                        failure: { error in
+                            completion(.failure(context.makeFlutterError(error: error)))
+                        }
+                    )
+                }
+            )
+        } catch let error {
+            completion(.failure(makeFlutterError(error: error)))
+        }
+    }
+
+    // takes an error and converts it into a Flutter error
+    private func makeFlutterError(error: Error) -> FlutterError {
+        if let error = error as? PluginError {
+            return error.asFlutterError
+        } else {
+            return PluginError.unknown(error).asFlutterError
+        }
+    }
 
     private func reportState(_ knownState: CBManagerState? = nil) {
         guard let sink = stateSink

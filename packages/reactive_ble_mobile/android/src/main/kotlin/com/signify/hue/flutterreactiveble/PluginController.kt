@@ -36,7 +36,8 @@ class PluginController {
             "stopNotifications" to this::stopNotifications,
             "negotiateMtuSize" to this::negotiateMtuSize,
             "requestConnectionPriority" to this::requestConnectionPriority,
-            "discoverServices" to this::discoverServices
+            "discoverServices" to this::discoverServices,
+            "readRssi" to this::readRssi,
     )
 
     lateinit var bleClient: com.signify.hue.flutterreactiveble.ble.BleClient
@@ -264,6 +265,20 @@ class PluginController {
                     result.success(protoConverter.convertDiscoverServicesInfo(request.deviceId, discoverResult).toByteArray())
                 }, {
                     throwable -> result.error("service_discovery_failure", throwable.message, null)
+                })
+                .discard()
+    }
+
+    private fun readRssi(call: MethodCall, result: Result) {
+        val args = pb.ClearGattCacheRequest.parseFrom(call.arguments as ByteArray)
+
+        bleClient.readRssi(args.deviceId)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({ rssi ->
+                    val info = protoConverter.convertReadRssiResult(rssi);
+                    result.success(info.toByteArray())
+                }, { error ->
+                    result.error("read_rssi_error", error.message, null)
                 })
                 .discard()
     }
