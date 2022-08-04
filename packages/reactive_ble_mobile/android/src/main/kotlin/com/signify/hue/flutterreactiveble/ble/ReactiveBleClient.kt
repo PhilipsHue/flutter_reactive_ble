@@ -334,7 +334,6 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
             activeConnections[deviceId]?.let(DeviceConnector::readRssi)
                     ?: Single.error(IllegalStateException("Device is not connected"))
 
-
     // enable this for extra debug output on the android stack
     private fun enableDebugLogging() = RxBleClient
         .updateLogOptions(

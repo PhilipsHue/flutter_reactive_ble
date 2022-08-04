@@ -275,7 +275,7 @@ class PluginController {
         bleClient.readRssi(args.deviceId)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({ rssi ->
-                    val info = protoConverter.convertReadRssiResult(rssi);
+                    val info = protoConverter.convertReadRssiResult(rssi)
                     result.success(info.toByteArray())
                 }, { error ->
                     result.error("read_rssi_error", error.message, null)
