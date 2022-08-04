@@ -411,7 +411,7 @@ packages:
     source: path
     version: "5.0.2"
   reactive_ble_platform_interface:
-    dependency: transitive
+    dependency: "direct overridden"
     description:
       path: "../packages/reactive_ble_platform_interface"
       relative: true
