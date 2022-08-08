@@ -13,6 +13,7 @@ class ReactiveBleMobilePlatform extends ReactiveBlePlatform {
     required Stream<List<int>> bleDeviceScanChannel,
     required Stream<List<int>> bleStatusChannel,
     required Stream<List<int>> connectedCentralChannel,
+    required Stream<List<int>> charCentralUpdateChannel,
   })  : _argsToProtobufConverter = argsToProtobufConverter,
         _protobufConverter = protobufConverter,
         _bleMethodChannel = bleMethodChannel,
@@ -20,7 +21,8 @@ class ReactiveBleMobilePlatform extends ReactiveBlePlatform {
         _charUpdateRawStream = charUpdateChannel,
         _bleStatusRawChannel = bleStatusChannel,
         _bleDeviceScanRawStream = bleDeviceScanChannel,
-        _connectedCentralRawStream = connectedCentralChannel;
+        _connectedCentralRawStream = connectedCentralChannel,
+        _charCentralUpdateRawStream = charCentralUpdateChannel;
 
   final ArgsToProtobufConverter _argsToProtobufConverter;
   final ProtobufConverter _protobufConverter;
@@ -30,12 +32,14 @@ class ReactiveBleMobilePlatform extends ReactiveBlePlatform {
   final Stream<List<int>> _bleDeviceScanRawStream;
   final Stream<List<int>> _bleStatusRawChannel;
   final Stream<List<int>> _connectedCentralRawStream;
+  final Stream<List<int>> _charCentralUpdateRawStream;
 
   Stream<ConnectionStateUpdate>? _connectionUpdateStream;
   Stream<CharacteristicValue>? _charValueStream;
   Stream<ScanResult>? _scanResultStream;
   Stream<BleStatus>? _bleStatusStream;
   Stream<ConnectionStateUpdate>? _connectionCentralStream;
+  Stream<CharacteristicValue>? _charCentralValueStream;
 
   @override
   Stream<ConnectionStateUpdate> get connectionCentralStream =>
@@ -70,6 +74,14 @@ class ReactiveBleMobilePlatform extends ReactiveBlePlatform {
       _bleStatusStream ??= _bleStatusRawChannel
           .map(_protobufConverter.bleStatusFrom)
           .map((status) => status);
+
+  @override
+  Stream<CharacteristicValue> get charCentralValueUpdateStream =>
+      _charCentralValueStream ??= _charCentralUpdateRawStream
+          .map(_protobufConverter.characteristicValueFrom)
+          .map(
+            (update) => update,
+          );
 
   @override
   Future<void> initialize() => _bleMethodChannel.invokeMethod("initialize");
@@ -274,6 +286,21 @@ class ReactiveBleMobilePlatform extends ReactiveBlePlatform {
       );
 
   @override
+  Future<WriteCharacteristicInfo> writeLocalCharacteristic(
+    QualifiedCharacteristic characteristic,
+    List<int> value,
+  ) async =>
+      _bleMethodChannel
+          .invokeMethod<List<int>>(
+            "writeLocalCharacteristic",
+            _argsToProtobufConverter
+                .createWriteCharacteristicRequest(characteristic, value)
+                .writeToBuffer(),
+          )
+          .then(
+              (data) => _protobufConverter.writeCharacteristicInfoFrom(data!));
+
+  @override
   Future<int> requestMtuSize(String deviceId, int? mtu) async =>
       _bleMethodChannel
           .invokeMethod<List<int>>(
@@ -326,11 +353,15 @@ class ReactiveBleMobilePlatformFactory {
   ReactiveBleMobilePlatform create() {
     const _bleMethodChannel = MethodChannel("flutter_reactive_ble_method");
 
-    const connectedDeviceChannel = EventChannel("flutter_reactive_ble_connected_device");
+    const connectedDeviceChannel =
+        EventChannel("flutter_reactive_ble_connected_device");
     const charEventChannel = EventChannel("flutter_reactive_ble_char_update");
     const scanEventChannel = EventChannel("flutter_reactive_ble_scan");
     const bleStatusChannel = EventChannel("flutter_reactive_ble_status");
-    const connectedCentralChannel = EventChannel("flutter_reactive_ble_connected_central");
+    const connectedCentralChannel =
+        EventChannel("flutter_reactive_ble_connected_central");
+    const charCentralUpdateChannel =
+        EventChannel("flutter_reactive_ble_char_update_central");
 
     return ReactiveBleMobilePlatform(
       protobufConverter: const ProtobufConverterImpl(),
@@ -346,6 +377,8 @@ class ReactiveBleMobilePlatformFactory {
           bleStatusChannel.receiveBroadcastStream().cast<List<int>>(),
       connectedCentralChannel:
           connectedCentralChannel.receiveBroadcastStream().cast<List<int>>(),
+      charCentralUpdateChannel:
+          charCentralUpdateChannel.receiveBroadcastStream().cast<List<int>>(),
     );
   }
 }

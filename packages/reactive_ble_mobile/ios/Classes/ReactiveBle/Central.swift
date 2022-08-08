@@ -18,8 +18,9 @@ final class Central {
     typealias CharacteristicNotifyCompletionHandler = (Central, Error?) -> Void
     typealias CharacteristicValueUpdateHandler = (Central, QualifiedCharacteristic, Data?, Error?) -> Void
     typealias CharacteristicWriteCompletionHandler = (Central, QualifiedCharacteristic, Error?) -> Void
-    typealias CharacteristicSubscribedByCentralHandler = (Central, CBCentral, CBCharacteristic) -> Void
+    typealias CharacteristicSubscribedByCentralHandler = (Central, QualifiedCharacteristic, Data?, Error?) -> Void//(Central, CBCentral, CBCharacteristic) -> Void
     typealias SubChangeHandler = (Central, CBCentral, CBCharacteristic) -> Void
+    typealias CharRequestHandler = (Central, CBPeripheralManager, QualifiedCharacteristic, Data?) -> Void
 
     private let onServicesWithCharacteristicsInitialDiscovery: ServicesWithCharacteristicsDiscoveryHandler
 
@@ -44,14 +45,20 @@ final class Central {
         onConnectionChange: @escaping ConnectionChangeHandler,
         onServicesWithCharacteristicsInitialDiscovery: @escaping ServicesWithCharacteristicsDiscoveryHandler,
         onCharacteristicValueUpdate: @escaping CharacteristicValueUpdateHandler,
-        onCharacteristicSubscribedByCentral: @escaping CharacteristicSubscribedByCentralHandler
+        onCharacteristicSubscribedByCentral: @escaping CharacteristicSubscribedByCentralHandler,
+        onCharRequest: @escaping CharRequestHandler
     ) {
         self.onServicesWithCharacteristicsInitialDiscovery = onServicesWithCharacteristicsInitialDiscovery
         self.peripheralManagerDelegate = PeripheralManagerDelegate(
             onSubChange: papply(weak: self) { central, connectedCentral, characteristic in
                 print("characteristic: ", characteristic)
                 onSubChange(central, connectedCentral, characteristic)
-        })
+            },
+            onCharRequest: papply(weak: self) { central, peripheral, request in
+                            print("request: ", request)
+                onCharRequest(central, peripheral, QualifiedCharacteristic(request.characteristic), request.characteristic.value)
+            }
+            )
         self.centralManagerDelegate = CentralManagerDelegate(
             onStateChange: papply(weak: self) { central, state in
                 if state != .poweredOn {
@@ -167,7 +174,7 @@ final class Central {
         let UartCharRxUUID : String = "6E400002-B5A3-F393-E0A9-E50E24DCCA9E"
         let UartCharTxUUID : String = "6E400003-B5A3-F393-E0A9-E50E24DCCA9E"
 
-        let uartproperties: CBCharacteristicProperties = [.notify, .read, .write]
+        //let uartproperties: CBCharacteristicProperties = [.notify, .read, .write]
         let uartpermissions: CBAttributePermissions = [.readable, .writeable]
 
         var UartCharRxProperties = CBCharacteristicProperties.read;
@@ -297,6 +304,22 @@ final class Central {
         service.characteristics = [characteristic1, characteristic2]
          */
     }
+
+    func writeLocalCharacteristic(value: Data, characteristic qualifiedCharacteristic: QualifiedCharacteristic) throws {
+        let characteristic = try resolve(characteristic: qualifiedCharacteristic) as! CBMutableCharacteristic
+
+        //TODO add subscribed central onSubscribedCentrals: centrals / centrals: [CBCentral]
+        peripheralManager.updateValue(value, for: characteristic, onSubscribedCentrals: nil)
+        /*
+        guard characteristic.properties.contains(.writeWithoutResponse)
+        else { throw Failure.notWritable(qualifiedCharacteristic) }
+
+        guard let response = characteristic.service?.peripheral?.writeValue(value, for: characteristic, type: .withoutResponse)
+        else { throw Failure.characteristicNotFound(qualifiedCharacteristic) }
+
+        return response
+        */
+     }
 
     func connect(to peripheralID: PeripheralID, discover servicesWithCharacteristicsToDiscover: ServicesWithCharacteristicsToDiscover, timeout: TimeInterval?) throws {
         print("connect")

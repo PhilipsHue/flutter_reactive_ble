@@ -15,6 +15,7 @@ interface BleClient {
 
     val connectionUpdateSubject: BehaviorSubject<com.signify.hue.flutterreactiveble.ble.ConnectionUpdate>
     val centralConnectionUpdateSubject: BehaviorSubject<com.signify.hue.flutterreactiveble.ble.ConnectionUpdate>
+    val charRequestSubject: BehaviorSubject<com.signify.hue.flutterreactiveble.ble.CharOperationResult>
 
     fun initializeClient()
     fun scanForDevices(services: List<ParcelUuid>, scanMode: ScanMode, requireLocationServicesEnabled: Boolean): Observable<com.signify.hue.flutterreactiveble.ble.ScanInfo>
@@ -45,4 +46,9 @@ interface BleClient {
     fun addGattCharacteristic()
     fun startGattServer()
     fun stopGattServer()
+    fun writeLocalCharacteristic(
+        deviceId: String,
+        characteristic: UUID,
+        value: ByteArray
+    )
 }

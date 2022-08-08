@@ -64,6 +64,12 @@ abstract class ReactiveBlePlatform extends PlatformInterface {
     throw UnimplementedError('charValueUpdateStream has not been implemented.');
   }
 
+  /// Stream that provides value updates about the characteristics central writerequest.
+  Stream<CharacteristicValue> get charCentralValueUpdateStream {
+    throw UnimplementedError(
+        'charCentralValueUpdateStream has not been implemented.');
+  }
+
   /// Initializes the ble plugin platform specific counter parts.
   ///
   /// The initialization is performed automatically the first time any BLE
@@ -215,11 +221,9 @@ abstract class ReactiveBlePlatform extends PlatformInterface {
     throw UnimplementedError('addGattCharacteristic has not been implemented.');
   }
 
-  Future<int> getPermissions() {
-    throw UnimplementedError('getPermissions has not been implemented.');
-  }
-
-  Future<int> setPermissions() {
-    throw UnimplementedError('setPermissions has not been implemented.');
+  Future<void> writeLocalCharacteristic(
+      QualifiedCharacteristic characteristic, List<int> value) {
+    throw UnimplementedError(
+        'writeCharacteristicWithoutResponse has not been implemented.');
   }
 }

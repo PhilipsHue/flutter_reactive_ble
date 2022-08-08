@@ -27,6 +27,7 @@ final class PluginController {
     var connectedDeviceSink: EventSink?
     var characteristicValueUpdateSink: EventSink?
     var connectedCentralSink: EventSink?
+    var characteristicCentralValueUpdateSink: EventSink?
 
     func initialize(name: String, completion: @escaping PlatformMethodCompletionHandler) {
         if let central = central {
@@ -139,8 +140,54 @@ final class PluginController {
                     context.messageQueue.append(message);
                 }
 
-            }, onCharacteristicSubscribedByCentral: papply(weak: self) { context, central, cbCentral, characteristic in
-                print("Success")
+            },
+            onCharacteristicSubscribedByCentral: papply(weak: self) { context, central, characteristic, value, error in
+                let message = CharacteristicValueInfo.with {
+                    $0.characteristic = CharacteristicAddress.with {
+                        $0.characteristicUuid = Uuid.with { $0.data = characteristic.id.data }
+                        $0.serviceUuid = Uuid.with { $0.data = characteristic.serviceID.data }
+                        $0.deviceID = characteristic.peripheralID.uuidString
+                    }
+                    if let value = value {
+                        $0.value = value
+                    }
+                    if let error = error {
+                        $0.failure = GenericFailure.with {
+                            $0.code = Int32(CharacteristicValueUpdateFailure.unknown.rawValue)
+                            $0.message = "\(error)"
+                        }
+                    }
+                }
+                print("onCharacteristicSubscribedByCentral")
+                print("=>", message)
+                let sink = context.characteristicCentralValueUpdateSink
+                if (sink != nil) {
+                    sink!.add(.success(message))
+                } else {
+                    // In case message arrives before sink is created
+                    context.messageQueue.append(message);
+                }
+            },
+            onCharRequest: papply(weak: self) { context, central, peripheral, characteristic, value in
+                let message = CharacteristicValueInfo.with {
+                    $0.characteristic = CharacteristicAddress.with {
+                        $0.characteristicUuid = Uuid.with { $0.data = characteristic.id.data }
+                        $0.serviceUuid = Uuid.with { $0.data = characteristic.serviceID.data }
+                        $0.deviceID = characteristic.peripheralID.uuidString
+                    }
+                    if let value = value {
+                        $0.value = value
+                    }
+                }
+                print("onCharRequest")
+                print("=>", message)
+                let sink = context.characteristicCentralValueUpdateSink
+                if (sink != nil) {
+                    sink!.add(.success(message))
+                } else {
+                    // In case message arrives before sink is created
+                    context.messageQueue.append(message);
+                }
             }
         )
         print("completion!")
@@ -245,6 +292,28 @@ final class PluginController {
 
         central.addGattCharacteristic()
         
+        completion(.success(nil))
+    }
+
+    func writeLocalCharacteristic(name: String, args: WriteCharacteristicRequest, completion: @escaping PlatformMethodCompletionHandler) {
+        guard let central = central
+            else {
+                completion(.failure(PluginError.notInitialized.asFlutterError))
+                return
+            }
+
+            guard let characteristic = QualifiedCharacteristicIDFactory().make(from: args.characteristic)
+            else {
+                completion(.failure(PluginError.invalidMethodCall(method: name, details: "characteristic, service, and peripheral IDs are required").asFlutterError))
+                return
+            }
+
+        do {
+            try central.writeLocalCharacteristic(value: args.value, characteristic: QualifiedCharacteristic(id: characteristic.id, serviceID: characteristic.serviceID, peripheralID: characteristic.peripheralID))
+        }
+        catch {
+            completion(.failure(PluginError.notInitialized.asFlutterError))
+        }
         completion(.success(nil))
     }
 

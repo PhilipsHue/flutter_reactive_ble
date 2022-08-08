@@ -4,13 +4,17 @@ import CoreBluetooth
 final class PeripheralManagerDelegate: NSObject, CBPeripheralManagerDelegate {
     
     typealias SubChangeHandler = (CBCentral, CBCharacteristic) -> Void
+    typealias CharRequestHandler = (CBPeripheralManager, CBATTRequest) -> Void
 
     private let onSubChange: SubChangeHandler
+    private let onCharRequest: CharRequestHandler
 
     init(
-        onSubChange: @escaping SubChangeHandler
+        onSubChange: @escaping SubChangeHandler,
+        onCharRequest: @escaping CharRequestHandler
     ) {
         self.onSubChange = onSubChange
+        self.onCharRequest = onCharRequest
     }
 
     func peripheralManagerDidUpdateState(_ peripheral: CBPeripheralManager) {
@@ -57,6 +61,7 @@ final class PeripheralManagerDelegate: NSObject, CBPeripheralManagerDelegate {
     func peripheralManager(_ peripheral: CBPeripheralManager, didReceiveWrite requests: [CBATTRequest])
     {
         print("received write request")
+        
         //for request in requests
         //{
             //TODO add characteristic from mutabletable
@@ -69,6 +74,10 @@ final class PeripheralManagerDelegate: NSObject, CBPeripheralManagerDelegate {
             }
              */
         //}
+        
+        for request in requests{
+            onCharRequest(peripheral, request)
+        }
         peripheral.respond(to: requests[0], withResult: .success)
 
         //TODO Add Notify

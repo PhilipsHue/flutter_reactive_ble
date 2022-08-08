@@ -41,6 +41,9 @@ import android.util.Log
 private const val tag : String = "ReactiveBleClient"
 
 private lateinit var mBluetoothGattServer: BluetoothGattServer
+
+private lateinit var mCentralBluetoothDevice : BluetoothDevice
+
 private var advertiseCallback : AdvertiseCallback =  object : AdvertiseCallback() {
             override fun onStartSuccess(settingsInEffect: AdvertiseSettings) {
                 Log.d("adv", "success")
@@ -57,13 +60,14 @@ private var advertiseCallback : AdvertiseCallback =  object : AdvertiseCallback(
 open class ReactiveBleClient(private val context: Context) : BleClient {
     private val connectionQueue = ConnectionQueue()
     private val allConnections = CompositeDisposable()
+    private var serviceUUIDsList = ArrayList<String>()
 
     companion object {
         // this needs to be in companion update since backgroundisolates respawn the eventchannels
         // Fix for https://github.com/PhilipsHue/flutter_reactive_ble/issues/277
         private val connectionUpdateBehaviorSubject: BehaviorSubject<ConnectionUpdate> = BehaviorSubject.create()
-
         private val centralConnectionUpdateBehaviorSubject: BehaviorSubject<ConnectionUpdate> = BehaviorSubject.create()
+        private val charRequestBehaviorSubject: BehaviorSubject<CharOperationResult> = BehaviorSubject.create()
 
         lateinit var rxBleClient: RxBleClient
             internal set
@@ -78,6 +82,9 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
 
     override val centralConnectionUpdateSubject: BehaviorSubject<ConnectionUpdate>
         get() = centralConnectionUpdateBehaviorSubject
+
+    override val charRequestSubject: BehaviorSubject<CharOperationResult>
+        get() = charRequestBehaviorSubject
 
     override fun initializeClient() {
         activeConnections = mutableMapOf()
@@ -281,20 +288,6 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
         val scanResponse: AdvertiseData = AdvertiseData.Builder()
             .setIncludeDeviceName(true)
             .build()
-
-        /*
-        val advertiseCallback: AdvertiseCallback =  object : AdvertiseCallback() {
-            override fun onStartSuccess(settingsInEffect: AdvertiseSettings) {
-                Log.d("adv", "success")
-                super.onStartSuccess(settingsInEffect)
-            }
-
-            override fun onStartFailure(errorCode: Int) {
-                Log.d("adv", errorCode.toString())
-                super.onStartFailure(errorCode)
-            }
-        }
-        */
 
         advertiser.startAdvertising(advertiseSettings, advertiseData, scanResponse, advertiseCallback)
 
@@ -590,7 +583,19 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
                     )
                 }
 
+                charRequestBehaviorSubject.onNext(CharOperationSuccessful(characteristic!!.getUuid().toString(), value!!.asList()))
+
+                //val request = createCharacteristicRequest(BluetoothDevice?.getAddress().toString(), UUID.randomUUID())
                 // TODO sent event to flutter with received write request
+                /*
+                value.asList()
+                val charInfo = protoConverter.convertCharacteristicInfo(
+                    characteristic,
+                    value.toByteArray()
+                )
+                */
+
+                //TODO add to Event sink
             }
 
             @Override
@@ -623,12 +628,12 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
 
                     // TODO sent event to flutter with central connetion changed
                     var deviceID : String =  device?.getAddress().toString()
-
+                    mCentralBluetoothDevice = device!!
                     Log.i(tag, "centralConnectionUpdateBehaviorSubject.onNext" + centralConnectionUpdateBehaviorSubject + " deviceID=" + deviceID)
                     centralConnectionUpdateBehaviorSubject.onNext(
                         ConnectionUpdateSuccess(
                             deviceID,
-                            2 /*CONNECTED*/
+                            1 /*CONNECTED*/
                         )
                     )
                 }
@@ -694,6 +699,11 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
 
         mBluetoothGattServer = bluetoothManager.openGattServer(context, serverCallback)//.also { it.addService(service1service) }
 
+        serviceUUIDsList.add(SrvUUID1);
+        serviceUUIDsList.add(SrvUUID2);
+        serviceUUIDsList.add(SrvUUID3);
+        serviceUUIDsList.add(UartSrvUUID);
+
         // add service to a local mutable key value map
         gattServices.put(SrvUUID1, service1)
         gattServices.put(SrvUUID2, service2)
@@ -709,19 +719,6 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
         val bluetoothManager: BluetoothManager = ctx.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
         val bluetoothAdapter: BluetoothAdapter = bluetoothManager.adapter
         val advertiser: BluetoothLeAdvertiser = bluetoothAdapter.getBluetoothLeAdvertiser()
-
-        /*
-        val advertiseCallback: AdvertiseCallback =  object : AdvertiseCallback() {
-            override fun onStartSuccess(settingsInEffect: AdvertiseSettings) {
-                Log.d("adv stop", "success")
-                super.onStartSuccess(settingsInEffect)
-            }
-
-            override fun onStartFailure(errorCode: Int) {
-                Log.d("adv stop", errorCode.toString())
-                super.onStartFailure(errorCode)
-            }
-        }*/
 
         advertiser.stopAdvertising(advertiseCallback)
 
@@ -748,6 +745,26 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
 
     override fun addGattCharacteristic() {
         // TODO Move from addExampleGattService to addGattCharacteristic
+    }
+
+    override fun writeLocalCharacteristic(deviceId: String, characteristic: UUID, value: ByteArray) {
+        // TODO write to local characteristic and notify
+        val servicesList: List<BluetoothGattService> = mBluetoothGattServer.getServices()
+
+        for (i in 0 until servicesList.size) {
+            val bluetoothGattService: BluetoothGattService = servicesList[i]
+
+            val bluetoothGattCharacteristicList: List<BluetoothGattCharacteristic> =
+                bluetoothGattService.getCharacteristics()
+            for (bluetoothGattCharacteristic in bluetoothGattCharacteristicList) {
+                if (bluetoothGattCharacteristic.getUuid().equals(characteristic)) {
+                    // TODO This method was deprecated in API level 33.
+                    // https://developer.android.com/reference/android/bluetooth/BluetoothGattServer
+                    // mBluetoothGattServer.notifyCharacteristicChanged(mCentralBluetoothDevice, bluetoothGattCharacteristic, false, value)
+                    mBluetoothGattServer.notifyCharacteristicChanged(mCentralBluetoothDevice, bluetoothGattCharacteristic, false)
+                }
+            }
+        }
     }
 
     override fun observeBleStatus(): Observable<BleStatus> = rxBleClient.observeStateChanges()

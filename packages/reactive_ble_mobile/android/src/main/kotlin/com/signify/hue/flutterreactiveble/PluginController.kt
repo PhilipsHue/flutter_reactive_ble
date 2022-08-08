@@ -7,6 +7,7 @@ import com.signify.hue.flutterreactiveble.channelhandlers.CharNotificationHandle
 import com.signify.hue.flutterreactiveble.channelhandlers.DeviceConnectionHandler
 import com.signify.hue.flutterreactiveble.channelhandlers.CentralConnectionHandler
 import com.signify.hue.flutterreactiveble.channelhandlers.ScanDevicesHandler
+import com.signify.hue.flutterreactiveble.channelhandlers.CharCentralNotificationHandler
 import com.signify.hue.flutterreactiveble.converters.ProtobufMessageConverter
 import com.signify.hue.flutterreactiveble.converters.UuidConverter
 import com.signify.hue.flutterreactiveble.model.ClearGattCacheErrorType
@@ -44,6 +45,7 @@ class PluginController {
             "addGattCharacteristic" to this::addGattCharacteristic,
             "startGattServer" to this::startGattServer,
             "stopGattServer" to this::stopGattServer,
+            "writeLocalCharacteristic" to this::writeLocalCharacteristic,
     )
 
     lateinit var bleClient: com.signify.hue.flutterreactiveble.ble.BleClient
@@ -52,11 +54,13 @@ class PluginController {
     lateinit var deviceConnectionChannel: EventChannel
     lateinit var charNotificationChannel: EventChannel
     lateinit var centralConnectionChannel: EventChannel
+    lateinit var charCentralNotifcationChannel: EventChannel
 
     lateinit var scandevicesHandler: ScanDevicesHandler
     lateinit var deviceConnectionHandler: DeviceConnectionHandler
     lateinit var charNotificationHandler: CharNotificationHandler
     lateinit var centralConnectionHandler: CentralConnectionHandler
+    lateinit var charCentralNotificationHandler: CharCentralNotificationHandler
 
     private val uuidConverter = UuidConverter()
     private val protoConverter = ProtobufMessageConverter()
@@ -69,18 +73,21 @@ class PluginController {
         charNotificationChannel = EventChannel(messenger, "flutter_reactive_ble_char_update")
         val bleStatusChannel = EventChannel(messenger, "flutter_reactive_ble_status")
         centralConnectionChannel = EventChannel(messenger, "flutter_reactive_ble_connected_central")
+        charCentralNotifcationChannel = EventChannel(messenger, "flutter_reactive_ble_char_update_central")
 
         scandevicesHandler = ScanDevicesHandler(bleClient)
         deviceConnectionHandler = DeviceConnectionHandler(bleClient)
         charNotificationHandler = CharNotificationHandler(bleClient)
         val bleStatusHandler = BleStatusHandler(bleClient)
         centralConnectionHandler = CentralConnectionHandler(bleClient)
+        charCentralNotificationHandler = CharCentralNotificationHandler(bleClient)
 
         scanchannel.setStreamHandler(scandevicesHandler)
         deviceConnectionChannel.setStreamHandler(deviceConnectionHandler)
         charNotificationChannel.setStreamHandler(charNotificationHandler)
         bleStatusChannel.setStreamHandler(bleStatusHandler)
         centralConnectionChannel.setStreamHandler(centralConnectionHandler)
+        charCentralNotifcationChannel.setStreamHandler(charCentralNotificationHandler)
     }
 
     internal fun deinitialize() {
@@ -263,6 +270,14 @@ class PluginController {
 
     private fun addGattCharacteristic(call: MethodCall, result: Result) {
         bleClient.addGattCharacteristic()
+        result.success(null)
+    }
+
+    private fun writeLocalCharacteristic(call: MethodCall, result: Result) {
+        val writeCharMessage = pb.WriteCharacteristicRequest.parseFrom(call.arguments as ByteArray)
+        bleClient.writeLocalCharacteristic(writeCharMessage.characteristic.deviceId,
+            uuidConverter.uuidFromByteArray(writeCharMessage.characteristic.characteristicUuid.data.toByteArray()),
+            writeCharMessage.value.toByteArray())
         result.success(null)
     }
 

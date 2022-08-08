@@ -18,6 +18,8 @@ public class SwiftReactiveBlePlugin: NSObject, FlutterPlugin {
             .setStreamHandler(plugin.characteristicValueUpdateStreamHandler)
         FlutterEventChannel(name: "flutter_reactive_ble_connected_central", binaryMessenger: registrar.messenger())
             .setStreamHandler(plugin.connectedCentralStreamHandler)
+        FlutterEventChannel(name: "flutter_reactive_ble_char_update_central", binaryMessenger: registrar.messenger())
+            .setStreamHandler(plugin.characteristicCentralValueUpdateStreamHandler)
     }
 
     var statusStreamHandler: StreamHandler<PluginController> {
@@ -98,6 +100,26 @@ public class SwiftReactiveBlePlugin: NSObject, FlutterPlugin {
         )
     }
 
+    var characteristicCentralValueUpdateStreamHandler: StreamHandler<PluginController> {
+        return StreamHandler(
+            name: "characteristic central value update stream handler",
+            context: context,
+            onListen: { context, sink in
+                context.characteristicCentralValueUpdateSink = sink
+                context.messageQueue.forEach { msg in
+                sink.add(.success(msg))
+                }
+                context.messageQueue.removeAll()
+                return nil
+            },
+            onCancel: { context in
+                context.messageQueue.removeAll()
+                context.characteristicCentralValueUpdateSink = nil
+                return nil
+            }
+        )
+    }
+
     private let context = PluginController()
 
     private let methodHandler = MethodHandler<PluginController>([
@@ -172,6 +194,9 @@ public class SwiftReactiveBlePlugin: NSObject, FlutterPlugin {
         }),
         AnyPlatformMethod(NullaryPlatformMethod(name: "addGattCharacteristic") { (name, context, completion) in
             context.addGattCharacteristic(name: name, completion: completion)
+        }),
+        AnyPlatformMethod(UnaryPlatformMethod(name: "writeLocalCharacteristic") { (name, context, args: WriteCharacteristicRequest, completion) in
+            context.writeCharacteristicWithoutResponse(name: name, args: args, completion: completion)
         }),
     ])
 
