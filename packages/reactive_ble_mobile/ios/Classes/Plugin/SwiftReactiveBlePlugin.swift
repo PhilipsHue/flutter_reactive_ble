@@ -196,7 +196,7 @@ public class SwiftReactiveBlePlugin: NSObject, FlutterPlugin {
             context.addGattCharacteristic(name: name, completion: completion)
         }),
         AnyPlatformMethod(UnaryPlatformMethod(name: "writeLocalCharacteristic") { (name, context, args: WriteCharacteristicRequest, completion) in
-            context.writeCharacteristicWithoutResponse(name: name, args: args, completion: completion)
+            context.writeLocalCharacteristic(name: name, args: args, completion: completion)
         }),
     ])
 

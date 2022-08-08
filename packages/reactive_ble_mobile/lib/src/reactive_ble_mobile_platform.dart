@@ -286,7 +286,7 @@ class ReactiveBleMobilePlatform extends ReactiveBlePlatform {
       );
 
   @override
-  Future<WriteCharacteristicInfo> writeLocalCharacteristic(
+  Future<void/*WriteCharacteristicInfo*/> writeLocalCharacteristic(
     QualifiedCharacteristic characteristic,
     List<int> value,
   ) async =>
@@ -296,9 +296,8 @@ class ReactiveBleMobilePlatform extends ReactiveBlePlatform {
             _argsToProtobufConverter
                 .createWriteCharacteristicRequest(characteristic, value)
                 .writeToBuffer(),
-          )
-          .then(
-              (data) => _protobufConverter.writeCharacteristicInfoFrom(data!));
+          );
+          //.then((data) => _protobufConverter.writeCharacteristicInfoFrom(data!));
 
   @override
   Future<int> requestMtuSize(String deviceId, int? mtu) async =>

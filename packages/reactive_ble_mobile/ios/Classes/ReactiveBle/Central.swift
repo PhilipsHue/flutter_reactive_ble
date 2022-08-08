@@ -22,6 +22,8 @@ final class Central {
     typealias SubChangeHandler = (Central, CBCentral, CBCharacteristic) -> Void
     typealias CharRequestHandler = (Central, CBPeripheralManager, QualifiedCharacteristic, Data?) -> Void
 
+    private var mConnectedCentral : CBCentral!
+    
     private let onServicesWithCharacteristicsInitialDiscovery: ServicesWithCharacteristicsDiscoveryHandler
 
     private var peripheralDelegate: PeripheralDelegate!
@@ -31,6 +33,8 @@ final class Central {
     private var peripheralManager: CBPeripheralManager!
     private var peripheralManagerDelegate: PeripheralManagerDelegate!
 
+    private var sampleChar : CBMutableCharacteristic!
+    
     private(set) var isScanning = false
     private(set) var activePeripherals = [PeripheralID: CBPeripheral]()
     private(set) var connectRegistry = PeripheralTaskRegistry<ConnectTaskController>()
@@ -53,6 +57,7 @@ final class Central {
             onSubChange: papply(weak: self) { central, connectedCentral, characteristic in
                 print("characteristic: ", characteristic)
                 onSubChange(central, connectedCentral, characteristic)
+                self.mConnectedCentral = connectedCentral
             },
             onCharRequest: papply(weak: self) { central, peripheral, request in
                             print("request: ", request)
@@ -258,6 +263,8 @@ final class Central {
             type: CBUUID(string: UartSrvUUID),
             primary: true)
         
+        sampleChar = UartCharRx;
+        
         service1.characteristics = [Characteristic1]
         service2.characteristics = [Characteristic2]
         service3.characteristics = [Characteristic3]
@@ -305,11 +312,14 @@ final class Central {
          */
     }
 
-    func writeLocalCharacteristic(value: Data, characteristic qualifiedCharacteristic: QualifiedCharacteristic) throws {
-        let characteristic = try resolve(characteristic: qualifiedCharacteristic) as! CBMutableCharacteristic
+    func writeLocalCharacteristic(value: Data/*, characteristic qualifiedCharacteristic: QualifiedCharacteristic*/) throws {
+        print("writeLocalCharacteristic")
+        //let characteristic = try resolve(characteristic: qualifiedCharacteristic) as! CBMutableCharacteristic
 
         //TODO add subscribed central onSubscribedCentrals: centrals / centrals: [CBCentral]
-        peripheralManager.updateValue(value, for: characteristic, onSubscribedCentrals: nil)
+        let bRet: Bool = peripheralManager.updateValue(value, for: sampleChar, onSubscribedCentrals: [self.mConnectedCentral])
+        print("value:", value)
+        print("characteristic:", sampleChar)
         /*
         guard characteristic.properties.contains(.writeWithoutResponse)
         else { throw Failure.notWritable(qualifiedCharacteristic) }

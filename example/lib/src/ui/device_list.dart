@@ -33,23 +33,27 @@ class DeviceListScreen extends StatelessWidget {
           stopScan: bleScanner.stopScan,
           startAdvertising: bleScanner.startAdvertising,
           stopAdvertising: bleScanner.stopAdvertising,
+          writeSample: bleScanner.writeSample,
         ),
       );
 }
 
 class _DeviceList extends StatefulWidget {
-  const _DeviceList(
-      {required this.scannerState,
+  const _DeviceList({
+    required this.scannerState,
       required this.startScan,
       required this.stopScan,
       required this.startAdvertising,
-      required this.stopAdvertising });
+    required this.stopAdvertising,
+    required this.writeSample,
+  });
 
   final BleScannerState scannerState;
   final void Function(List<Uuid>) startScan;
   final VoidCallback stopScan;
   final VoidCallback startAdvertising;
   final VoidCallback stopAdvertising;
+  final VoidCallback writeSample;
 
   @override
   _DeviceListState createState() => _DeviceListState();
@@ -139,6 +143,12 @@ class _DeviceListState extends State<_DeviceList> {
                                       device: _sampleDevice)));
                           },
                         ),
+                      ElevatedButton(
+                        child: const Text('write'),
+                        onPressed: () async {
+                          widget.writeSample();
+                        },
+                      ),
                       ],
                     ),
                   ],

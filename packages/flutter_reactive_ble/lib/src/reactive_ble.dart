@@ -219,9 +219,9 @@ class FlutterReactiveBle {
     await _blePlatform.addGattCharacteristic();
   }
 
-  Future<void> writeLocalCharacteristic(QualifiedCharacteristic characteristic,
-      {required List<int> value}) async {
-    await _blePlatform.writeLocalCharacteristic(characteristic, value);
+  Future<void> writeLocalCharacteristic(QualifiedCharacteristic characteristic,List<int> value) async {
+    await initialize();
+    return _blePlatform.writeLocalCharacteristic(characteristic, value);
   }
 
   /// Deinitializes this [FlutterReactiveBle] instance and its platform-specific

@@ -758,6 +758,7 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
                 bluetoothGattService.getCharacteristics()
             for (bluetoothGattCharacteristic in bluetoothGattCharacteristicList) {
                 if (bluetoothGattCharacteristic.getUuid().equals(characteristic)) {
+                    bluetoothGattCharacteristic.setValue(value)
                     // TODO This method was deprecated in API level 33.
                     // https://developer.android.com/reference/android/bluetooth/BluetoothGattServer
                     // mBluetoothGattServer.notifyCharacteristicChanged(mCentralBluetoothDevice, bluetoothGattCharacteristic, false, value)

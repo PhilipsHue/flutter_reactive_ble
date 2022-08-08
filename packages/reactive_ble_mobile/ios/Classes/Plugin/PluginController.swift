@@ -302,14 +302,17 @@ final class PluginController {
                 return
             }
 
+        /*
             guard let characteristic = QualifiedCharacteristicIDFactory().make(from: args.characteristic)
             else {
                 completion(.failure(PluginError.invalidMethodCall(method: name, details: "characteristic, service, and peripheral IDs are required").asFlutterError))
                 return
-            }
+            }*/
 
         do {
-            try central.writeLocalCharacteristic(value: args.value, characteristic: QualifiedCharacteristic(id: characteristic.id, serviceID: characteristic.serviceID, peripheralID: characteristic.peripheralID))
+            //try central.writeLocalCharacteristic(value: args.value, characteristic: QualifiedCharacteristic(id: characteristic.id, serviceID: characteristic.serviceID, peripheralID: characteristic.peripheralID))
+            try central.writeLocalCharacteristic(value: args.value)
+
         }
         catch {
             completion(.failure(PluginError.notInitialized.asFlutterError))
