@@ -210,6 +210,14 @@ class ProtobufMessageConverter {
         return root.addAllIncludedServices(children).build()
     }
 
+    fun convertToCharacteristicAddress(deviceId : String, serviceUuid : UUID, characteristicUuid :UUID ) : pb.CharacteristicAddress {
+        return pb.CharacteristicAddress.newBuilder()
+            .setDeviceId(deviceId)
+            .setServiceUuid(createUuidFromParcelUuid(serviceUuid))
+            .setCharacteristicUuid(createUuidFromParcelUuid(characteristicUuid))
+            .build()
+    }
+
     private fun createCharacteristicAddress(request: pb.CharacteristicAddress):
             pb.CharacteristicAddress.Builder? {
         return pb.CharacteristicAddress.newBuilder()
@@ -237,7 +245,7 @@ class ProtobufMessageConverter {
         return serviceUuids.map { createUuidFromParcelUuid(it) }
     }
 
-    private fun createUuidFromParcelUuid(uuid: UUID): pb.Uuid {
+    fun createUuidFromParcelUuid(uuid: UUID): pb.Uuid {
         val convertedUuid = uuidConverter.byteArrayFromUuid(uuid)
 
         return pb.Uuid.newBuilder().setData(ByteString.copyFrom(convertedUuid)).build()

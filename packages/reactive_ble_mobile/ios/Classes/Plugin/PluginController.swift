@@ -5,6 +5,8 @@ import var CoreBluetooth.CBAdvertisementDataServiceDataKey
 import var CoreBluetooth.CBAdvertisementDataServiceUUIDsKey
 import var CoreBluetooth.CBAdvertisementDataManufacturerDataKey
 import var CoreBluetooth.CBAdvertisementDataLocalNameKey
+import class CoreBluetooth.CBCharacteristic
+import class CoreBluetooth.CBCentral
 
 final class PluginController {
 
@@ -24,6 +26,8 @@ final class PluginController {
     var messageQueue: [CharacteristicValueInfo] = [];
     var connectedDeviceSink: EventSink?
     var characteristicValueUpdateSink: EventSink?
+    var connectedCentralSink: EventSink?
+    var characteristicCentralValueUpdateSink: EventSink?
 
     func initialize(name: String, completion: @escaping PlatformMethodCompletionHandler) {
         if let central = central {
@@ -32,6 +36,9 @@ final class PluginController {
         }
 
         central = Central(
+            onSubChange: papply(weak: self) { context, _, connectedCentral, characteristic in
+                context.reportSub(connectedCentral, changedSub: characteristic)
+            },
             onStateChange: papply(weak: self) { context, _, state in
                 context.reportState(state)
             },
@@ -63,7 +70,7 @@ final class PluginController {
             },
             onConnectionChange: papply(weak: self) { context, central, peripheral, change in
                 let failure: (code: ConnectionFailure, message: String)?
-
+                print("onConnectionChange1: ", change)
                 switch change {
                 case .connected:
                     // Wait for services & characteristics to be discovered
@@ -80,15 +87,17 @@ final class PluginController {
                             $0.code = Int32(error.code.rawValue)
                             $0.message = error.message
                         }
+                        print("error: ", error)
                     }
                 }
+                print("86 =>", message)
 
                 context.connectedDeviceSink?.add(.success(message))
             },
             onServicesWithCharacteristicsInitialDiscovery: papply(weak: self) { context, central, peripheral, errors in
                 guard let sink = context.connectedDeviceSink
                 else { assert(false); return }
-
+                print("onServicesWithCharacteristicsInitialDiscovery")
                 let message = DeviceInfo.with {
                     $0.id = peripheral.identifier.uuidString
                     $0.connectionState = encode(peripheral.state)
@@ -97,8 +106,10 @@ final class PluginController {
                             $0.code = Int32(ConnectionFailure.unknown.rawValue)
                             $0.message = errors.map(String.init(describing:)).joined(separator: "\n")
                         }
+                        print("error: ", errors)
                     }
                 }
+                print("105 =>", message)
 
                 sink.add(.success(message))
             },
@@ -119,6 +130,8 @@ final class PluginController {
                         }
                     }
                 }
+                print("onCharacteristicValueUpdate")
+                print("=>", message)
                 let sink = context.characteristicValueUpdateSink
                 if (sink != nil) {
                     sink!.add(.success(message))
@@ -127,9 +140,57 @@ final class PluginController {
                     context.messageQueue.append(message);
                 }
 
+            },
+            onCharacteristicSubscribedByCentral: papply(weak: self) { context, central, characteristic, value, error in
+                let message = CharacteristicValueInfo.with {
+                    $0.characteristic = CharacteristicAddress.with {
+                        $0.characteristicUuid = Uuid.with { $0.data = characteristic.id.data }
+                        $0.serviceUuid = Uuid.with { $0.data = characteristic.serviceID.data }
+                        $0.deviceID = characteristic.peripheralID.uuidString
+                    }
+                    if let value = value {
+                        $0.value = value
+                    }
+                    if let error = error {
+                        $0.failure = GenericFailure.with {
+                            $0.code = Int32(CharacteristicValueUpdateFailure.unknown.rawValue)
+                            $0.message = "\(error)"
+                        }
+                    }
+                }
+                print("onCharacteristicSubscribedByCentral")
+                print("=>", message)
+                let sink = context.characteristicCentralValueUpdateSink
+                if (sink != nil) {
+                    sink!.add(.success(message))
+                } else {
+                    // In case message arrives before sink is created
+                    context.messageQueue.append(message);
+                }
+            },
+            onCharRequest: papply(weak: self) { context, central, peripheral, characteristic, value in
+                let message = CharacteristicValueInfo.with {
+                    $0.characteristic = CharacteristicAddress.with {
+                        $0.characteristicUuid = Uuid.with { $0.data = characteristic.id.data }
+                        $0.serviceUuid = Uuid.with { $0.data = characteristic.serviceID.data }
+                        $0.deviceID = characteristic.peripheralID.uuidString
+                    }
+                    if let value = value {
+                        $0.value = value
+                    }
+                }
+                print("onCharRequest")
+                print("=>", message)
+                let sink = context.characteristicCentralValueUpdateSink
+                if (sink != nil) {
+                    sink!.add(.success(message))
+                } else {
+                    // In case message arrives before sink is created
+                    context.messageQueue.append(message);
+                }
             }
         )
-
+        print("completion!")
         completion(.success(nil))
     }
 
@@ -186,6 +247,79 @@ final class PluginController {
         completion(.success(nil))
     }
 
+    func startGattServer(name: String, completion: @escaping PlatformMethodCompletionHandler){
+        guard let central = central
+        else {
+            completion(.failure(PluginError.notInitialized.asFlutterError))
+            return
+        }
+
+        central.startGattServer()
+        
+        completion(.success(nil))
+    }
+    
+    func stopGattServer(name: String, completion: @escaping PlatformMethodCompletionHandler){
+        guard let central = central
+        else {
+            completion(.failure(PluginError.notInitialized.asFlutterError))
+            return
+        }
+
+        central.stopGattServer()
+        
+        completion(.success(nil))
+    }
+    
+    func addGattService(name: String, completion: @escaping PlatformMethodCompletionHandler){
+        guard let central = central
+        else {
+            completion(.failure(PluginError.notInitialized.asFlutterError))
+            return
+        }
+
+        central.addGattService()
+        
+        completion(.success(nil))
+    }
+    
+    func addGattCharacteristic(name: String, completion: @escaping PlatformMethodCompletionHandler){
+        guard let central = central
+        else {
+            completion(.failure(PluginError.notInitialized.asFlutterError))
+            return
+        }
+
+        central.addGattCharacteristic()
+        
+        completion(.success(nil))
+    }
+
+    func writeLocalCharacteristic(name: String, args: WriteCharacteristicRequest, completion: @escaping PlatformMethodCompletionHandler) {
+        guard let central = central
+            else {
+                completion(.failure(PluginError.notInitialized.asFlutterError))
+                return
+            }
+
+        /*
+            guard let characteristic = QualifiedCharacteristicIDFactory().make(from: args.characteristic)
+            else {
+                completion(.failure(PluginError.invalidMethodCall(method: name, details: "characteristic, service, and peripheral IDs are required").asFlutterError))
+                return
+            }*/
+
+        do {
+            //try central.writeLocalCharacteristic(value: args.value, characteristic: QualifiedCharacteristic(id: characteristic.id, serviceID: characteristic.serviceID, peripheralID: characteristic.peripheralID))
+            try central.writeLocalCharacteristic(value: args.value)
+
+        }
+        catch {
+            completion(.failure(PluginError.notInitialized.asFlutterError))
+        }
+        completion(.success(nil))
+    }
+
     func startScanning(sink: EventSink) -> FlutterError? {
         guard let central = central
         else { return PluginError.notInitialized.asFlutterError }
@@ -238,11 +372,15 @@ final class PluginController {
 
         completion(.success(nil))
         
+        //print("currentState:", args.connectionState)
+        
         if let sink = connectedDeviceSink {
             let message = DeviceInfo.with {
                 $0.id = args.deviceID
-                $0.connectionState = encode(.connecting)
+                $0.connectionState = encode(.connected) //encode(.connecting)
+                //TODO ensure if connection is already established
             }
+            print("300 =>", message)
             sink.add(.success(message))
         } else {
             print("Warning! No event channel set up to report a connection update")
@@ -269,6 +407,8 @@ final class PluginController {
                     $0.message = "\(error)"
                 }
             }
+
+            print("328 =>", message)
 
             sink.add(.success(message))
         }
@@ -326,6 +466,7 @@ final class PluginController {
                 }
  
                 $0.includedServices = (service.includedServices ?? []).map(makeDiscoveredService)
+                print("=>", service)
             }
         }
 
@@ -554,6 +695,17 @@ final class PluginController {
 
         let stateToReport = knownState ?? central?.state ?? .unknown
         let message = BleStatusInfo.with { $0.status = encode(stateToReport) }
+
+        sink.add(.success(message))
+    }
+    
+    private func reportSub(_ connectedCentral: CBCentral, changedSub: CBCharacteristic) {
+        print("reportSub: ", changedSub as Any)
+        
+        guard let sink = connectedCentralSink
+        else { return }
+
+        let message = DeviceInfo.with { $0.id = connectedCentral.identifier.uuidString} //TODO add DeviceID
 
         sink.add(.success(message))
     }

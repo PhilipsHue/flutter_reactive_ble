@@ -16,6 +16,10 @@ public class SwiftReactiveBlePlugin: NSObject, FlutterPlugin {
             .setStreamHandler(plugin.connectedDeviceStreamHandler)
         FlutterEventChannel(name: "flutter_reactive_ble_char_update", binaryMessenger: registrar.messenger())
             .setStreamHandler(plugin.characteristicValueUpdateStreamHandler)
+        FlutterEventChannel(name: "flutter_reactive_ble_connected_central", binaryMessenger: registrar.messenger())
+            .setStreamHandler(plugin.connectedCentralStreamHandler)
+        FlutterEventChannel(name: "flutter_reactive_ble_char_update_central", binaryMessenger: registrar.messenger())
+            .setStreamHandler(plugin.characteristicCentralValueUpdateStreamHandler)
     }
 
     var statusStreamHandler: StreamHandler<PluginController> {
@@ -61,6 +65,21 @@ public class SwiftReactiveBlePlugin: NSObject, FlutterPlugin {
         )
     }
 
+    var connectedCentralStreamHandler: StreamHandler<PluginController> {
+        return StreamHandler(
+            name: "connected central stream handler",
+            context: context,
+            onListen: { context, sink in
+                context.connectedCentralSink = sink
+                return nil
+            },
+            onCancel: { context in
+                context.connectedCentralSink = nil
+                return nil
+            }
+        )
+    }
+
     var characteristicValueUpdateStreamHandler: StreamHandler<PluginController> {
         return StreamHandler(
             name: "characteristic value update stream handler",
@@ -76,6 +95,26 @@ public class SwiftReactiveBlePlugin: NSObject, FlutterPlugin {
             onCancel: { context in
                 context.messageQueue.removeAll()
                 context.characteristicValueUpdateSink = nil
+                return nil
+            }
+        )
+    }
+
+    var characteristicCentralValueUpdateStreamHandler: StreamHandler<PluginController> {
+        return StreamHandler(
+            name: "characteristic central value update stream handler",
+            context: context,
+            onListen: { context, sink in
+                context.characteristicCentralValueUpdateSink = sink
+                context.messageQueue.forEach { msg in
+                sink.add(.success(msg))
+                }
+                context.messageQueue.removeAll()
+                return nil
+            },
+            onCancel: { context in
+                context.messageQueue.removeAll()
+                context.characteristicCentralValueUpdateSink = nil
                 return nil
             }
         )
@@ -156,7 +195,9 @@ public class SwiftReactiveBlePlugin: NSObject, FlutterPlugin {
         AnyPlatformMethod(NullaryPlatformMethod(name: "addGattCharacteristic") { (name, context, completion) in
             context.addGattCharacteristic(name: name, completion: completion)
         }),
-
+        AnyPlatformMethod(UnaryPlatformMethod(name: "writeLocalCharacteristic") { (name, context, args: WriteCharacteristicRequest, completion) in
+            context.writeLocalCharacteristic(name: name, args: args, completion: completion)
+        }),
     ])
 
     public func handle(_ call: FlutterMethodCall, result completion: @escaping FlutterResult) {

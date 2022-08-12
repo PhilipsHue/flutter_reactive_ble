@@ -24,6 +24,15 @@ abstract class ReactiveBlePlatform extends PlatformInterface {
     _instance = instance;
   }
 
+  /// Stream providing ble connected central update.
+  ///
+  /// It is important to subscribe to this stream before waiting for central to be connected
+  /// since it can happen that some results are missed.
+  Stream<ConnectionStateUpdate> get connectionCentralStream {
+    throw UnimplementedError(
+        'connectionCentralStream has not been implemented.');
+  }
+
   /// Stream providing ble scan results.
   ///
   /// It is important to subscribe to this stream before scanning for devices
@@ -53,6 +62,12 @@ abstract class ReactiveBlePlatform extends PlatformInterface {
   /// or subscribed to.
   Stream<CharacteristicValue> get charValueUpdateStream {
     throw UnimplementedError('charValueUpdateStream has not been implemented.');
+  }
+
+  /// Stream that provides value updates about the characteristics central writerequest.
+  Stream<CharacteristicValue> get charCentralValueUpdateStream {
+    throw UnimplementedError(
+        'charCentralValueUpdateStream has not been implemented.');
   }
 
   /// Initializes the ble plugin platform specific counter parts.
@@ -206,11 +221,9 @@ abstract class ReactiveBlePlatform extends PlatformInterface {
     throw UnimplementedError('addGattCharacteristic has not been implemented.');
   }
 
-  Future<int> getPermissions() {
-    throw UnimplementedError('getPermissions has not been implemented.');
-  }
-
-  Future<int> setPermissions() {
-    throw UnimplementedError('setPermissions has not been implemented.');
+  Future<void> writeLocalCharacteristic(
+      QualifiedCharacteristic characteristic, List<int> value) {
+    throw UnimplementedError(
+        'writeCharacteristicWithoutResponse has not been implemented.');
   }
 }

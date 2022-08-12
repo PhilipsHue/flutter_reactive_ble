@@ -14,6 +14,8 @@ import java.util.UUID
 interface BleClient {
 
     val connectionUpdateSubject: BehaviorSubject<com.signify.hue.flutterreactiveble.ble.ConnectionUpdate>
+    val centralConnectionUpdateSubject: BehaviorSubject<com.signify.hue.flutterreactiveble.ble.ConnectionUpdate>
+    val charRequestSubject: BehaviorSubject<com.signify.hue.flutterreactiveble.ble.CharOperationResult>
 
     fun initializeClient()
     fun scanForDevices(services: List<ParcelUuid>, scanMode: ScanMode, requireLocationServicesEnabled: Boolean): Observable<com.signify.hue.flutterreactiveble.ble.ScanInfo>
@@ -38,11 +40,15 @@ interface BleClient {
     fun observeBleStatus(): Observable<BleStatus>
     fun requestConnectionPriority(deviceId: String, priority: ConnectionPriority):
             Single<RequestConnectionPriorityResult>
-    fun startAdvertising()
+    fun startAdvertising()//: Observable<ConnectionUpdate>
     fun stopAdvertising()
     fun addGattService()
     fun addGattCharacteristic()
     fun startGattServer()
     fun stopGattServer()
-    fun startAdvertisingWaitDeviceConnect()//: Observable<com.signify.hue.flutterreactiveble.ble.ScanInfo>
+    fun writeLocalCharacteristic(
+        deviceId: String,
+        characteristic: UUID,
+        value: ByteArray
+    )
 }

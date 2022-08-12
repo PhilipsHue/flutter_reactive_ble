@@ -10,6 +10,8 @@ abstract class DeviceScanner {
     ScanMode scanMode = ScanMode.balanced,
     bool requireLocationServicesEnabled = true,
   });
+
+  //Stream<ConnectionStateUpdate> get centralConnectionStateUpdateStream;
 }
 
 class DeviceScannerImpl implements DeviceScanner {
