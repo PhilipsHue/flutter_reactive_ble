@@ -104,7 +104,7 @@ class FlutterReactiveBle {
         print,
       );
 
-      ReactiveBlePlatform.instance =
+      ReactiveBlePlatform.instance ??=
           const ReactiveBleMobilePlatformFactory().create();
 
       _blePlatform = ReactiveBlePlatform.instance;
