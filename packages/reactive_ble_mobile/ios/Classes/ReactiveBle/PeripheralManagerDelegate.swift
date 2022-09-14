@@ -35,7 +35,7 @@ final class PeripheralManagerDelegate: NSObject, CBPeripheralManagerDelegate {
             print("error: \(error)")
             return
         }
-        print("service: \(service)")
+         //print("service: \(service)")
     }
 
     // Callback received read request

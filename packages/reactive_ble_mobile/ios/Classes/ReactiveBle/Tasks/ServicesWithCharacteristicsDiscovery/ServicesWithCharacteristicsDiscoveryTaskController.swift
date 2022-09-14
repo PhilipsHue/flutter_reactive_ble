@@ -52,7 +52,7 @@ struct ServicesWithCharacteristicsDiscoveryTaskController: PeripheralTaskControl
                     with: peripheral.services
                 ) { service, characteristicsToDiscover in
                     peripheral.discoverCharacteristics(characteristicsToDiscover.characteristics, for: service)
-                    print("=>", service)
+                    //print("=>", service)
                 }
 
             return task
