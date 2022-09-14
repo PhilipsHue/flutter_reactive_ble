@@ -70,7 +70,7 @@ final class PluginController {
             },
             onConnectionChange: papply(weak: self) { context, central, peripheral, change in
                 let failure: (code: ConnectionFailure, message: String)?
-                print("onConnectionChange1: ", change)
+                //print("onConnectionChange1: ", change)
                 switch change {
                 case .connected:
                     // Wait for services & characteristics to be discovered
@@ -90,7 +90,7 @@ final class PluginController {
                         print("error: ", error)
                     }
                 }
-                print("86 =>", message)
+                //print("86 =>", message)
 
                 context.connectedDeviceSink?.add(.success(message))
             },
@@ -109,7 +109,7 @@ final class PluginController {
                         print("error: ", errors)
                     }
                 }
-                print("105 =>", message)
+                //print("105 =>", message)
 
                 sink.add(.success(message))
             },
@@ -131,7 +131,7 @@ final class PluginController {
                     }
                 }
                 print("onCharacteristicValueUpdate")
-                print("=>", message)
+                //print("=>", message)
                 let sink = context.characteristicValueUpdateSink
                 if (sink != nil) {
                     sink!.add(.success(message))
@@ -159,7 +159,7 @@ final class PluginController {
                     }
                 }
                 print("onCharacteristicSubscribedByCentral")
-                print("=>", message)
+                //print("=>", message)
                 let sink = context.characteristicCentralValueUpdateSink
                 if (sink != nil) {
                     sink!.add(.success(message))
@@ -180,7 +180,7 @@ final class PluginController {
                     }
                 }
                 print("onCharRequest")
-                print("=>", message)
+                //print("=>", message)
                 let sink = context.characteristicCentralValueUpdateSink
                 if (sink != nil) {
                     sink!.add(.success(message))
@@ -380,7 +380,7 @@ final class PluginController {
                 $0.connectionState = encode(.connected) //encode(.connecting)
                 //TODO ensure if connection is already established
             }
-            print("300 =>", message)
+            //print("300 =>", message)
             sink.add(.success(message))
         } else {
             print("Warning! No event channel set up to report a connection update")
@@ -408,7 +408,7 @@ final class PluginController {
                 }
             }
 
-            print("328 =>", message)
+            //print("328 =>", message)
 
             sink.add(.success(message))
         }
@@ -466,7 +466,7 @@ final class PluginController {
                 }
  
                 $0.includedServices = (service.includedServices ?? []).map(makeDiscoveredService)
-                print("=>", service)
+                //print("=>", service)
             }
         }
 
@@ -700,7 +700,7 @@ final class PluginController {
     }
     
     private func reportSub(_ connectedCentral: CBCentral, changedSub: CBCharacteristic) {
-        print("reportSub: ", changedSub as Any)
+        //print("reportSub: ", changedSub as Any)
         
         guard let sink = connectedCentralSink
         else { return }

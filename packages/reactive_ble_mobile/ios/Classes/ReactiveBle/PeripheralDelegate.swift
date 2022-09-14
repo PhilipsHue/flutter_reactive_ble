@@ -35,7 +35,7 @@ final class PeripheralDelegate: NSObject, CBPeripheralDelegate {
 
     func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?) {
         print("peripheral didDiscoverCharacteristicsFor")
-        print("=>", service)
+        //print("=>", service)
         onCharacteristicsDiscovery(service, error)
     }
 

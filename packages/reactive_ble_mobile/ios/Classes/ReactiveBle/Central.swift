@@ -55,13 +55,13 @@ final class Central {
         self.onServicesWithCharacteristicsInitialDiscovery = onServicesWithCharacteristicsInitialDiscovery
         self.peripheralManagerDelegate = PeripheralManagerDelegate(
             onSubChange: papply(weak: self) { central, connectedCentral, characteristic in
-                print("characteristic: ", characteristic)
+                //print("characteristic: ", characteristic)
                 onSubChange(central, connectedCentral, characteristic)
                 self.mConnectedCentral = connectedCentral
             },
             onCharRequest: papply(weak: self) { central, peripheral, request in
-                            print("request: ", request)
-                onCharRequest(central, peripheral, QualifiedCharacteristic(request.characteristic), request.characteristic.value)
+                            //print("request: ", request)
+                onCharRequest(central, peripheral, QualifiedCharacteristic(request.characteristic), request.value)
             }
             )
         self.centralManagerDelegate = CentralManagerDelegate(
@@ -73,7 +73,7 @@ final class Central {
                         onConnectionChange(central, peripheral, .disconnected(error))
                     }
                 }
-                print("ConnectionState: ", state)
+                //print("ConnectionState: ", state)
                 onStateChange(central, state)
             },
             onDiscovery: papply(weak: self, onDiscovery),
@@ -89,7 +89,7 @@ final class Central {
                 case .failedToConnect(let error), .disconnected(let error):
                     central.eject(peripheral, error: error ?? PluginError.connectionLost)
                 }
-                print("onConnectionChange2: ", change)
+                //print("onConnectionChange2: ", change)
                 onConnectionChange(central, peripheral, change)
             }
         )
@@ -318,8 +318,8 @@ final class Central {
 
         //TODO add subscribed central onSubscribedCentrals: centrals / centrals: [CBCentral]
         let bRet: Bool = peripheralManager.updateValue(value, for: sampleChar, onSubscribedCentrals: [self.mConnectedCentral])
-        print("value:", value)
-        print("characteristic:", sampleChar)
+        //print("value:", value)
+        //print("characteristic:", sampleChar)
         /*
         guard characteristic.properties.contains(.writeWithoutResponse)
         else { throw Failure.notWritable(qualifiedCharacteristic) }
@@ -366,7 +366,7 @@ final class Central {
                 case .failedToConnect(_), .disconnected(_):
                     break
                 }
-                print("connectionChange: ", connectionChange)
+                //print("connectionChange: ", connectionChange)
             }
         )
 
