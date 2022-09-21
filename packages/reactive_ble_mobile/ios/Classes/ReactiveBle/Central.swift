@@ -226,7 +226,7 @@ final class Central {
             type: CBUUID(string: CharUUID3),
             properties: Properties3,
             value: nil,
-            permissions: CBAttributePermissions.readable)
+            permissions: uartpermissions)
         
         let UartCharRx: CBMutableCharacteristic = CBMutableCharacteristic(
                     type: CBUUID(string: UartCharRxUUID),
