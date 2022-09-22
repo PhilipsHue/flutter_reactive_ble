@@ -411,11 +411,11 @@ packages:
     source: path
     version: "5.0.2"
   reactive_ble_platform_interface:
-    dependency: transitive
+    dependency: "direct overridden"
     description:
-      name: reactive_ble_platform_interface
-      url: "https://pub.dartlang.org"
-    source: hosted
+      path: "../packages/reactive_ble_platform_interface"
+      relative: true
+    source: path
     version: "5.0.2"
   shelf:
     dependency: transitive
@@ -536,4 +536,4 @@ packages:
     version: "3.1.0"
 sdks:
   dart: ">=2.17.0-0 <3.0.0"
-  flutter: ">=2.0.0"
+  flutter: ">=1.16.0"

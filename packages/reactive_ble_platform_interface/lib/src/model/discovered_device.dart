@@ -41,6 +41,10 @@ class DiscoveredDevice extends $DiscoveredDevice {
 
   final int rssi;
 
+  final double txPowerLevel;
+
+  final bool isConnectable;
+
   const DiscoveredDevice({
     required this.id,
     required this.name,
@@ -48,6 +52,8 @@ class DiscoveredDevice extends $DiscoveredDevice {
     required this.manufacturerData,
     required this.rssi,
     required this.serviceUuids,
+    required this.txPowerLevel,
+    required this.isConnectable,
   });
 }
 

@@ -146,7 +146,7 @@ class _DeviceListState extends State<_DeviceList> {
                       (device) => ListTile(
                         title: Text(device.name),
                         subtitle: Text(
-                            "${device.id}\nRSSI: ${device.rssi}\n${device.txPowerLevel}"),
+                            "${device.id}\nRSSI: ${device.rssi}\n${device.txPowerLevel}\nconnectible: ${device.isConnectable}"),
                         leading: const BluetoothIcon(),
                         onTap: () async {
                           widget.stopScan();

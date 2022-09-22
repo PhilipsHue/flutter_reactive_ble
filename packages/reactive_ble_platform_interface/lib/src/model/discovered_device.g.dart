@@ -71,6 +71,8 @@ abstract class $DiscoveredDevice {
   List<Uuid> get serviceUuids;
   Uint8List get manufacturerData;
   int get rssi;
+  double get txPowerLevel;
+  bool get isConnectable;
 
   DiscoveredDevice copyWith({
     String? id,
@@ -79,6 +81,8 @@ abstract class $DiscoveredDevice {
     List<Uuid>? serviceUuids,
     Uint8List? manufacturerData,
     int? rssi,
+    double? txPowerLevel,
+    bool? isConnectable,
   }) =>
       DiscoveredDevice(
         id: id ?? this.id,
@@ -87,6 +91,8 @@ abstract class $DiscoveredDevice {
         serviceUuids: serviceUuids ?? this.serviceUuids,
         manufacturerData: manufacturerData ?? this.manufacturerData,
         rssi: rssi ?? this.rssi,
+        txPowerLevel: txPowerLevel ?? this.txPowerLevel,
+        isConnectable: isConnectable ?? this.isConnectable,
       );
 
   DiscoveredDevice copyUsing(
@@ -98,6 +104,8 @@ abstract class $DiscoveredDevice {
       this.serviceUuids,
       this.manufacturerData,
       this.rssi,
+      this.txPowerLevel,
+      this.isConnectable,
     );
     mutator(change);
     return DiscoveredDevice(
@@ -107,12 +115,14 @@ abstract class $DiscoveredDevice {
       serviceUuids: change.serviceUuids,
       manufacturerData: change.manufacturerData,
       rssi: change.rssi,
+      txPowerLevel: change.txPowerLevel,
+      isConnectable: change.isConnectable,
     );
   }
 
   @override
   String toString() =>
-      "DiscoveredDevice(id: $id, name: $name, serviceData: $serviceData, serviceUuids: $serviceUuids, manufacturerData: $manufacturerData, rssi: $rssi)";
+      "DiscoveredDevice(id: $id, name: $name, serviceData: $serviceData, serviceUuids: $serviceUuids, manufacturerData: $manufacturerData, rssi: $rssi, txPowerLevel: $txPowerLevel, isConnectable: $isConnectable)";
 
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
@@ -125,7 +135,9 @@ abstract class $DiscoveredDevice {
       const DeepCollectionEquality().equals(serviceUuids, other.serviceUuids) &&
       const DeepCollectionEquality()
           .equals(manufacturerData, other.manufacturerData) &&
-      rssi == other.rssi;
+      rssi == other.rssi &&
+      txPowerLevel == other.txPowerLevel &&
+      isConnectable == other.isConnectable;
 
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
@@ -138,6 +150,8 @@ abstract class $DiscoveredDevice {
     result =
         37 * result + const DeepCollectionEquality().hash(manufacturerData);
     result = 37 * result + rssi.hashCode;
+    result = 37 * result + txPowerLevel.hashCode;
+    result = 37 * result + isConnectable.hashCode;
     return result;
   }
 }
@@ -150,6 +164,8 @@ class DiscoveredDevice$Change {
     this.serviceUuids,
     this.manufacturerData,
     this.rssi,
+    this.txPowerLevel,
+    this.isConnectable,
   );
 
   String id;
@@ -158,6 +174,8 @@ class DiscoveredDevice$Change {
   List<Uuid> serviceUuids;
   Uint8List manufacturerData;
   int rssi;
+  double txPowerLevel;
+  bool isConnectable;
 }
 
 // ignore: avoid_classes_with_only_static_members
@@ -193,5 +211,17 @@ class DiscoveredDevice$ {
   static final rssi = Lens<DiscoveredDevice, int>(
     (rssiContainer) => rssiContainer.rssi,
     (rssiContainer, rssi) => rssiContainer.copyWith(rssi: rssi),
+  );
+
+  static final txPowerLevel = Lens<DiscoveredDevice, double>(
+    (txPowerLevelContainer) => txPowerLevelContainer.txPowerLevel,
+    (txPowerLevelContainer, txPowerLevel) =>
+        txPowerLevelContainer.copyWith(txPowerLevel: txPowerLevel),
+  );
+
+  static final isConnectable = Lens<DiscoveredDevice, bool>(
+    (isConnectableContainer) => isConnectableContainer.isConnectable,
+    (isConnectableContainer, isConnectable) =>
+        isConnectableContainer.copyWith(isConnectable: isConnectable),
   );
 }

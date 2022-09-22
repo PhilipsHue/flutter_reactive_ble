@@ -64,6 +64,7 @@ class ProtobufConverterImpl implements ProtobufConverter {
           manufacturerData: Uint8List.fromList(message.manufacturerData),
           rssi: message.rssi,
           txPowerLevel: message.txPowerLevel,
+          isConnectable: message.isConnectable,
         ),
         failure: genericFailureFrom(
             hasFailure: message.hasFailure(),

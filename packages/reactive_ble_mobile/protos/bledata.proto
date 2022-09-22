@@ -17,6 +17,7 @@ message DeviceScanInfo {
     repeated Uuid serviceUuids = 7;
     int32 rssi = 5;
     double txPowerLevel = 8;
+    bool isConnectable = 9;
 }
 
 message ConnectToDeviceRequest {

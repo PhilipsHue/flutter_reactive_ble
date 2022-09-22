@@ -88,6 +88,7 @@ class DeviceScanInfo extends $pb.GeneratedMessage {
     ..a<$core.List<$core.int>>(6, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'manufacturerData', $pb.PbFieldType.OY, protoName: 'manufacturerData')
     ..pc<Uuid>(7, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'serviceUuids', $pb.PbFieldType.PM, protoName: 'serviceUuids', subBuilder: Uuid.create)
     ..a<$core.double>(8, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'txPowerLevel', $pb.PbFieldType.OD, protoName: 'txPowerLevel')
+    ..aOB(9, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'isConnectable', protoName: 'isConnectable')
     ..hasRequiredFields = false
   ;
 
@@ -101,6 +102,7 @@ class DeviceScanInfo extends $pb.GeneratedMessage {
     $core.List<$core.int>? manufacturerData,
     $core.Iterable<Uuid>? serviceUuids,
     $core.double? txPowerLevel,
+    $core.bool? isConnectable,
   }) {
     final _result = create();
     if (id != null) {
@@ -126,6 +128,9 @@ class DeviceScanInfo extends $pb.GeneratedMessage {
     }
     if (txPowerLevel != null) {
       _result.txPowerLevel = txPowerLevel;
+    }
+    if (isConnectable != null) {
+      _result.isConnectable = isConnectable;
     }
     return _result;
   }
@@ -211,6 +216,15 @@ class DeviceScanInfo extends $pb.GeneratedMessage {
   $core.bool hasTxPowerLevel() => $_has(7);
   @$pb.TagNumber(8)
   void clearTxPowerLevel() => clearField(8);
+
+  @$pb.TagNumber(9)
+  $core.bool get isConnectable => $_getBF(8);
+  @$pb.TagNumber(9)
+  set isConnectable($core.bool v) { $_setBool(8, v); }
+  @$pb.TagNumber(9)
+  $core.bool hasIsConnectable() => $_has(8);
+  @$pb.TagNumber(9)
+  void clearIsConnectable() => clearField(9);
 }
 
 class ConnectToDeviceRequest extends $pb.GeneratedMessage {
