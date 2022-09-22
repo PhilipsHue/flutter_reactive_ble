@@ -5,6 +5,7 @@ import var CoreBluetooth.CBAdvertisementDataServiceDataKey
 import var CoreBluetooth.CBAdvertisementDataServiceUUIDsKey
 import var CoreBluetooth.CBAdvertisementDataManufacturerDataKey
 import var CoreBluetooth.CBAdvertisementDataLocalNameKey
+import var CoreBluetooth.CBAdvertisementDataTxPowerLevelKey
 
 final class PluginController {
 
@@ -43,11 +44,13 @@ final class PluginController {
                 let serviceUuids = advertisementData[CBAdvertisementDataServiceUUIDsKey] as? [CBUUID] ?? []
                 let manufacturerData = advertisementData[CBAdvertisementDataManufacturerDataKey] as? Data ?? Data();
                 let name = advertisementData[CBAdvertisementDataLocalNameKey] as? String ?? peripheral.name ?? String();
+                let txPowerLevel = advertisementData[CBAdvertisementDataTxPowerLevelKey] as? Double ?? 0;
 
                 let deviceDiscoveryMessage = DeviceScanInfo.with {
                     $0.id = peripheral.identifier.uuidString
                     $0.name = name
                     $0.rssi = Int32(rssi)
+                    $0.txPowerLevel = txPowerLevel
                     $0.serviceData = serviceData
                         .map { entry in
                             ServiceDataEntry.with {
