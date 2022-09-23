@@ -41,7 +41,7 @@ class DiscoveredDevice extends $DiscoveredDevice {
 
   final int rssi;
 
-  final double txPowerLevel;
+  final int txPowerLevel;
 
   final bool isConnectable;
 
@@ -55,6 +55,8 @@ class DiscoveredDevice extends $DiscoveredDevice {
     required this.txPowerLevel,
     required this.isConnectable,
   });
+
+  int? get getTxPowerLevel => txPowerLevel == -2147483648 ? null : txPowerLevel;
 }
 
 ///Connection status of the BLE device.

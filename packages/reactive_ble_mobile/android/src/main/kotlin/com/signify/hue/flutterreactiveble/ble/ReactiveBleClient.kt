@@ -90,7 +90,7 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
                     result.scanRecord.serviceData?.mapKeys { it.key.uuid } ?: emptyMap(),
                     result.scanRecord.serviceUuids?.map { it.uuid } ?: emptyList(),
                     extractManufacturerData(result.scanRecord.manufacturerSpecificData),
-                    result.scanRecord.txPowerLevel.toDouble(),
+                    result.scanRecord.txPowerLevel,
                     result.isConnectable.toString() == "CONNECTABLE")
             }
     }

@@ -87,7 +87,7 @@ class DeviceScanInfo extends $pb.GeneratedMessage {
     ..a<$core.int>(5, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'rssi', $pb.PbFieldType.O3)
     ..a<$core.List<$core.int>>(6, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'manufacturerData', $pb.PbFieldType.OY, protoName: 'manufacturerData')
     ..pc<Uuid>(7, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'serviceUuids', $pb.PbFieldType.PM, protoName: 'serviceUuids', subBuilder: Uuid.create)
-    ..a<$core.double>(8, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'txPowerLevel', $pb.PbFieldType.OD, protoName: 'txPowerLevel')
+    ..a<$core.int>(8, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'txPowerLevel', $pb.PbFieldType.O3, protoName: 'txPowerLevel')
     ..aOB(9, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'isConnectable', protoName: 'isConnectable')
     ..hasRequiredFields = false
   ;
@@ -101,7 +101,7 @@ class DeviceScanInfo extends $pb.GeneratedMessage {
     $core.int? rssi,
     $core.List<$core.int>? manufacturerData,
     $core.Iterable<Uuid>? serviceUuids,
-    $core.double? txPowerLevel,
+    $core.int? txPowerLevel,
     $core.bool? isConnectable,
   }) {
     final _result = create();
@@ -209,9 +209,9 @@ class DeviceScanInfo extends $pb.GeneratedMessage {
   $core.List<Uuid> get serviceUuids => $_getList(6);
 
   @$pb.TagNumber(8)
-  $core.double get txPowerLevel => $_getN(7);
+  $core.int get txPowerLevel => $_getIZ(7);
   @$pb.TagNumber(8)
-  set txPowerLevel($core.double v) { $_setDouble(7, v); }
+  set txPowerLevel($core.int v) { $_setSignedInt32(7, v); }
   @$pb.TagNumber(8)
   $core.bool hasTxPowerLevel() => $_has(7);
   @$pb.TagNumber(8)

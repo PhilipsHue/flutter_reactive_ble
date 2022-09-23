@@ -31,13 +31,13 @@ const DeviceScanInfo$json = const {
     const {'1': 'manufacturerData', '3': 6, '4': 1, '5': 12, '10': 'manufacturerData'},
     const {'1': 'serviceUuids', '3': 7, '4': 3, '5': 11, '6': '.Uuid', '10': 'serviceUuids'},
     const {'1': 'rssi', '3': 5, '4': 1, '5': 5, '10': 'rssi'},
-    const {'1': 'txPowerLevel', '3': 8, '4': 1, '5': 1, '10': 'txPowerLevel'},
+    const {'1': 'txPowerLevel', '3': 8, '4': 1, '5': 5, '10': 'txPowerLevel'},
     const {'1': 'isConnectable', '3': 9, '4': 1, '5': 8, '10': 'isConnectable'},
   ],
 };
 
 /// Descriptor for `DeviceScanInfo`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List deviceScanInfoDescriptor = $convert.base64Decode('Cg5EZXZpY2VTY2FuSW5mbxIOCgJpZBgBIAEoCVICaWQSEgoEbmFtZRgCIAEoCVIEbmFtZRIpCgdmYWlsdXJlGAMgASgLMg8uR2VuZXJpY0ZhaWx1cmVSB2ZhaWx1cmUSMwoLc2VydmljZURhdGEYBCADKAsyES5TZXJ2aWNlRGF0YUVudHJ5UgtzZXJ2aWNlRGF0YRIqChBtYW51ZmFjdHVyZXJEYXRhGAYgASgMUhBtYW51ZmFjdHVyZXJEYXRhEikKDHNlcnZpY2VVdWlkcxgHIAMoCzIFLlV1aWRSDHNlcnZpY2VVdWlkcxISCgRyc3NpGAUgASgFUgRyc3NpEiIKDHR4UG93ZXJMZXZlbBgIIAEoAVIMdHhQb3dlckxldmVsEiQKDWlzQ29ubmVjdGFibGUYCSABKAhSDWlzQ29ubmVjdGFibGU=');
+final $typed_data.Uint8List deviceScanInfoDescriptor = $convert.base64Decode('Cg5EZXZpY2VTY2FuSW5mbxIOCgJpZBgBIAEoCVICaWQSEgoEbmFtZRgCIAEoCVIEbmFtZRIpCgdmYWlsdXJlGAMgASgLMg8uR2VuZXJpY0ZhaWx1cmVSB2ZhaWx1cmUSMwoLc2VydmljZURhdGEYBCADKAsyES5TZXJ2aWNlRGF0YUVudHJ5UgtzZXJ2aWNlRGF0YRIqChBtYW51ZmFjdHVyZXJEYXRhGAYgASgMUhBtYW51ZmFjdHVyZXJEYXRhEikKDHNlcnZpY2VVdWlkcxgHIAMoCzIFLlV1aWRSDHNlcnZpY2VVdWlkcxISCgRyc3NpGAUgASgFUgRyc3NpEiIKDHR4UG93ZXJMZXZlbBgIIAEoBVIMdHhQb3dlckxldmVsEiQKDWlzQ29ubmVjdGFibGUYCSABKAhSDWlzQ29ubmVjdGFibGU=');
 @$core.Deprecated('Use connectToDeviceRequestDescriptor instead')
 const ConnectToDeviceRequest$json = const {
   '1': 'ConnectToDeviceRequest',

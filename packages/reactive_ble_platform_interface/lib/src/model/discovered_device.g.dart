@@ -71,7 +71,7 @@ abstract class $DiscoveredDevice {
   List<Uuid> get serviceUuids;
   Uint8List get manufacturerData;
   int get rssi;
-  double get txPowerLevel;
+  int get txPowerLevel;
   bool get isConnectable;
 
   DiscoveredDevice copyWith({
@@ -81,7 +81,7 @@ abstract class $DiscoveredDevice {
     List<Uuid>? serviceUuids,
     Uint8List? manufacturerData,
     int? rssi,
-    double? txPowerLevel,
+    int? txPowerLevel,
     bool? isConnectable,
   }) =>
       DiscoveredDevice(
@@ -174,7 +174,7 @@ class DiscoveredDevice$Change {
   List<Uuid> serviceUuids;
   Uint8List manufacturerData;
   int rssi;
-  double txPowerLevel;
+  int txPowerLevel;
   bool isConnectable;
 }
 
@@ -213,7 +213,7 @@ class DiscoveredDevice$ {
     (rssiContainer, rssi) => rssiContainer.copyWith(rssi: rssi),
   );
 
-  static final txPowerLevel = Lens<DiscoveredDevice, double>(
+  static final txPowerLevel = Lens<DiscoveredDevice, int>(
     (txPowerLevelContainer) => txPowerLevelContainer.txPowerLevel,
     (txPowerLevelContainer, txPowerLevel) =>
         txPowerLevelContainer.copyWith(txPowerLevel: txPowerLevel),

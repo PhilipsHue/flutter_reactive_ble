@@ -62,7 +62,7 @@ struct DeviceScanInfo {
 
   var rssi: Int32 = 0
 
-  var txPowerLevel: Double = 0
+  var txPowerLevel: Int32 = 0
 
   var isConnectable: Bool = false
 
@@ -721,7 +721,7 @@ extension DeviceScanInfo: SwiftProtobuf.Message, SwiftProtobuf._MessageImplement
       case 5: try { try decoder.decodeSingularInt32Field(value: &self.rssi) }()
       case 6: try { try decoder.decodeSingularBytesField(value: &self.manufacturerData) }()
       case 7: try { try decoder.decodeRepeatedMessageField(value: &self.serviceUuids) }()
-      case 8: try { try decoder.decodeSingularDoubleField(value: &self.txPowerLevel) }()
+      case 8: try { try decoder.decodeSingularInt32Field(value: &self.txPowerLevel) }()
       case 9: try { try decoder.decodeSingularBoolField(value: &self.isConnectable) }()
       default: break
       }
@@ -755,7 +755,7 @@ extension DeviceScanInfo: SwiftProtobuf.Message, SwiftProtobuf._MessageImplement
       try visitor.visitRepeatedMessageField(value: self.serviceUuids, fieldNumber: 7)
     }
     if self.txPowerLevel != 0 {
-      try visitor.visitSingularDoubleField(value: self.txPowerLevel, fieldNumber: 8)
+      try visitor.visitSingularInt32Field(value: self.txPowerLevel, fieldNumber: 8)
     }
     if self.isConnectable != false {
       try visitor.visitSingularBoolField(value: self.isConnectable, fieldNumber: 9)
