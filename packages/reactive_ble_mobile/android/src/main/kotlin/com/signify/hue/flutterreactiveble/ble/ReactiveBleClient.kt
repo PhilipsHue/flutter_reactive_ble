@@ -340,28 +340,28 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
 
         val Characteristic3 : BluetoothGattCharacteristic = BluetoothGattCharacteristic(
             UUID.fromString(CharUUID3),
-            BluetoothGattCharacteristic.PROPERTY_READ or BluetoothGattCharacteristic.PROPERTY_NOTIFY,
-            BluetoothGattCharacteristic.PERMISSION_READ,
+            BluetoothGattCharacteristic.PROPERTY_READ + BluetoothGattCharacteristic.PROPERTY_NOTIFY,
+            BluetoothGattCharacteristic.PERMISSION_READ_ENCRYPTED,
         )
 
         val CCCDUartRx : BluetoothGattDescriptor = BluetoothGattDescriptor(
             UUID.fromString(CccdUUID),
-            BluetoothGattDescriptor.PERMISSION_READ + BluetoothGattDescriptor.PERMISSION_WRITE
+            BluetoothGattDescriptor.PERMISSION_READ + BluetoothGattDescriptor.PERMISSION_WRITE,
         )
 
         val CCCD1 : BluetoothGattDescriptor = BluetoothGattDescriptor(
             UUID.fromString(CccdUUID),
-            BluetoothGattDescriptor.PERMISSION_READ or BluetoothGattDescriptor.PERMISSION_WRITE
+            BluetoothGattDescriptor.PERMISSION_READ or BluetoothGattDescriptor.PERMISSION_WRITE,
         )
 
         val CCCD2 : BluetoothGattDescriptor = BluetoothGattDescriptor(
             UUID.fromString(CccdUUID),
-            BluetoothGattDescriptor.PERMISSION_READ or BluetoothGattDescriptor.PERMISSION_WRITE
+            BluetoothGattDescriptor.PERMISSION_READ or BluetoothGattDescriptor.PERMISSION_WRITE,
         )
 
         val CCCD3 : BluetoothGattDescriptor = BluetoothGattDescriptor(
             UUID.fromString(CccdUUID),
-            BluetoothGattDescriptor.PERMISSION_READ or BluetoothGattDescriptor.PERMISSION_WRITE
+            BluetoothGattDescriptor.PERMISSION_READ or BluetoothGattDescriptor.PERMISSION_WRITE,
         )
 
         val uartService = BluetoothGattService(
