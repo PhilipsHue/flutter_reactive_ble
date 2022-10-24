@@ -39,6 +39,8 @@ class ProtobufMessageConverter {
                     .addAllServiceData(createServiceDataEntry(scanInfo.serviceData))
                     .addAllServiceUuids(createServiceUuids(scanInfo.serviceUuids))
                     .setManufacturerData(ByteString.copyFrom(scanInfo.manufacturerData))
+                    .setTxPowerLevel(scanInfo.txPowerLevel)
+                    .setIsConnectable(scanInfo.isConnectable)
                     .build()
 
     fun convertScanErrorInfo(errorMessage: String?): pb.DeviceScanInfo =

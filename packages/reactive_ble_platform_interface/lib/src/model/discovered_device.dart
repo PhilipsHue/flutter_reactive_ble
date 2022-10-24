@@ -41,6 +41,10 @@ class DiscoveredDevice extends $DiscoveredDevice {
 
   final int rssi;
 
+  final int txPowerLevel;
+
+  final bool isConnectable;
+
   const DiscoveredDevice({
     required this.id,
     required this.name,
@@ -48,7 +52,11 @@ class DiscoveredDevice extends $DiscoveredDevice {
     required this.manufacturerData,
     required this.rssi,
     required this.serviceUuids,
+    required this.txPowerLevel,
+    required this.isConnectable,
   });
+
+  int? get getTxPowerLevel => txPowerLevel == -2147483648 ? null : txPowerLevel;
 }
 
 ///Connection status of the BLE device.

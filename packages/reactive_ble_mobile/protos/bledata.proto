@@ -16,6 +16,8 @@ message DeviceScanInfo {
     bytes manufacturerData = 6;
     repeated Uuid serviceUuids = 7;
     int32 rssi = 5;
+    int32 txPowerLevel = 8;
+    bool isConnectable = 9;
 }
 
 message ConnectToDeviceRequest {

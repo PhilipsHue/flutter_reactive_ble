@@ -32,6 +32,8 @@ import java.util.concurrent.TimeUnit
 import kotlin.collections.component1
 import kotlin.collections.component2
 
+import android.util.Log
+
 @Suppress("TooManyFunctions")
 open class ReactiveBleClient(private val context: Context) : BleClient {
     private val connectionQueue = ConnectionQueue()
@@ -87,7 +89,9 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
                     result.rssi,
                     result.scanRecord.serviceData?.mapKeys { it.key.uuid } ?: emptyMap(),
                     result.scanRecord.serviceUuids?.map { it.uuid } ?: emptyList(),
-                    extractManufacturerData(result.scanRecord.manufacturerSpecificData))
+                    extractManufacturerData(result.scanRecord.manufacturerSpecificData),
+                    result.scanRecord.txPowerLevel,
+                    result.isConnectable.toString() == "CONNECTABLE")
             }
     }
 
