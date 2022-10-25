@@ -4,6 +4,8 @@ import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
 import 'package:flutter_reactive_ble_example/src/ble/reactive_state.dart';
 import 'package:meta/meta.dart';
 
+final _serviceUuid = Uuid.parse('E20A39F4-73F5-4BC4-A12F-17D1AD07A961');
+
 class BleScanner implements ReactiveState<BleScannerState> {
   BleScanner({
     required FlutterReactiveBle ble,
@@ -13,8 +15,7 @@ class BleScanner implements ReactiveState<BleScannerState> {
 
   final FlutterReactiveBle _ble;
   final void Function(String message) _logMessage;
-  final StreamController<BleScannerState> _stateStreamController =
-      StreamController();
+  final StreamController<BleScannerState> _stateStreamController = StreamController();
 
   final _devices = <DiscoveredDevice>[];
 
@@ -25,8 +26,7 @@ class BleScanner implements ReactiveState<BleScannerState> {
     _logMessage('Start ble discovery');
     _devices.clear();
     _subscription?.cancel();
-    _subscription =
-        _ble.scanForDevices(withServices: serviceIds).listen((device) {
+    _subscription = _ble.scanForDevices(withServices: [_serviceUuid]).listen((device) {
       final knownDeviceIndex = _devices.indexWhere((d) => d.id == device.id);
       if (knownDeviceIndex >= 0) {
         _devices[knownDeviceIndex] = device;
