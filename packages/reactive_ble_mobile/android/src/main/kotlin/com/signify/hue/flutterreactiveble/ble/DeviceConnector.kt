@@ -37,6 +37,7 @@ internal class DeviceConnector(
         private const val delayMsAfterClearingCache = 300L
     }
 
+    private var bleGatt: BluetoothGatt? = null
     private var bonded = false
     private val connectDeviceSubject = BehaviorSubject.create<EstablishConnectionResult>()
 
@@ -122,6 +123,8 @@ internal class DeviceConnector(
             sendDisconnectedUpdate(deviceId)
             disposeSubscriptions()
         }
+        bleGatt?.disconnect()
+        bleGatt = null
     }
 
     private fun sendDisconnectedUpdate(deviceId: String) {
@@ -222,36 +225,20 @@ internal class DeviceConnector(
                                 "Error $status encountered for $deviceAddress! Disconnecting..."
                             )
                             gatt.close()
-//                            emitter.onError(Exception())
                         }
                         if (newState != BluetoothProfile.STATE_CONNECTED) {
                             Log.w("BluetoothGattCallback", "Successfully disconnected from $deviceAddress")
                             gatt.close()
-//                            emitter.onError(Exception())
                         }
+                        if (bleGatt == null) bleGatt = gatt
                         emitter.onNext(Unit)
                         emitter.onComplete()
-//                        if (bondState == BluetoothDevice.BOND_BONDED) {
-//                            Log.w("BluetoothGattCallback", "Successfully connected to $deviceAddress")
-//                            emitter.onNext(Unit)
-//                        }
-//                        createBond()
-//                        Observable.interval(5, TimeUnit.SECONDS)
-//                            .take(3)
-//                            .subscribe {
-//                                Log.w("BluetoothGattCallback", "onConnectionStateChange: $it", )
-//                                if (bondState == BluetoothDevice.BOND_BONDED) {
-//                                    Log.w("BluetoothGattCallback", "Successfully bonded to $deviceAddress")
-//                                    emitter.onNext(Unit)
-//                                }
-//                                if (bondState != BluetoothDevice.BOND_BONDED && it == 2L) {
-//                                    emitter.onError(Exception())
-//                                }
-//                            }
                     }
                 })
             }
-        }.concatMap {
+        }
+            .retry(3)
+            .concatMap {
                 Log.w("BluetoothGattCallback", "getConnObservable: bleDevice.establishConnection(false)")
                 rxBleDevice.establishConnection(false)
             }
