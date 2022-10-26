@@ -124,6 +124,7 @@ internal class DeviceConnector(
             disposeSubscriptions()
         }
         bleGatt?.disconnect()
+        bleGatt?.close()
         bleGatt = null
     }
 
