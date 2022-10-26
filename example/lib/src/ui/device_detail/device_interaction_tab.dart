@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
 import 'package:flutter_reactive_ble_example/src/ble/ble_device_connector.dart';
@@ -30,7 +32,7 @@ class DeviceInteractionTab extends StatelessWidget {
             deviceConnector: deviceConnector,
             discoverServices: () =>
                 serviceDiscoverer.discoverServices(device.id),
-            readRssi: () => serviceDiscoverer.readRssi(device.id),
+            streamRssi: () => serviceDiscoverer.streamRssi(device.id),
           ),
         ),
       );
@@ -44,7 +46,7 @@ class DeviceInteractionViewModel extends $DeviceInteractionViewModel {
     required this.connectionStatus,
     required this.deviceConnector,
     required this.discoverServices,
-    required this.readRssi,
+    required this.streamRssi,
   });
 
   final String deviceId;
@@ -52,7 +54,7 @@ class DeviceInteractionViewModel extends $DeviceInteractionViewModel {
   final BleDeviceConnector deviceConnector;
   @CustomEquality(Ignore())
   final Future<List<DiscoveredService>> Function() discoverServices;
-  final Future<int> Function() readRssi;
+  final Stream<int> Function() streamRssi;
 
   bool get deviceConnected =>
       connectionStatus == DeviceConnectionState.connected;
@@ -80,13 +82,32 @@ class _DeviceInteractionTab extends StatefulWidget {
 
 class _DeviceInteractionTabState extends State<_DeviceInteractionTab> {
   late List<DiscoveredService> discoveredServices;
-
+  StreamSubscription<int>? rssiStreamSub;
   int _rssi = 0;
 
   @override
   void initState() {
     discoveredServices = [];
     super.initState();
+  }
+
+  @override
+  void didUpdateWidget(covariant _DeviceInteractionTab oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (widget.viewModel.deviceConnected &&
+        !oldWidget.viewModel.deviceConnected) {
+      _startRssiStream();
+    } else if (!widget.viewModel.deviceConnected &&
+        oldWidget.viewModel.deviceConnected) {
+      rssiStreamSub?.cancel();
+    }
+  }
+
+  @override
+  void dispose() {
+    rssiStreamSub?.cancel();
+    super.dispose();
   }
 
   Future<void> discoverServices() async {
@@ -96,11 +117,14 @@ class _DeviceInteractionTabState extends State<_DeviceInteractionTab> {
     });
   }
 
-  Future<void> readRssi() async {
-    final rssi = await widget.viewModel.readRssi();
-    setState(() {
-      _rssi = rssi;
-    });
+  void _startRssiStream() {
+    rssiStreamSub = widget.viewModel.streamRssi().listen(
+      (rssi) {
+        setState(() {
+          _rssi = rssi;
+        });
+      },
+    );
   }
 
   @override
@@ -153,12 +177,6 @@ class _DeviceInteractionTabState extends State<_DeviceInteractionTab> {
                             ? discoverServices
                             : null,
                         child: const Text("Discover Services"),
-                      ),
-                      ElevatedButton(
-                        onPressed: widget.viewModel.deviceConnected
-                            ? readRssi
-                            : null,
-                        child: const Text("Get RSSI"),
                       ),
                     ],
                   ),

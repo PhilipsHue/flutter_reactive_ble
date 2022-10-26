@@ -17,7 +17,7 @@ class BleDeviceInteractor {
     required void Function(String message) logMessage,
     required Stream<List<int>> Function(QualifiedCharacteristic characteristic)
         subscribeToCharacteristic,
-    required this.readRssi,
+    required this.streamRssi,
   })  : _bleDiscoverServices = bleDiscoverServices,
         _readCharacteristic = readCharacteristic,
         _writeWithResponse = writeWithResponse,
@@ -40,7 +40,7 @@ class BleDeviceInteractor {
   final Stream<List<int>> Function(QualifiedCharacteristic characteristic)
       _subScribeToCharacteristic;
 
-  final Future<int> Function(String deviceId) readRssi;
+  final Stream<int> Function(String deviceId) streamRssi;
 
   final void Function(String message) _logMessage;
 
