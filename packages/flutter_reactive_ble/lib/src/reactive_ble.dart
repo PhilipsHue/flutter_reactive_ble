@@ -315,8 +315,10 @@ class FlutterReactiveBle {
   ///
   /// [rssiPeriod] controls the interval at which a new RSSI value will be
   /// returned. Defaults to 1 second.
-  Stream<int> streamRssi(String deviceId,
-          {Duration rssiPeriod = const Duration(seconds: 1)}) =>
+  Stream<int> streamRssi(
+    String deviceId, {
+    Duration rssiPeriod = const Duration(seconds: 1),
+  }) =>
       _blePlatform.streamRssi(deviceId, rssiPeriod);
 
   /// Subscribes to updates from the characteristic specified.
