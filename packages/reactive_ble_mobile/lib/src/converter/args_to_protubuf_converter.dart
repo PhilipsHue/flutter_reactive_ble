@@ -17,7 +17,7 @@ abstract class ArgsToProtobufConverter {
     QualifiedCharacteristic characteristic,
   );
 
-  pb.WriteCharacteristicRequest createWriteChacracteristicRequest(
+  pb.WriteCharacteristicRequest createWriteCharacteristicRequest(
     QualifiedCharacteristic characteristic,
     List<int> value,
   );
@@ -108,7 +108,7 @@ class ArgsToProtobufConverterImpl implements ArgsToProtobufConverter {
   }
 
   @override
-  pb.WriteCharacteristicRequest createWriteChacracteristicRequest(
+  pb.WriteCharacteristicRequest createWriteCharacteristicRequest(
     QualifiedCharacteristic characteristic,
     List<int> value,
   ) {

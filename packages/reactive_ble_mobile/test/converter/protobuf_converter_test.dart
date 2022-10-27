@@ -4,18 +4,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:reactive_ble_mobile/src/converter/protobuf_converter.dart';
 import 'package:reactive_ble_mobile/src/generated/bledata.pb.dart' as pb;
 import 'package:reactive_ble_platform_interface/reactive_ble_platform_interface.dart';
-import 'package:reactive_ble_platform_interface/src/model/ble_status.dart';
-import 'package:reactive_ble_platform_interface/src/model/characteristic_value.dart';
-import 'package:reactive_ble_platform_interface/src/model/clear_gatt_cache_error.dart';
-import 'package:reactive_ble_platform_interface/src/model/connection_priority.dart';
-import 'package:reactive_ble_platform_interface/src/model/connection_state_update.dart';
-import 'package:reactive_ble_platform_interface/src/model/discovered_device.dart';
-import 'package:reactive_ble_platform_interface/src/model/discovered_service.dart';
-import 'package:reactive_ble_platform_interface/src/model/generic_failure.dart';
-import 'package:reactive_ble_platform_interface/src/model/result.dart';
-import 'package:reactive_ble_platform_interface/src/model/unit.dart';
-import 'package:reactive_ble_platform_interface/src/model/uuid.dart';
-import 'package:reactive_ble_platform_interface/src/model/write_characteristic_info.dart';
 
 void main() {
   group('$ProtobufConverter', () {

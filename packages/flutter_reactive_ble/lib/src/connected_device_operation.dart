@@ -1,6 +1,5 @@
 import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
 import 'package:meta/meta.dart';
-import 'package:reactive_ble_platform_interface/reactive_ble_platform_interface.dart';
 
 abstract class ConnectedDeviceOperation {
   Stream<CharacteristicValue> get characteristicValueStream;

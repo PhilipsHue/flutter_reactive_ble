@@ -10,13 +10,6 @@ import 'package:reactive_ble_mobile/src/converter/protobuf_converter.dart';
 import 'package:reactive_ble_mobile/src/generated/bledata.pb.dart' as pb;
 import 'package:reactive_ble_mobile/src/reactive_ble_mobile_platform.dart';
 import 'package:reactive_ble_platform_interface/reactive_ble_platform_interface.dart';
-import 'package:reactive_ble_platform_interface/src/model/characteristic_value.dart';
-import 'package:reactive_ble_platform_interface/src/model/connection_state_update.dart';
-import 'package:reactive_ble_platform_interface/src/model/qualified_characteristic.dart';
-import 'package:reactive_ble_platform_interface/src/model/result.dart';
-import 'package:reactive_ble_platform_interface/src/model/unit.dart';
-import 'package:reactive_ble_platform_interface/src/model/uuid.dart';
-import 'package:reactive_ble_platform_interface/src/model/write_characteristic_info.dart';
 
 import 'reactive_ble_platform_test.mocks.dart';
 // ignore_for_file: avoid_implementing_value_types
@@ -226,7 +219,7 @@ void main() {
         when(_methodChannel.invokeMethod<List<int>?>(any, any)).thenAnswer(
           (_) async => [1],
         );
-        when(_argsConverter.createWriteChacracteristicRequest(
+        when(_argsConverter.createWriteCharacteristicRequest(
             characteristic, [0, 1])).thenReturn(request);
         when(_protobufConverter.writeCharacteristicInfoFrom([1]))
             .thenReturn(expectedResult);
@@ -270,7 +263,7 @@ void main() {
         when(_methodChannel.invokeMethod<List<int>?>(any, any)).thenAnswer(
           (_) async => value,
         );
-        when(_argsConverter.createWriteChacracteristicRequest(
+        when(_argsConverter.createWriteCharacteristicRequest(
                 characteristic, value))
             .thenReturn(request);
         when(_protobufConverter.writeCharacteristicInfoFrom(value))

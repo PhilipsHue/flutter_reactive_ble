@@ -47,7 +47,7 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
 
         lateinit var rxBleClient: RxBleClient
             internal set
-        internal lateinit var activeConnections: MutableMap<String, DeviceConnector>
+        internal var activeConnections = mutableMapOf<String, DeviceConnector>()
     }
 
     override val connectionUpdateSubject: BehaviorSubject<ConnectionUpdate>
@@ -78,6 +78,7 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
         return rxBleClient.scanBleDevices(
             ScanSettings.Builder()
                 .setScanMode(scanMode.toScanSettings())
+                .setLegacy(false)
                 .setCallbackType(ScanSettings.CALLBACK_TYPE_ALL_MATCHES)
                 .setShouldCheckLocationServicesState(requireLocationServicesEnabled)
                 .build(),
@@ -89,7 +90,7 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
                     result.scanRecord.deviceName
                         ?: result.bleDevice.name ?: "",
                     result.rssi,
-                    result.scanRecord.serviceData.mapKeys { it.key.uuid },
+                    result.scanRecord.serviceData?.mapKeys { it.key.uuid } ?: emptyMap(),
                     result.scanRecord.serviceUuids?.map { it.uuid } ?: emptyList(),
                     extractManufacturerData(result.scanRecord.manufacturerSpecificData),
                     result.scanRecord.bytes,
