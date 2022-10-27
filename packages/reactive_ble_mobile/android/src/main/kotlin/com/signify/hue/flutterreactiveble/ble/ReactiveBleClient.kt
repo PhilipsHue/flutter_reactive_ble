@@ -71,6 +71,7 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
         val filters = services.map { service ->
             ScanFilter.Builder()
                 .setServiceUuid(service)
+                .setLegacy(false)
                 .build()
         }.toTypedArray()
 
