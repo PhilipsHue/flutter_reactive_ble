@@ -113,6 +113,7 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
         return rxBleClient.scanBleDevices(
             ScanSettings.Builder()
                 .setScanMode(scanMode.toScanSettings())
+                .setLegacy(false)
                 .setCallbackType(ScanSettings.CALLBACK_TYPE_ALL_MATCHES)
                 .setShouldCheckLocationServicesState(requireLocationServicesEnabled)
                 .build(),
