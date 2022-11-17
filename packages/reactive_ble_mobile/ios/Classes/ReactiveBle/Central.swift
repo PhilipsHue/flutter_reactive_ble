@@ -381,14 +381,22 @@ final class Central {
         guard let peripheral = try? resolve(known: peripheralID)
         else { return }
 
-        centralManager.cancelPeripheralConnection(peripheral)
+        connectRegistry.updateTask(
+            key: peripheralID,
+            action: { $0.cancel(centralManager: centralManager, peripheral: peripheral, error: nil) }
+        )
     }
 
     func disconnectAll() {
         print("disconnect all")
         activePeripherals
             .values
-            .forEach(centralManager.cancelPeripheralConnection)
+            .forEach { (peripheral) in
+                connectRegistry.updateTask(
+                    key: peripheral.identifier,
+                    action: { $0.cancel(centralManager: centralManager, peripheral: peripheral, error: nil) }
+                )
+            }
     }
 
     func discoverServicesWithCharacteristics(
