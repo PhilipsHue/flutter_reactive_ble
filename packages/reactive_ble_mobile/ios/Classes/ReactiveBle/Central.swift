@@ -381,12 +381,9 @@ final class Central {
         guard let peripheral = try? resolve(known: peripheralID)
         else { return }
 
-<<<<<<< HEAD
-=======
         //centralManager.cancelPeripheralConnection(peripheral)
         // 2022-11-21 (BA) - added fix from pullrequest
         // https://github.com/PhilipsHue/flutter_reactive_ble/pull/593/files
->>>>>>> master
         connectRegistry.updateTask(
             key: peripheralID,
             action: { $0.cancel(centralManager: centralManager, peripheral: peripheral, error: nil) }
@@ -397,12 +394,9 @@ final class Central {
         print("disconnect all")
         activePeripherals
             .values
-<<<<<<< HEAD
-=======
             //.forEach(centralManager.cancelPeripheralConnection)
             // 2022-11-21 (BA) - added fix from pullrequest
             // https://github.com/PhilipsHue/flutter_reactive_ble/pull/593/files
->>>>>>> master
             .forEach { (peripheral) in
                 connectRegistry.updateTask(
                     key: peripheral.identifier,
