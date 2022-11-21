@@ -280,7 +280,7 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
 
         val SERVICE_UUID = "61808880-b7b3-11E4-b3a4-0002a5d5c51b"
 
-        val isNameChanged: Boolean = bluetoothAdapter.setName("Truma App")
+        //val isNameChanged: Boolean = bluetoothAdapter.setName("Truma App")
 
         val advertiseData: AdvertiseData = AdvertiseData.Builder()
             .addServiceUuid(ParcelUuid.fromString(SERVICE_UUID))
