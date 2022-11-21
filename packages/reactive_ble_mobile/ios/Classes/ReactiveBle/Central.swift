@@ -153,7 +153,7 @@ final class Central {
         let SERVICE_UUID: String = "61808880-B7B3-11E4-B3A4-0002A5D5C51B"//: UUID = UUID.parse("61808880-B7B3-11E4-B3A4-0002A5D5C51B")
         //CBAdvertisementDataServiceUUIDsKey: SERVICE_UUID,
         
-        peripheralManager.startAdvertising([CBAdvertisementDataLocalNameKey: "Truma Ben",
+        peripheralManager.startAdvertising([CBAdvertisementDataLocalNameKey: "Truma App",
                                             //CBAdvertisementDataIsConnectable: true])
                                             CBAdvertisementDataServiceUUIDsKey: [CBUUID(string: SERVICE_UUID)]])
     }
@@ -381,14 +381,28 @@ final class Central {
         guard let peripheral = try? resolve(known: peripheralID)
         else { return }
 
-        centralManager.cancelPeripheralConnection(peripheral)
+        //centralManager.cancelPeripheralConnection(peripheral)
+        // 2022-11-21 (BA) - added fix from pullrequest
+        // https://github.com/PhilipsHue/flutter_reactive_ble/pull/593/files
+        connectRegistry.updateTask(
+            key: peripheralID,
+            action: { $0.cancel(centralManager: centralManager, peripheral: peripheral, error: nil) }
+        )
     }
 
     func disconnectAll() {
         print("disconnect all")
         activePeripherals
             .values
-            .forEach(centralManager.cancelPeripheralConnection)
+            //.forEach(centralManager.cancelPeripheralConnection)
+            // 2022-11-21 (BA) - added fix from pullrequest
+            // https://github.com/PhilipsHue/flutter_reactive_ble/pull/593/files
+            .forEach { (peripheral) in
+                connectRegistry.updateTask(
+                    key: peripheral.identifier,
+                    action: { $0.cancel(centralManager: centralManager, peripheral: peripheral, error: nil) }
+                )
+            }
     }
 
     func discoverServicesWithCharacteristics(
