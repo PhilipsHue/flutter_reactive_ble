@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import 'package:flutter/foundation.dart';
 import 'package:reactive_ble_platform_interface/reactive_ble_platform_interface.dart';
 
@@ -14,7 +12,8 @@ abstract class ProtobufConverter {
   ConnectionStateUpdate connectionStateUpdateFrom(List<int> data);
 
   Result<Unit, GenericFailure<ClearGattCacheError>?> clearGattCacheResultFrom(
-      List<int> data);
+    List<int> data,
+  );
 
   CharacteristicValue characteristicValueFrom(List<int> data);
 
@@ -218,8 +217,10 @@ class ProtobufConverterImpl implements ProtobufConverter {
       );
 
   @visibleForTesting
-  Result<Value, Failure> resultFrom<Value, Failure>(
-          {required Value Function() getValue, required Failure failure}) =>
+  Result<Value, Failure> resultFrom<Value, Failure>({
+    required Value Function() getValue,
+    required Failure failure,
+  }) =>
       failure != null
           ? Result<Value, Failure>.failure(failure)
           : Result.success(getValue());
