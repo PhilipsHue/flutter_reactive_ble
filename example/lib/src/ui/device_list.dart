@@ -3,6 +3,7 @@ import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
 import 'package:flutter_reactive_ble_example/src/ble/ble_scanner.dart';
 import 'package:provider/provider.dart';
 
+import '../ble/ble_logger.dart';
 import '../widgets.dart';
 import 'device_detail/device_detail_screen.dart';
 
@@ -10,8 +11,9 @@ class DeviceListScreen extends StatelessWidget {
   const DeviceListScreen({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) => Consumer2<BleScanner, BleScannerState?>(
-        builder: (_, bleScanner, bleScannerState, __) => _DeviceList(
+  Widget build(BuildContext context) =>
+      Consumer3<BleScanner, BleScannerState?, BleLogger>(
+        builder: (_, bleScanner, bleScannerState, bleLogger, __) => _DeviceList(
           scannerState: bleScannerState ??
               const BleScannerState(
                 discoveredDevices: [],
@@ -19,19 +21,26 @@ class DeviceListScreen extends StatelessWidget {
               ),
           startScan: bleScanner.startScan,
           stopScan: bleScanner.stopScan,
+          toggleVerboseLogging: bleLogger.toggleVerboseLogging,
+          verboseLogging: bleLogger.verboseLogging,
         ),
       );
 }
 
 class _DeviceList extends StatefulWidget {
-  const _DeviceList(
-      {required this.scannerState,
-      required this.startScan,
-      required this.stopScan});
+  const _DeviceList({
+    required this.scannerState,
+    required this.startScan,
+    required this.stopScan,
+    required this.toggleVerboseLogging,
+    required this.verboseLogging,
+  });
 
   final BleScannerState scannerState;
   final void Function(List<Uuid>) startScan;
   final VoidCallback stopScan;
+  final VoidCallback toggleVerboseLogging;
+  final bool verboseLogging;
 
   @override
   _DeviceListState createState() => _DeviceListState();
@@ -116,48 +125,49 @@ class _DeviceListState extends State<_DeviceList> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 16),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: Text(!widget.scannerState.scanIsInProgress
-                            ? 'Enter a UUID above and tap start to begin scanning'
-                            : 'Tap a device to connect to it'),
-                      ),
-                      if (widget.scannerState.scanIsInProgress ||
-                          widget.scannerState.discoveredDevices.isNotEmpty)
-                        Padding(
-                          padding:
-                              const EdgeInsetsDirectional.only(start: 18.0),
-                          child: Text(
-                              'count: ${widget.scannerState.discoveredDevices.length}'),
-                        ),
-                    ],
-                  ),
                 ],
               ),
             ),
             const SizedBox(height: 8),
             Flexible(
               child: ListView(
-                children: widget.scannerState.discoveredDevices
-                    .map(
-                      (device) => ListTile(
-                        title: Text(device.name),
-                        subtitle: Text("${device.id}\nRSSI: ${device.rssi}"),
-                        leading: const BluetoothIcon(),
-                        onTap: () async {
-                          widget.stopScan();
-                          await Navigator.push<void>(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (_) =>
-                                      DeviceDetailScreen(device: device)));
-                        },
-                      ),
-                    )
-                    .toList(),
+                children: [
+                  SwitchListTile(
+                    title: const Text("Verbose logging"),
+                    value: widget.verboseLogging,
+                    onChanged: (_) => setState(widget.toggleVerboseLogging),
+                  ),
+                  ListTile(
+                    title: Text(
+                      !widget.scannerState.scanIsInProgress
+                          ? 'Enter a UUID above and tap start to begin scanning'
+                          : 'Tap a device to connect to it',
+                    ),
+                    trailing: (widget.scannerState.scanIsInProgress ||
+                            widget.scannerState.discoveredDevices.isNotEmpty)
+                        ? Text(
+                            'count: ${widget.scannerState.discoveredDevices.length}',
+                          )
+                        : null,
+                  ),
+                  ...widget.scannerState.discoveredDevices
+                      .map(
+                        (device) => ListTile(
+                          title: Text(device.name),
+                          subtitle: Text("${device.id}\nRSSI: ${device.rssi}"),
+                          leading: const BluetoothIcon(),
+                          onTap: () async {
+                            widget.stopScan();
+                            await Navigator.push<void>(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (_) =>
+                                        DeviceDetailScreen(device: device)));
+                          },
+                        ),
+                      )
+                      .toList(),
+                ],
               ),
             ),
           ],

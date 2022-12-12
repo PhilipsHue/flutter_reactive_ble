@@ -5,9 +5,10 @@ workflows:
   ble-workflow:
     name: Ble Workflow
     max_build_duration: 60
+    instance_type: mac_mini_m1
     environment:
       flutter: stable
-      xcode: 13.0
+      xcode: 13.3
       cocoapods: default
     cache:
       cache_paths: []
