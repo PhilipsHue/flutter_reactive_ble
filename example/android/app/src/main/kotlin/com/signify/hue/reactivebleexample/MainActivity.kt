@@ -25,6 +25,14 @@ class MainActivity: FlutterActivity(){
       } else {
         throw throwable
       }
-    }
+        // fix for rxjava undelivered exception see:
+        // https://github.com/Polidea/RxAndroidBle/wiki/FAQ:-UndeliverableException
+        RxJavaPlugins.setErrorHandler { error ->
+            if (error is UndeliverableException) {
+                return@setErrorHandler
+            } else {
+                throw error
+            }
+        }
   }
 }
