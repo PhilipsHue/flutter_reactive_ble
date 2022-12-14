@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter/foundation.dart';
 import 'package:reactive_ble_platform_interface/reactive_ble_platform_interface.dart';
 
