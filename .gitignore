@@ -30,6 +30,8 @@
 build/
 .flutter-plugins-dependencies
 Flutter.podspec
+packages/*/pubspec.lock
+
 # Android related
 .gradle/
 **/android/.gradle
