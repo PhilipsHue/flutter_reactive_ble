@@ -9,7 +9,7 @@ import 'package:flutter_reactive_ble/src/discovered_devices_registry.dart';
 import 'package:flutter_reactive_ble/src/rx_ext/repeater.dart';
 import 'package:meta/meta.dart';
 import 'package:reactive_ble_mobile/reactive_ble_mobile.dart';
-import 'package:reactive_ble_platform_interface/reactive_ble_platform_interface.dart';
+import 'package:reactive_ble_platform_interface/reactive_ble_platform_interface.dart' hide Logger;
 
 /// [FlutterReactiveBle] is the facade of the library. Its interface allows to
 /// perform all the supported BLE operations.
