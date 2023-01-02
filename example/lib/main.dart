@@ -16,12 +16,14 @@ const _themeColor = Colors.lightGreen;
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
 
-  final _bleLogger = BleLogger();
   final _ble = FlutterReactiveBle();
+  final _bleLogger = BleLogger(ble: _ble);
   final _scanner = BleScanner(ble: _ble, logMessage: _bleLogger.addToLog);
   final _monitor = BleStatusMonitor(_ble);
-  final _connector =
-      BleDeviceConnector(ble: _ble, logMessage: _bleLogger.addToLog);
+  final _connector = BleDeviceConnector(
+    ble: _ble,
+    logMessage: _bleLogger.addToLog,
+  );
   final _serviceDiscoverer = BleDeviceInteractor(
     bleDiscoverServices: _ble.discoverServices,
     readCharacteristic: _ble.readCharacteristic,

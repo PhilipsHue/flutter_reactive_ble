@@ -160,7 +160,9 @@ class FlutterReactiveBle {
       );
 
       ReactiveBlePlatform.instance =
-          const ReactiveBleMobilePlatformFactory().create();
+          const ReactiveBleMobilePlatformFactory().create(
+        logger: _debugLogger,
+      );
 
       _blePlatform = ReactiveBlePlatform.instance;
 
@@ -426,4 +428,6 @@ class FlutterReactiveBle {
   /// Use [LogLevel.verbose] for full debug output. Make sure to  run this only for debugging purposes.
   /// Use [LogLevel.none] to disable logging. This is also the default.
   set logLevel(LogLevel logLevel) => _debugLogger.logLevel = logLevel;
+
+  LogLevel get logLevel => _debugLogger.logLevel;
 }
