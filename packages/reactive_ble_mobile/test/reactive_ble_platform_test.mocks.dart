@@ -4,9 +4,8 @@
 
 import 'dart:async' as _i9;
 
-import 'package:flutter/src/services/binding.dart' as _i5;
+import 'package:flutter/src/services/binary_messenger.dart' as _i5;
 import 'package:flutter/src/services/message_codec.dart' as _i4;
-import 'package:flutter/src/services/message_codecs.dart' as _i10;
 import 'package:flutter/src/services/platform_channel.dart' as _i8;
 import 'package:mockito/mockito.dart' as _i1;
 import 'package:reactive_ble_mobile/src/converter/args_to_protubuf_converter.dart'
@@ -279,7 +278,7 @@ class MockMethodChannel extends _i1.Mock implements _i8.MethodChannel {
           returnValue: Future<Map<K, V>?>.value()) as _i9.Future<Map<K, V>?>);
   @override
   void setMethodCallHandler(
-          _i9.Future<dynamic> Function(_i10.MethodCall)? handler) =>
+          _i9.Future<dynamic> Function(_i4.MethodCall)? handler) =>
       super.noSuchMethod(Invocation.method(#setMethodCallHandler, [handler]),
           returnValueForMissingStub: null);
   @override

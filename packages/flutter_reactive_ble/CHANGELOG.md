@@ -1,10 +1,3 @@
-## 5.0.3
-
-* Enable extended advertising on android. Fix #571
-* Add additional null checks to scanRecord. Fix #521
-* Restore support for Xcode 12
-* Add verbose debug logging Fix #583 
-
 ## 5.0.2
 
 * Revert Queue up messages on iOS until event channel is ready. Fix #439
