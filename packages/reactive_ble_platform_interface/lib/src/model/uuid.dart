@@ -70,7 +70,7 @@ class Uuid {
   @override
   bool operator ==(Object other) =>
       other.runtimeType == runtimeType &&
-      const DeepCollectionEquality().equals(other.data, data);
+      const DeepCollectionEquality().equals((other as Uuid).data, data);
 }
 
 @immutable

@@ -33,7 +33,7 @@ class QualifiedCharacteristic {
   @override
   bool operator ==(Object other) =>
       runtimeType == other.runtimeType &&
-      characteristicId == other.characteristicId &&
-      serviceId == other.serviceId &&
-      deviceId == other.deviceId;
+      characteristicId == (other as QualifiedCharacteristic).characteristicId &&
+      serviceId == (other as QualifiedCharacteristic).serviceId &&
+      deviceId == (other as QualifiedCharacteristic).deviceId;
 }
