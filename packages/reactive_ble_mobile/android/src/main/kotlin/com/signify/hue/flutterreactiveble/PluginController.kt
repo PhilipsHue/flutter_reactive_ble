@@ -151,10 +151,11 @@ class PluginController {
 
         val readCharMessage = pb.ReadCharacteristicRequest.parseFrom(call.arguments as ByteArray)
         val deviceId = readCharMessage.characteristic.deviceId
+        val service = uuidConverter.uuidFromByteArray(readCharMessage.characteristic.serviceUuid.data.toByteArray())
         val characteristic = uuidConverter.uuidFromByteArray(readCharMessage.characteristic.characteristicUuid.data.toByteArray())
 
         bleClient.readCharacteristic(
-                readCharMessage.characteristic.deviceId, characteristic
+                readCharMessage.characteristic.deviceId, service, characteristic
         )
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
@@ -202,12 +203,14 @@ class PluginController {
             result: Result,
             writeOperation: com.signify.hue.flutterreactiveble.ble.BleClient.(
                     deviceId: String,
+                    service: UUID,
                     characteristic: UUID,
                     value: ByteArray
             ) -> Single<com.signify.hue.flutterreactiveble.ble.CharOperationResult>
     ) {
         val writeCharMessage = pb.WriteCharacteristicRequest.parseFrom(call.arguments as ByteArray)
         bleClient.writeOperation(writeCharMessage.characteristic.deviceId,
+                uuidConverter.uuidFromByteArray(writeCharMessage.characteristic.serviceUuid.data.toByteArray()),
                 uuidConverter.uuidFromByteArray(writeCharMessage.characteristic.characteristicUuid.data.toByteArray()),
                 writeCharMessage.value.toByteArray())
                 .observeOn(AndroidSchedulers.mainThread())

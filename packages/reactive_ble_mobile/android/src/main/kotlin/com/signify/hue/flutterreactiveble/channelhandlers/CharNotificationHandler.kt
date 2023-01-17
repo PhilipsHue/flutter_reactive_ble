@@ -29,9 +29,9 @@ class CharNotificationHandler(private val bleClient: com.signify.hue.flutterreac
     }
 
     fun subscribeToNotifications(request: pb.NotifyCharacteristicRequest) {
-        val charUuid = uuidConverter
-            .uuidFromByteArray(request.characteristic.characteristicUuid.data.toByteArray())
-        val subscription = bleClient.setupNotification(request.characteristic.deviceId, charUuid)
+        val charUuid = uuidConverter.uuidFromByteArray(request.characteristic.serviceUuid.data.toByteArray())
+        val serviceUuid = uuidConverter.uuidFromByteArray(request.characteristic.characteristicUuid.data.toByteArray())
+        val subscription = bleClient.setupNotification(request.characteristic.deviceId, serviceUuid, charUuid)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({ value ->
                 handleNotificationValue(request.characteristic, value)

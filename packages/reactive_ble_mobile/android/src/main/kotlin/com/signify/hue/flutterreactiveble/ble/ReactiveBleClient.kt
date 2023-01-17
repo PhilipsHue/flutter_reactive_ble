@@ -15,6 +15,7 @@ import com.polidea.rxandroidble2.RxBleDevice
 import com.polidea.rxandroidble2.RxBleDeviceServices
 import com.polidea.rxandroidble2.scan.ScanFilter
 import com.polidea.rxandroidble2.scan.ScanSettings
+import com.signify.hue.flutterreactiveble.ble.extensions.readChar
 import com.signify.hue.flutterreactiveble.ble.extensions.writeCharWithResponse
 import com.signify.hue.flutterreactiveble.ble.extensions.writeCharWithoutResponse
 import com.signify.hue.flutterreactiveble.converters.extractManufacturerData
@@ -186,6 +187,18 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
 
     override fun readCharacteristic(
         deviceId: String,
+        service: UUID,
+        characteristic: UUID
+    ): Single<CharOperationResult> =
+        executeReadOperation(
+            deviceId,
+            service,
+            characteristic,
+        )
+/*
+    override fun readCharacteristic(
+        deviceId: String,
+        service: UUID,
         characteristic: UUID
     ): Single<CharOperationResult> =
         getConnection(deviceId).flatMapSingle<CharOperationResult> { connectionResult ->
@@ -211,14 +224,16 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
                     )
             }
         }.first(CharOperationFailed(deviceId, "read char failed"))
-
+*/
     override fun writeCharacteristicWithResponse(
         deviceId: String,
+        service: UUID,
         characteristic: UUID,
         value: ByteArray
     ): Single<CharOperationResult> =
         executeWriteOperation(
             deviceId,
+            service,
             characteristic,
             value,
             RxBleConnection::writeCharWithResponse
@@ -226,22 +241,25 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
 
     override fun writeCharacteristicWithoutResponse(
         deviceId: String,
+        service: UUID,
         characteristic: UUID,
         value: ByteArray
     ): Single<CharOperationResult> =
 
         executeWriteOperation(
             deviceId,
+            service,
             characteristic,
             value,
             RxBleConnection::writeCharWithoutResponse
         )
 
-    override fun setupNotification(deviceId: String, characteristic: UUID): Observable<ByteArray> {
+    override fun setupNotification(deviceId: String, service: UUID, characteristic: UUID): Observable<ByteArray> {
         return getConnection(deviceId)
             .flatMap { deviceConnection ->
                 setupNotificationOrIndication(
                     deviceConnection,
+                    service,
                     characteristic
                 )
             }
@@ -788,17 +806,49 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
         return connector.connection
     }
 
+    private fun executeReadOperation(
+        deviceId: String,
+        service: UUID,
+        characteristic: UUID
+        ): Single<CharOperationResult> {
+    return getConnection(deviceId).flatMapSingle<CharOperationResult> { connectionResult ->
+        when (connectionResult) {
+            is EstablishedConnection ->
+                //connectionResult.rxConnection.readCharacteristic(characteristic)
+                connectionResult.rxConnection.readChar(service, characteristic)
+                    /*
+                    On Android7 the ble stack frequently gives incorrectly
+                    the error GAT_AUTH_FAIL(137) when reading char that will establish
+                    the bonding with the peripheral. By retrying the operation once we
+                    deviate between this flaky one time error and real auth failed cases
+                    */
+                    .retry(1) { Build.VERSION.SDK_INT < Build.VERSION_CODES.O }
+                    .map { value ->
+                        CharOperationSuccessful(deviceId, value.asList())
+                    }
+            is EstablishConnectionFailure ->
+                Single.just(
+                    CharOperationFailed(
+                        deviceId,
+                        "failed to connect ${connectionResult.errorMessage}"
+                    )
+                )
+        }
+    }.first(CharOperationFailed(deviceId, "read char failed"))
+    }
+
     private fun executeWriteOperation(
         deviceId: String,
+        service: UUID,
         characteristic: UUID,
         value: ByteArray,
-        bleOperation: RxBleConnection.(characteristic: UUID, value: ByteArray) -> Single<ByteArray>
+        bleOperation: RxBleConnection.(service: UUID, characteristic: UUID, value: ByteArray) -> Single<ByteArray>
     ): Single<CharOperationResult> {
         return getConnection(deviceId)
             .flatMapSingle<CharOperationResult> { connectionResult ->
                 when (connectionResult) {
                     is EstablishedConnection -> {
-                        connectionResult.rxConnection.bleOperation(characteristic, value)
+                        connectionResult.rxConnection.bleOperation(service, characteristic, value)
                             .map { value -> CharOperationSuccessful(deviceId, value.asList()) }
                     }
                     is EstablishConnectionFailure -> {
@@ -815,7 +865,8 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
 
     private fun setupNotificationOrIndication(
         deviceConnection: EstablishConnectionResult,
-        characteristic: UUID
+        serviceUuid: UUID,
+        charUuid: UUID
     ): Observable<Observable<ByteArray>> =
 
         when (deviceConnection) {
@@ -824,7 +875,26 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
                 if (rxBleClient.getBleDevice(deviceConnection.deviceId).bluetoothDevice.bondState == BOND_BONDING) {
                     Observable.error(Exception("Bonding is in progress wait for bonding to be finished before executing more operations on the device"))
                 } else {
-                    deviceConnection.rxConnection.discoverServices()
+                    deviceConnection.rxConnection.discoverServices().flatMap {
+                            services -> services.getService(serviceUuid)}.map{
+                            service -> service.getCharacteristic(charUuid)}
+                        .flatMapObservable { characteristic ->
+                            val mode = if (characteristic.descriptors.isEmpty()) {
+                                NotificationSetupMode.COMPAT
+                            } else {
+                                NotificationSetupMode.DEFAULT
+                            }
+
+                            if ((characteristic.properties and BluetoothGattCharacteristic.PROPERTY_NOTIFY) > 0) {
+                                deviceConnection.rxConnection.setupNotification(
+                                    characteristic,
+                                    mode
+                                )
+                            } else {
+                                deviceConnection.rxConnection.setupIndication(characteristic, mode)
+                            }
+                        }
+                        /*
                         .flatMap { deviceServices -> deviceServices.getCharacteristic(characteristic) }
                         .flatMapObservable { char ->
                             val mode = if (char.descriptors.isEmpty()) {
@@ -841,7 +911,7 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
                             } else {
                                 deviceConnection.rxConnection.setupIndication(characteristic, mode)
                             }
-                        }
+                        }*/
                 }
             }
             is EstablishConnectionFailure -> {
