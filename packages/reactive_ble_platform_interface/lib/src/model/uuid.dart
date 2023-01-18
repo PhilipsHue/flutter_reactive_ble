@@ -68,9 +68,11 @@ class Uuid {
       data.fold(17, (hash, octet) => 37 * hash + octet.hashCode);
 
   @override
-  bool operator ==(Object other) =>
-      other.runtimeType == runtimeType &&
-      const DeepCollectionEquality().equals((other as Uuid).data, data);
+  bool operator ==(Object other) {
+    return other is Uuid &&
+        other.runtimeType == runtimeType &&
+        const DeepCollectionEquality().equals(other.data, data);
+  }
 }
 
 @immutable

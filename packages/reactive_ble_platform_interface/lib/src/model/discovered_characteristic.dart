@@ -39,7 +39,8 @@ class DiscoveredCharacteristic {
 
   @override
   bool operator ==(Object other) =>
+      other is DiscoveredCharacteristic &&
       runtimeType == other.runtimeType &&
-      characteristicId == (other as DiscoveredCharacteristic).characteristicId &&
-      serviceId == (other as DiscoveredCharacteristic).serviceId;
+      characteristicId == other.characteristicId &&
+      serviceId == other.serviceId;
 }
