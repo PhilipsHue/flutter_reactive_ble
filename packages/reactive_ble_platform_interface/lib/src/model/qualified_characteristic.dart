@@ -31,7 +31,8 @@ class QualifiedCharacteristic {
       deviceId.hashCode;
 
   @override
-  bool operator ==(dynamic other) =>
+  bool operator ==(Object other) =>
+      other is QualifiedCharacteristic &&
       runtimeType == other.runtimeType &&
       characteristicId == other.characteristicId &&
       serviceId == other.serviceId &&
