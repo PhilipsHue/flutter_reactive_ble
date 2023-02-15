@@ -13,7 +13,7 @@ abstract class ReactiveBlePlatform extends PlatformInterface {
   ReactiveBlePlatform() : super(token: _token);
   static final Object _token = Object();
 
-  static late ReactiveBlePlatform _instance;
+  static ReactiveBlePlatform _instance = _PlaceholderImplementation();
 
   static ReactiveBlePlatform get instance => _instance;
 
@@ -182,3 +182,5 @@ abstract class ReactiveBlePlatform extends PlatformInterface {
         'requesConnectionPriority has not been implemented.');
   }
 }
+
+class _PlaceholderImplementation extends ReactiveBlePlatform {}
