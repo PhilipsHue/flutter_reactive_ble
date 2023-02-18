@@ -1,0 +1,33 @@
+PODS:
+  - FlutterMacOS (1.0.0)
+  - Protobuf (3.21.12)
+  - reactive_ble_mobile (0.0.1):
+    - FlutterMacOS
+    - Protobuf (~> 3.5)
+    - SwiftProtobuf (~> 1.0)
+  - SwiftProtobuf (1.20.3)
+
+DEPENDENCIES:
+  - FlutterMacOS (from `Flutter/ephemeral`)
+  - reactive_ble_mobile (from `Flutter/ephemeral/.symlinks/plugins/reactive_ble_mobile/macos`)
+
+SPEC REPOS:
+  trunk:
+    - Protobuf
+    - SwiftProtobuf
+
+EXTERNAL SOURCES:
+  FlutterMacOS:
+    :path: Flutter/ephemeral
+  reactive_ble_mobile:
+    :path: Flutter/ephemeral/.symlinks/plugins/reactive_ble_mobile/macos
+
+SPEC CHECKSUMS:
+  FlutterMacOS: 8f6f14fa908a6fb3fba0cd85dbd81ec4b251fb24
+  Protobuf: 120350fc38646e2dedc26f49ecba778184ea1de2
+  reactive_ble_mobile: 8644f287b57675c6fe88bfadbb1c24135bb03c78
+  SwiftProtobuf: b02b5075dcf60c9f5f403000b3b0c202a11b6ae1
+
+PODFILE CHECKSUM: 353c8bcc5d5b0994e508d035b5431cfe18c1dea7
+
+COCOAPODS: 1.11.3
