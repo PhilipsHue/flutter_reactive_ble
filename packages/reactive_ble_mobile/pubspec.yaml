@@ -26,3 +26,5 @@ flutter:
         pluginClass: ReactiveBlePlugin
       ios:
         pluginClass: ReactiveBlePlugin
+      macos:
+        pluginClass: ReactiveBlePlugin
