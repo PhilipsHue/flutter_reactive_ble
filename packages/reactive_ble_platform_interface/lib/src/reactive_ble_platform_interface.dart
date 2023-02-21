@@ -70,6 +70,12 @@ abstract class ReactiveBlePlatform extends PlatformInterface {
         'charCentralValueUpdateStream has not been implemented.');
   }
 
+  /// Stream that provides value updates about which service changed.
+  Stream<CharacteristicValue> get centralServiceChangedStream {
+    throw UnimplementedError(
+        'centralServiceChangedStream has not been implemented.');
+  }
+
   /// Initializes the ble plugin platform specific counter parts.
   ///
   /// The initialization is performed automatically the first time any BLE

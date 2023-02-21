@@ -20,6 +20,8 @@ public class SwiftReactiveBlePlugin: NSObject, FlutterPlugin {
             .setStreamHandler(plugin.connectedCentralStreamHandler)
         FlutterEventChannel(name: "flutter_reactive_ble_char_update_central", binaryMessenger: registrar.messenger())
             .setStreamHandler(plugin.characteristicCentralValueUpdateStreamHandler)
+        FlutterEventChannel(name: "flutter_reactive_ble_service_changed_central", binaryMessenger: registrar.messenger())
+            .setStreamHandler(plugin.centralServiceChangedStreamHandler)
     }
 
     var statusStreamHandler: StreamHandler<PluginController> {
@@ -115,6 +117,26 @@ public class SwiftReactiveBlePlugin: NSObject, FlutterPlugin {
             onCancel: { context in
                 context.messageQueue.removeAll()
                 context.characteristicCentralValueUpdateSink = nil
+                return nil
+            }
+        )
+    }
+
+    var centralServiceChangedStreamHandler: StreamHandler<PluginController> {
+        return StreamHandler(
+            name: "central service changed stream handler",
+            context: context,
+            onListen: { context, sink in
+                context.centralServiceChangedSink = sink
+                context.messageQueue.forEach { msg in
+                sink.add(.success(msg))
+                }
+                context.messageQueue.removeAll()
+                return nil
+            },
+            onCancel: { context in
+                context.messageQueue.removeAll()
+                context.centralServiceChangedSink = nil
                 return nil
             }
         )

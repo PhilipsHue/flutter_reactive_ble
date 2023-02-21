@@ -28,6 +28,7 @@ final class PluginController {
     var characteristicValueUpdateSink: EventSink?
     var connectedCentralSink: EventSink?
     var characteristicCentralValueUpdateSink: EventSink?
+    var centralServiceChangedSink: EventSink?
 
     func initialize(name: String, completion: @escaping PlatformMethodCompletionHandler) {
         if let central = central {
@@ -182,6 +183,27 @@ final class PluginController {
                 print("onCharRequest")
                 //print("=>", message)
                 let sink = context.characteristicCentralValueUpdateSink
+                if (sink != nil) {
+                    sink!.add(.success(message))
+                } else {
+                    // In case message arrives before sink is created
+                    context.messageQueue.append(message);
+                }
+            },
+            onServiceChangedByCentral: papply(weak: self) { context, central, service  in
+                let message = CharacteristicValueInfo.with {
+                    $0.characteristic = CharacteristicAddress.with {
+                        //$0.characteristicUuid = Uuid.with { $0.data = 0xffff }
+                        $0.serviceUuid = Uuid.with { $0.data = service.uuid.data }
+                        $0.deviceID = ""
+                        //$0.characteristicUuid = Uuid.with { $0.data = characteristic.id.data }
+                        //$0.serviceUuid = Uuid.with { $0.data = characteristic.serviceID.data }
+                        //$0.deviceID = characteristic.peripheralID.uuidString
+                    }
+                }
+                print("onServiceChangedByCentral")
+                //print("=>", message)
+                let sink = context.centralServiceChangedSink
                 if (sink != nil) {
                     sink!.add(.success(message))
                 } else {
