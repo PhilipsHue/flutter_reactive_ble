@@ -21,6 +21,7 @@ final class Central {
     typealias CharacteristicSubscribedByCentralHandler = (Central, QualifiedCharacteristic, Data?, Error?) -> Void//(Central, CBCentral, CBCharacteristic) -> Void
     typealias SubChangeHandler = (Central, CBCentral, CBCharacteristic) -> Void
     typealias CharRequestHandler = (Central, CBPeripheralManager, QualifiedCharacteristic, Data?) -> Void
+    typealias ServiceChangedByCentralHandler = (Central, /*[CBService]*/CBService) -> Void
 
     private var mConnectedCentral : CBCentral!
     
@@ -50,7 +51,8 @@ final class Central {
         onServicesWithCharacteristicsInitialDiscovery: @escaping ServicesWithCharacteristicsDiscoveryHandler,
         onCharacteristicValueUpdate: @escaping CharacteristicValueUpdateHandler,
         onCharacteristicSubscribedByCentral: @escaping CharacteristicSubscribedByCentralHandler,
-        onCharRequest: @escaping CharRequestHandler
+        onCharRequest: @escaping CharRequestHandler,
+        onServiceChangedByCentral: @escaping ServiceChangedByCentralHandler
     ) {
         self.onServicesWithCharacteristicsInitialDiscovery = onServicesWithCharacteristicsInitialDiscovery
         self.peripheralManagerDelegate = PeripheralManagerDelegate(
@@ -120,6 +122,9 @@ final class Central {
                     key: QualifiedCharacteristic(characteristic),
                     action: { $0.handleWrite(error: error) }
                 )
+            },
+            onServiceChangedByCentral: papply(weak: self) { central, CBService in
+                onServiceChangedByCentral(central, CBService)
             }
         )
         self.peripheralManager = CBPeripheralManager(
@@ -148,7 +153,7 @@ final class Central {
 
     func startAdvertising(){
         print("startAdvertising")
-        addExampleGattService()
+        //addExampleGattService()
         
         let SERVICE_UUID: String = "61808880-B7B3-11E4-B3A4-0002A5D5C51B"//: UUID = UUID.parse("61808880-B7B3-11E4-B3A4-0002A5D5C51B")
         //CBAdvertisementDataServiceUUIDsKey: SERVICE_UUID,
@@ -279,6 +284,7 @@ final class Central {
 
     func startGattServer() {
         // TODO Move from addExampleGattService to startGattServer
+        addExampleGattService()
     }
 
     func stopGattServer() {
@@ -317,7 +323,8 @@ final class Central {
         //let characteristic = try resolve(characteristic: qualifiedCharacteristic) as! CBMutableCharacteristic
 
         //TODO add subscribed central onSubscribedCentrals: centrals / centrals: [CBCentral]
-        let bRet: Bool = peripheralManager.updateValue(value, for: sampleChar, onSubscribedCentrals: [self.mConnectedCentral])
+        //let bRet: Bool =
+        peripheralManager.updateValue(value, for: sampleChar, onSubscribedCentrals: [self.mConnectedCentral])
         //print("value:", value)
         //print("characteristic:", sampleChar)
         /*

@@ -69,6 +69,7 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
         private val connectionUpdateBehaviorSubject: BehaviorSubject<ConnectionUpdate> = BehaviorSubject.create()
         private val centralConnectionUpdateBehaviorSubject: BehaviorSubject<ConnectionUpdate> = BehaviorSubject.create()
         private val charRequestBehaviorSubject: BehaviorSubject<CharOperationResult> = BehaviorSubject.create()
+        private val serviceChangedBehaviorSubject: BehaviorSubject<CharOperationResult> = BehaviorSubject.create()
 
         lateinit var rxBleClient: RxBleClient
             internal set
@@ -86,6 +87,9 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
 
     override val charRequestSubject: BehaviorSubject<CharOperationResult>
         get() = charRequestBehaviorSubject
+
+    override val serviceChangedSubject: BehaviorSubject<CharOperationResult>
+        get() = serviceChangedBehaviorSubject
 
     override fun initializeClient() {
         activeConnections = mutableMapOf()
@@ -310,7 +314,7 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
 
         advertiser.startAdvertising(advertiseSettings, advertiseData, scanResponse, advertiseCallback)
 
-        addExampleGattService()
+        //addExampleGattService()
     }
 
     private fun addExampleGattService() {
@@ -443,6 +447,9 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
             ) {
                 super.onCharacteristicChanged(gatt, characteristic)
                 Log.i(tag, "onCharacteristicChanged")
+                //TODO Add event for app here
+                val value = byteArrayOf(0x00)
+                serviceChangedBehaviorSubject.onNext(CharOperationSuccessful(characteristic!!.getUuid().toString(), value!!.asList()))
             }
 
             @Override
@@ -742,12 +749,13 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
         advertiser.stopAdvertising(advertiseCallback)
 
         // clear and close gatt server after advertising stopped
-        mBluetoothGattServer.clearServices()
-        mBluetoothGattServer.close()
+        // mBluetoothGattServer.clearServices()
+        // mBluetoothGattServer.close()
     }
 
     override fun startGattServer() {
         // TODO Move from addExampleGattService to startGattServer
+        addExampleGattService()
     }
 
     override fun stopGattServer() {

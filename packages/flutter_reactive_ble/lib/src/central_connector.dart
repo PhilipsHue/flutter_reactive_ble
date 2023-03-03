@@ -5,8 +5,8 @@ import 'package:reactive_ble_platform_interface/reactive_ble_platform_interface.
 
 abstract class CentralConnector {
   Stream<ConnectionStateUpdate> get centralConnectionStateUpdateStream;
-
   Stream<CharacteristicValue> get centralDataChangedStream;
+  Stream<CharacteristicValue> get centralServiceChangedStream;
 }
 
 class CentralConnectorImpl implements CentralConnector {
@@ -23,4 +23,8 @@ class CentralConnectorImpl implements CentralConnector {
   @override
   Stream<CharacteristicValue> get centralDataChangedStream =>
       _blePlatform.charCentralValueUpdateStream;
+
+  @override
+  Stream<CharacteristicValue> get centralServiceChangedStream =>
+      _blePlatform.centralServiceChangedStream;
 }
