@@ -297,7 +297,8 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
         val advertiseSettings = AdvertiseSettings.Builder()
             .setAdvertiseMode(AdvertiseSettings.ADVERTISE_MODE_BALANCED)
             .setConnectable(true)
-            .setTimeout(0)
+            // https://issuetracker.google.com/issues/37132890
+            //.setTimeout(0)
             .setTxPowerLevel(AdvertiseSettings.ADVERTISE_TX_POWER_MEDIUM).build()
 
         val SERVICE_UUID = "61808880-b7b3-11E4-b3a4-0002a5d5c51b"
