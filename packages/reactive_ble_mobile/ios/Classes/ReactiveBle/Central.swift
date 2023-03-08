@@ -82,9 +82,17 @@ final class Central {
                 )
             },
             onCharacteristicNotificationStateUpdate: papply(weak: self) { central, characteristic, error in
+                //  let err: Error? = {
+                //     guard let nserror = error as NSError?
+                //     else { return error }
+                //     if (nserror.code == 3 && (characteristic.descriptors?.isEmpty ?? true) == true) { return nil }
+                //     return error
+                // }()
+
                 central.characteristicNotifyRegistry.updateTask(
                     key: QualifiedCharacteristic(characteristic),
-                    action: { $0.complete(error: error) }
+                    action: { $0.complete(error: nil) }
+                    // action: { $0.complete(error: err) }
                 )
             },
             onCharacteristicValueUpdate: papply(weak: self) { central, characteristic, error in
