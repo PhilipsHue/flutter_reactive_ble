@@ -297,7 +297,8 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
         val advertiseSettings = AdvertiseSettings.Builder()
             .setAdvertiseMode(AdvertiseSettings.ADVERTISE_MODE_BALANCED)
             .setConnectable(true)
-            .setTimeout(0)
+            // https://issuetracker.google.com/issues/37132890
+            //.setTimeout(0)
             .setTxPowerLevel(AdvertiseSettings.ADVERTISE_TX_POWER_MEDIUM).build()
 
         val SERVICE_UUID = "61808880-b7b3-11E4-b3a4-0002a5d5c51b"
@@ -448,8 +449,8 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
                 super.onCharacteristicChanged(gatt, characteristic)
                 Log.i(tag, "onCharacteristicChanged")
                 //TODO Add event for app here
-                val value = byteArrayOf(0x00)
-                serviceChangedBehaviorSubject.onNext(CharOperationSuccessful(characteristic!!.getUuid().toString(), value!!.asList()))
+                //val value = byteArrayOf(0x00)
+                //serviceChangedBehaviorSubject.onNext(CharOperationSuccessful(characteristic!!.getUuid().toString(), value!!.asList()))
             }
 
             @Override
@@ -488,6 +489,15 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
             override fun onMtuChanged(gatt: BluetoothGatt?, mtu: Int, status: Int) {
                 super.onMtuChanged(gatt, mtu, status)
                 Log.i(tag, "onMtuChanged")
+            }
+
+            @Override
+            override fun onServiceChanged(gatt: BluetoothGatt?) {
+                super.onServiceChanged(gatt)
+                Log.i(tag, "onServiceChanged")
+
+                val value = byteArrayOf(0x00)
+                serviceChangedBehaviorSubject.onNext(CharOperationSuccessful("", value!!.asList()))
             }
         }
 
