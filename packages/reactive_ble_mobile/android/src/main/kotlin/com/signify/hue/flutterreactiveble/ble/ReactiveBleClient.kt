@@ -449,8 +449,8 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
                 super.onCharacteristicChanged(gatt, characteristic)
                 Log.i(tag, "onCharacteristicChanged")
                 //TODO Add event for app here
-                val value = byteArrayOf(0x00)
-                serviceChangedBehaviorSubject.onNext(CharOperationSuccessful(characteristic!!.getUuid().toString(), value!!.asList()))
+                //val value = byteArrayOf(0x00)
+                //serviceChangedBehaviorSubject.onNext(CharOperationSuccessful(characteristic!!.getUuid().toString(), value!!.asList()))
             }
 
             @Override
@@ -489,6 +489,15 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
             override fun onMtuChanged(gatt: BluetoothGatt?, mtu: Int, status: Int) {
                 super.onMtuChanged(gatt, mtu, status)
                 Log.i(tag, "onMtuChanged")
+            }
+
+            @Override
+            override fun onServiceChanged(gatt: BluetoothGatt?) {
+                super.onServiceChanged(gatt)
+                Log.i(tag, "onServiceChanged")
+
+                val value = byteArrayOf(0x00)
+                serviceChangedBehaviorSubject.onNext(CharOperationSuccessful("", value!!.asList()))
             }
         }
 
