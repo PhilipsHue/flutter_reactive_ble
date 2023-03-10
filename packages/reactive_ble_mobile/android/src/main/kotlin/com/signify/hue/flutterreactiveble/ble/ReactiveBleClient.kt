@@ -287,11 +287,13 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
                     deviceConnection.rxConnection.discoverServices()
                         .flatMap { deviceServices -> deviceServices.getCharacteristic(characteristic) }
                         .flatMapObservable { char ->
-                            val mode = if (char.descriptors.isEmpty()) {
-                                NotificationSetupMode.COMPAT
-                            } else {
-                                NotificationSetupMode.DEFAULT
-                            }
+                            // val mode = if (char.descriptors.isEmpty()) {
+                            //     NotificationSetupMode.COMPAT
+                            // } else {
+                            //     NotificationSetupMode.DEFAULT
+                            // }
+                            // Just gonna try compat mode for now
+                            val mode = NotificationSetupMode.COMPAT
 
                             if ((char.properties and BluetoothGattCharacteristic.PROPERTY_NOTIFY) > 0) {
                                 deviceConnection.rxConnection.setupNotification(
