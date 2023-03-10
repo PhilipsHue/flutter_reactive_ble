@@ -215,9 +215,9 @@ final class Central {
     func turnNotifications(_ state: OnOff, for qualifiedCharacteristic: QualifiedCharacteristic, completion: @escaping CharacteristicNotifyCompletionHandler) throws {
         let characteristic = try resolve(characteristic: qualifiedCharacteristic)
 
-        guard [CBCharacteristicProperties.notify, .notifyEncryptionRequired, .indicate, .indicateEncryptionRequired]
-                .contains(where: characteristic.properties.contains)
-        else { throw Failure.notificationsNotSupported(qualifiedCharacteristic) }
+        // guard [CBCharacteristicProperties.notify, .notifyEncryptionRequired, .indicate, .indicateEncryptionRequired]
+        //         .contains(where: characteristic.properties.contains)
+        // else { throw Failure.notificationsNotSupported(qualifiedCharacteristic) }
 
         characteristicNotifyRegistry.registerTask(
             key: qualifiedCharacteristic,
