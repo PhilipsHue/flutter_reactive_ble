@@ -63,7 +63,6 @@ void main() {
 
     group('connect to device', () {
       late pb.ConnectToDeviceRequest request;
-      StreamSubscription? subscription;
       setUp(() {
         request = pb.ConnectToDeviceRequest();
         when(_argsConverter.createConnectToDeviceArgs('id', any, any))
@@ -84,10 +83,6 @@ void main() {
       test('It emits 1 item', () async {
         final length = await _sut.connectToDevice('id', {}, null).length;
         expect(length, 1);
-      });
-
-      tearDown(() async {
-        await subscription?.cancel();
       });
     });
 
