@@ -492,7 +492,7 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
             }
 
             @Override
-            fun onServiceChanged(gatt: BluetoothGatt) {
+            override fun onServiceChanged(gatt: BluetoothGatt) {
                 super.onServiceChanged(gatt)
                 Log.i(tag, "onServiceChanged")
 
