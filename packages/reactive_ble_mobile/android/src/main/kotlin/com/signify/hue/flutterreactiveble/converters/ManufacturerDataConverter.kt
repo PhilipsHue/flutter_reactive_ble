@@ -6,12 +6,17 @@ fun extractManufacturerData(manufacturerData: SparseArray<ByteArray>?): ByteArra
     val rawData = mutableListOf<Byte>()
 
     if (manufacturerData != null && manufacturerData.size() > 0) {
-        val companyId = manufacturerData.keyAt(0)
-        val payload = manufacturerData.get(companyId)
-
-        rawData.add((companyId.toByte()))
-        rawData.add(((companyId.shr(Byte.SIZE_BITS)).toByte()))
-        rawData.addAll(2, payload.asList())
+        var index = 0;
+        for(i in 0 until manufacturerData.size()){
+            val companyId = manufacturerData.keyAt(i)
+            val payload = manufacturerData.get(companyId)
+            rawData.add((companyId.toByte()))
+            rawData.add(((companyId.shr(Byte.SIZE_BITS)).toByte()))
+            index += 2;
+            var list = payload.asList();
+            rawData.addAll(index, list)
+            index += list.size;
+        }
     }
 
     return rawData.toByteArray()
