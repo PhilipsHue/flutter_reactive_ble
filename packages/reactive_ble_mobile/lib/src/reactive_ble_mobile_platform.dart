@@ -14,7 +14,6 @@ class ReactiveBleMobilePlatform extends ReactiveBlePlatform {
     required Stream<List<int>> bleStatusChannel,
     required Stream<List<int>> connectedCentralChannel,
     required Stream<List<int>> charCentralUpdateChannel,
-    required Stream<List<int>> serviceCentralChannel,
   })  : _argsToProtobufConverter = argsToProtobufConverter,
         _protobufConverter = protobufConverter,
         _bleMethodChannel = bleMethodChannel,
@@ -23,8 +22,7 @@ class ReactiveBleMobilePlatform extends ReactiveBlePlatform {
         _bleStatusRawChannel = bleStatusChannel,
         _bleDeviceScanRawStream = bleDeviceScanChannel,
         _connectedCentralRawStream = connectedCentralChannel,
-        _charCentralUpdateRawStream = charCentralUpdateChannel,
-        _serviceCentralRawStream = serviceCentralChannel;
+        _charCentralUpdateRawStream = charCentralUpdateChannel;
 
   final ArgsToProtobufConverter _argsToProtobufConverter;
   final ProtobufConverter _protobufConverter;
@@ -35,7 +33,6 @@ class ReactiveBleMobilePlatform extends ReactiveBlePlatform {
   final Stream<List<int>> _bleStatusRawChannel;
   final Stream<List<int>> _connectedCentralRawStream;
   final Stream<List<int>> _charCentralUpdateRawStream;
-  final Stream<List<int>> _serviceCentralRawStream;
 
   Stream<ConnectionStateUpdate>? _connectionUpdateStream;
   Stream<CharacteristicValue>? _charValueStream;
@@ -43,7 +40,6 @@ class ReactiveBleMobilePlatform extends ReactiveBlePlatform {
   Stream<BleStatus>? _bleStatusStream;
   Stream<ConnectionStateUpdate>? _connectionCentralStream;
   Stream<CharacteristicValue>? _charCentralValueStream;
-  Stream<CharacteristicValue>? _serviceCentralStream;
 
   @override
   Stream<ConnectionStateUpdate> get connectionCentralStream =>
@@ -86,14 +82,6 @@ class ReactiveBleMobilePlatform extends ReactiveBlePlatform {
           .map(
             (update) => update,
           );
-
-  @override
-  Stream<CharacteristicValue> get centralServiceChangedStream =>
-      _serviceCentralStream ??= _serviceCentralRawStream
-          .map(_protobufConverter.characteristicValueFrom)
-          .map(
-            (serviceData) => serviceData,
-      );
 
   @override
   Future<void> initialize() => _bleMethodChannel.invokeMethod("initialize");
@@ -373,8 +361,6 @@ class ReactiveBleMobilePlatformFactory {
         EventChannel("flutter_reactive_ble_connected_central");
     const charCentralUpdateChannel =
         EventChannel("flutter_reactive_ble_char_update_central");
-    const serviceCentralChannel =
-        EventChannel("flutter_reactive_ble_service_changed_central");
 
     return ReactiveBleMobilePlatform(
       protobufConverter: const ProtobufConverterImpl(),
@@ -392,8 +378,6 @@ class ReactiveBleMobilePlatformFactory {
           connectedCentralChannel.receiveBroadcastStream().cast<List<int>>(),
       charCentralUpdateChannel:
           charCentralUpdateChannel.receiveBroadcastStream().cast<List<int>>(),
-      serviceCentralChannel:
-          serviceCentralChannel.receiveBroadcastStream().cast<List<int>>(),
     );
   }
 }

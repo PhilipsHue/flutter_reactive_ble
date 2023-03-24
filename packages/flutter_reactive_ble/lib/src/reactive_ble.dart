@@ -43,14 +43,12 @@ class FlutterReactiveBle {
     _trackStatus();
     _trackCentralConnected();
     _trackCentralDataChanged();
-    _trackCentralServiceChanged();
   }
 
   FlutterReactiveBle._() {
     _trackStatus();
     _trackCentralConnected();
     _trackCentralDataChanged();
-    _trackCentralServiceChanged();
   }
 
   /// Registry that keeps track of all BLE devices found during a BLE scan.
@@ -92,12 +90,6 @@ class FlutterReactiveBle {
         yield* _centralDataChangedStream;
       }).stream;
 
-  Stream<CharacteristicValue> get centralServiceChangedStream =>
-      Repeater(onListenEmitFrom: () async* {
-        await initialize();
-        yield* _centralServiceChangedStream;
-      }).stream;
-
   /// A stream providing value updates for all the connected BLE devices.
   ///
   /// The updates include read responses as well as notifications.
@@ -124,15 +116,6 @@ class FlutterReactiveBle {
     result: const Result.success([0]),
   );
 
-  CharacteristicValue _serviceData = CharacteristicValue(
-    characteristic: QualifiedCharacteristic(
-      characteristicId: Uuid.parse('0000'),
-      serviceId: Uuid.parse('0000'),
-      deviceId: '',
-    ),
-    result: const Result.success([0]),
-  );
-
   Stream<BleStatus> get _statusStream => _blePlatform.bleStatusStream;
 
   Future<void> _trackStatus() async {
@@ -145,14 +128,6 @@ class FlutterReactiveBle {
 
   Stream<CharacteristicValue> get _centralDataChangedStream =>
       _centralConnector.centralDataChangedStream;
-
-  Stream<CharacteristicValue> get _centralServiceChangedStream =>
-      _centralConnector.centralServiceChangedStream;
-
-  Future<void> _trackCentralServiceChanged() async {
-    await initialize();
-    _centralServiceChangedStream.listen((serviceData) => _serviceData = serviceData);
-  }
 
   Future<void> _trackCentralConnected() async {
     await initialize();

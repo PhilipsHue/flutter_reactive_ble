@@ -8,7 +8,6 @@ import com.signify.hue.flutterreactiveble.channelhandlers.DeviceConnectionHandle
 import com.signify.hue.flutterreactiveble.channelhandlers.CentralConnectionHandler
 import com.signify.hue.flutterreactiveble.channelhandlers.ScanDevicesHandler
 import com.signify.hue.flutterreactiveble.channelhandlers.CharCentralNotificationHandler
-import com.signify.hue.flutterreactiveble.channelhandlers.ServiceChangedHandler
 import com.signify.hue.flutterreactiveble.converters.ProtobufMessageConverter
 import com.signify.hue.flutterreactiveble.converters.UuidConverter
 import com.signify.hue.flutterreactiveble.model.ClearGattCacheErrorType
@@ -56,14 +55,12 @@ class PluginController {
     lateinit var charNotificationChannel: EventChannel
     lateinit var centralConnectionChannel: EventChannel
     lateinit var charCentralNotifcationChannel: EventChannel
-    lateinit var centralServiceChangedChannel: EventChannel
 
     lateinit var scandevicesHandler: ScanDevicesHandler
     lateinit var deviceConnectionHandler: DeviceConnectionHandler
     lateinit var charNotificationHandler: CharNotificationHandler
     lateinit var centralConnectionHandler: CentralConnectionHandler
     lateinit var charCentralNotificationHandler: CharCentralNotificationHandler
-    lateinit var centralServiceChangedHandler: ServiceChangedHandler
 
     private val uuidConverter = UuidConverter()
     private val protoConverter = ProtobufMessageConverter()
@@ -77,7 +74,6 @@ class PluginController {
         val bleStatusChannel = EventChannel(messenger, "flutter_reactive_ble_status")
         centralConnectionChannel = EventChannel(messenger, "flutter_reactive_ble_connected_central")
         charCentralNotifcationChannel = EventChannel(messenger, "flutter_reactive_ble_char_update_central")
-        centralServiceChangedChannel = EventChannel(messenger, "flutter_reactive_ble_service_changed_central")
 
         scandevicesHandler = ScanDevicesHandler(bleClient)
         deviceConnectionHandler = DeviceConnectionHandler(bleClient)
@@ -85,7 +81,6 @@ class PluginController {
         val bleStatusHandler = BleStatusHandler(bleClient)
         centralConnectionHandler = CentralConnectionHandler(bleClient)
         charCentralNotificationHandler = CharCentralNotificationHandler(bleClient)
-        centralServiceChangedHandler = ServiceChangedHandler(bleClient)
 
         scanchannel.setStreamHandler(scandevicesHandler)
         deviceConnectionChannel.setStreamHandler(deviceConnectionHandler)
@@ -93,7 +88,6 @@ class PluginController {
         bleStatusChannel.setStreamHandler(bleStatusHandler)
         centralConnectionChannel.setStreamHandler(centralConnectionHandler)
         charCentralNotifcationChannel.setStreamHandler(charCentralNotificationHandler)
-        centralServiceChangedChannel.setStreamHandler(centralServiceChangedHandler)
     }
 
     internal fun deinitialize() {

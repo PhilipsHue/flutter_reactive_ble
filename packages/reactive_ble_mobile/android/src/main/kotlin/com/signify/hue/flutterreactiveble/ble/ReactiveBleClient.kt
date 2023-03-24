@@ -69,8 +69,6 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
         private val connectionUpdateBehaviorSubject: BehaviorSubject<ConnectionUpdate> = BehaviorSubject.create()
         private val centralConnectionUpdateBehaviorSubject: BehaviorSubject<ConnectionUpdate> = BehaviorSubject.create()
         private val charRequestBehaviorSubject: BehaviorSubject<CharOperationResult> = BehaviorSubject.create()
-        private val serviceChangedBehaviorSubject: BehaviorSubject<CharOperationResult> = BehaviorSubject.create()
-
         lateinit var rxBleClient: RxBleClient
             internal set
         internal var activeConnections = mutableMapOf<String, DeviceConnector>()
@@ -87,9 +85,6 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
 
     override val charRequestSubject: BehaviorSubject<CharOperationResult>
         get() = charRequestBehaviorSubject
-
-    override val serviceChangedSubject: BehaviorSubject<CharOperationResult>
-        get() = serviceChangedBehaviorSubject
 
     override fun initializeClient() {
         activeConnections = mutableMapOf()
@@ -448,9 +443,6 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
             ) {
                 super.onCharacteristicChanged(gatt, characteristic)
                 Log.i(tag, "onCharacteristicChanged")
-                //TODO Add event for app here
-                //val value = byteArrayOf(0x00)
-                //serviceChangedBehaviorSubject.onNext(CharOperationSuccessful(characteristic!!.getUuid().toString(), value!!.asList()))
             }
 
             @Override
@@ -489,15 +481,6 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
             override fun onMtuChanged(gatt: BluetoothGatt?, mtu: Int, status: Int) {
                 super.onMtuChanged(gatt, mtu, status)
                 Log.i(tag, "onMtuChanged")
-            }
-
-            @Override
-            override fun onServiceChanged(gatt: BluetoothGatt?) {
-                super.onServiceChanged(gatt)
-                Log.i(tag, "onServiceChanged")
-
-                val value = byteArrayOf(0x00)
-                serviceChangedBehaviorSubject.onNext(CharOperationSuccessful("", value!!.asList()))
             }
         }
 
