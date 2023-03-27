@@ -482,6 +482,12 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
                 super.onMtuChanged(gatt, mtu, status)
                 Log.i(tag, "onMtuChanged")
             }
+
+            @Override
+            override fun onServiceChanged(gatt: BluetoothGatt) {
+                super.onServiceChanged(gatt)
+                Log.i(tag, "onServiceChanged")
+            }
         }
 
         val serverCallback = object : BluetoothGattServerCallback() {
