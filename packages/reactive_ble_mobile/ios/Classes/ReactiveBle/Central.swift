@@ -86,11 +86,15 @@ final class Central {
                     guard let nserror = error as NSError?
                     else { return error }
                     if (nserror.domain == "CBATTErrorDomain"
-                        && (nserror.code == 3
-                            || nserror.code == 10 && (characteristic.descriptors?.isEmpty ?? true) == true
-                        )) {
+                        && (nserror.code == 3 || nserror.code == 10)) {
                         return nil
                     }
+                    // if (nserror.domain == "CBATTErrorDomain"
+                    //     && (nserror.code == 3
+                    //         || nserror.code == 10 && (characteristic.descriptors?.isEmpty ?? true) == true
+                    //     )) {
+                    //     return nil
+                    // }
                     return error
                 }()
 
