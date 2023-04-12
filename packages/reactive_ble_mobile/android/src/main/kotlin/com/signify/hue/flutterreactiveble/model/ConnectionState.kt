@@ -9,6 +9,7 @@ enum class ConnectionState(val code: Int) {
     DISCONNECTING(2),
     DISCONNECTED(3),
     UNKNOWN(4)
+    FORCEDISCONNECTED(5)
 }
 
 fun RxBleConnection.RxBleConnectionState.toConnectionState(): ConnectionState =
@@ -17,5 +18,6 @@ fun RxBleConnection.RxBleConnectionState.toConnectionState(): ConnectionState =
         "CONNECTING" -> ConnectionState.CONNECTING
         "CONNECTED" -> ConnectionState.CONNECTED
         "DISCONNECTING" -> ConnectionState.DISCONNECTING
+        "FORCEDISCONNECTED" -> ConnectionState.FORCEDISCONNECTED
         else -> ConnectionState.UNKNOWN
 }

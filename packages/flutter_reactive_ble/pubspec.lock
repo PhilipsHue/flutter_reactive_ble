@@ -378,20 +378,16 @@ packages:
   reactive_ble_mobile:
     dependency: "direct main"
     description:
-      path: "packages/reactive_ble_mobile"
-      ref: package
-      resolved-ref: "1af948e619bee4c268a0d55b059a23c239cf5ca1"
-      url: "https://github.com/ben91187/flutter_reactive_ble.git"
-    source: git
+      name: reactive_ble_mobile
+      url: "https://pub.dartlang.org"
+    source: hosted
     version: "5.0.2"
   reactive_ble_platform_interface:
     dependency: "direct main"
     description:
-      path: "packages/reactive_ble_platform_interface"
-      ref: package
-      resolved-ref: "1af948e619bee4c268a0d55b059a23c239cf5ca1"
-      url: "https://github.com/ben91187/flutter_reactive_ble.git"
-    source: git
+      name: reactive_ble_platform_interface
+      url: "https://pub.dartlang.org"
+    source: hosted
     version: "5.0.2"
   shelf:
     dependency: transitive
