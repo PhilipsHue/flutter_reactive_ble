@@ -21,7 +21,7 @@ class BleDeviceConnector extends ReactiveState<ConnectionStateUpdate> {
   // ignore: cancel_subscriptions
   late StreamSubscription<ConnectionStateUpdate> _connection;
 
-  Future<void> connect(String deviceId) async {
+  void connect(String deviceId) {
     _logMessage('Start connecting to $deviceId');
     _connection = _ble.connectToDevice(id: deviceId).listen(
       (update) {
