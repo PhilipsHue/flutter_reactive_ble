@@ -15,6 +15,10 @@ struct CharacteristicNotifyTaskController: PeripheralTaskController {
         else { return task.with(state: task.state.finished(CharacteristicNotifyError.unExpected)) }
         
         peripheral.setNotifyValue(task.params.state.isOn, for: characteristic)
+        
+        // Log the value and characteristic id
+        print("setNotifyValue: \(notifyValue), for characteristic: \(characteristic.uuid.uuidString)")
+
         return task.with(state: task.state.processing(.applying))
     }
 
