@@ -287,22 +287,32 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
                     deviceConnection.rxConnection.discoverServices()
                         .flatMap { deviceServices -> deviceServices.getCharacteristic(characteristic) }
                         .flatMapObservable { char ->
+                            val cccdUuid = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb")
+                            val cccd = char.descriptors.firstOrNull { it.uuid == cccdUuid }
+
+                            if (cccd == null) {
+                                Observable.error<BluetoothGattDescriptor>(Exception("CCCD not found for characteristic"))
+                            } else {
+                                val enableNotificationValue = byteArrayOf(0x01, 0x00) // Enable notifications
+                                // val enableIndicationValue = byteArrayOf(0x02, 0x00) // Enable indications if you want to enable indications instead
+
+                                deviceConnection.rxConnection.writeDescriptor(cccd, enableNotificationValue)
+                                    .toObservable()
+                                    .map { char }
+                            }
+                            
                             val mode = if (char.descriptors.isEmpty()) {
                                 NotificationSetupMode.COMPAT
                             } else {
                                 NotificationSetupMode.DEFAULT
                             }
-                            // Just gonna try compat mode for now
-                            // val mode = NotificationSetupMode.COMPAT
 
                             if ((char.properties and BluetoothGattCharacteristic.PROPERTY_NOTIFY) > 0) {
                                 deviceConnection.rxConnection.setupNotification(
                                     characteristic,
                                     mode
                                 )
-                            }
-                            
-                            if ((char.properties and BluetoothGattCharacteristic.PROPERTY_INDICATE) > 0) {
+                            } else if ((char.properties and BluetoothGattCharacteristic.PROPERTY_INDICATE) > 0) {
                                 deviceConnection.rxConnection.setupIndication(characteristic, mode)
                             }
                         }
