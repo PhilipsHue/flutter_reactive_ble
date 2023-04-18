@@ -298,7 +298,7 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
                                 // val enableIndicationValue = byteArrayOf(0x02, 0x00) // Enable indications if you want to enable indications instead
 
                                 deviceConnection.rxConnection.writeDescriptor(cccd, enableNotificationValue)
-                                    .toObservable()
+                                    .toObservable<ByteArray>()
                                     .map { char }
                             }
                             
