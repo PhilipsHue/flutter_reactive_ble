@@ -300,7 +300,9 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
                                     characteristic,
                                     mode
                                 )
-                            } else {
+                            }
+                            
+                            if ((char.properties and BluetoothGattCharacteristic.PROPERTY_INDICATE) > 0) {
                                 deviceConnection.rxConnection.setupIndication(characteristic, mode)
                             }
                         }
