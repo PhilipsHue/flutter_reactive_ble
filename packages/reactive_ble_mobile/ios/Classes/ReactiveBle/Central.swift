@@ -85,6 +85,8 @@ final class Central {
                 let err: Error? = {
                     guard let nserror = error as NSError?
                     else { return error }
+                    print("onCharacteristicNotificationStateUpdate: \(nserror.domain) \(nserror.code)")
+
                     if (nserror.domain == "CBATTErrorDomain"
                         && (nserror.code == 3 || nserror.code == 10)) {
                         return nil
