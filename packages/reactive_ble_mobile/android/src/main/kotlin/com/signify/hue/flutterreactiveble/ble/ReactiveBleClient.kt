@@ -315,6 +315,8 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
                                 )
                             } else if ((char.properties and BluetoothGattCharacteristic.PROPERTY_INDICATE) > 0) {
                                 deviceConnection.rxConnection.setupIndication(characteristic, mode)
+                            } else {
+                                Observable.error(Exception("Characteristic does not support notifications or indications"))
                             }
                         }
                 }
