@@ -85,10 +85,20 @@ final class Central {
                 let err: Error? = {
                     guard let nserror = error as NSError?
                     else { return error }
-                    print("onCharacteristicNotificationStateUpdate: \(nserror.domain) \(nserror.code)")
 
                     if (nserror.domain == "CBATTErrorDomain"
                         && (nserror.code == 3 || nserror.code == 10)) {
+                        // Try to workaround this by writing to the cccd descriptor
+                        // ourselves:
+                        // let cccd = characteristic.descriptors?.first(where: { $0.uuid == CBUUID(string: "2902") })
+                        // if let cccd = cccd {
+                        //     characteristic.peripheral?.writeValue(
+                        //         characteristic.isNotifying ? Data([1, 0]) : Data([0, 0]),
+                        //         for: cccd,
+                        //         type: .withResponse
+                        //     )
+                        // }
+
                         return nil
                     }
                     // if (nserror.domain == "CBATTErrorDomain"

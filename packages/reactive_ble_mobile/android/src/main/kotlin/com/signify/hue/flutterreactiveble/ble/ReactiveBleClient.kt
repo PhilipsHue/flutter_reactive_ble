@@ -291,8 +291,9 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
                             val cccd = char.descriptors.firstOrNull { it.uuid == cccdUuid }
 
                             if (cccd == null) {
-                                Observable.error<BluetoothGattDescriptor>(Exception("CCCD not found for characteristic"))
+                                Observable.just(char)
                             } else {
+                                println("CCCD found")
                                 val enableNotificationValue = byteArrayOf(0x01, 0x00) // Enable notifications
                                 // val enableIndicationValue = byteArrayOf(0x02, 0x00) // Enable indications if you want to enable indications instead
 
