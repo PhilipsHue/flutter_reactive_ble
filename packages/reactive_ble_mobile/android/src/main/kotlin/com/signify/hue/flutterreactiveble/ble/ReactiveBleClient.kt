@@ -287,16 +287,16 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
                     deviceConnection.rxConnection.discoverServices()
                         .flatMap { deviceServices -> deviceServices.getCharacteristic(characteristic) }
                         .flatMapObservable { char ->
-                            println("CCCD", "Characteristic ${char.uuid}")
+                            println("Characteristic ${char.uuid}")
 
                             val cccdUuid = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb")
                             val cccd = char.descriptors.firstOrNull { it.uuid == cccdUuid }
 
                             if (cccd == null) {
-                                println("CCCD", "CCCD not found")
+                                println("CCCD not found")
                                 // Observable.just(char)
                             } else {
-                                println("CCCD", "CCCD found ${cccd.uuid}")
+                                println("CCCD found ${cccd.uuid}")
                                 // val enableNotificationValue = byteArrayOf(0x01, 0x00) // Enable notifications
                                 // val enableIndicationValue = byteArrayOf(0x02, 0x00) // Enable indications if you want to enable indications instead
 
