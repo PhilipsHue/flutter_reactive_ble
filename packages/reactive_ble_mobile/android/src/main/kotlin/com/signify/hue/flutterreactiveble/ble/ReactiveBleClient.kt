@@ -287,20 +287,25 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
                     deviceConnection.rxConnection.discoverServices()
                         .flatMap { deviceServices -> deviceServices.getCharacteristic(characteristic) }
                         .flatMapObservable { char ->
-                            // val cccdUuid = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb")
-                            // val cccd = char.descriptors.firstOrNull { it.uuid == cccdUuid }
+                            Log.d("CCCD", "Characteristic ${char.uuid}")
+                            
+                            val cccdUuid = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb")
+                            val cccd = char.descriptors.firstOrNull { it.uuid == cccdUuid }
 
-                            // if (cccd == null) {
-                            //     Observable.just(char)
-                            // } else {
-                            //     println("CCCD found")
-                            //     val enableNotificationValue = byteArrayOf(0x01, 0x00) // Enable notifications
-                            //     // val enableIndicationValue = byteArrayOf(0x02, 0x00) // Enable indications if you want to enable indications instead
+                            if (cccd == null) {
+                                Log.d("CCCD", "CCCD not found")
+                                // Observable.just(char)
+                            } else {
+                                Log.d("CCCD", "CCCD found ${cccd.uuid}")
+                                val enableNotificationValue = byteArrayOf(0x01, 0x00) // Enable notifications
+                                // val enableIndicationValue = byteArrayOf(0x02, 0x00) // Enable indications if you want to enable indications instead
 
-                            //     deviceConnection.rxConnection.writeDescriptor(cccd, enableNotificationValue)
-                            //         .toObservable<ByteArray>()
-                            //         .map { char }
-                            // }
+                                deviceConnection.rxConnection.writeDescriptor(cccd, enableNotificationValue)
+                                    .toObservable<ByteArray>()
+                                    .map { char }
+                            }
+
+                            // Print all the descriptors of the characteristic
                             
                             val mode = if (char.descriptors.isEmpty()) {
                                 NotificationSetupMode.COMPAT
