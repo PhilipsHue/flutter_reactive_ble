@@ -297,12 +297,14 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
                                 // Observable.just(char)
                             } else {
                                 println("CCCD found ${cccd.uuid}")
-                                // val enableNotificationValue = byteArrayOf(0x01, 0x00) // Enable notifications
-                                // val enableIndicationValue = byteArrayOf(0x02, 0x00) // Enable indications if you want to enable indications instead
+                                
+                                // Manually enable notifications on the CCCD
 
-                                // deviceConnection.rxConnection.writeDescriptor(cccd, enableNotificationValue)
-                                //     .toObservable<ByteArray>()
-                                //     .map { char }
+                                deviceConnection.rxConnection.writeDescriptor(cccd, BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE)
+                                    .subscribe(
+                                        { println("Notification enabled on CCCD") },
+                                        { throwable -> println("Error while enabling notification: $throwable") }
+                                    )
                             }
 
                             // Print all the descriptors of the characteristic
