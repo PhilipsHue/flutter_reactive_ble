@@ -297,6 +297,8 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
 
                             assert(isNotify || isIndicate) { "Either isNotify or isIndicate must be true" }
 
+                            println("isNotify $isNotify isIndicate $isIndicate")
+
                             if (cccd == null) {
                                 println("CCCD not found")
                                 // Observable.just(char)
