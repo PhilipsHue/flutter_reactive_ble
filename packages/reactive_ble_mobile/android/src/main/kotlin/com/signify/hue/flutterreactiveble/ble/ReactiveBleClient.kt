@@ -318,25 +318,27 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
                                     )
                             }
 
-                            // Print all the descriptors of the characteristic
+                            // Print all the properties of the cccd descriptor
+                            println("CCCD properties: ${cccd?.characteristic?.properties}")
                             
                             val mode = if (char.descriptors.isEmpty()) {
                                 NotificationSetupMode.COMPAT
                             } else {
-                                NotificationSetupMode.COMPAT
+                                NotificationSetupMode.DEFAULT
+//                                NotificationSetupMode.QUICK_SETUP
                                 // NotificationSetupMode.DEFAULT
                             }
 
-                            deviceConnection.rxConnection.setupIndication(characteristic, mode)
-                            // if (isNotify) {
-                            //     deviceConnection.rxConnection.setupNotification(
-                            //         characteristic,
-                            //         mode
-                            //     )
-                            // }
-
-                            // if (isIndicate) {
-                            // }
+                            if (isNotify) {
+                                deviceConnection.rxConnection.setupNotification(
+                                    characteristic,
+                                    mode
+                                )
+                            } else if (isIndicate) {
+                                deviceConnection.rxConnection.setupIndication(characteristic, mode)
+                            } else {
+                                throw IllegalStateException("Yikes")
+                            }
                         }
                 }
             }
