@@ -301,7 +301,6 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
 
                             if (cccd == null) {
                                 println("CCCD not found")
-                                // Observable.just(char)
                             } else {
                                 println("CCCD found ${cccd.uuid}")
                                 
@@ -328,16 +327,16 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
                                 // NotificationSetupMode.DEFAULT
                             }
 
-                            if (isNotify) {
-                                deviceConnection.rxConnection.setupNotification(
-                                    characteristic,
-                                    mode
-                                )
-                            } else if (isIndicate) {
-                                deviceConnection.rxConnection.setupIndication(characteristic, mode)
-                            } else {
-                                throw IllegalStateException("Yikes")
-                            }
+                            deviceConnection.rxConnection.setupIndication(characteristic, mode)
+                            // if (isNotify) {
+                            //     deviceConnection.rxConnection.setupNotification(
+                            //         characteristic,
+                            //         mode
+                            //     )
+                            // }
+
+                            // if (isIndicate) {
+                            // }
                         }
                 }
             }
