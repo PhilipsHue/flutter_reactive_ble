@@ -292,6 +292,10 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
 
                             val cccdUuid = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb")
                             val cccd = char.descriptors.firstOrNull { it.uuid == cccdUuid }
+                            val isNotify = (char.properties and BluetoothGattCharacteristic.PROPERTY_NOTIFY) > 0
+                            val isIndicate = (char.properties and BluetoothGattCharacteristic.PROPERTY_INDICATE) > 0
+
+                            assert(isNotify || isIndicate) { "Either isNotify or isIndicate must be true" }
 
                             if (cccd == null) {
                                 println("CCCD not found")
@@ -299,12 +303,17 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
                             } else {
                                 println("CCCD found ${cccd.uuid}")
                                 
-                                // Manually enable notifications on the CCCD
+                                // Manually enable indications on the CCCD
+                                val descriptorValue = if (isNotify) {
+                                    BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
+                                } else {
+                                    BluetoothGattDescriptor.ENABLE_INDICATION_VALUE
+                                }
 
-                                deviceConnection.rxConnection.writeDescriptor(cccd, BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE)
+                                deviceConnection.rxConnection.writeDescriptor(cccd, descriptorValue)
                                     .subscribe(
-                                        { println("Notification enabled on CCCD") },
-                                        { throwable -> println("Error while enabling notification: $throwable") }
+                                        { println("Indcations/notifications enabled on CCCD") },
+                                        { throwable -> println("Error while enabling indication/notification: $throwable") }
                                     )
                             }
 
@@ -317,13 +326,15 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
                                 // NotificationSetupMode.DEFAULT
                             }
 
-                            if ((char.properties and BluetoothGattCharacteristic.PROPERTY_NOTIFY) > 0) {
+                            if (isNotify) {
                                 deviceConnection.rxConnection.setupNotification(
                                     characteristic,
                                     mode
                                 )
-                            } else {
+                            } else if (isIndicate) {
                                 deviceConnection.rxConnection.setupIndication(characteristic, mode)
+                            } else {
+                                throw IllegalStateException("Yikes")
                             }
                         }
                 }
