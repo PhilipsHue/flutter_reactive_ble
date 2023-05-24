@@ -38,7 +38,8 @@ class DiscoveredCharacteristic {
       (((17 * 37) + characteristicId.hashCode) * 37 + serviceId.hashCode) * 37;
 
   @override
-  bool operator ==(dynamic other) =>
+  bool operator ==(Object other) =>
+      other is DiscoveredCharacteristic &&
       runtimeType == other.runtimeType &&
       characteristicId == other.characteristicId &&
       serviceId == other.serviceId;
