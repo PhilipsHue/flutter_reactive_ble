@@ -492,19 +492,23 @@ void main() {
 
           final discoveredInternalServices = pb.DiscoveredService()
             ..serviceUuid = internalServiceUuid
-            ..characteristics.add(pb.DiscoveredCharacteristic(
-                characteristicId: internalCharUuid,
-                serviceId: internalServiceUuid,
-                isReadable: true))
+            ..characteristics.add(
+              pb.DiscoveredCharacteristic()
+                ..characteristicId = internalCharUuid
+                ..serviceId = internalServiceUuid
+                ..isReadable = true,
+            )
             ..characteristicUuids.add(internalCharUuid);
 
           final discoveredService = pb.DiscoveredService()
             ..serviceUuid = serviceUuid
             ..characteristicUuids.add(charUuid)
-            ..characteristics.add(pb.DiscoveredCharacteristic(
-                characteristicId: charUuid,
-                serviceId: serviceUuid,
-                isWritableWithResponse: true))
+            ..characteristics.add(
+              pb.DiscoveredCharacteristic()
+                ..characteristicId = charUuid
+                ..serviceId = serviceUuid
+                ..isWritableWithResponse = true,
+            )
             ..includedServices.add(discoveredInternalServices);
 
           message = pb.DiscoverServicesInfo()
