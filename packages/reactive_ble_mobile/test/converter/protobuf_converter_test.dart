@@ -12,6 +12,7 @@ void main() {
     group("decoding ${pb.DeviceScanInfo}", () {
       const id = 'id';
       const name = 'name';
+      const connectable = Connectable.available;
 
       late pb.ServiceDataEntry serviceDataEntry1;
       late pb.ServiceDataEntry serviceDataEntry2;
@@ -35,6 +36,7 @@ void main() {
         message = pb.DeviceScanInfo()
           ..id = id
           ..name = name
+          ..isConnectable = (pb.IsConnectable()..code = 2)
           ..serviceData.add(serviceDataEntry1)
           ..serviceData.add(serviceDataEntry2)
           ..serviceUuids.add(serviceUuid1)
@@ -56,6 +58,16 @@ void main() {
             scanresult.result
                 .iif(success: (d) => d.name, failure: (_) => throw Exception()),
             name);
+      });
+
+      test('converts connectable', () {
+        expect(
+          scanresult.result.iif(
+            success: (d) => d.connectable,
+            failure: (_) => throw Exception(),
+          ),
+          connectable,
+        );
       });
 
       test('converts service data', () {

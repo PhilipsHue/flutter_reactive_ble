@@ -236,6 +236,7 @@ void main() {
         manufacturerData: Uint8List.fromList([0]),
         name: 'test',
         rssi: -39,
+        connectable: Connectable.unknown,
         serviceData: const {},
         serviceUuids: const [],
       );

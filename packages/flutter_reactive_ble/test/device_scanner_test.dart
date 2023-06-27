@@ -28,6 +28,7 @@ void main() {
         serviceData: const {},
         manufacturerData: Uint8List.fromList([1]),
         rssi: -40,
+        connectable: Connectable.unknown,
       );
       _device2 = DiscoveredDevice(
         id: '456',
@@ -36,6 +37,7 @@ void main() {
         serviceData: const {},
         manufacturerData: Uint8List.fromList([0]),
         rssi: -80,
+        connectable: Connectable.unknown,
       );
 
       _delayAfterScanCompletion = Completer();
