@@ -13,6 +13,7 @@ import com.polidea.rxandroidble2.RxBleClient
 import com.polidea.rxandroidble2.RxBleConnection
 import com.polidea.rxandroidble2.RxBleDevice
 import com.polidea.rxandroidble2.RxBleDeviceServices
+import com.polidea.rxandroidble2.scan.IsConnectable
 import com.polidea.rxandroidble2.scan.ScanFilter
 import com.polidea.rxandroidble2.scan.ScanSettings
 import com.signify.hue.flutterreactiveble.ble.extensions.writeCharWithResponse
@@ -85,6 +86,11 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
                 ScanInfo(result.bleDevice.macAddress, result.scanRecord.deviceName
                     ?: result.bleDevice.name ?: "",
                     result.rssi,
+                    when (result.isConnectable) {
+                        IsConnectable.LEGACY_UNKNOWN -> Connectable.UNKNOWN
+                        IsConnectable.NOT_CONNECTABLE -> Connectable.NOT_CONNECTABLE
+                        IsConnectable.CONNECTABLE -> Connectable.CONNECTABLE
+                    },
                     result.scanRecord.serviceData?.mapKeys { it.key.uuid } ?: emptyMap(),
                     result.scanRecord.serviceUuids?.map { it.uuid } ?: emptyList(),
                     extractManufacturerData(result.scanRecord.manufacturerSpecificData))

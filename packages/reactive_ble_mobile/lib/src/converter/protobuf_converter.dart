@@ -62,6 +62,7 @@ class ProtobufConverterImpl implements ProtobufConverter {
           serviceUuids: serviceUuids,
           manufacturerData: Uint8List.fromList(message.manufacturerData),
           rssi: message.rssi,
+          connectable: _connectableFrom(message.isConnectable),
         ),
         failure: genericFailureFrom(
             hasFailure: message.hasFailure(),
@@ -224,6 +225,19 @@ class ProtobufConverterImpl implements ProtobufConverter {
       failure != null
           ? Result<Value, Failure>.failure(failure)
           : Result.success(getValue());
+
+  Connectable _connectableFrom(pb.IsConnectable status) {
+    switch (status.code) {
+      case 0:
+        return Connectable.unknown;
+      case 1:
+        return Connectable.unavailable;
+      case 2:
+        return Connectable.available;
+    }
+
+    return Connectable.unknown;
+  }
 }
 
 class _InvalidConnectionState extends Error {

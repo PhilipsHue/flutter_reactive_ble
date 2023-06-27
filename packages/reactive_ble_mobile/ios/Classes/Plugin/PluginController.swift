@@ -4,6 +4,7 @@ import enum CoreBluetooth.CBManagerState
 import var CoreBluetooth.CBAdvertisementDataServiceDataKey
 import var CoreBluetooth.CBAdvertisementDataServiceUUIDsKey
 import var CoreBluetooth.CBAdvertisementDataManufacturerDataKey
+import var CoreBluetooth.CBAdvertisementDataIsConnectable
 import var CoreBluetooth.CBAdvertisementDataLocalNameKey
 
 final class PluginController {
@@ -41,13 +42,20 @@ final class PluginController {
 
                 let serviceData = advertisementData[CBAdvertisementDataServiceDataKey] as? ServiceData ?? [:]
                 let serviceUuids = advertisementData[CBAdvertisementDataServiceUUIDsKey] as? [CBUUID] ?? []
-                let manufacturerData = advertisementData[CBAdvertisementDataManufacturerDataKey] as? Data ?? Data();
-                let name = advertisementData[CBAdvertisementDataLocalNameKey] as? String ?? peripheral.name ?? String();
-
+                let isConnectable = (advertisementData[CBAdvertisementDataIsConnectable] as? NSNumber)?.boolValue
+                let manufacturerData = advertisementData[CBAdvertisementDataManufacturerDataKey] as? Data ?? Data()
+                let name = advertisementData[CBAdvertisementDataLocalNameKey] as? String ?? peripheral.name ?? String()
                 let deviceDiscoveryMessage = DeviceScanInfo.with {
                     $0.id = peripheral.identifier.uuidString
                     $0.name = name
                     $0.rssi = Int32(rssi)
+                    $0.isConnectable = IsConnectable()
+                    switch isConnectable {
+                    case .none:
+                      $0.isConnectable.code = 0
+                    case .some(let isConnectable):
+                      $0.isConnectable.code = isConnectable ? 2 : 1
+                    }
                     $0.serviceData = serviceData
                         .map { entry in
                             ServiceDataEntry.with {

@@ -153,16 +153,26 @@ class _DeviceListState extends State<_DeviceList> {
                   ...widget.scannerState.discoveredDevices
                       .map(
                         (device) => ListTile(
-                          title: Text(device.name),
-                          subtitle: Text("${device.id}\nRSSI: ${device.rssi}"),
+                          title: Text(
+                            device.name.isNotEmpty ? device.name : "Undefined",
+                          ),
+                          subtitle: Text(
+                            """
+${device.id}
+RSSI: ${device.rssi}
+${device.connectable}
+                            """,
+                          ),
                           leading: const BluetoothIcon(),
                           onTap: () async {
                             widget.stopScan();
                             await Navigator.push<void>(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (_) =>
-                                        DeviceDetailScreen(device: device)));
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) =>
+                                    DeviceDetailScreen(device: device),
+                              ),
+                            );
                           },
                         ),
                       )

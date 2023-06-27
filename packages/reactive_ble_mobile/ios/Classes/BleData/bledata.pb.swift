@@ -62,11 +62,21 @@ struct DeviceScanInfo {
 
   var rssi: Int32 = 0
 
+  var isConnectable: IsConnectable {
+    get {return _isConnectable ?? IsConnectable()}
+    set {_isConnectable = newValue}
+  }
+  /// Returns true if `isConnectable` has been explicitly set.
+  var hasIsConnectable: Bool {return self._isConnectable != nil}
+  /// Clears the value of `isConnectable`. Subsequent reads from it will return its default value.
+  mutating func clearIsConnectable() {self._isConnectable = nil}
+
   var unknownFields = SwiftProtobuf.UnknownStorage()
 
   init() {}
 
   fileprivate var _failure: GenericFailure? = nil
+  fileprivate var _isConnectable: IsConnectable? = nil
 }
 
 struct ConnectToDeviceRequest {
@@ -613,6 +623,50 @@ struct GenericFailure {
   init() {}
 }
 
+struct IsConnectable {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  var code: Int32 = 0
+
+  var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  init() {}
+}
+
+#if swift(>=5.5) && canImport(_Concurrency)
+extension ScanForDevicesRequest: @unchecked Sendable {}
+extension DeviceScanInfo: @unchecked Sendable {}
+extension ConnectToDeviceRequest: @unchecked Sendable {}
+extension DeviceInfo: @unchecked Sendable {}
+extension DisconnectFromDeviceRequest: @unchecked Sendable {}
+extension ClearGattCacheRequest: @unchecked Sendable {}
+extension ClearGattCacheInfo: @unchecked Sendable {}
+extension NotifyCharacteristicRequest: @unchecked Sendable {}
+extension NotifyNoMoreCharacteristicRequest: @unchecked Sendable {}
+extension ReadCharacteristicRequest: @unchecked Sendable {}
+extension CharacteristicValueInfo: @unchecked Sendable {}
+extension WriteCharacteristicRequest: @unchecked Sendable {}
+extension WriteCharacteristicInfo: @unchecked Sendable {}
+extension NegotiateMtuRequest: @unchecked Sendable {}
+extension NegotiateMtuInfo: @unchecked Sendable {}
+extension BleStatusInfo: @unchecked Sendable {}
+extension ChangeConnectionPriorityRequest: @unchecked Sendable {}
+extension ChangeConnectionPriorityInfo: @unchecked Sendable {}
+extension CharacteristicAddress: @unchecked Sendable {}
+extension ServiceDataEntry: @unchecked Sendable {}
+extension ServicesWithCharacteristics: @unchecked Sendable {}
+extension ServiceWithCharacteristics: @unchecked Sendable {}
+extension DiscoverServicesRequest: @unchecked Sendable {}
+extension DiscoverServicesInfo: @unchecked Sendable {}
+extension DiscoveredService: @unchecked Sendable {}
+extension DiscoveredCharacteristic: @unchecked Sendable {}
+extension Uuid: @unchecked Sendable {}
+extension GenericFailure: @unchecked Sendable {}
+extension IsConnectable: @unchecked Sendable {}
+#endif  // swift(>=5.5) && canImport(_Concurrency)
+
 // MARK: - Code below here is support for the SwiftProtobuf runtime.
 
 extension ScanForDevicesRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
@@ -666,9 +720,10 @@ extension DeviceScanInfo: SwiftProtobuf.Message, SwiftProtobuf._MessageImplement
     2: .same(proto: "name"),
     3: .same(proto: "failure"),
     4: .same(proto: "serviceData"),
-    6: .same(proto: "manufacturerData"),
-    7: .same(proto: "serviceUuids"),
+    7: .same(proto: "manufacturerData"),
+    8: .same(proto: "serviceUuids"),
     5: .same(proto: "rssi"),
+    6: .same(proto: "isConnectable"),
   ]
 
   mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -682,34 +737,42 @@ extension DeviceScanInfo: SwiftProtobuf.Message, SwiftProtobuf._MessageImplement
       case 3: try { try decoder.decodeSingularMessageField(value: &self._failure) }()
       case 4: try { try decoder.decodeRepeatedMessageField(value: &self.serviceData) }()
       case 5: try { try decoder.decodeSingularInt32Field(value: &self.rssi) }()
-      case 6: try { try decoder.decodeSingularBytesField(value: &self.manufacturerData) }()
-      case 7: try { try decoder.decodeRepeatedMessageField(value: &self.serviceUuids) }()
+      case 6: try { try decoder.decodeSingularMessageField(value: &self._isConnectable) }()
+      case 7: try { try decoder.decodeSingularBytesField(value: &self.manufacturerData) }()
+      case 8: try { try decoder.decodeRepeatedMessageField(value: &self.serviceUuids) }()
       default: break
       }
     }
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
     if !self.id.isEmpty {
       try visitor.visitSingularStringField(value: self.id, fieldNumber: 1)
     }
     if !self.name.isEmpty {
       try visitor.visitSingularStringField(value: self.name, fieldNumber: 2)
     }
-    if let v = self._failure {
+    try { if let v = self._failure {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 3)
-    }
+    } }()
     if !self.serviceData.isEmpty {
       try visitor.visitRepeatedMessageField(value: self.serviceData, fieldNumber: 4)
     }
     if self.rssi != 0 {
       try visitor.visitSingularInt32Field(value: self.rssi, fieldNumber: 5)
     }
+    try { if let v = self._isConnectable {
+      try visitor.visitSingularMessageField(value: v, fieldNumber: 6)
+    } }()
     if !self.manufacturerData.isEmpty {
-      try visitor.visitSingularBytesField(value: self.manufacturerData, fieldNumber: 6)
+      try visitor.visitSingularBytesField(value: self.manufacturerData, fieldNumber: 7)
     }
     if !self.serviceUuids.isEmpty {
-      try visitor.visitRepeatedMessageField(value: self.serviceUuids, fieldNumber: 7)
+      try visitor.visitRepeatedMessageField(value: self.serviceUuids, fieldNumber: 8)
     }
     try unknownFields.traverse(visitor: &visitor)
   }
@@ -722,6 +785,7 @@ extension DeviceScanInfo: SwiftProtobuf.Message, SwiftProtobuf._MessageImplement
     if lhs.manufacturerData != rhs.manufacturerData {return false}
     if lhs.serviceUuids != rhs.serviceUuids {return false}
     if lhs.rssi != rhs.rssi {return false}
+    if lhs._isConnectable != rhs._isConnectable {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
@@ -750,12 +814,16 @@ extension ConnectToDeviceRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageI
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
     if !self.deviceID.isEmpty {
       try visitor.visitSingularStringField(value: self.deviceID, fieldNumber: 1)
     }
-    if let v = self._servicesWithCharacteristicsToDiscover {
+    try { if let v = self._servicesWithCharacteristicsToDiscover {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 2)
-    }
+    } }()
     if self.timeoutInMs != 0 {
       try visitor.visitSingularInt32Field(value: self.timeoutInMs, fieldNumber: 3)
     }
@@ -794,15 +862,19 @@ extension DeviceInfo: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementatio
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
     if !self.id.isEmpty {
       try visitor.visitSingularStringField(value: self.id, fieldNumber: 1)
     }
     if self.connectionState != 0 {
       try visitor.visitSingularInt32Field(value: self.connectionState, fieldNumber: 2)
     }
-    if let v = self._failure {
+    try { if let v = self._failure {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 3)
-    }
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -898,9 +970,13 @@ extension ClearGattCacheInfo: SwiftProtobuf.Message, SwiftProtobuf._MessageImple
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._failure {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._failure {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 1)
-    }
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -930,9 +1006,13 @@ extension NotifyCharacteristicRequest: SwiftProtobuf.Message, SwiftProtobuf._Mes
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._characteristic {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._characteristic {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 1)
-    }
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -962,9 +1042,13 @@ extension NotifyNoMoreCharacteristicRequest: SwiftProtobuf.Message, SwiftProtobu
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._characteristic {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._characteristic {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 1)
-    }
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -994,9 +1078,13 @@ extension ReadCharacteristicRequest: SwiftProtobuf.Message, SwiftProtobuf._Messa
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._characteristic {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._characteristic {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 1)
-    }
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -1030,15 +1118,19 @@ extension CharacteristicValueInfo: SwiftProtobuf.Message, SwiftProtobuf._Message
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._characteristic {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._characteristic {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 1)
-    }
+    } }()
     if !self.value.isEmpty {
       try visitor.visitSingularBytesField(value: self.value, fieldNumber: 2)
     }
-    if let v = self._failure {
+    try { if let v = self._failure {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 3)
-    }
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -1072,9 +1164,13 @@ extension WriteCharacteristicRequest: SwiftProtobuf.Message, SwiftProtobuf._Mess
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._characteristic {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._characteristic {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 1)
-    }
+    } }()
     if !self.value.isEmpty {
       try visitor.visitSingularBytesField(value: self.value, fieldNumber: 2)
     }
@@ -1110,12 +1206,16 @@ extension WriteCharacteristicInfo: SwiftProtobuf.Message, SwiftProtobuf._Message
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._characteristic {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._characteristic {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 1)
-    }
-    if let v = self._failure {
+    } }()
+    try { if let v = self._failure {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 3)
-    }
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -1188,15 +1288,19 @@ extension NegotiateMtuInfo: SwiftProtobuf.Message, SwiftProtobuf._MessageImpleme
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
     if !self.deviceID.isEmpty {
       try visitor.visitSingularStringField(value: self.deviceID, fieldNumber: 1)
     }
     if self.mtuSize != 0 {
       try visitor.visitSingularInt32Field(value: self.mtuSize, fieldNumber: 2)
     }
-    if let v = self._failure {
+    try { if let v = self._failure {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 3)
-    }
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -1300,12 +1404,16 @@ extension ChangeConnectionPriorityInfo: SwiftProtobuf.Message, SwiftProtobuf._Me
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
     if !self.deviceID.isEmpty {
       try visitor.visitSingularStringField(value: self.deviceID, fieldNumber: 1)
     }
-    if let v = self._failure {
+    try { if let v = self._failure {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 2)
-    }
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -1340,15 +1448,19 @@ extension CharacteristicAddress: SwiftProtobuf.Message, SwiftProtobuf._MessageIm
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
     if !self.deviceID.isEmpty {
       try visitor.visitSingularStringField(value: self.deviceID, fieldNumber: 1)
     }
-    if let v = self._serviceUuid {
+    try { if let v = self._serviceUuid {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 2)
-    }
-    if let v = self._characteristicUuid {
+    } }()
+    try { if let v = self._characteristicUuid {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 3)
-    }
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -1382,9 +1494,13 @@ extension ServiceDataEntry: SwiftProtobuf.Message, SwiftProtobuf._MessageImpleme
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._serviceUuid {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._serviceUuid {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 1)
-    }
+    } }()
     if !self.data.isEmpty {
       try visitor.visitSingularBytesField(value: self.data, fieldNumber: 2)
     }
@@ -1452,9 +1568,13 @@ extension ServiceWithCharacteristics: SwiftProtobuf.Message, SwiftProtobuf._Mess
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._serviceID {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._serviceID {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 1)
-    }
+    } }()
     if !self.characteristics.isEmpty {
       try visitor.visitRepeatedMessageField(value: self.characteristics, fieldNumber: 2)
     }
@@ -1564,9 +1684,13 @@ extension DiscoveredService: SwiftProtobuf.Message, SwiftProtobuf._MessageImplem
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._serviceUuid {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._serviceUuid {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 1)
-    }
+    } }()
     if !self.characteristicUuids.isEmpty {
       try visitor.visitRepeatedMessageField(value: self.characteristicUuids, fieldNumber: 2)
     }
@@ -1620,12 +1744,16 @@ extension DiscoveredCharacteristic: SwiftProtobuf.Message, SwiftProtobuf._Messag
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._characteristicID {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._characteristicID {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 1)
-    }
-    if let v = self._serviceID {
+    } }()
+    try { if let v = self._serviceID {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 2)
-    }
+    } }()
     if self.isReadable != false {
       try visitor.visitSingularBoolField(value: self.isReadable, fieldNumber: 3)
     }
@@ -1722,6 +1850,38 @@ extension GenericFailure: SwiftProtobuf.Message, SwiftProtobuf._MessageImplement
   static func ==(lhs: GenericFailure, rhs: GenericFailure) -> Bool {
     if lhs.code != rhs.code {return false}
     if lhs.message != rhs.message {return false}
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+extension IsConnectable: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  static let protoMessageName: String = "IsConnectable"
+  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "code"),
+  ]
+
+  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeSingularInt32Field(value: &self.code) }()
+      default: break
+      }
+    }
+  }
+
+  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    if self.code != 0 {
+      try visitor.visitSingularInt32Field(value: self.code, fieldNumber: 1)
+    }
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  static func ==(lhs: IsConnectable, rhs: IsConnectable) -> Bool {
+    if lhs.code != rhs.code {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
