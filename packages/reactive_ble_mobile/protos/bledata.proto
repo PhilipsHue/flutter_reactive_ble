@@ -16,6 +16,7 @@ message DeviceScanInfo {
     bytes manufacturerData = 6;
     repeated Uuid serviceUuids = 7;
     int32 rssi = 5;
+    IsConnectable isConnectable = 8;
 }
 
 message ConnectToDeviceRequest {
@@ -148,4 +149,8 @@ message Uuid {
 message GenericFailure {
     int32 code = 1;
     string message = 2;
+}
+
+message IsConnectable {
+    int32 code = 1;
 }

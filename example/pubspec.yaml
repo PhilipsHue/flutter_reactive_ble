@@ -18,7 +18,7 @@ dependencies:
   provider: ^6.0.1
 
 dev_dependencies:
-  build_runner: ^2.1.4
+  build_runner: ^2.3.3
   dependency_validator: ^3.1.0
   flutter_test:
     sdk: flutter
@@ -29,6 +29,8 @@ dependency_overrides:
     path: ../packages/flutter_reactive_ble
   reactive_ble_mobile:
     path: ../packages/reactive_ble_mobile
+  reactive_ble_platform_interface:
+    path: ../packages/reactive_ble_platform_interface
 
 flutter:
   uses-material-design: true
