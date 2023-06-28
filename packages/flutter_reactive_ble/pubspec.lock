@@ -409,14 +409,14 @@ packages:
       path: "../reactive_ble_mobile"
       relative: true
     source: path
-    version: "5.0.3"
+    version: "5.1.0"
   reactive_ble_platform_interface:
     dependency: "direct main"
     description:
       path: "../reactive_ble_platform_interface"
       relative: true
     source: path
-    version: "5.0.3"
+    version: "5.1.0"
   shelf:
     dependency: transitive
     description:

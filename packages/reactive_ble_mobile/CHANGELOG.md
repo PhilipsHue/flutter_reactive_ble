@@ -1,3 +1,8 @@
+## 5.1.0
+
+* Add IsConnectable to discovery data. #750
+* Upgraded build_runner. #750
+
 ## 5.0.3
 
 * Enable extended advertising on android. Fix #571
