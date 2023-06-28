@@ -720,10 +720,10 @@ extension DeviceScanInfo: SwiftProtobuf.Message, SwiftProtobuf._MessageImplement
     2: .same(proto: "name"),
     3: .same(proto: "failure"),
     4: .same(proto: "serviceData"),
-    7: .same(proto: "manufacturerData"),
-    8: .same(proto: "serviceUuids"),
+    6: .same(proto: "manufacturerData"),
+    7: .same(proto: "serviceUuids"),
     5: .same(proto: "rssi"),
-    6: .same(proto: "isConnectable"),
+    8: .same(proto: "isConnectable"),
   ]
 
   mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -737,9 +737,9 @@ extension DeviceScanInfo: SwiftProtobuf.Message, SwiftProtobuf._MessageImplement
       case 3: try { try decoder.decodeSingularMessageField(value: &self._failure) }()
       case 4: try { try decoder.decodeRepeatedMessageField(value: &self.serviceData) }()
       case 5: try { try decoder.decodeSingularInt32Field(value: &self.rssi) }()
-      case 6: try { try decoder.decodeSingularMessageField(value: &self._isConnectable) }()
-      case 7: try { try decoder.decodeSingularBytesField(value: &self.manufacturerData) }()
-      case 8: try { try decoder.decodeRepeatedMessageField(value: &self.serviceUuids) }()
+      case 6: try { try decoder.decodeSingularBytesField(value: &self.manufacturerData) }()
+      case 7: try { try decoder.decodeRepeatedMessageField(value: &self.serviceUuids) }()
+      case 8: try { try decoder.decodeSingularMessageField(value: &self._isConnectable) }()
       default: break
       }
     }
@@ -765,15 +765,15 @@ extension DeviceScanInfo: SwiftProtobuf.Message, SwiftProtobuf._MessageImplement
     if self.rssi != 0 {
       try visitor.visitSingularInt32Field(value: self.rssi, fieldNumber: 5)
     }
-    try { if let v = self._isConnectable {
-      try visitor.visitSingularMessageField(value: v, fieldNumber: 6)
-    } }()
     if !self.manufacturerData.isEmpty {
-      try visitor.visitSingularBytesField(value: self.manufacturerData, fieldNumber: 7)
+      try visitor.visitSingularBytesField(value: self.manufacturerData, fieldNumber: 6)
     }
     if !self.serviceUuids.isEmpty {
-      try visitor.visitRepeatedMessageField(value: self.serviceUuids, fieldNumber: 8)
+      try visitor.visitRepeatedMessageField(value: self.serviceUuids, fieldNumber: 7)
     }
+    try { if let v = self._isConnectable {
+      try visitor.visitSingularMessageField(value: v, fieldNumber: 8)
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 

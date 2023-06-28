@@ -13,10 +13,10 @@ message DeviceScanInfo {
     string name = 2;
     GenericFailure failure = 3;
     repeated ServiceDataEntry serviceData = 4;
-    bytes manufacturerData = 7;
-    repeated Uuid serviceUuids = 8;
+    bytes manufacturerData = 6;
+    repeated Uuid serviceUuids = 7;
     int32 rssi = 5;
-    IsConnectable isConnectable = 6;
+    IsConnectable isConnectable = 8;
 }
 
 message ConnectToDeviceRequest {

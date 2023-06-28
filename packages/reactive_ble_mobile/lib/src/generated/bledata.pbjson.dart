@@ -38,10 +38,10 @@ const DeviceScanInfo$json = {
     {'1': 'name', '3': 2, '4': 1, '5': 9, '10': 'name'},
     {'1': 'failure', '3': 3, '4': 1, '5': 11, '6': '.GenericFailure', '10': 'failure'},
     {'1': 'serviceData', '3': 4, '4': 3, '5': 11, '6': '.ServiceDataEntry', '10': 'serviceData'},
-    {'1': 'manufacturerData', '3': 7, '4': 1, '5': 12, '10': 'manufacturerData'},
-    {'1': 'serviceUuids', '3': 8, '4': 3, '5': 11, '6': '.Uuid', '10': 'serviceUuids'},
+    {'1': 'manufacturerData', '3': 6, '4': 1, '5': 12, '10': 'manufacturerData'},
+    {'1': 'serviceUuids', '3': 7, '4': 3, '5': 11, '6': '.Uuid', '10': 'serviceUuids'},
     {'1': 'rssi', '3': 5, '4': 1, '5': 5, '10': 'rssi'},
-    {'1': 'isConnectable', '3': 6, '4': 1, '5': 11, '6': '.IsConnectable', '10': 'isConnectable'},
+    {'1': 'isConnectable', '3': 8, '4': 1, '5': 11, '6': '.IsConnectable', '10': 'isConnectable'},
   ],
 };
 
@@ -50,8 +50,8 @@ final $typed_data.Uint8List deviceScanInfoDescriptor = $convert.base64Decode(
     'Cg5EZXZpY2VTY2FuSW5mbxIOCgJpZBgBIAEoCVICaWQSEgoEbmFtZRgCIAEoCVIEbmFtZRIpCg'
     'dmYWlsdXJlGAMgASgLMg8uR2VuZXJpY0ZhaWx1cmVSB2ZhaWx1cmUSMwoLc2VydmljZURhdGEY'
     'BCADKAsyES5TZXJ2aWNlRGF0YUVudHJ5UgtzZXJ2aWNlRGF0YRIqChBtYW51ZmFjdHVyZXJEYX'
-    'RhGAcgASgMUhBtYW51ZmFjdHVyZXJEYXRhEikKDHNlcnZpY2VVdWlkcxgIIAMoCzIFLlV1aWRS'
-    'DHNlcnZpY2VVdWlkcxISCgRyc3NpGAUgASgFUgRyc3NpEjQKDWlzQ29ubmVjdGFibGUYBiABKA'
+    'RhGAYgASgMUhBtYW51ZmFjdHVyZXJEYXRhEikKDHNlcnZpY2VVdWlkcxgHIAMoCzIFLlV1aWRS'
+    'DHNlcnZpY2VVdWlkcxISCgRyc3NpGAUgASgFUgRyc3NpEjQKDWlzQ29ubmVjdGFibGUYCCABKA'
     'syDi5Jc0Nvbm5lY3RhYmxlUg1pc0Nvbm5lY3RhYmxl');
 
 @$core.Deprecated('Use connectToDeviceRequestDescriptor instead')

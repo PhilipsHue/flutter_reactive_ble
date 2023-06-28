@@ -154,7 +154,7 @@ class _DeviceListState extends State<_DeviceList> {
                       .map(
                         (device) => ListTile(
                           title: Text(
-                            device.name.isNotEmpty ? device.name : "Undefined",
+                            device.name.isNotEmpty ? device.name : "Unnamed",
                           ),
                           subtitle: Text(
                             """

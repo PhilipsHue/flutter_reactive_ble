@@ -39,7 +39,7 @@ class _DeviceDetail extends StatelessWidget {
           length: 2,
           child: Scaffold(
             appBar: AppBar(
-              title: Text(device.name.isNotEmpty ? device.name : "Undefined"),
+              title: Text(device.name.isNotEmpty ? device.name : "Unnamed"),
               bottom: const TabBar(
                 tabs: [
                   Tab(

@@ -81,9 +81,9 @@ class DeviceScanInfo extends $pb.GeneratedMessage {
     ..aOM<GenericFailure>(3, _omitFieldNames ? '' : 'failure', subBuilder: GenericFailure.create)
     ..pc<ServiceDataEntry>(4, _omitFieldNames ? '' : 'serviceData', $pb.PbFieldType.PM, protoName: 'serviceData', subBuilder: ServiceDataEntry.create)
     ..a<$core.int>(5, _omitFieldNames ? '' : 'rssi', $pb.PbFieldType.O3)
-    ..aOM<IsConnectable>(6, _omitFieldNames ? '' : 'isConnectable', protoName: 'isConnectable', subBuilder: IsConnectable.create)
-    ..a<$core.List<$core.int>>(7, _omitFieldNames ? '' : 'manufacturerData', $pb.PbFieldType.OY, protoName: 'manufacturerData')
-    ..pc<Uuid>(8, _omitFieldNames ? '' : 'serviceUuids', $pb.PbFieldType.PM, protoName: 'serviceUuids', subBuilder: Uuid.create)
+    ..a<$core.List<$core.int>>(6, _omitFieldNames ? '' : 'manufacturerData', $pb.PbFieldType.OY, protoName: 'manufacturerData')
+    ..pc<Uuid>(7, _omitFieldNames ? '' : 'serviceUuids', $pb.PbFieldType.PM, protoName: 'serviceUuids', subBuilder: Uuid.create)
+    ..aOM<IsConnectable>(8, _omitFieldNames ? '' : 'isConnectable', protoName: 'isConnectable', subBuilder: IsConnectable.create)
     ..hasRequiredFields = false
   ;
 
@@ -150,27 +150,27 @@ class DeviceScanInfo extends $pb.GeneratedMessage {
   void clearRssi() => clearField(5);
 
   @$pb.TagNumber(6)
-  IsConnectable get isConnectable => $_getN(5);
+  $core.List<$core.int> get manufacturerData => $_getN(5);
   @$pb.TagNumber(6)
-  set isConnectable(IsConnectable v) { setField(6, v); }
+  set manufacturerData($core.List<$core.int> v) { $_setBytes(5, v); }
   @$pb.TagNumber(6)
-  $core.bool hasIsConnectable() => $_has(5);
+  $core.bool hasManufacturerData() => $_has(5);
   @$pb.TagNumber(6)
-  void clearIsConnectable() => clearField(6);
-  @$pb.TagNumber(6)
-  IsConnectable ensureIsConnectable() => $_ensure(5);
+  void clearManufacturerData() => clearField(6);
 
   @$pb.TagNumber(7)
-  $core.List<$core.int> get manufacturerData => $_getN(6);
-  @$pb.TagNumber(7)
-  set manufacturerData($core.List<$core.int> v) { $_setBytes(6, v); }
-  @$pb.TagNumber(7)
-  $core.bool hasManufacturerData() => $_has(6);
-  @$pb.TagNumber(7)
-  void clearManufacturerData() => clearField(7);
+  $core.List<Uuid> get serviceUuids => $_getList(6);
 
   @$pb.TagNumber(8)
-  $core.List<Uuid> get serviceUuids => $_getList(7);
+  IsConnectable get isConnectable => $_getN(7);
+  @$pb.TagNumber(8)
+  set isConnectable(IsConnectable v) { setField(8, v); }
+  @$pb.TagNumber(8)
+  $core.bool hasIsConnectable() => $_has(7);
+  @$pb.TagNumber(8)
+  void clearIsConnectable() => clearField(8);
+  @$pb.TagNumber(8)
+  IsConnectable ensureIsConnectable() => $_ensure(7);
 }
 
 class ConnectToDeviceRequest extends $pb.GeneratedMessage {
