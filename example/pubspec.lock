@@ -220,7 +220,7 @@ packages:
       path: "../packages/flutter_reactive_ble"
       relative: false
     source: path
-    version: "5.1.0"
+    version: "5.1.1"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -440,14 +440,14 @@ packages:
       path: "../packages/reactive_ble_mobile"
       relative: false
     source: path
-    version: "5.1.0"
+    version: "5.1.1"
   reactive_ble_platform_interface:
     dependency: "direct overridden"
     description:
       path: "../packages/reactive_ble_platform_interface"
       relative: true
     source: path
-    version: "5.1.0"
+    version: "5.1.1"
   shelf:
     dependency: transitive
     description:
