@@ -1,3 +1,7 @@
+## 5.1.1
+
+* Make Connectable backwards compatible #757, #750
+
 ## 5.1.0
 
 * Add IsConnectable to discovery data. #750

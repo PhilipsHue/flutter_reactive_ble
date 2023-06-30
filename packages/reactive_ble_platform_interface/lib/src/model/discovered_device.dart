@@ -50,8 +50,8 @@ class DiscoveredDevice extends $DiscoveredDevice {
     required this.serviceData,
     required this.manufacturerData,
     required this.rssi,
-    required this.connectable,
     required this.serviceUuids,
+    this.connectable = Connectable.unknown,
   });
 }
 

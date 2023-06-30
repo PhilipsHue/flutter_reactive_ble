@@ -385,7 +385,7 @@ packages:
       path: "../reactive_ble_platform_interface"
       relative: true
     source: path
-    version: "5.1.0"
+    version: "5.1.1"
   shelf:
     dependency: transitive
     description:
