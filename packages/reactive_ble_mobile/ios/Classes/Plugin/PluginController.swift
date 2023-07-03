@@ -507,6 +507,10 @@ final class PluginController {
         let result: NegotiateMtuInfo
         do {
             let mtu = try central.maximumWriteValueLength(for: peripheralID, type: .withoutResponse)
+            let other = try central.maximumWriteValueLength(for: peripheralID, type: .withResponse)
+
+            print("WithResponse MTU: \(other)")
+
             result = NegotiateMtuInfo.with {
                 $0.deviceID = args.deviceID
                 $0.mtuSize = Int32(mtu)

@@ -20,6 +20,11 @@ struct CharacteristicWriteTaskController: PeripheralTaskController {
             return task.with(state: task.state.finished(PluginError.internalInconcictency(details: nil)))
         }
 
+        // print out the value's length in bytes
+        print("value length: \(task.params.value.count)")
+
+        print("WithResponse maximum write value length: \(peripheral.maximumWriteValueLength(for: .withResponse))")
+
         peripheral.writeValue(task.params.value, for: characteristic, type: .withResponse)
 
         return task.with(state: task.state.processing(.writing))

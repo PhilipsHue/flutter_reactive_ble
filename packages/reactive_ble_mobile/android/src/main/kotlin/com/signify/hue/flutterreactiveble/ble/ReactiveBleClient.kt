@@ -297,37 +297,17 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
 
                             assert(isNotify || isIndicate) { "Either isNotify or isIndicate must be true" }
 
-                            println("isNotify $isNotify isIndicate $isIndicate")
-
-                            if (cccd == null) {
-                                println("CCCD not found")
-                            } else {
-                                println("CCCD found ${cccd.uuid}")
-                                
-                                // Manually enable indications on the CCCD
-                                val descriptorValue = if (isNotify) {
-                                    BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
-                                } else {
-                                    BluetoothGattDescriptor.ENABLE_INDICATION_VALUE
-                                }
-
-                                deviceConnection.rxConnection.writeDescriptor(cccd, descriptorValue)
-                                    .subscribe(
-                                        { println("Indcations/notifications enabled on CCCD") },
-                                        { throwable -> println("Error while enabling indication/notification: $throwable") }
-                                    )
-                            }
-
-                            // Print all the properties of the cccd descriptor
-                            println("CCCD properties: ${cccd?.characteristic?.properties}")
-                            
                             val mode = if (char.descriptors.isEmpty()) {
                                 NotificationSetupMode.COMPAT
                             } else {
-                                NotificationSetupMode.DEFAULT
-//                                NotificationSetupMode.QUICK_SETUP
+                                NotificationSetupMode.COMPAT
+                                // NotificationSetupMode.DEFAULT
+                                // NotificationSetupMode.QUICK_SETUP
                                 // NotificationSetupMode.DEFAULT
                             }
+
+                            println("char descriptors ${char.descriptors}")
+                            println("mode $mode")
 
                             if (isNotify) {
                                 deviceConnection.rxConnection.setupNotification(

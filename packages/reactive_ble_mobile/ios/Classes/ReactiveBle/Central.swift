@@ -88,25 +88,9 @@ final class Central {
 
                     if (nserror.domain == "CBATTErrorDomain"
                         && (nserror.code == 3 || nserror.code == 10)) {
-                        // Try to workaround this by writing to the cccd descriptor
-                        // ourselves:
-                        // let cccd = characteristic.descriptors?.first(where: { $0.uuid == CBUUID(string: "2902") })
-                        // if let cccd = cccd {
-                        //     characteristic.peripheral?.writeValue(
-                        //         characteristic.isNotifying ? Data([1, 0]) : Data([0, 0]),
-                        //         for: cccd,
-                        //         type: .withResponse
-                        //     )
-                        // }
-
                         return nil
                     }
-                    // if (nserror.domain == "CBATTErrorDomain"
-                    //     && (nserror.code == 3
-                    //         || nserror.code == 10 && (characteristic.descriptors?.isEmpty ?? true) == true
-                    //     )) {
-                    //     return nil
-                    // }
+                    
                     return error
                 }()
 
@@ -119,6 +103,18 @@ final class Central {
                 onCharacteristicValueUpdate(central, QualifiedCharacteristic(characteristic), characteristic.value, error)
             },
             onCharacteristicValueWrite: papply(weak: self) { central, characteristic, error in
+                // Error Domain=CBATTErrorDomain Code=13 "The value's length is invalid."
+                // let err: Error? = {
+                //     guard let nserror = error as NSError?
+                //     else { return error }
+
+                //     if (nserror.domain == "CBATTErrorDomain" && nserror.code == 13) {
+                //         return nil
+                //     }
+                    
+                //     return error
+                // }()
+
                 central.characteristicWriteRegistry.updateTask(
                     key: QualifiedCharacteristic(characteristic),
                     action: { $0.handleWrite(error: error) }
