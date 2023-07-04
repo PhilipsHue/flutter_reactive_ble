@@ -31,8 +31,3 @@ dev_dependencies:
   functional_data_generator: ^1.1.2
   mockito: ^5.0.14
 
-dependency_overrides:
-  reactive_ble_mobile: 
-    path: ../reactive_ble_mobile
-  reactive_ble_platform_interface:
-    path: ../reactive_ble_platform_interface
