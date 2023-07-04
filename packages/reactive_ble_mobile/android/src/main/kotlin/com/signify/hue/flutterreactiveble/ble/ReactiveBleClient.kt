@@ -19,6 +19,7 @@ import com.polidea.rxandroidble2.scan.ScanSettings
 import com.signify.hue.flutterreactiveble.ble.extensions.writeCharWithResponse
 import com.signify.hue.flutterreactiveble.ble.extensions.writeCharWithoutResponse
 import com.signify.hue.flutterreactiveble.converters.extractManufacturerData
+import com.signify.hue.flutterreactiveble.model.BondingMode
 import com.signify.hue.flutterreactiveble.model.ScanMode
 import com.signify.hue.flutterreactiveble.model.toScanSettings
 import com.signify.hue.flutterreactiveble.utils.Duration
@@ -97,8 +98,8 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
             }
     }
 
-    override fun connectToDevice(deviceId: String, timeout: Duration) {
-        allConnections.add(getConnection(deviceId, timeout)
+    override fun connectToDevice(deviceId: String, timeout: Duration, bondingMode: BondingMode) {
+        allConnections.add(getConnection(deviceId, timeout, bondingMode)
             .subscribe({ result ->
                 when (result) {
                     is EstablishedConnection -> {
@@ -240,16 +241,17 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
         .map { it.toBleState() }
 
     @VisibleForTesting
-    internal open fun createDeviceConnector(device: RxBleDevice, timeout: Duration) =
-        DeviceConnector(device, timeout, connectionUpdateBehaviorSubject::onNext, connectionQueue)
+    internal open fun createDeviceConnector(device: RxBleDevice, timeout: Duration, bondingMode: BondingMode) =
+        DeviceConnector(context, device, timeout, connectionUpdateBehaviorSubject::onNext, connectionQueue, bondingMode)
 
     private fun getConnection(
         deviceId: String,
-        timeout: Duration = Duration(0, TimeUnit.MILLISECONDS)
+        timeout: Duration = Duration(0, TimeUnit.MILLISECONDS),
+        bondingMode: BondingMode = BondingMode.NONE,
     ): Observable<EstablishConnectionResult> {
         val device = rxBleClient.getBleDevice(deviceId)
         val connector =
-            activeConnections.getOrPut(deviceId) { createDeviceConnector(device, timeout) }
+            activeConnections.getOrPut(deviceId) { createDeviceConnector(device, timeout, bondingMode) }
 
         return connector.connection
     }

@@ -68,6 +68,16 @@ abstract class ReactiveBlePlatform extends PlatformInterface {
     throw UnimplementedError('deInitialize() has not been implemented.');
   }
 
+  /// Launch Companion workflow for connecting a Ble device (Android only)
+  Future<AssociationInfo?> launchCompanionWorkflow({
+    required String pattern,
+    required bool singleDeviceScan,
+    required bool forceConfirmation,
+  }) {
+    throw UnimplementedError(
+        'launchCompanionWorkflow() has not been implemented.');
+  }
+
   /// Stream that handles triggers scanning for Ble devices.
   ///
   /// As long as the stream has been `listened` to the scanning continues. When
@@ -95,6 +105,7 @@ abstract class ReactiveBlePlatform extends PlatformInterface {
     String id,
     Map<Uuid, List<Uuid>>? servicesWithCharacteristicsToDiscover,
     Duration? connectionTimeout,
+    BondingMode? bondingMode,
   ) {
     throw UnimplementedError('connectToDevice has not been implemented.');
   }

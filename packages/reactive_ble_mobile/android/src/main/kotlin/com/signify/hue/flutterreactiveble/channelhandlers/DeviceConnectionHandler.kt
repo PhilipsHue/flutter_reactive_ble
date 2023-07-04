@@ -2,6 +2,7 @@ package com.signify.hue.flutterreactiveble.channelhandlers
 
 import com.signify.hue.flutterreactiveble.ProtobufModel as pb
 import com.signify.hue.flutterreactiveble.converters.ProtobufMessageConverter
+import com.signify.hue.flutterreactiveble.model.BondingMode
 import com.signify.hue.flutterreactiveble.utils.Duration
 import io.flutter.plugin.common.EventChannel
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -29,7 +30,8 @@ class DeviceConnectionHandler(private val bleClient: com.signify.hue.flutterreac
     fun connectToDevice(connectToDeviceMessage: pb.ConnectToDeviceRequest) {
         bleClient.connectToDevice(
                 connectToDeviceMessage.deviceId,
-                Duration(connectToDeviceMessage.timeoutInMs.toLong(), TimeUnit.MILLISECONDS)
+                Duration(connectToDeviceMessage.timeoutInMs.toLong(), TimeUnit.MILLISECONDS),
+            BondingMode.values()[connectToDeviceMessage.bondingMode],
         )
     }
 

@@ -7,6 +7,8 @@ import '../select_from.dart';
 abstract class ProtobufConverter {
   BleStatus bleStatusFrom(List<int> data);
 
+  AssociationInfo associationInfoFrom(List<int> data);
+
   ScanResult scanResultFrom(List<int> data);
 
   ConnectionStateUpdate connectionStateUpdateFrom(List<int> data);
@@ -38,6 +40,13 @@ class ProtobufConverterImpl implements ProtobufConverter {
       index: message.status,
       fallback: (_) => BleStatus.unknown,
     );
+  }
+
+  @override
+  AssociationInfo associationInfoFrom(List<int> data) {
+    final pbVersion = pb.AssociationInfo.fromBuffer(data);
+
+    return AssociationInfo(deviceMacAddress: pbVersion.deviceMacAddress);
   }
 
   @override

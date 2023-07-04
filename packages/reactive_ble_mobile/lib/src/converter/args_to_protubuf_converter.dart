@@ -7,6 +7,7 @@ abstract class ArgsToProtobufConverter {
     String id,
     Map<Uuid, List<Uuid>>? servicesWithCharacteristicsToDiscover,
     Duration? connectionTimeout,
+    BondingMode? bondingMode,
   );
 
   pb.DisconnectFromDeviceRequest createDisconnectDeviceArgs(String deviceId);
@@ -38,6 +39,12 @@ abstract class ArgsToProtobufConverter {
     ConnectionPriority priority,
   );
 
+  pb.LaunchCompanionRequest createLaunchCompanionWorkflowRequest({
+    required String pattern,
+    required bool singleDeviceScan,
+    required bool forceConfirmation,
+  });
+
   pb.ScanForDevicesRequest createScanForDevicesRequest({
     required List<Uuid>? withServices,
     required ScanMode scanMode,
@@ -57,6 +64,7 @@ class ArgsToProtobufConverterImpl implements ArgsToProtobufConverter {
     String id,
     Map<Uuid, List<Uuid>>? servicesWithCharacteristicsToDiscover,
     Duration? connectionTimeout,
+    BondingMode? bondingMode,
   ) {
     final args = pb.ConnectToDeviceRequest()..deviceId = id;
 
@@ -79,6 +87,9 @@ class ArgsToProtobufConverterImpl implements ArgsToProtobufConverter {
       args.servicesWithCharacteristicsToDiscover =
           pb.ServicesWithCharacteristics()..items.addAll(items);
     }
+
+    args.bondingMode = bondingMode?.index ?? BondingMode.none.index;
+
     return args;
   }
 
@@ -167,6 +178,17 @@ class ArgsToProtobufConverterImpl implements ArgsToProtobufConverter {
 
     return args;
   }
+
+  @override
+  pb.LaunchCompanionRequest createLaunchCompanionWorkflowRequest({
+    required String pattern,
+    required bool singleDeviceScan,
+    required bool forceConfirmation,
+  }) =>
+      pb.LaunchCompanionRequest()
+        ..pattern = pattern
+        ..singleDeviceScan = singleDeviceScan
+        ..forceConfirmation = forceConfirmation;
 
   @override
   pb.ScanForDevicesRequest createScanForDevicesRequest({

@@ -13,6 +13,110 @@ import 'dart:core' as $core;
 
 import 'package:protobuf/protobuf.dart' as $pb;
 
+class LaunchCompanionRequest extends $pb.GeneratedMessage {
+  factory LaunchCompanionRequest() => create();
+  LaunchCompanionRequest._() : super();
+  factory LaunchCompanionRequest.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory LaunchCompanionRequest.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'LaunchCompanionRequest', createEmptyInstance: create)
+    ..aOS(1, _omitFieldNames ? '' : 'pattern')
+    ..aOB(2, _omitFieldNames ? '' : 'singleDeviceScan', protoName: 'singleDeviceScan')
+    ..aOB(3, _omitFieldNames ? '' : 'forceConfirmation', protoName: 'forceConfirmation')
+    ..hasRequiredFields = false
+  ;
+
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  LaunchCompanionRequest clone() => LaunchCompanionRequest()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  LaunchCompanionRequest copyWith(void Function(LaunchCompanionRequest) updates) => super.copyWith((message) => updates(message as LaunchCompanionRequest)) as LaunchCompanionRequest;
+
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static LaunchCompanionRequest create() => LaunchCompanionRequest._();
+  LaunchCompanionRequest createEmptyInstance() => create();
+  static $pb.PbList<LaunchCompanionRequest> createRepeated() => $pb.PbList<LaunchCompanionRequest>();
+  @$core.pragma('dart2js:noInline')
+  static LaunchCompanionRequest getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<LaunchCompanionRequest>(create);
+  static LaunchCompanionRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get pattern => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set pattern($core.String v) { $_setString(0, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasPattern() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearPattern() => clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.bool get singleDeviceScan => $_getBF(1);
+  @$pb.TagNumber(2)
+  set singleDeviceScan($core.bool v) { $_setBool(1, v); }
+  @$pb.TagNumber(2)
+  $core.bool hasSingleDeviceScan() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearSingleDeviceScan() => clearField(2);
+
+  @$pb.TagNumber(3)
+  $core.bool get forceConfirmation => $_getBF(2);
+  @$pb.TagNumber(3)
+  set forceConfirmation($core.bool v) { $_setBool(2, v); }
+  @$pb.TagNumber(3)
+  $core.bool hasForceConfirmation() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearForceConfirmation() => clearField(3);
+}
+
+class AssociationInfo extends $pb.GeneratedMessage {
+  factory AssociationInfo() => create();
+  AssociationInfo._() : super();
+  factory AssociationInfo.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory AssociationInfo.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'AssociationInfo', createEmptyInstance: create)
+    ..aOS(1, _omitFieldNames ? '' : 'deviceMacAddress', protoName: 'deviceMacAddress')
+    ..hasRequiredFields = false
+  ;
+
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  AssociationInfo clone() => AssociationInfo()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  AssociationInfo copyWith(void Function(AssociationInfo) updates) => super.copyWith((message) => updates(message as AssociationInfo)) as AssociationInfo;
+
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static AssociationInfo create() => AssociationInfo._();
+  AssociationInfo createEmptyInstance() => create();
+  static $pb.PbList<AssociationInfo> createRepeated() => $pb.PbList<AssociationInfo>();
+  @$core.pragma('dart2js:noInline')
+  static AssociationInfo getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<AssociationInfo>(create);
+  static AssociationInfo? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get deviceMacAddress => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set deviceMacAddress($core.String v) { $_setString(0, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasDeviceMacAddress() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearDeviceMacAddress() => clearField(1);
+}
+
 class ScanForDevicesRequest extends $pb.GeneratedMessage {
   factory ScanForDevicesRequest() => create();
   ScanForDevicesRequest._() : super();
@@ -183,6 +287,7 @@ class ConnectToDeviceRequest extends $pb.GeneratedMessage {
     ..aOS(1, _omitFieldNames ? '' : 'deviceId', protoName: 'deviceId')
     ..aOM<ServicesWithCharacteristics>(2, _omitFieldNames ? '' : 'servicesWithCharacteristicsToDiscover', protoName: 'servicesWithCharacteristicsToDiscover', subBuilder: ServicesWithCharacteristics.create)
     ..a<$core.int>(3, _omitFieldNames ? '' : 'timeoutInMs', $pb.PbFieldType.O3, protoName: 'timeoutInMs')
+    ..a<$core.int>(4, _omitFieldNames ? '' : 'bondingMode', $pb.PbFieldType.O3, protoName: 'bondingMode')
     ..hasRequiredFields = false
   ;
 
@@ -235,6 +340,15 @@ class ConnectToDeviceRequest extends $pb.GeneratedMessage {
   $core.bool hasTimeoutInMs() => $_has(2);
   @$pb.TagNumber(3)
   void clearTimeoutInMs() => clearField(3);
+
+  @$pb.TagNumber(4)
+  $core.int get bondingMode => $_getIZ(3);
+  @$pb.TagNumber(4)
+  set bondingMode($core.int v) { $_setSignedInt32(3, v); }
+  @$pb.TagNumber(4)
+  $core.bool hasBondingMode() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearBondingMode() => clearField(4);
 }
 
 class DeviceInfo extends $pb.GeneratedMessage {

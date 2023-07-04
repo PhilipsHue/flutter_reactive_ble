@@ -65,14 +65,14 @@ void main() {
       late pb.ConnectToDeviceRequest request;
       setUp(() {
         request = pb.ConnectToDeviceRequest();
-        when(_argsConverter.createConnectToDeviceArgs('id', any, any))
+        when(_argsConverter.createConnectToDeviceArgs('id', any, any, any))
             .thenReturn(request);
       });
 
       test(
         'It invokes methodchannel with correct method and arguments',
         () async {
-          await _sut.connectToDevice('id', {}, null).first;
+          await _sut.connectToDevice('id', {}, null, null).first;
           verify(_methodChannel.invokeMethod<void>(
             'connectToDevice',
             request.writeToBuffer(),
@@ -81,7 +81,7 @@ void main() {
       );
 
       test('It emits 1 item', () async {
-        final length = await _sut.connectToDevice('id', {}, null).length;
+        final length = await _sut.connectToDevice('id', {}, null, null).length;
         expect(length, 1);
       });
     });

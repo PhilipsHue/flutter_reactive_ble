@@ -13,6 +13,35 @@ import 'dart:convert' as $convert;
 import 'dart:core' as $core;
 import 'dart:typed_data' as $typed_data;
 
+@$core.Deprecated('Use launchCompanionRequestDescriptor instead')
+const LaunchCompanionRequest$json = {
+  '1': 'LaunchCompanionRequest',
+  '2': [
+    {'1': 'pattern', '3': 1, '4': 1, '5': 9, '10': 'pattern'},
+    {'1': 'singleDeviceScan', '3': 2, '4': 1, '5': 8, '10': 'singleDeviceScan'},
+    {'1': 'forceConfirmation', '3': 3, '4': 1, '5': 8, '10': 'forceConfirmation'},
+  ],
+};
+
+/// Descriptor for `LaunchCompanionRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List launchCompanionRequestDescriptor = $convert.base64Decode(
+    'ChZMYXVuY2hDb21wYW5pb25SZXF1ZXN0EhgKB3BhdHRlcm4YASABKAlSB3BhdHRlcm4SKgoQc2'
+    'luZ2xlRGV2aWNlU2NhbhgCIAEoCFIQc2luZ2xlRGV2aWNlU2NhbhIsChFmb3JjZUNvbmZpcm1h'
+    'dGlvbhgDIAEoCFIRZm9yY2VDb25maXJtYXRpb24=');
+
+@$core.Deprecated('Use associationInfoDescriptor instead')
+const AssociationInfo$json = {
+  '1': 'AssociationInfo',
+  '2': [
+    {'1': 'deviceMacAddress', '3': 1, '4': 1, '5': 9, '10': 'deviceMacAddress'},
+  ],
+};
+
+/// Descriptor for `AssociationInfo`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List associationInfoDescriptor = $convert.base64Decode(
+    'Cg9Bc3NvY2lhdGlvbkluZm8SKgoQZGV2aWNlTWFjQWRkcmVzcxgBIAEoCVIQZGV2aWNlTWFjQW'
+    'RkcmVzcw==');
+
 @$core.Deprecated('Use scanForDevicesRequestDescriptor instead')
 const ScanForDevicesRequest$json = {
   '1': 'ScanForDevicesRequest',
@@ -61,6 +90,7 @@ const ConnectToDeviceRequest$json = {
     {'1': 'deviceId', '3': 1, '4': 1, '5': 9, '10': 'deviceId'},
     {'1': 'servicesWithCharacteristicsToDiscover', '3': 2, '4': 1, '5': 11, '6': '.ServicesWithCharacteristics', '10': 'servicesWithCharacteristicsToDiscover'},
     {'1': 'timeoutInMs', '3': 3, '4': 1, '5': 5, '10': 'timeoutInMs'},
+    {'1': 'bondingMode', '3': 4, '4': 1, '5': 5, '10': 'bondingMode'},
   ],
 };
 
@@ -69,7 +99,8 @@ final $typed_data.Uint8List connectToDeviceRequestDescriptor = $convert.base64De
     'ChZDb25uZWN0VG9EZXZpY2VSZXF1ZXN0EhoKCGRldmljZUlkGAEgASgJUghkZXZpY2VJZBJyCi'
     'VzZXJ2aWNlc1dpdGhDaGFyYWN0ZXJpc3RpY3NUb0Rpc2NvdmVyGAIgASgLMhwuU2VydmljZXNX'
     'aXRoQ2hhcmFjdGVyaXN0aWNzUiVzZXJ2aWNlc1dpdGhDaGFyYWN0ZXJpc3RpY3NUb0Rpc2Nvdm'
-    'VyEiAKC3RpbWVvdXRJbk1zGAMgASgFUgt0aW1lb3V0SW5Ncw==');
+    'VyEiAKC3RpbWVvdXRJbk1zGAMgASgFUgt0aW1lb3V0SW5NcxIgCgtib25kaW5nTW9kZRgEIAEo'
+    'BVILYm9uZGluZ01vZGU=');
 
 @$core.Deprecated('Use deviceInfoDescriptor instead')
 const DeviceInfo$json = {

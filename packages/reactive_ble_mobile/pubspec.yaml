@@ -18,6 +18,10 @@ dev_dependencies:
     sdk: flutter
   mockito: ^5.0.14
 
+dependency_overrides:
+  reactive_ble_platform_interface:
+    path: ../reactive_ble_platform_interface
+
 flutter:
   plugin:
     platforms:

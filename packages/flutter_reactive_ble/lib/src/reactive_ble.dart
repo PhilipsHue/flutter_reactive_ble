@@ -217,6 +217,20 @@ class FlutterReactiveBle {
         deviceId, priority);
   }
 
+  Future<AssociationInfo?> launchCompanionWorkflow({
+    required String pattern,
+    bool singleDeviceScan = true,
+    bool forceConfirmation = false,
+  }) async {
+    await initialize();
+
+    return _deviceScanner.launchCompanionWorkflow(
+      pattern: pattern,
+      singleDeviceScan: singleDeviceScan,
+      forceConfirmation: forceConfirmation,
+    );
+  }
+
   /// Scan for BLE peripherals advertising the services specified in [withServices]
   /// or for all BLE peripherals, if no services is specified. It is recommended to always specify some services.
   ///
@@ -256,6 +270,7 @@ class FlutterReactiveBle {
     required String id,
     Map<Uuid, List<Uuid>>? servicesWithCharacteristicsToDiscover,
     Duration? connectionTimeout,
+    BondingMode? bondingMode,
   }) =>
       initialize().asStream().asyncExpand(
             (_) => _deviceConnector.connect(
@@ -263,6 +278,7 @@ class FlutterReactiveBle {
               servicesWithCharacteristicsToDiscover:
                   servicesWithCharacteristicsToDiscover,
               connectionTimeout: connectionTimeout,
+              bondingMode: bondingMode,
             ),
           );
 

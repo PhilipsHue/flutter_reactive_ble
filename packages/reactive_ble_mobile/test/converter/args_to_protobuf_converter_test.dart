@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:reactive_ble_mobile/src/converter/args_to_protubuf_converter.dart';
 import 'package:reactive_ble_mobile/src/generated/bledata.pb.dart' as pb;
+import 'package:reactive_ble_platform_interface/reactive_ble_platform_interface.dart';
 import 'package:reactive_ble_platform_interface/src/model/connection_priority.dart';
 import 'package:reactive_ble_platform_interface/src/model/qualified_characteristic.dart';
 import 'package:reactive_ble_platform_interface/src/model/scan_mode.dart';
@@ -14,6 +15,7 @@ void main() {
       const deviceId = '123';
       Map<Uuid, List<Uuid>>? servicesToDiscover;
       Duration? timeout;
+      BondingMode? bondingMode;
       late pb.ConnectToDeviceRequest result;
 
       group('And servicesToDiscover is not null', () {
@@ -27,7 +29,7 @@ void main() {
           setUp(() {
             timeout = const Duration(seconds: 2);
             result = _sut.createConnectToDeviceArgs(
-                deviceId, servicesToDiscover, timeout);
+                deviceId, servicesToDiscover, timeout, bondingMode);
           });
 
           test('It converts deviceId', () {
@@ -52,7 +54,7 @@ void main() {
           setUp(() {
             timeout = null;
             result = _sut.createConnectToDeviceArgs(
-                deviceId, servicesToDiscover, timeout);
+                deviceId, servicesToDiscover, timeout, bondingMode);
           });
           test('It sets timeout to default value', () {
             expect(result.timeoutInMs, 0);
@@ -64,7 +66,7 @@ void main() {
         setUp(() {
           servicesToDiscover = null;
           result = _sut.createConnectToDeviceArgs(
-              deviceId, servicesToDiscover, timeout);
+              deviceId, servicesToDiscover, timeout, bondingMode);
         });
 
         test('It converts servicesToDiscover to default', () {

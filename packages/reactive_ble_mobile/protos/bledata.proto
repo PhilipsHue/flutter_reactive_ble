@@ -2,6 +2,16 @@ syntax = "proto3";
 option java_package = "com.signify.hue.flutterreactiveble";
 option java_outer_classname = "ProtobufModel";
 
+message LaunchCompanionRequest {
+    string pattern = 1;
+    bool singleDeviceScan = 2;
+    bool forceConfirmation = 3;
+}
+
+message AssociationInfo {
+    string deviceMacAddress = 1;
+}
+
 message ScanForDevicesRequest {
     repeated Uuid serviceUuids = 1;
     int32 scanMode = 2;
@@ -23,6 +33,7 @@ message ConnectToDeviceRequest {
     string deviceId = 1;
     ServicesWithCharacteristics servicesWithCharacteristicsToDiscover = 2;
     int32 timeoutInMs = 3;
+    int32 bondingMode = 4;
 }
 
 message DeviceInfo {

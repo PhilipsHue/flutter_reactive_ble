@@ -96,6 +96,30 @@ class ReactiveBleMobilePlatform extends ReactiveBlePlatform {
   }
 
   @override
+  Future<AssociationInfo?> launchCompanionWorkflow({
+    required String pattern,
+    required bool singleDeviceScan,
+    required bool forceConfirmation,
+  }) async {
+    final bytes = await _bleMethodChannel.invokeMethod<List<int>>(
+      'launchCompanionWorkflow',
+      _argsToProtobufConverter
+          .createLaunchCompanionWorkflowRequest(
+            pattern: pattern,
+            singleDeviceScan: singleDeviceScan,
+            forceConfirmation: forceConfirmation,
+          )
+          .writeToBuffer(),
+    );
+
+    if (bytes == null) {
+      return null;
+    }
+
+    return _protobufConverter.associationInfoFrom(bytes);
+  }
+
+  @override
   Stream<void> scanForDevices({
     required List<Uuid> withServices,
     required ScanMode scanMode,
@@ -123,6 +147,7 @@ class ReactiveBleMobilePlatform extends ReactiveBlePlatform {
     String id,
     Map<Uuid, List<Uuid>>? servicesWithCharacteristicsToDiscover,
     Duration? connectionTimeout,
+    BondingMode? bondingMode,
   ) {
     _logger?.log(
       'Connect to device: $id, servicesWithCharacteristicsToDiscover: $servicesWithCharacteristicsToDiscover, timeout: $connectionTimeout',
@@ -135,6 +160,7 @@ class ReactiveBleMobilePlatform extends ReactiveBlePlatform {
                 id,
                 servicesWithCharacteristicsToDiscover,
                 connectionTimeout,
+                bondingMode,
               )
               .writeToBuffer(),
         )
