@@ -486,6 +486,7 @@ void main() {
         id: '123',
         name: 'Testdevice',
         rssi: -40,
+        connectable: Connectable.unknown,
         serviceData: const {},
         serviceUuids: const [],
         manufacturerData: Uint8List.fromList([1]),

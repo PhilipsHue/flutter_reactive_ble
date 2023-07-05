@@ -180,7 +180,7 @@ class ArgsToProtobufConverterImpl implements ArgsToProtobufConverter {
 
     if (withServices != null) {
       for (final withService in withServices) {
-        args.serviceUuids.add((pb.Uuid()..data = withService.data));
+        args.serviceUuids.add(pb.Uuid()..data = withService.data);
       }
     }
 
