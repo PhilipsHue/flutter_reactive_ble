@@ -104,6 +104,17 @@ class MockReactiveBlePlatform extends _i1.Mock
         returnValueForMissingStub: _i4.Future<void>.value(),
       ) as _i4.Future<void>);
   @override
+  _i4.Future<void> launchCompanionWorkflow({required String? pattern}) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #launchCompanionWorkflow,
+          [],
+          {#pattern: pattern},
+        ),
+        returnValue: _i4.Future<void>.value(),
+        returnValueForMissingStub: _i4.Future<void>.value(),
+      ) as _i4.Future<void>);
+  @override
   _i4.Stream<void> scanForDevices({
     required List<_i2.Uuid>? withServices,
     required _i2.ScanMode? scanMode,

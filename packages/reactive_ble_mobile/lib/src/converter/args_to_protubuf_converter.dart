@@ -10,6 +10,8 @@ abstract class ArgsToProtobufConverter {
     BondingMode? bondingMode,
   );
 
+  pb.GetDeviceNameRequest createGetDeviceNameArgs(String id);
+
   pb.DisconnectFromDeviceRequest createDisconnectDeviceArgs(String deviceId);
 
   pb.ReadCharacteristicRequest createReadCharacteristicRequest(
@@ -92,6 +94,10 @@ class ArgsToProtobufConverterImpl implements ArgsToProtobufConverter {
 
     return args;
   }
+
+  @override
+  pb.GetDeviceNameRequest createGetDeviceNameArgs(String deviceId) =>
+      pb.GetDeviceNameRequest()..deviceId = deviceId;
 
   @override
   pb.DisconnectFromDeviceRequest createDisconnectDeviceArgs(String deviceId) =>

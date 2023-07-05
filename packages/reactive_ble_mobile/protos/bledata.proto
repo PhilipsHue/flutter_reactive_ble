@@ -42,6 +42,15 @@ message DeviceInfo {
     GenericFailure failure = 3;
 }
 
+message GetDeviceNameRequest {
+    string deviceId = 1;
+}
+
+message DeviceNameInfo {
+    string id = 1;
+    string deviceName = 2;
+}
+
 message DisconnectFromDeviceRequest {
     string deviceId = 1;
 }

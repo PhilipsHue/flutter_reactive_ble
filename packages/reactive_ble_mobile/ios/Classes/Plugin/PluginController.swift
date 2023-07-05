@@ -258,6 +258,31 @@ final class PluginController {
         }
     }
 
+    func retrieveDeviceName(name: String, args: GetDeviceNameRequest, completion: @escaping PlatformMethodCompletionHandler) {
+        guard let central = central
+        else {
+            completion(.failure(PluginError.notInitialized.asFlutterError))
+            return
+        }
+
+        guard let deviceID = UUID(uuidString: args.deviceID)
+        else {
+            completion(.failure(PluginError.invalidMethodCall(method: name, details: "\"deviceID\" is invalid").asFlutterError))
+            return
+        }
+
+        do {
+            let name: String? = try central.retrievePeripheralName(for: deviceID)
+            let message = DeviceNameInfo.with {
+                $0.id = deviceID.uuidString
+                $0.deviceName = name ?? ""
+            }
+            completion(.success(message))
+        } catch {
+            completion(.success(nil))
+        }
+    }
+
     func disconnectFromDevice(name: String, args: ConnectToDeviceRequest, completion: @escaping PlatformMethodCompletionHandler) {
         guard let central = central
         else {

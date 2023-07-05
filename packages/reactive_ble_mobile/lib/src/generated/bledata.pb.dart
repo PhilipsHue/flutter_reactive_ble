@@ -415,6 +415,100 @@ class DeviceInfo extends $pb.GeneratedMessage {
   GenericFailure ensureFailure() => $_ensure(2);
 }
 
+class GetDeviceNameRequest extends $pb.GeneratedMessage {
+  factory GetDeviceNameRequest() => create();
+  GetDeviceNameRequest._() : super();
+  factory GetDeviceNameRequest.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory GetDeviceNameRequest.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'GetDeviceNameRequest', createEmptyInstance: create)
+    ..aOS(1, _omitFieldNames ? '' : 'deviceId', protoName: 'deviceId')
+    ..hasRequiredFields = false
+  ;
+
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  GetDeviceNameRequest clone() => GetDeviceNameRequest()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  GetDeviceNameRequest copyWith(void Function(GetDeviceNameRequest) updates) => super.copyWith((message) => updates(message as GetDeviceNameRequest)) as GetDeviceNameRequest;
+
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static GetDeviceNameRequest create() => GetDeviceNameRequest._();
+  GetDeviceNameRequest createEmptyInstance() => create();
+  static $pb.PbList<GetDeviceNameRequest> createRepeated() => $pb.PbList<GetDeviceNameRequest>();
+  @$core.pragma('dart2js:noInline')
+  static GetDeviceNameRequest getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<GetDeviceNameRequest>(create);
+  static GetDeviceNameRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get deviceId => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set deviceId($core.String v) { $_setString(0, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasDeviceId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearDeviceId() => clearField(1);
+}
+
+class DeviceNameInfo extends $pb.GeneratedMessage {
+  factory DeviceNameInfo() => create();
+  DeviceNameInfo._() : super();
+  factory DeviceNameInfo.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory DeviceNameInfo.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'DeviceNameInfo', createEmptyInstance: create)
+    ..aOS(1, _omitFieldNames ? '' : 'id')
+    ..aOS(2, _omitFieldNames ? '' : 'deviceName', protoName: 'deviceName')
+    ..hasRequiredFields = false
+  ;
+
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  DeviceNameInfo clone() => DeviceNameInfo()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  DeviceNameInfo copyWith(void Function(DeviceNameInfo) updates) => super.copyWith((message) => updates(message as DeviceNameInfo)) as DeviceNameInfo;
+
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static DeviceNameInfo create() => DeviceNameInfo._();
+  DeviceNameInfo createEmptyInstance() => create();
+  static $pb.PbList<DeviceNameInfo> createRepeated() => $pb.PbList<DeviceNameInfo>();
+  @$core.pragma('dart2js:noInline')
+  static DeviceNameInfo getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<DeviceNameInfo>(create);
+  static DeviceNameInfo? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get id => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set id($core.String v) { $_setString(0, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearId() => clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.String get deviceName => $_getSZ(1);
+  @$pb.TagNumber(2)
+  set deviceName($core.String v) { $_setString(1, v); }
+  @$pb.TagNumber(2)
+  $core.bool hasDeviceName() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearDeviceName() => clearField(2);
+}
+
 class DisconnectFromDeviceRequest extends $pb.GeneratedMessage {
   factory DisconnectFromDeviceRequest() => create();
   DisconnectFromDeviceRequest._() : super();

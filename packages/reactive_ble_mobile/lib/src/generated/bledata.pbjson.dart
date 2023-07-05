@@ -118,6 +118,32 @@ final $typed_data.Uint8List deviceInfoDescriptor = $convert.base64Decode(
     'Nvbm5lY3Rpb25TdGF0ZRIpCgdmYWlsdXJlGAMgASgLMg8uR2VuZXJpY0ZhaWx1cmVSB2ZhaWx1'
     'cmU=');
 
+@$core.Deprecated('Use getDeviceNameRequestDescriptor instead')
+const GetDeviceNameRequest$json = {
+  '1': 'GetDeviceNameRequest',
+  '2': [
+    {'1': 'deviceId', '3': 1, '4': 1, '5': 9, '10': 'deviceId'},
+  ],
+};
+
+/// Descriptor for `GetDeviceNameRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List getDeviceNameRequestDescriptor = $convert.base64Decode(
+    'ChRHZXREZXZpY2VOYW1lUmVxdWVzdBIaCghkZXZpY2VJZBgBIAEoCVIIZGV2aWNlSWQ=');
+
+@$core.Deprecated('Use deviceNameInfoDescriptor instead')
+const DeviceNameInfo$json = {
+  '1': 'DeviceNameInfo',
+  '2': [
+    {'1': 'id', '3': 1, '4': 1, '5': 9, '10': 'id'},
+    {'1': 'deviceName', '3': 2, '4': 1, '5': 9, '10': 'deviceName'},
+  ],
+};
+
+/// Descriptor for `DeviceNameInfo`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List deviceNameInfoDescriptor = $convert.base64Decode(
+    'Cg5EZXZpY2VOYW1lSW5mbxIOCgJpZBgBIAEoCVICaWQSHgoKZGV2aWNlTmFtZRgCIAEoCVIKZG'
+    'V2aWNlTmFtZQ==');
+
 @$core.Deprecated('Use disconnectFromDeviceRequestDescriptor instead')
 const DisconnectFromDeviceRequest$json = {
   '1': 'DisconnectFromDeviceRequest',

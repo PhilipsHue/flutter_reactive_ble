@@ -13,6 +13,8 @@ abstract class DeviceConnector {
     BondingMode? bondingMode,
   });
 
+  Future<String?> retrieveDeviceName(String id);
+
   Stream<ConnectionStateUpdate> connectToAdvertisingDevice({
     required String id,
     required List<Uuid> withServices,
@@ -79,6 +81,10 @@ class DeviceConnectorImpl implements DeviceConnector {
 
     return autoconnectingRepeater.stream;
   }
+
+  @override
+  Future<String?> retrieveDeviceName(String id) =>
+      _blePlatform.retrieveDeviceName(id);
 
   @override
   Stream<ConnectionStateUpdate> connectToAdvertisingDevice({

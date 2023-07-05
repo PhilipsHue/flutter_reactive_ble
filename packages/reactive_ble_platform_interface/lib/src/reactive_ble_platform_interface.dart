@@ -110,6 +110,11 @@ abstract class ReactiveBlePlatform extends PlatformInterface {
     throw UnimplementedError('connectToDevice has not been implemented.');
   }
 
+  /// Retrieve the device name.
+  Future<String?> retrieveDeviceName(String id) {
+    throw UnimplementedError('retrieveDeviceName has not been implemented.');
+  }
+
   /// Operation that disconnects the host with the peripheral.
   Future<void> disconnectDevice(String deviceId) {
     throw UnimplementedError('disconnectDevice has not been implemented.');

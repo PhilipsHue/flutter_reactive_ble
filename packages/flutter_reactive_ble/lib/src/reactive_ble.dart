@@ -282,6 +282,19 @@ class FlutterReactiveBle {
             ),
           );
 
+  /// iOS only. Retrieves the name of the device with the given id.
+  ///
+  /// This operation can only succeed when the host is `connected` with the peripheral.
+  ///
+  /// It is using the the CBPeripheral `name` property to retrieve the name.
+  /// See the [documentation](https://developer.apple.com/documentation/corebluetooth/cbperipheral/1519029-name) for details.
+  /// Under the hood, this uses the GAP profile to retrieve the name.
+  ///
+  /// This operation is only supported on Apple platforms.
+  /// It will throw an [UnimplementedError] on other platforms.
+  Future<String?> retrieveDeviceName(String id) =>
+      _deviceConnector.retrieveDeviceName(id);
+
   /// Scans for a specific device and connects to it in case a device containing the specified [id]
   /// is found and that is advertising the services specified in [withServices].
   ///

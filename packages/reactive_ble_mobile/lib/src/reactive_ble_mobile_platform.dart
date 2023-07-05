@@ -168,6 +168,17 @@ class ReactiveBleMobilePlatform extends ReactiveBlePlatform {
   }
 
   @override
+  Future<String?> retrieveDeviceName(String id) {
+    _logger?.log(
+      'Retrieve device name: $id',
+    );
+    return _bleMethodChannel.invokeMethod<String>(
+      'retrieveDeviceName',
+      _argsToProtobufConverter.createGetDeviceNameArgs(id).writeToBuffer(),
+    );
+  }
+
+  @override
   Future<void> disconnectDevice(String deviceId) {
     _logger?.log(
       'Disconnect device: $deviceId',

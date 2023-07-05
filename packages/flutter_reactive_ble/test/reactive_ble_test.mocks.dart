@@ -107,6 +107,17 @@ class MockReactiveBlePlatform extends _i1.Mock
         returnValueForMissingStub: _i4.Future<void>.value(),
       ) as _i4.Future<void>);
   @override
+  _i4.Future<void> launchCompanionWorkflow({required String? pattern}) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #launchCompanionWorkflow,
+          [],
+          {#pattern: pattern},
+        ),
+        returnValue: _i4.Future<void>.value(),
+        returnValueForMissingStub: _i4.Future<void>.value(),
+      ) as _i4.Future<void>);
+  @override
   _i4.Stream<void> scanForDevices({
     required List<_i2.Uuid>? withServices,
     required _i2.ScanMode? scanMode,
@@ -465,6 +476,7 @@ class MockDeviceConnector extends _i1.Mock implements _i6.DeviceConnector {
     required String? id,
     Map<_i2.Uuid, List<_i2.Uuid>>? servicesWithCharacteristicsToDiscover,
     Duration? connectionTimeout,
+    dynamic bondingMode,
   }) =>
       (super.noSuchMethod(
         Invocation.method(
@@ -475,6 +487,7 @@ class MockDeviceConnector extends _i1.Mock implements _i6.DeviceConnector {
             #servicesWithCharacteristicsToDiscover:
                 servicesWithCharacteristicsToDiscover,
             #connectionTimeout: connectionTimeout,
+            #bondingMode: bondingMode,
           },
         ),
         returnValue: _i4.Stream<_i2.ConnectionStateUpdate>.empty(),
@@ -512,6 +525,24 @@ class MockDeviceScanner extends _i1.Mock implements _i7.DeviceScanner {
     _i1.throwOnMissingStub(this);
   }
 
+  @override
+  _i4.Future<dynamic> launchCompanionWorkflow({
+    required String? pattern,
+    required bool? singleDeviceScan,
+    required bool? forceConfirmation,
+  }) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #launchCompanionWorkflow,
+          [],
+          {
+            #pattern: pattern,
+            #singleDeviceScan: singleDeviceScan,
+            #forceConfirmation: forceConfirmation,
+          },
+        ),
+        returnValue: _i4.Future<dynamic>.value(),
+      ) as _i4.Future<dynamic>);
   @override
   _i4.Stream<_i2.DiscoveredDevice> scanForDevices({
     required List<_i2.Uuid>? withServices,
