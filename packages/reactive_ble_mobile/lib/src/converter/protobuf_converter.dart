@@ -11,6 +11,8 @@ abstract class ProtobufConverter {
 
   ScanResult scanResultFrom(List<int> data);
 
+  String deviceNameFrom(List<int> data);
+
   ConnectionStateUpdate connectionStateUpdateFrom(List<int> data);
 
   Result<Unit, GenericFailure<ClearGattCacheError>?> clearGattCacheResultFrom(
@@ -80,6 +82,12 @@ class ProtobufConverterImpl implements ProtobufConverter {
             fallback: (rawOrNull) => ScanFailure.unknown),
       ),
     );
+  }
+
+  @override
+  String deviceNameFrom(List<int> data) {
+    final deviceNameInfo = pb.DeviceNameInfo.fromBuffer(data);
+    return deviceNameInfo.deviceName;
   }
 
   @override

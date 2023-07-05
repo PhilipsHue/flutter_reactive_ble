@@ -172,10 +172,13 @@ class ReactiveBleMobilePlatform extends ReactiveBlePlatform {
     _logger?.log(
       'Retrieve device name: $id',
     );
-    return _bleMethodChannel.invokeMethod<String>(
-      'retrieveDeviceName',
-      _argsToProtobufConverter.createGetDeviceNameArgs(id).writeToBuffer(),
-    );
+    return _bleMethodChannel
+        .invokeMethod<List<int>>(
+          'retrieveDeviceName',
+          _argsToProtobufConverter.createGetDeviceNameArgs(id).writeToBuffer(),
+        )
+        .then((data) => _protobufConverter.deviceNameFrom(data!));
+    ;
   }
 
   @override
