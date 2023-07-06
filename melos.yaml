@@ -1,6 +1,7 @@
 name: flutter_reactive_ble
 packages:
-  - /**
+  - packages/*
+  - example
 scripts:
   analyze: melos exec -- flutter analyze
 
