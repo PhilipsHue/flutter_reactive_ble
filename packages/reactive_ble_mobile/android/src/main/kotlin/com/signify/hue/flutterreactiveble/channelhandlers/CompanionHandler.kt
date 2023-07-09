@@ -33,13 +33,11 @@ class CompanionHandler(private val context: Context, private val bleClient: BleC
         result: MethodChannel.Result
     ) {
         val deviceFilter: BluetoothLeDeviceFilter = BluetoothLeDeviceFilter.Builder()
-            .setNamePattern(Pattern.compile(parseFrom.pattern))
+            .setNamePattern(Pattern.compile(parseFrom.deviceNamePattern))
             .build()
 
         val pairingRequestBuilder = AssociationRequest.Builder()
-            // Find only devices that match this request filter.
             .addDeviceFilter(deviceFilter)
-            // Stop scanning as soon as one device matching the filter is found.
             .setSingleDevice(parseFrom.singleDeviceScan)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -55,8 +53,6 @@ class CompanionHandler(private val context: Context, private val bleClient: BleC
             deviceManager.associate(pairingRequestBuilder.build(),
                 executor,
                 object : CompanionDeviceManager.Callback() {
-                    //                // Called when a device is found. Launch the IntentSender so the user
-                    //                // can select the device they want to pair with.
                     override fun onAssociationPending(intentSender: IntentSender) {
                         Log.d(TAG, "onAssociationPending: $intentSender")
                         intentSender.let {

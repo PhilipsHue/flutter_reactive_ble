@@ -17,7 +17,7 @@ import 'dart:typed_data' as $typed_data;
 const LaunchCompanionRequest$json = {
   '1': 'LaunchCompanionRequest',
   '2': [
-    {'1': 'pattern', '3': 1, '4': 1, '5': 9, '10': 'pattern'},
+    {'1': 'deviceNamePattern', '3': 1, '4': 1, '5': 9, '10': 'deviceNamePattern'},
     {'1': 'singleDeviceScan', '3': 2, '4': 1, '5': 8, '10': 'singleDeviceScan'},
     {'1': 'forceConfirmation', '3': 3, '4': 1, '5': 8, '10': 'forceConfirmation'},
   ],
@@ -25,9 +25,9 @@ const LaunchCompanionRequest$json = {
 
 /// Descriptor for `LaunchCompanionRequest`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List launchCompanionRequestDescriptor = $convert.base64Decode(
-    'ChZMYXVuY2hDb21wYW5pb25SZXF1ZXN0EhgKB3BhdHRlcm4YASABKAlSB3BhdHRlcm4SKgoQc2'
-    'luZ2xlRGV2aWNlU2NhbhgCIAEoCFIQc2luZ2xlRGV2aWNlU2NhbhIsChFmb3JjZUNvbmZpcm1h'
-    'dGlvbhgDIAEoCFIRZm9yY2VDb25maXJtYXRpb24=');
+    'ChZMYXVuY2hDb21wYW5pb25SZXF1ZXN0EiwKEWRldmljZU5hbWVQYXR0ZXJuGAEgASgJUhFkZX'
+    'ZpY2VOYW1lUGF0dGVybhIqChBzaW5nbGVEZXZpY2VTY2FuGAIgASgIUhBzaW5nbGVEZXZpY2VT'
+    'Y2FuEiwKEWZvcmNlQ29uZmlybWF0aW9uGAMgASgIUhFmb3JjZUNvbmZpcm1hdGlvbg==');
 
 @$core.Deprecated('Use associationInfoDescriptor instead')
 const AssociationInfo$json = {

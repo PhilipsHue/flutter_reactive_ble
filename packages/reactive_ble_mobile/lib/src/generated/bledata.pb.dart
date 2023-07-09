@@ -24,7 +24,7 @@ class LaunchCompanionRequest extends $pb.GeneratedMessage {
   factory LaunchCompanionRequest.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'LaunchCompanionRequest', createEmptyInstance: create)
-    ..aOS(1, _omitFieldNames ? '' : 'pattern')
+    ..aOS(1, _omitFieldNames ? '' : 'deviceNamePattern', protoName: 'deviceNamePattern')
     ..aOB(2, _omitFieldNames ? '' : 'singleDeviceScan', protoName: 'singleDeviceScan')
     ..aOB(3, _omitFieldNames ? '' : 'forceConfirmation', protoName: 'forceConfirmation')
     ..hasRequiredFields = false
@@ -52,13 +52,13 @@ class LaunchCompanionRequest extends $pb.GeneratedMessage {
   static LaunchCompanionRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
-  $core.String get pattern => $_getSZ(0);
+  $core.String get deviceNamePattern => $_getSZ(0);
   @$pb.TagNumber(1)
-  set pattern($core.String v) { $_setString(0, v); }
+  set deviceNamePattern($core.String v) { $_setString(0, v); }
   @$pb.TagNumber(1)
-  $core.bool hasPattern() => $_has(0);
+  $core.bool hasDeviceNamePattern() => $_has(0);
   @$pb.TagNumber(1)
-  void clearPattern() => clearField(1);
+  void clearDeviceNamePattern() => clearField(1);
 
   @$pb.TagNumber(2)
   $core.bool get singleDeviceScan => $_getBF(1);

@@ -25,7 +25,7 @@ struct LaunchCompanionRequest {
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  var pattern: String = String()
+  var deviceNamePattern: String = String()
 
   var singleDeviceScan: Bool = false
 
@@ -805,7 +805,7 @@ extension IsConnectable: @unchecked Sendable {}
 extension LaunchCompanionRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = "LaunchCompanionRequest"
   static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
-    1: .same(proto: "pattern"),
+    1: .same(proto: "deviceNamePattern"),
     2: .same(proto: "singleDeviceScan"),
     3: .same(proto: "forceConfirmation"),
   ]
@@ -816,7 +816,7 @@ extension LaunchCompanionRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageI
       // allocates stack space for every case branch when no optimizations are
       // enabled. https://github.com/apple/swift-protobuf/issues/1034
       switch fieldNumber {
-      case 1: try { try decoder.decodeSingularStringField(value: &self.pattern) }()
+      case 1: try { try decoder.decodeSingularStringField(value: &self.deviceNamePattern) }()
       case 2: try { try decoder.decodeSingularBoolField(value: &self.singleDeviceScan) }()
       case 3: try { try decoder.decodeSingularBoolField(value: &self.forceConfirmation) }()
       default: break
@@ -825,8 +825,8 @@ extension LaunchCompanionRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageI
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if !self.pattern.isEmpty {
-      try visitor.visitSingularStringField(value: self.pattern, fieldNumber: 1)
+    if !self.deviceNamePattern.isEmpty {
+      try visitor.visitSingularStringField(value: self.deviceNamePattern, fieldNumber: 1)
     }
     if self.singleDeviceScan != false {
       try visitor.visitSingularBoolField(value: self.singleDeviceScan, fieldNumber: 2)
@@ -838,7 +838,7 @@ extension LaunchCompanionRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageI
   }
 
   static func ==(lhs: LaunchCompanionRequest, rhs: LaunchCompanionRequest) -> Bool {
-    if lhs.pattern != rhs.pattern {return false}
+    if lhs.deviceNamePattern != rhs.deviceNamePattern {return false}
     if lhs.singleDeviceScan != rhs.singleDeviceScan {return false}
     if lhs.forceConfirmation != rhs.forceConfirmation {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}

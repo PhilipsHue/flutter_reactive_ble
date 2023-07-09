@@ -3,7 +3,7 @@ option java_package = "com.signify.hue.flutterreactiveble";
 option java_outer_classname = "ProtobufModel";
 
 message LaunchCompanionRequest {
-    string pattern = 1;
+    string deviceNamePattern = 1;
     bool singleDeviceScan = 2;
     bool forceConfirmation = 3;
 }

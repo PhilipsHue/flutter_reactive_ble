@@ -105,7 +105,7 @@ class ReactiveBleMobilePlatform extends ReactiveBlePlatform {
       'launchCompanionWorkflow',
       _argsToProtobufConverter
           .createLaunchCompanionWorkflowRequest(
-            pattern: pattern,
+            deviceNamePattern: pattern,
             singleDeviceScan: singleDeviceScan,
             forceConfirmation: forceConfirmation,
           )

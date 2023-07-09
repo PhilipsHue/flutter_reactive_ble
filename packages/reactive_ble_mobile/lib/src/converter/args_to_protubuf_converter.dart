@@ -43,7 +43,7 @@ abstract class ArgsToProtobufConverter {
   );
 
   pb.LaunchCompanionRequest createLaunchCompanionWorkflowRequest({
-    required String pattern,
+    required String deviceNamePattern,
     required bool singleDeviceScan,
     required bool forceConfirmation,
   });
@@ -189,12 +189,12 @@ class ArgsToProtobufConverterImpl implements ArgsToProtobufConverter {
 
   @override
   pb.LaunchCompanionRequest createLaunchCompanionWorkflowRequest({
-    required String pattern,
+    required String deviceNamePattern,
     required bool singleDeviceScan,
     required bool forceConfirmation,
   }) =>
       pb.LaunchCompanionRequest()
-        ..pattern = pattern
+        ..deviceNamePattern = deviceNamePattern
         ..singleDeviceScan = singleDeviceScan
         ..forceConfirmation = forceConfirmation;
 
