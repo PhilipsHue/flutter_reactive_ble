@@ -71,8 +71,8 @@ class CompanionHandler(private val context: Context, private val bleClient: BleC
                         Log.d(TAG, "onAssociationCreated: $associationInfo")
 
                         result.success(
-                            ProtobufModel.AssociationInfo.newBuilder()
-                                .setDeviceMacAddress(
+                            ProtobufModel.DeviceAssociationInfo.newBuilder()
+                                .setMacAddress(
                                     associationInfo.deviceMacAddress!!.toString().uppercase()
                                 )
                                 .build()

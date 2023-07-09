@@ -1,10 +1,10 @@
-export './model/association_info.dart';
 export './model/ble_status.dart';
 export './model/bonding_status.dart';
 export './model/characteristic_value.dart';
 export './model/clear_gatt_cache_error.dart';
 export './model/connection_priority.dart';
 export './model/connection_state_update.dart';
+export './model/device_association_info.dart';
 export './model/discovered_characteristic.dart';
 export './model/discovered_device.dart';
 export './model/discovered_service.dart';

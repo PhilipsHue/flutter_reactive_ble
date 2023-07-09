@@ -8,8 +8,8 @@ message LaunchCompanionRequest {
     bool forceConfirmation = 3;
 }
 
-message AssociationInfo {
-    string deviceMacAddress = 1;
+message DeviceAssociationInfo {
+    string macAddress = 1;
 }
 
 message ScanForDevicesRequest {

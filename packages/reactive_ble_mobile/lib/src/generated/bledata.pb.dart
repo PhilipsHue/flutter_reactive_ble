@@ -79,14 +79,14 @@ class LaunchCompanionRequest extends $pb.GeneratedMessage {
   void clearForceConfirmation() => clearField(3);
 }
 
-class AssociationInfo extends $pb.GeneratedMessage {
-  factory AssociationInfo() => create();
-  AssociationInfo._() : super();
-  factory AssociationInfo.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
-  factory AssociationInfo.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+class DeviceAssociationInfo extends $pb.GeneratedMessage {
+  factory DeviceAssociationInfo() => create();
+  DeviceAssociationInfo._() : super();
+  factory DeviceAssociationInfo.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory DeviceAssociationInfo.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
 
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'AssociationInfo', createEmptyInstance: create)
-    ..aOS(1, _omitFieldNames ? '' : 'deviceMacAddress', protoName: 'deviceMacAddress')
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'DeviceAssociationInfo', createEmptyInstance: create)
+    ..aOS(1, _omitFieldNames ? '' : 'macAddress', protoName: 'macAddress')
     ..hasRequiredFields = false
   ;
 
@@ -94,31 +94,31 @@ class AssociationInfo extends $pb.GeneratedMessage {
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
   'Will be removed in next major version')
-  AssociationInfo clone() => AssociationInfo()..mergeFromMessage(this);
+  DeviceAssociationInfo clone() => DeviceAssociationInfo()..mergeFromMessage(this);
   @$core.Deprecated(
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
   'Will be removed in next major version')
-  AssociationInfo copyWith(void Function(AssociationInfo) updates) => super.copyWith((message) => updates(message as AssociationInfo)) as AssociationInfo;
+  DeviceAssociationInfo copyWith(void Function(DeviceAssociationInfo) updates) => super.copyWith((message) => updates(message as DeviceAssociationInfo)) as DeviceAssociationInfo;
 
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
-  static AssociationInfo create() => AssociationInfo._();
-  AssociationInfo createEmptyInstance() => create();
-  static $pb.PbList<AssociationInfo> createRepeated() => $pb.PbList<AssociationInfo>();
+  static DeviceAssociationInfo create() => DeviceAssociationInfo._();
+  DeviceAssociationInfo createEmptyInstance() => create();
+  static $pb.PbList<DeviceAssociationInfo> createRepeated() => $pb.PbList<DeviceAssociationInfo>();
   @$core.pragma('dart2js:noInline')
-  static AssociationInfo getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<AssociationInfo>(create);
-  static AssociationInfo? _defaultInstance;
+  static DeviceAssociationInfo getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<DeviceAssociationInfo>(create);
+  static DeviceAssociationInfo? _defaultInstance;
 
   @$pb.TagNumber(1)
-  $core.String get deviceMacAddress => $_getSZ(0);
+  $core.String get macAddress => $_getSZ(0);
   @$pb.TagNumber(1)
-  set deviceMacAddress($core.String v) { $_setString(0, v); }
+  set macAddress($core.String v) { $_setString(0, v); }
   @$pb.TagNumber(1)
-  $core.bool hasDeviceMacAddress() => $_has(0);
+  $core.bool hasMacAddress() => $_has(0);
   @$pb.TagNumber(1)
-  void clearDeviceMacAddress() => clearField(1);
+  void clearMacAddress() => clearField(1);
 }
 
 class ScanForDevicesRequest extends $pb.GeneratedMessage {

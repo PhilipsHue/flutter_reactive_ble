@@ -96,7 +96,7 @@ class ReactiveBleMobilePlatform extends ReactiveBlePlatform {
   }
 
   @override
-  Future<AssociationInfo?> launchCompanionWorkflow({
+  Future<DeviceAssociationInfo?> launchCompanionWorkflow({
     required String pattern,
     required bool singleDeviceScan,
     required bool forceConfirmation,

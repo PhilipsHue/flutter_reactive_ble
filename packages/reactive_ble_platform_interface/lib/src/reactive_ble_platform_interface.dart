@@ -69,7 +69,28 @@ abstract class ReactiveBlePlatform extends PlatformInterface {
   }
 
   /// Launch Companion workflow for connecting a Ble device (Android only)
-  Future<AssociationInfo?> launchCompanionWorkflow({
+  ///
+  /// This method launches the companion workflow for connecting a BLE device.
+  ///
+  /// Calling this method will open the native companion user interface. The user
+  /// will be able to select a device from a list of BLE devices that are currently
+  /// advertising. The user will then be able to select the device.
+  ///
+  /// The result of the selection will be returned as a [DeviceAssociationInfo].
+  ///
+  /// The [pattern] parameter is used to filter the list of BLE devices that are
+  /// displayed to the user. The pattern is matched against the advertised name.
+  /// It is a regular expression.
+  ///
+  /// The [singleDeviceScan] parameter is used to determine if the user should be
+  /// able to select multiple devices or not. If set to true, no list interface
+  /// will be shown to the user. Instead, the user will confirm the selection
+  /// directly.
+  ///
+  /// The [forceConfirmation] parameter is used to determine if the user should
+  /// explictely confirm the selection or not. If set to true, the user will be
+  /// asked to confirm the selection.
+  Future<DeviceAssociationInfo?> launchCompanionWorkflow({
     required String pattern,
     required bool singleDeviceScan,
     required bool forceConfirmation,

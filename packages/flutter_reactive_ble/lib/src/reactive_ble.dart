@@ -217,7 +217,7 @@ class FlutterReactiveBle {
         deviceId, priority);
   }
 
-  Future<AssociationInfo?> launchCompanionWorkflow({
+  Future<DeviceAssociationInfo?> launchCompanionWorkflow({
     required String pattern,
     bool singleDeviceScan = true,
     bool forceConfirmation = false,

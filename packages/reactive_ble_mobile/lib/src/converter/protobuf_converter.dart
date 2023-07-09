@@ -9,7 +9,7 @@ abstract class ProtobufConverter {
 
   BleStatus bleStatusFrom(List<int> data);
 
-  AssociationInfo associationInfoFrom(List<int> data);
+  DeviceAssociationInfo associationInfoFrom(List<int> data);
 
   ScanResult scanResultFrom(List<int> data);
 
@@ -66,10 +66,10 @@ class ProtobufConverterImpl implements ProtobufConverter {
   }
 
   @override
-  AssociationInfo associationInfoFrom(List<int> data) {
-    final pbVersion = pb.AssociationInfo.fromBuffer(data);
+  DeviceAssociationInfo associationInfoFrom(List<int> data) {
+    final pbVersion = pb.DeviceAssociationInfo.fromBuffer(data);
 
-    return AssociationInfo(deviceMacAddress: pbVersion.deviceMacAddress);
+    return DeviceAssociationInfo(macAddress: pbVersion.macAddress);
   }
 
   @override

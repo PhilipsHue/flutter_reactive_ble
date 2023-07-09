@@ -29,18 +29,18 @@ final $typed_data.Uint8List launchCompanionRequestDescriptor = $convert.base64De
     'ZpY2VOYW1lUGF0dGVybhIqChBzaW5nbGVEZXZpY2VTY2FuGAIgASgIUhBzaW5nbGVEZXZpY2VT'
     'Y2FuEiwKEWZvcmNlQ29uZmlybWF0aW9uGAMgASgIUhFmb3JjZUNvbmZpcm1hdGlvbg==');
 
-@$core.Deprecated('Use associationInfoDescriptor instead')
-const AssociationInfo$json = {
-  '1': 'AssociationInfo',
+@$core.Deprecated('Use deviceAssociationInfoDescriptor instead')
+const DeviceAssociationInfo$json = {
+  '1': 'DeviceAssociationInfo',
   '2': [
-    {'1': 'deviceMacAddress', '3': 1, '4': 1, '5': 9, '10': 'deviceMacAddress'},
+    {'1': 'macAddress', '3': 1, '4': 1, '5': 9, '10': 'macAddress'},
   ],
 };
 
-/// Descriptor for `AssociationInfo`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List associationInfoDescriptor = $convert.base64Decode(
-    'Cg9Bc3NvY2lhdGlvbkluZm8SKgoQZGV2aWNlTWFjQWRkcmVzcxgBIAEoCVIQZGV2aWNlTWFjQW'
-    'RkcmVzcw==');
+/// Descriptor for `DeviceAssociationInfo`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List deviceAssociationInfoDescriptor = $convert.base64Decode(
+    'ChVEZXZpY2VBc3NvY2lhdGlvbkluZm8SHgoKbWFjQWRkcmVzcxgBIAEoCVIKbWFjQWRkcmVzcw'
+    '==');
 
 @$core.Deprecated('Use scanForDevicesRequestDescriptor instead')
 const ScanForDevicesRequest$json = {

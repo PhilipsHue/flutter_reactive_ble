@@ -5,7 +5,7 @@ import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
 abstract class DeviceScanner {
   ScanSession? get currentScan;
 
-  Future<AssociationInfo?> launchCompanionWorkflow({
+  Future<DeviceAssociationInfo?> launchCompanionWorkflow({
     required String pattern,
     required bool singleDeviceScan,
     required bool forceConfirmation,
@@ -45,7 +45,7 @@ class DeviceScannerImpl implements DeviceScanner {
   ScanSession? get currentScan => _currentScanSession;
 
   @override
-  Future<AssociationInfo?> launchCompanionWorkflow({
+  Future<DeviceAssociationInfo?> launchCompanionWorkflow({
     required String pattern,
     required bool singleDeviceScan,
     required bool forceConfirmation,

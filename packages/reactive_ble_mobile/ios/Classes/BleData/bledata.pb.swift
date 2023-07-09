@@ -36,12 +36,12 @@ struct LaunchCompanionRequest {
   init() {}
 }
 
-struct AssociationInfo {
+struct DeviceAssociationInfo {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  var deviceMacAddress: String = String()
+  var macAddress: String = String()
 
   var unknownFields = SwiftProtobuf.UnknownStorage()
 
@@ -763,7 +763,7 @@ struct IsConnectable {
 
 #if swift(>=5.5) && canImport(_Concurrency)
 extension LaunchCompanionRequest: @unchecked Sendable {}
-extension AssociationInfo: @unchecked Sendable {}
+extension DeviceAssociationInfo: @unchecked Sendable {}
 extension ScanForDevicesRequest: @unchecked Sendable {}
 extension DeviceScanInfo: @unchecked Sendable {}
 extension EstablishBondingRequest: @unchecked Sendable {}
@@ -846,10 +846,10 @@ extension LaunchCompanionRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageI
   }
 }
 
-extension AssociationInfo: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = "AssociationInfo"
+extension DeviceAssociationInfo: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  static let protoMessageName: String = "DeviceAssociationInfo"
   static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
-    1: .same(proto: "deviceMacAddress"),
+    1: .same(proto: "macAddress"),
   ]
 
   mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -858,21 +858,21 @@ extension AssociationInfo: SwiftProtobuf.Message, SwiftProtobuf._MessageImplemen
       // allocates stack space for every case branch when no optimizations are
       // enabled. https://github.com/apple/swift-protobuf/issues/1034
       switch fieldNumber {
-      case 1: try { try decoder.decodeSingularStringField(value: &self.deviceMacAddress) }()
+      case 1: try { try decoder.decodeSingularStringField(value: &self.macAddress) }()
       default: break
       }
     }
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if !self.deviceMacAddress.isEmpty {
-      try visitor.visitSingularStringField(value: self.deviceMacAddress, fieldNumber: 1)
+    if !self.macAddress.isEmpty {
+      try visitor.visitSingularStringField(value: self.macAddress, fieldNumber: 1)
     }
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: AssociationInfo, rhs: AssociationInfo) -> Bool {
-    if lhs.deviceMacAddress != rhs.deviceMacAddress {return false}
+  static func ==(lhs: DeviceAssociationInfo, rhs: DeviceAssociationInfo) -> Bool {
+    if lhs.macAddress != rhs.macAddress {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
