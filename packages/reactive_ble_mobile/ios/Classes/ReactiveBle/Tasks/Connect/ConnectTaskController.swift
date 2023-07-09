@@ -39,7 +39,7 @@ struct ConnectTaskController: PeripheralTaskController {
         case .processing(since: _, .connecting):
             centralManager.cancelPeripheralConnection(peripheral)
             return task.with(state: task.state.finished(.failedToConnect(error)))
-        case .finished(in: _, _):
+        case .finished:
             assert(false)
             return task
         }
