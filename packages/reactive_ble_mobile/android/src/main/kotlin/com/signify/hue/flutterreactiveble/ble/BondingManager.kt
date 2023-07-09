@@ -17,21 +17,18 @@ import io.reactivex.disposables.Disposables
 
 class BondingFailedException : RuntimeException()
 
-object BondingManager {
+class BondingManager(private val context: Context) {
     /**
      * @throws BondingFailedException
      */
     // TODO: try to understand why the popup is being displayed in the notification center (sometimes) ???!!!
     @SuppressLint("MissingPermission")
-    fun bondWithDevice(
-        context: Context,
-        rxBleDevice: RxBleDevice
-    ): Single<Int> {
+    fun bondWithDevice(rxBleDevice: RxBleDevice): Single<Int> {
         return Single.create { completion ->
             when (rxBleDevice.bluetoothDevice.bondState) {
+
                 BluetoothDevice.BOND_BONDED -> completion.onSuccess(BluetoothDevice.BOND_BONDED)
                 else -> {
-
                     val receiver = object : BroadcastReceiver() {
                         override fun onReceive(context: Context, intent: Intent) {
                             val deviceBeingPaired: BluetoothDevice? =
@@ -76,7 +73,6 @@ object BondingManager {
                     if (!createBondResult) {
                         completion.tryOnError(BondingFailedException())
                     }
-
                 }
             }
 
