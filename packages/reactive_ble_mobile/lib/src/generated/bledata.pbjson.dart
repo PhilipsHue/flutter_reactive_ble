@@ -83,42 +83,43 @@ final $typed_data.Uint8List deviceScanInfoDescriptor = $convert.base64Decode(
     'DHNlcnZpY2VVdWlkcxISCgRyc3NpGAUgASgFUgRyc3NpEjQKDWlzQ29ubmVjdGFibGUYCCABKA'
     'syDi5Jc0Nvbm5lY3RhYmxlUg1pc0Nvbm5lY3RhYmxl');
 
-@$core.Deprecated('Use establishBondRequestDescriptor instead')
-const EstablishBondRequest$json = {
-  '1': 'EstablishBondRequest',
+@$core.Deprecated('Use establishBondingRequestDescriptor instead')
+const EstablishBondingRequest$json = {
+  '1': 'EstablishBondingRequest',
   '2': [
     {'1': 'deviceId', '3': 1, '4': 1, '5': 9, '10': 'deviceId'},
   ],
 };
 
-/// Descriptor for `EstablishBondRequest`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List establishBondRequestDescriptor = $convert.base64Decode(
-    'ChRFc3RhYmxpc2hCb25kUmVxdWVzdBIaCghkZXZpY2VJZBgBIAEoCVIIZGV2aWNlSWQ=');
+/// Descriptor for `EstablishBondingRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List establishBondingRequestDescriptor = $convert.base64Decode(
+    'ChdFc3RhYmxpc2hCb25kaW5nUmVxdWVzdBIaCghkZXZpY2VJZBgBIAEoCVIIZGV2aWNlSWQ=');
 
-@$core.Deprecated('Use establishBondInfoDescriptor instead')
-const EstablishBondInfo$json = {
-  '1': 'EstablishBondInfo',
+@$core.Deprecated('Use establishBondingInfoDescriptor instead')
+const EstablishBondingInfo$json = {
+  '1': 'EstablishBondingInfo',
   '2': [
-    {'1': 'status', '3': 1, '4': 1, '5': 14, '6': '.EstablishBondInfo.BondState', '10': 'status'},
+    {'1': 'status', '3': 1, '4': 1, '5': 14, '6': '.EstablishBondingInfo.BondState', '10': 'status'},
   ],
-  '4': [EstablishBondInfo_BondState$json],
+  '4': [EstablishBondingInfo_BondState$json],
 };
 
-@$core.Deprecated('Use establishBondInfoDescriptor instead')
-const EstablishBondInfo_BondState$json = {
+@$core.Deprecated('Use establishBondingInfoDescriptor instead')
+const EstablishBondingInfo_BondState$json = {
   '1': 'BondState',
   '2': [
-    {'1': 'BOND_BONDING', '2': 0},
-    {'1': 'BOND_BONDED', '2': 1},
-    {'1': 'BOND_NONE', '2': 2},
+    {'1': 'UNKNOWN', '2': 0},
+    {'1': 'BOND_NONE', '2': 10},
+    {'1': 'BOND_BONDING', '2': 11},
+    {'1': 'BOND_BONDED', '2': 12},
   ],
 };
 
-/// Descriptor for `EstablishBondInfo`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List establishBondInfoDescriptor = $convert.base64Decode(
-    'ChFFc3RhYmxpc2hCb25kSW5mbxI0CgZzdGF0dXMYASABKA4yHC5Fc3RhYmxpc2hCb25kSW5mby'
-    '5Cb25kU3RhdGVSBnN0YXR1cyI9CglCb25kU3RhdGUSEAoMQk9ORF9CT05ESU5HEAASDwoLQk9O'
-    'RF9CT05ERUQQARINCglCT05EX05PTkUQAg==');
+/// Descriptor for `EstablishBondingInfo`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List establishBondingInfoDescriptor = $convert.base64Decode(
+    'ChRFc3RhYmxpc2hCb25kaW5nSW5mbxI3CgZzdGF0dXMYASABKA4yHy5Fc3RhYmxpc2hCb25kaW'
+    '5nSW5mby5Cb25kU3RhdGVSBnN0YXR1cyJKCglCb25kU3RhdGUSCwoHVU5LTk9XThAAEg0KCUJP'
+    'TkRfTk9ORRAKEhAKDEJPTkRfQk9ORElORxALEg8KC0JPTkRfQk9OREVEEAw=');
 
 @$core.Deprecated('Use connectToDeviceRequestDescriptor instead')
 const ConnectToDeviceRequest$json = {

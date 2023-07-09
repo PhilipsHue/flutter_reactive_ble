@@ -29,11 +29,11 @@ message DeviceScanInfo {
     IsConnectable isConnectable = 8;
 }
 
-message EstablishBondRequest {
+message EstablishBondingRequest {
     string deviceId = 1;
 }
 
-message EstablishBondInfo {
+message EstablishBondingInfo {
     enum BondState {
         UNKNOWN = 0;
         BOND_NONE = 10;

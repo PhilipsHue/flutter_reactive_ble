@@ -6,7 +6,7 @@ import 'package:reactive_ble_platform_interface/reactive_ble_platform_interface.
 abstract class DeviceConnector {
   Stream<ConnectionStateUpdate> get deviceConnectionStateUpdateStream;
 
-  Future<BondingStatus> establishBond({
+  Future<BondingStatus> establishBonding({
     required String deviceId,
   });
 
@@ -55,8 +55,8 @@ class DeviceConnectorImpl implements DeviceConnector {
       _blePlatform.connectionUpdateStream;
 
   @override
-  Future<BondingStatus> establishBond({required String deviceId}) async =>
-      _blePlatform.establishBond(deviceId);
+  Future<BondingStatus> establishBonding({required String deviceId}) async =>
+      _blePlatform.establishBonding(deviceId);
 
   @override
   Stream<ConnectionStateUpdate> connect({

@@ -107,7 +107,7 @@ struct DeviceScanInfo {
   fileprivate var _isConnectable: IsConnectable? = nil
 }
 
-struct EstablishBondRequest {
+struct EstablishBondingRequest {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -119,40 +119,43 @@ struct EstablishBondRequest {
   init() {}
 }
 
-struct EstablishBondInfo {
+struct EstablishBondingInfo {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  var status: EstablishBondInfo.BondState = .bondBonding
+  var status: EstablishBondingInfo.BondState = .unknown
 
   var unknownFields = SwiftProtobuf.UnknownStorage()
 
   enum BondState: SwiftProtobuf.Enum {
     typealias RawValue = Int
-    case bondBonding // = 0
-    case bondBonded // = 1
-    case bondNone // = 2
+    case unknown // = 0
+    case bondNone // = 10
+    case bondBonding // = 11
+    case bondBonded // = 12
     case UNRECOGNIZED(Int)
 
     init() {
-      self = .bondBonding
+      self = .unknown
     }
 
     init?(rawValue: Int) {
       switch rawValue {
-      case 0: self = .bondBonding
-      case 1: self = .bondBonded
-      case 2: self = .bondNone
+      case 0: self = .unknown
+      case 10: self = .bondNone
+      case 11: self = .bondBonding
+      case 12: self = .bondBonded
       default: self = .UNRECOGNIZED(rawValue)
       }
     }
 
     var rawValue: Int {
       switch self {
-      case .bondBonding: return 0
-      case .bondBonded: return 1
-      case .bondNone: return 2
+      case .unknown: return 0
+      case .bondNone: return 10
+      case .bondBonding: return 11
+      case .bondBonded: return 12
       case .UNRECOGNIZED(let i): return i
       }
     }
@@ -164,12 +167,13 @@ struct EstablishBondInfo {
 
 #if swift(>=4.2)
 
-extension EstablishBondInfo.BondState: CaseIterable {
+extension EstablishBondingInfo.BondState: CaseIterable {
   // The compiler won't synthesize support with the UNRECOGNIZED case.
-  static var allCases: [EstablishBondInfo.BondState] = [
+  static var allCases: [EstablishBondingInfo.BondState] = [
+    .unknown,
+    .bondNone,
     .bondBonding,
     .bondBonded,
-    .bondNone,
   ]
 }
 
@@ -762,9 +766,9 @@ extension LaunchCompanionRequest: @unchecked Sendable {}
 extension AssociationInfo: @unchecked Sendable {}
 extension ScanForDevicesRequest: @unchecked Sendable {}
 extension DeviceScanInfo: @unchecked Sendable {}
-extension EstablishBondRequest: @unchecked Sendable {}
-extension EstablishBondInfo: @unchecked Sendable {}
-extension EstablishBondInfo.BondState: @unchecked Sendable {}
+extension EstablishBondingRequest: @unchecked Sendable {}
+extension EstablishBondingInfo: @unchecked Sendable {}
+extension EstablishBondingInfo.BondState: @unchecked Sendable {}
 extension ConnectToDeviceRequest: @unchecked Sendable {}
 extension DeviceInfo: @unchecked Sendable {}
 extension GetDeviceNameRequest: @unchecked Sendable {}
@@ -996,8 +1000,8 @@ extension DeviceScanInfo: SwiftProtobuf.Message, SwiftProtobuf._MessageImplement
   }
 }
 
-extension EstablishBondRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = "EstablishBondRequest"
+extension EstablishBondingRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  static let protoMessageName: String = "EstablishBondingRequest"
   static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "deviceId"),
   ]
@@ -1021,15 +1025,15 @@ extension EstablishBondRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImp
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: EstablishBondRequest, rhs: EstablishBondRequest) -> Bool {
+  static func ==(lhs: EstablishBondingRequest, rhs: EstablishBondingRequest) -> Bool {
     if lhs.deviceID != rhs.deviceID {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
 }
 
-extension EstablishBondInfo: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = "EstablishBondInfo"
+extension EstablishBondingInfo: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  static let protoMessageName: String = "EstablishBondingInfo"
   static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "status"),
   ]
@@ -1047,24 +1051,25 @@ extension EstablishBondInfo: SwiftProtobuf.Message, SwiftProtobuf._MessageImplem
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if self.status != .bondBonding {
+    if self.status != .unknown {
       try visitor.visitSingularEnumField(value: self.status, fieldNumber: 1)
     }
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: EstablishBondInfo, rhs: EstablishBondInfo) -> Bool {
+  static func ==(lhs: EstablishBondingInfo, rhs: EstablishBondingInfo) -> Bool {
     if lhs.status != rhs.status {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
 }
 
-extension EstablishBondInfo.BondState: SwiftProtobuf._ProtoNameProviding {
+extension EstablishBondingInfo.BondState: SwiftProtobuf._ProtoNameProviding {
   static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
-    0: .same(proto: "BOND_BONDING"),
-    1: .same(proto: "BOND_BONDED"),
-    2: .same(proto: "BOND_NONE"),
+    0: .same(proto: "UNKNOWN"),
+    10: .same(proto: "BOND_NONE"),
+    11: .same(proto: "BOND_BONDING"),
+    12: .same(proto: "BOND_BONDED"),
   ]
 }
 

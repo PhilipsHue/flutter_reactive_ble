@@ -27,7 +27,7 @@ class DeviceConnectionHandler(private val bleClient: com.signify.hue.flutterreac
         connectionUpdatesDisposable.dispose()
     }
 
-    fun establishBond(connectToDeviceMessage: pb.EstablishBondRequest): Single<Int> {
+    fun establishBond(connectToDeviceMessage: pb.EstablishBondingRequest): Single<Int> {
         return bleClient.establishBond(connectToDeviceMessage.deviceId)
     }
 

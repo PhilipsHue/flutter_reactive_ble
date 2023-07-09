@@ -98,8 +98,8 @@ abstract class ReactiveBlePlatform extends PlatformInterface {
   }
 
   /// Creates a bond with the peripheral. This is a Android-only operation.
-  Future<BondingStatus> establishBond(String deviceId) {
-    throw UnimplementedError('establishBond() has not been implemented.');
+  Future<BondingStatus> establishBonding(String deviceId) {
+    throw UnimplementedError('establishBonding() has not been implemented.');
   }
 
   /// Connects to a specific device and the connection remains `established` until

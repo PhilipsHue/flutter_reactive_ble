@@ -254,10 +254,10 @@ class FlutterReactiveBle {
     );
   }
 
-  Future<BondingStatus> establishBond({required String deviceId}) async {
+  Future<BondingStatus> establishBonding({required String deviceId}) async {
     await initialize();
 
-    return _deviceConnector.establishBond(deviceId: deviceId);
+    return _deviceConnector.establishBonding(deviceId: deviceId);
   }
 
   /// Establishes a connection to a BLE device.

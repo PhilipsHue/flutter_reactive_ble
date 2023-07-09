@@ -125,7 +125,7 @@ class PluginController : PluginRegistry.ActivityResultListener {
     }
 
     private fun establishBond(call: MethodCall, result: Result) {
-        val establishBondMessage = pb.EstablishBondRequest.parseFrom(call.arguments as ByteArray)
+        val establishBondMessage = pb.EstablishBondingRequest.parseFrom(call.arguments as ByteArray)
         deviceConnectionHandler.establishBond(establishBondMessage).subscribe({
             result.success(protoConverter.convertBondInfo(it).toByteArray())
         }, {

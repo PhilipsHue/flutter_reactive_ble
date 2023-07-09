@@ -3,7 +3,7 @@ import 'package:reactive_ble_platform_interface/reactive_ble_platform_interface.
 import '../generated/bledata.pb.dart' as pb;
 
 abstract class ArgsToProtobufConverter {
-  pb.EstablishBondRequest createEstablishBondArgs(String id);
+  pb.EstablishBondingRequest createEstablishBondingArgs(String id);
 
   pb.ConnectToDeviceRequest createConnectToDeviceArgs(
     String id,
@@ -63,8 +63,8 @@ class ArgsToProtobufConverterImpl implements ArgsToProtobufConverter {
   const ArgsToProtobufConverterImpl();
 
   @override
-  pb.EstablishBondRequest createEstablishBondArgs(String id) =>
-      pb.EstablishBondRequest()..deviceId = id;
+  pb.EstablishBondingRequest createEstablishBondingArgs(String id) =>
+      pb.EstablishBondingRequest()..deviceId = id;
 
   @override
   pb.ConnectToDeviceRequest createConnectToDeviceArgs(

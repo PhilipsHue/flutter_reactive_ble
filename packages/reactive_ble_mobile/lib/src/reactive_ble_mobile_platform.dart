@@ -143,14 +143,14 @@ class ReactiveBleMobilePlatform extends ReactiveBlePlatform {
   }
 
   @override
-  Future<BondingStatus> establishBond(String deviceId) {
+  Future<BondingStatus> establishBonding(String deviceId) {
     _logger?.log('Establish bond with device: $deviceId');
 
     return _bleMethodChannel
         .invokeMethod<List<int>>(
-          "establishBond",
+          "establishBonding",
           _argsToProtobufConverter
-              .createEstablishBondArgs(deviceId)
+              .createEstablishBondingArgs(deviceId)
               .writeToBuffer(),
         )
         .then((data) => _protobufConverter.bondingStatusFrom(data!));

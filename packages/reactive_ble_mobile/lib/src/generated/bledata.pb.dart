@@ -281,13 +281,13 @@ class DeviceScanInfo extends $pb.GeneratedMessage {
   IsConnectable ensureIsConnectable() => $_ensure(7);
 }
 
-class EstablishBondRequest extends $pb.GeneratedMessage {
-  factory EstablishBondRequest() => create();
-  EstablishBondRequest._() : super();
-  factory EstablishBondRequest.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
-  factory EstablishBondRequest.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+class EstablishBondingRequest extends $pb.GeneratedMessage {
+  factory EstablishBondingRequest() => create();
+  EstablishBondingRequest._() : super();
+  factory EstablishBondingRequest.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory EstablishBondingRequest.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
 
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'EstablishBondRequest', createEmptyInstance: create)
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'EstablishBondingRequest', createEmptyInstance: create)
     ..aOS(1, _omitFieldNames ? '' : 'deviceId', protoName: 'deviceId')
     ..hasRequiredFields = false
   ;
@@ -296,22 +296,22 @@ class EstablishBondRequest extends $pb.GeneratedMessage {
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
   'Will be removed in next major version')
-  EstablishBondRequest clone() => EstablishBondRequest()..mergeFromMessage(this);
+  EstablishBondingRequest clone() => EstablishBondingRequest()..mergeFromMessage(this);
   @$core.Deprecated(
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
   'Will be removed in next major version')
-  EstablishBondRequest copyWith(void Function(EstablishBondRequest) updates) => super.copyWith((message) => updates(message as EstablishBondRequest)) as EstablishBondRequest;
+  EstablishBondingRequest copyWith(void Function(EstablishBondingRequest) updates) => super.copyWith((message) => updates(message as EstablishBondingRequest)) as EstablishBondingRequest;
 
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
-  static EstablishBondRequest create() => EstablishBondRequest._();
-  EstablishBondRequest createEmptyInstance() => create();
-  static $pb.PbList<EstablishBondRequest> createRepeated() => $pb.PbList<EstablishBondRequest>();
+  static EstablishBondingRequest create() => EstablishBondingRequest._();
+  EstablishBondingRequest createEmptyInstance() => create();
+  static $pb.PbList<EstablishBondingRequest> createRepeated() => $pb.PbList<EstablishBondingRequest>();
   @$core.pragma('dart2js:noInline')
-  static EstablishBondRequest getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<EstablishBondRequest>(create);
-  static EstablishBondRequest? _defaultInstance;
+  static EstablishBondingRequest getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<EstablishBondingRequest>(create);
+  static EstablishBondingRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
   $core.String get deviceId => $_getSZ(0);
@@ -323,14 +323,14 @@ class EstablishBondRequest extends $pb.GeneratedMessage {
   void clearDeviceId() => clearField(1);
 }
 
-class EstablishBondInfo extends $pb.GeneratedMessage {
-  factory EstablishBondInfo() => create();
-  EstablishBondInfo._() : super();
-  factory EstablishBondInfo.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
-  factory EstablishBondInfo.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+class EstablishBondingInfo extends $pb.GeneratedMessage {
+  factory EstablishBondingInfo() => create();
+  EstablishBondingInfo._() : super();
+  factory EstablishBondingInfo.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory EstablishBondingInfo.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
 
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'EstablishBondInfo', createEmptyInstance: create)
-    ..e<EstablishBondInfo_BondState>(1, _omitFieldNames ? '' : 'status', $pb.PbFieldType.OE, defaultOrMaker: EstablishBondInfo_BondState.BOND_BONDING, valueOf: EstablishBondInfo_BondState.valueOf, enumValues: EstablishBondInfo_BondState.values)
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'EstablishBondingInfo', createEmptyInstance: create)
+    ..e<EstablishBondingInfo_BondState>(1, _omitFieldNames ? '' : 'status', $pb.PbFieldType.OE, defaultOrMaker: EstablishBondingInfo_BondState.UNKNOWN, valueOf: EstablishBondingInfo_BondState.valueOf, enumValues: EstablishBondingInfo_BondState.values)
     ..hasRequiredFields = false
   ;
 
@@ -338,27 +338,27 @@ class EstablishBondInfo extends $pb.GeneratedMessage {
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
   'Will be removed in next major version')
-  EstablishBondInfo clone() => EstablishBondInfo()..mergeFromMessage(this);
+  EstablishBondingInfo clone() => EstablishBondingInfo()..mergeFromMessage(this);
   @$core.Deprecated(
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
   'Will be removed in next major version')
-  EstablishBondInfo copyWith(void Function(EstablishBondInfo) updates) => super.copyWith((message) => updates(message as EstablishBondInfo)) as EstablishBondInfo;
+  EstablishBondingInfo copyWith(void Function(EstablishBondingInfo) updates) => super.copyWith((message) => updates(message as EstablishBondingInfo)) as EstablishBondingInfo;
 
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
-  static EstablishBondInfo create() => EstablishBondInfo._();
-  EstablishBondInfo createEmptyInstance() => create();
-  static $pb.PbList<EstablishBondInfo> createRepeated() => $pb.PbList<EstablishBondInfo>();
+  static EstablishBondingInfo create() => EstablishBondingInfo._();
+  EstablishBondingInfo createEmptyInstance() => create();
+  static $pb.PbList<EstablishBondingInfo> createRepeated() => $pb.PbList<EstablishBondingInfo>();
   @$core.pragma('dart2js:noInline')
-  static EstablishBondInfo getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<EstablishBondInfo>(create);
-  static EstablishBondInfo? _defaultInstance;
+  static EstablishBondingInfo getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<EstablishBondingInfo>(create);
+  static EstablishBondingInfo? _defaultInstance;
 
   @$pb.TagNumber(1)
-  EstablishBondInfo_BondState get status => $_getN(0);
+  EstablishBondingInfo_BondState get status => $_getN(0);
   @$pb.TagNumber(1)
-  set status(EstablishBondInfo_BondState v) { setField(1, v); }
+  set status(EstablishBondingInfo_BondState v) { setField(1, v); }
   @$pb.TagNumber(1)
   $core.bool hasStatus() => $_has(0);
   @$pb.TagNumber(1)

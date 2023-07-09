@@ -38,13 +38,13 @@ class ProtobufConverterImpl implements ProtobufConverter {
 
   @override
   BondingStatus bondingStatusFrom(List<int> data) {
-    final message = pb.EstablishBondInfo.fromBuffer(data);
+    final message = pb.EstablishBondingInfo.fromBuffer(data);
     switch (message.status) {
-      case pb.EstablishBondInfo_BondState.BOND_BONDING:
+      case pb.EstablishBondingInfo_BondState.BOND_BONDING:
         return BondingStatus.bonding;
-      case pb.EstablishBondInfo_BondState.BOND_BONDED:
+      case pb.EstablishBondingInfo_BondState.BOND_BONDED:
         return BondingStatus.bonded;
-      case pb.EstablishBondInfo_BondState.BOND_NONE:
+      case pb.EstablishBondingInfo_BondState.BOND_NONE:
         return BondingStatus.none;
     }
 
