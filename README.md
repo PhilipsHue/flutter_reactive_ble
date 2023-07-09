@@ -11,7 +11,7 @@ Feel free to open an new issue or a pull request to make this project better
 
 This project uses melos to manage all the packages inside this repo.
 
-Install melos: `dart pub global activate melos 2.9.0`
+Install melos: `dart pub global activate melos`
 Setup melos to point to the dependencies in your local folder: `melos bootstrap`
 
 ### Android
