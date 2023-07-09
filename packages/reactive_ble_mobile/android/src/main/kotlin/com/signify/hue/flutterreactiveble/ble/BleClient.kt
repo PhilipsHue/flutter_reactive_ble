@@ -2,7 +2,6 @@ package com.signify.hue.flutterreactiveble.ble
 
 import android.os.ParcelUuid
 import com.polidea.rxandroidble2.RxBleDeviceServices
-import com.signify.hue.flutterreactiveble.model.BondingMode
 import com.signify.hue.flutterreactiveble.model.ScanMode
 import com.signify.hue.flutterreactiveble.utils.Duration
 import io.reactivex.Completable
@@ -18,7 +17,18 @@ interface BleClient {
 
     fun initializeClient()
     fun scanForDevices(services: List<ParcelUuid>, scanMode: ScanMode, requireLocationServicesEnabled: Boolean): Observable<com.signify.hue.flutterreactiveble.ble.ScanInfo>
-    fun connectToDevice(deviceId: String, timeout: Duration, bondingMode: BondingMode)
+
+    /**
+     * Establishes a bond with the device.
+     *
+     * The single will emit the final bond state of the device.
+     * The value is one of the constants in [android.bluetooth.BluetoothDevice]:
+     * - [android.bluetooth.BluetoothDevice.BOND_NONE]
+     * - [android.bluetooth.BluetoothDevice.BOND_BONDING]
+     * - [android.bluetooth.BluetoothDevice.BOND_BONDED]
+     */
+    fun establishBond(deviceId: String): Single<Int>
+    fun connectToDevice(deviceId: String, timeout: Duration)
     fun disconnectDevice(deviceId: String)
     fun disconnectAllDevices()
     fun discoverServices(deviceId: String): Single<RxBleDeviceServices>

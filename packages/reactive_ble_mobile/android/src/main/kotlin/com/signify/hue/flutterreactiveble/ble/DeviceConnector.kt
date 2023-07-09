@@ -1,11 +1,9 @@
 package com.signify.hue.flutterreactiveble.ble
 
-import android.content.Context
 import androidx.annotation.VisibleForTesting
 import com.polidea.rxandroidble2.RxBleConnection
 import com.polidea.rxandroidble2.RxBleCustomOperation
 import com.polidea.rxandroidble2.RxBleDevice
-import com.signify.hue.flutterreactiveble.model.BondingMode
 import com.signify.hue.flutterreactiveble.model.ConnectionState
 import com.signify.hue.flutterreactiveble.model.toConnectionState
 import com.signify.hue.flutterreactiveble.utils.Duration
@@ -18,12 +16,10 @@ import io.reactivex.subjects.BehaviorSubject
 import java.util.concurrent.TimeUnit
 
 internal class DeviceConnector(
-    private val context: Context,
     private val device: RxBleDevice,
     private val connectionTimeout: Duration,
     private val updateListeners: (update: ConnectionUpdate) -> Unit,
     private val connectionQueue: ConnectionQueue,
-    private val bondingMode: BondingMode = BondingMode.NONE,
 ) {
 
     companion object {
@@ -117,7 +113,7 @@ internal class DeviceConnector(
                         )
                     )
                 } else {
-                    connectDevice(rxBleDevice, shouldNotTimeout, bondingMode)
+                    connectDevice(rxBleDevice, shouldNotTimeout)
                         .map<EstablishConnectionResult> {
                             EstablishedConnection(
                                 rxBleDevice.macAddress,
@@ -158,25 +154,21 @@ internal class DeviceConnector(
     private fun connectDevice(
         rxBleDevice: RxBleDevice,
         shouldNotTimeout: Boolean,
-        bondingMode: BondingMode,
     ): Observable<RxBleConnection> =
-        BondingManager.bondWithDevice(this.context, rxBleDevice, bondingMode)
-            .andThen(
-                rxBleDevice.establishConnection(shouldNotTimeout)
+        rxBleDevice.establishConnection(shouldNotTimeout)
 
-                    .compose {
-                        if (shouldNotTimeout) {
-                            it
-                        } else {
-                            it.timeout(
-                                Observable.timer(connectionTimeout.value, connectionTimeout.unit),
-                                Function<RxBleConnection, Observable<Unit>> {
-                                    Observable.never<Unit>()
-                                }
-                            )
+            .compose {
+                if (shouldNotTimeout) {
+                    it
+                } else {
+                    it.timeout(
+                        Observable.timer(connectionTimeout.value, connectionTimeout.unit),
+                        Function<RxBleConnection, Observable<Unit>> {
+                            Observable.never<Unit>()
                         }
-                    }
-            )
+                    )
+                }
+            }
 
     internal fun clearGattCache(): Completable = currentConnection?.let { connection ->
         when (connection) {

@@ -143,11 +143,24 @@ class ReactiveBleMobilePlatform extends ReactiveBlePlatform {
   }
 
   @override
+  Future<BondingStatus> establishBond(String deviceId) {
+    _logger?.log('Establish bond with device: $deviceId');
+
+    return _bleMethodChannel
+        .invokeMethod<List<int>>(
+          "establishBond",
+          _argsToProtobufConverter
+              .createEstablishBondArgs(deviceId)
+              .writeToBuffer(),
+        )
+        .then((data) => _protobufConverter.bondingStatusFrom(data!));
+  }
+
+  @override
   Stream<void> connectToDevice(
     String id,
     Map<Uuid, List<Uuid>>? servicesWithCharacteristicsToDiscover,
     Duration? connectionTimeout,
-    BondingMode? bondingMode,
   ) {
     _logger?.log(
       'Connect to device: $id, servicesWithCharacteristicsToDiscover: $servicesWithCharacteristicsToDiscover, timeout: $connectionTimeout',
@@ -160,7 +173,6 @@ class ReactiveBleMobilePlatform extends ReactiveBlePlatform {
                 id,
                 servicesWithCharacteristicsToDiscover,
                 connectionTimeout,
-                bondingMode,
               )
               .writeToBuffer(),
         )
@@ -178,7 +190,6 @@ class ReactiveBleMobilePlatform extends ReactiveBlePlatform {
           _argsToProtobufConverter.createGetDeviceNameArgs(id).writeToBuffer(),
         )
         .then((data) => _protobufConverter.deviceNameFrom(data!));
-    ;
   }
 
   @override

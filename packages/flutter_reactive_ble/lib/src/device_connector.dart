@@ -6,11 +6,14 @@ import 'package:reactive_ble_platform_interface/reactive_ble_platform_interface.
 abstract class DeviceConnector {
   Stream<ConnectionStateUpdate> get deviceConnectionStateUpdateStream;
 
+  Future<BondingStatus> establishBond({
+    required String deviceId,
+  });
+
   Stream<ConnectionStateUpdate> connect({
     required String id,
     Map<Uuid, List<Uuid>>? servicesWithCharacteristicsToDiscover,
     Duration? connectionTimeout,
-    BondingMode? bondingMode,
   });
 
   Future<String?> retrieveDeviceName(String id);
@@ -52,11 +55,14 @@ class DeviceConnectorImpl implements DeviceConnector {
       _blePlatform.connectionUpdateStream;
 
   @override
+  Future<BondingStatus> establishBond({required String deviceId}) async =>
+      _blePlatform.establishBond(deviceId);
+
+  @override
   Stream<ConnectionStateUpdate> connect({
     required String id,
     Map<Uuid, List<Uuid>>? servicesWithCharacteristicsToDiscover,
     Duration? connectionTimeout,
-    BondingMode? bondingMode,
   }) {
     final specificConnectedDeviceStream = deviceConnectionStateUpdateStream
         .where((update) => update.deviceId == id)
@@ -73,7 +79,6 @@ class DeviceConnectorImpl implements DeviceConnector {
             id,
             servicesWithCharacteristicsToDiscover,
             connectionTimeout,
-            bondingMode,
           )
           .asyncExpand((_) => specificConnectedDeviceStream),
       onCancel: () => _blePlatform.disconnectDevice(id),

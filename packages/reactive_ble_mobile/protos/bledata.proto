@@ -29,11 +29,25 @@ message DeviceScanInfo {
     IsConnectable isConnectable = 8;
 }
 
+message EstablishBondRequest {
+    string deviceId = 1;
+}
+
+message EstablishBondInfo {
+    enum BondState {
+        UNKNOWN = 0;
+        BOND_NONE = 10;
+        BOND_BONDING = 11;
+        BOND_BONDED = 12;
+    }
+
+    BondState status = 1;
+}
+
 message ConnectToDeviceRequest {
     string deviceId = 1;
     ServicesWithCharacteristics servicesWithCharacteristicsToDiscover = 2;
     int32 timeoutInMs = 3;
-    int32 bondingMode = 4;
 }
 
 message DeviceInfo {

@@ -254,6 +254,12 @@ class FlutterReactiveBle {
     );
   }
 
+  Future<BondingStatus> establishBond({required String deviceId}) async {
+    await initialize();
+
+    return _deviceConnector.establishBond(deviceId: deviceId);
+  }
+
   /// Establishes a connection to a BLE device.
   ///
   /// Disconnecting the device is achieved by cancelling the stream subscription.
@@ -270,7 +276,6 @@ class FlutterReactiveBle {
     required String id,
     Map<Uuid, List<Uuid>>? servicesWithCharacteristicsToDiscover,
     Duration? connectionTimeout,
-    BondingMode? bondingMode,
   }) =>
       initialize().asStream().asyncExpand(
             (_) => _deviceConnector.connect(
@@ -278,7 +283,6 @@ class FlutterReactiveBle {
               servicesWithCharacteristicsToDiscover:
                   servicesWithCharacteristicsToDiscover,
               connectionTimeout: connectionTimeout,
-              bondingMode: bondingMode,
             ),
           );
 

@@ -37,6 +37,7 @@ class PluginController : PluginRegistry.ActivityResultListener {
         "deinitialize" to this::deinitializeClient,
         "launchCompanionWorkflow" to this::launchCompanionFlow,
         "scanForDevices" to this::scanForDevices,
+        "establishBond" to this::establishBond,
         "connectToDevice" to this::connectToDevice,
         "clearGattCache" to this::clearGattCache,
         "disconnectFromDevice" to this::disconnectFromDevice,
@@ -110,7 +111,11 @@ class PluginController : PluginRegistry.ActivityResultListener {
                 result
             )
         } else {
-            result.error("NOT_SUPPORTED", "Companion flow is only supported on Android Oreo and above", null)
+            result.error(
+                "NOT_SUPPORTED",
+                "Companion flow is only supported on Android Oreo and above",
+                null
+            )
         }
     }
 
@@ -119,9 +124,19 @@ class PluginController : PluginRegistry.ActivityResultListener {
         result.success(null)
     }
 
+    private fun establishBond(call: MethodCall, result: Result) {
+        val establishBondMessage = pb.EstablishBondRequest.parseFrom(call.arguments as ByteArray)
+        deviceConnectionHandler.establishBond(establishBondMessage).subscribe({
+            result.success(protoConverter.convertBondInfo(it).toByteArray())
+        }, {
+            result.error("establish_bond_error", it.message, null)
+        }).discard()
+    }
+
     private fun connectToDevice(call: MethodCall, result: Result) {
         result.success(null)
         val connectDeviceMessage = pb.ConnectToDeviceRequest.parseFrom(call.arguments as ByteArray)
+
         deviceConnectionHandler.connectToDevice(connectDeviceMessage)
     }
 
@@ -349,7 +364,10 @@ class PluginController : PluginRegistry.ActivityResultListener {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?): Boolean {
         if (requestCode == CompanionHandler.SELECT_DEVICE_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
-            Log.d(TAG, "received result from device selection activity, parsing via companion handler")
+            Log.d(
+                TAG,
+                "received result from device selection activity, parsing via companion handler"
+            )
 
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
                 Log.d(TAG, "not running on Android O, ignoring result")
@@ -359,7 +377,7 @@ class PluginController : PluginRegistry.ActivityResultListener {
             Log.d(TAG, "running on Android O, parsing result")
 
             val scanResult = companionHandler.onActivityResult(data) ?: return false
-Log.d(TAG, "got the scan result: ${scanResult.device.address}")
+            Log.d(TAG, "got the scan result: ${scanResult.device.address}")
         }
 
         return false

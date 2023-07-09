@@ -2,9 +2,9 @@ package com.signify.hue.flutterreactiveble.channelhandlers
 
 import com.signify.hue.flutterreactiveble.ProtobufModel as pb
 import com.signify.hue.flutterreactiveble.converters.ProtobufMessageConverter
-import com.signify.hue.flutterreactiveble.model.BondingMode
 import com.signify.hue.flutterreactiveble.utils.Duration
 import io.flutter.plugin.common.EventChannel
+import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import java.util.concurrent.TimeUnit
@@ -27,11 +27,14 @@ class DeviceConnectionHandler(private val bleClient: com.signify.hue.flutterreac
         connectionUpdatesDisposable.dispose()
     }
 
+    fun establishBond(connectToDeviceMessage: pb.EstablishBondRequest): Single<Int> {
+        return bleClient.establishBond(connectToDeviceMessage.deviceId)
+    }
+
     fun connectToDevice(connectToDeviceMessage: pb.ConnectToDeviceRequest) {
         bleClient.connectToDevice(
                 connectToDeviceMessage.deviceId,
-                Duration(connectToDeviceMessage.timeoutInMs.toLong(), TimeUnit.MILLISECONDS),
-            BondingMode.values()[connectToDeviceMessage.bondingMode],
+                Duration(connectToDeviceMessage.timeoutInMs.toLong(), TimeUnit.MILLISECONDS)
         )
     }
 

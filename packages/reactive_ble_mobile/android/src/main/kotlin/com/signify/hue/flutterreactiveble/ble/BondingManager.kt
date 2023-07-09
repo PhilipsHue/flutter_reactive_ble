@@ -2,15 +2,13 @@ package com.signify.hue.flutterreactiveble.ble
 
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothDevice
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.content.BroadcastReceiver
 import android.os.Build
-import android.util.Log
 import com.polidea.rxandroidble2.RxBleDevice
-import com.signify.hue.flutterreactiveble.model.BondingMode
-import io.reactivex.Completable
+import io.reactivex.Single
 import io.reactivex.disposables.Disposables
 
 /**
@@ -20,8 +18,6 @@ import io.reactivex.disposables.Disposables
 class BondingFailedException : RuntimeException()
 
 object BondingManager {
-    const val TAG = "CompanionHandler"
-
     /**
      * @throws BondingFailedException
      */
@@ -29,30 +25,25 @@ object BondingManager {
     @SuppressLint("MissingPermission")
     fun bondWithDevice(
         context: Context,
-        rxBleDevice: RxBleDevice,
-        bondingMode: BondingMode
-    ): Completable {
-        if (bondingMode == BondingMode.NONE) {
-            return Completable.complete()
-        }
-
-        return Completable.create { completion ->
-            Log.d(TAG, "pairWithDevice: ${rxBleDevice.bluetoothDevice.bondState}")
+        rxBleDevice: RxBleDevice
+    ): Single<Int> {
+        return Single.create { completion ->
             when (rxBleDevice.bluetoothDevice.bondState) {
-                BluetoothDevice.BOND_BONDED -> completion.onComplete()
+                BluetoothDevice.BOND_BONDED -> completion.onSuccess(BluetoothDevice.BOND_BONDED)
                 else -> {
 
                     val receiver = object : BroadcastReceiver() {
                         override fun onReceive(context: Context, intent: Intent) {
                             val deviceBeingPaired: BluetoothDevice? =
                                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                                    intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE, BluetoothDevice::class.java)
+                                    intent.getParcelableExtra(
+                                        BluetoothDevice.EXTRA_DEVICE,
+                                        BluetoothDevice::class.java
+                                    )
                                 } else {
                                     @Suppress("DEPRECATION")
                                     intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE)
                                 }
-
-                            Log.d(TAG, "pairWithDevice: deviceBeingPaired: $deviceBeingPaired")
 
                             if (deviceBeingPaired?.address == rxBleDevice.bluetoothDevice.address) {
                                 val state = intent.getIntExtra(
@@ -60,17 +51,10 @@ object BondingManager {
                                     BluetoothDevice.BOND_NONE
                                 )
 
-                                Log.d(TAG, "pairWithDevice: state: $state")
-
                                 when (state) {
-                                    BluetoothDevice.BOND_BONDED -> completion.onComplete()
-                                    BluetoothDevice.BOND_NONE ->
-                                        // When bonding is required, we throw an exception if the bonding fails.
-                                        if (bondingMode == BondingMode.REQUIRED) {
-                                            completion.tryOnError(BondingFailedException())
-                                        } else { // BondingMode.NOT_REQUIRED
-                                            completion.onComplete()
-                                        }
+                                    BluetoothDevice.BOND_BONDED -> completion.onSuccess(state)
+                                    BluetoothDevice.BOND_NONE -> completion.onSuccess(state)
+                                    // BOND_BONDING is a intermediate state - do not send this back.
                                 }
                             }
                         }
@@ -88,8 +72,6 @@ object BondingManager {
                     )
 
                     val createBondResult = rxBleDevice.bluetoothDevice.createBond()
-
-                    Log.d(TAG, "pairWithDevice: createBondResult: $createBondResult")
 
                     if (!createBondResult) {
                         completion.tryOnError(BondingFailedException())

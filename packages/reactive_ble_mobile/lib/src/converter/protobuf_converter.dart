@@ -5,6 +5,8 @@ import '../generated/bledata.pb.dart' as pb;
 import '../select_from.dart';
 
 abstract class ProtobufConverter {
+  BondingStatus bondingStatusFrom(List<int> data);
+
   BleStatus bleStatusFrom(List<int> data);
 
   AssociationInfo associationInfoFrom(List<int> data);
@@ -33,6 +35,25 @@ abstract class ProtobufConverter {
 
 class ProtobufConverterImpl implements ProtobufConverter {
   const ProtobufConverterImpl();
+
+  @override
+  BondingStatus bondingStatusFrom(List<int> data) {
+    final message = pb.EstablishBondInfo.fromBuffer(data);
+    switch (message.status) {
+      case pb.EstablishBondInfo_BondState.BOND_BONDING:
+        return BondingStatus.bonding;
+      case pb.EstablishBondInfo_BondState.BOND_BONDED:
+        return BondingStatus.bonded;
+      case pb.EstablishBondInfo_BondState.BOND_NONE:
+        return BondingStatus.none;
+    }
+
+    throw ArgumentError.value(
+      message.status,
+      'message.status',
+      'Unknown bonding status',
+    );
+  }
 
   @override
   BleStatus bleStatusFrom(List<int> data) {

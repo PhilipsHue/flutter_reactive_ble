@@ -13,6 +13,10 @@ import 'dart:core' as $core;
 
 import 'package:protobuf/protobuf.dart' as $pb;
 
+import 'bledata.pbenum.dart';
+
+export 'bledata.pbenum.dart';
+
 class LaunchCompanionRequest extends $pb.GeneratedMessage {
   factory LaunchCompanionRequest() => create();
   LaunchCompanionRequest._() : super();
@@ -277,6 +281,90 @@ class DeviceScanInfo extends $pb.GeneratedMessage {
   IsConnectable ensureIsConnectable() => $_ensure(7);
 }
 
+class EstablishBondRequest extends $pb.GeneratedMessage {
+  factory EstablishBondRequest() => create();
+  EstablishBondRequest._() : super();
+  factory EstablishBondRequest.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory EstablishBondRequest.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'EstablishBondRequest', createEmptyInstance: create)
+    ..aOS(1, _omitFieldNames ? '' : 'deviceId', protoName: 'deviceId')
+    ..hasRequiredFields = false
+  ;
+
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  EstablishBondRequest clone() => EstablishBondRequest()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  EstablishBondRequest copyWith(void Function(EstablishBondRequest) updates) => super.copyWith((message) => updates(message as EstablishBondRequest)) as EstablishBondRequest;
+
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static EstablishBondRequest create() => EstablishBondRequest._();
+  EstablishBondRequest createEmptyInstance() => create();
+  static $pb.PbList<EstablishBondRequest> createRepeated() => $pb.PbList<EstablishBondRequest>();
+  @$core.pragma('dart2js:noInline')
+  static EstablishBondRequest getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<EstablishBondRequest>(create);
+  static EstablishBondRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get deviceId => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set deviceId($core.String v) { $_setString(0, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasDeviceId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearDeviceId() => clearField(1);
+}
+
+class EstablishBondInfo extends $pb.GeneratedMessage {
+  factory EstablishBondInfo() => create();
+  EstablishBondInfo._() : super();
+  factory EstablishBondInfo.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory EstablishBondInfo.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'EstablishBondInfo', createEmptyInstance: create)
+    ..e<EstablishBondInfo_BondState>(1, _omitFieldNames ? '' : 'status', $pb.PbFieldType.OE, defaultOrMaker: EstablishBondInfo_BondState.BOND_BONDING, valueOf: EstablishBondInfo_BondState.valueOf, enumValues: EstablishBondInfo_BondState.values)
+    ..hasRequiredFields = false
+  ;
+
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  EstablishBondInfo clone() => EstablishBondInfo()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  EstablishBondInfo copyWith(void Function(EstablishBondInfo) updates) => super.copyWith((message) => updates(message as EstablishBondInfo)) as EstablishBondInfo;
+
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static EstablishBondInfo create() => EstablishBondInfo._();
+  EstablishBondInfo createEmptyInstance() => create();
+  static $pb.PbList<EstablishBondInfo> createRepeated() => $pb.PbList<EstablishBondInfo>();
+  @$core.pragma('dart2js:noInline')
+  static EstablishBondInfo getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<EstablishBondInfo>(create);
+  static EstablishBondInfo? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  EstablishBondInfo_BondState get status => $_getN(0);
+  @$pb.TagNumber(1)
+  set status(EstablishBondInfo_BondState v) { setField(1, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasStatus() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearStatus() => clearField(1);
+}
+
 class ConnectToDeviceRequest extends $pb.GeneratedMessage {
   factory ConnectToDeviceRequest() => create();
   ConnectToDeviceRequest._() : super();
@@ -287,7 +375,6 @@ class ConnectToDeviceRequest extends $pb.GeneratedMessage {
     ..aOS(1, _omitFieldNames ? '' : 'deviceId', protoName: 'deviceId')
     ..aOM<ServicesWithCharacteristics>(2, _omitFieldNames ? '' : 'servicesWithCharacteristicsToDiscover', protoName: 'servicesWithCharacteristicsToDiscover', subBuilder: ServicesWithCharacteristics.create)
     ..a<$core.int>(3, _omitFieldNames ? '' : 'timeoutInMs', $pb.PbFieldType.O3, protoName: 'timeoutInMs')
-    ..a<$core.int>(4, _omitFieldNames ? '' : 'bondingMode', $pb.PbFieldType.O3, protoName: 'bondingMode')
     ..hasRequiredFields = false
   ;
 
@@ -340,15 +427,6 @@ class ConnectToDeviceRequest extends $pb.GeneratedMessage {
   $core.bool hasTimeoutInMs() => $_has(2);
   @$pb.TagNumber(3)
   void clearTimeoutInMs() => clearField(3);
-
-  @$pb.TagNumber(4)
-  $core.int get bondingMode => $_getIZ(3);
-  @$pb.TagNumber(4)
-  set bondingMode($core.int v) { $_setSignedInt32(3, v); }
-  @$pb.TagNumber(4)
-  $core.bool hasBondingMode() => $_has(3);
-  @$pb.TagNumber(4)
-  void clearBondingMode() => clearField(4);
 }
 
 class DeviceInfo extends $pb.GeneratedMessage {

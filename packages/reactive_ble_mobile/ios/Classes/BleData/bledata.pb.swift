@@ -107,6 +107,74 @@ struct DeviceScanInfo {
   fileprivate var _isConnectable: IsConnectable? = nil
 }
 
+struct EstablishBondRequest {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  var deviceID: String = String()
+
+  var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  init() {}
+}
+
+struct EstablishBondInfo {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  var status: EstablishBondInfo.BondState = .bondBonding
+
+  var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  enum BondState: SwiftProtobuf.Enum {
+    typealias RawValue = Int
+    case bondBonding // = 0
+    case bondBonded // = 1
+    case bondNone // = 2
+    case UNRECOGNIZED(Int)
+
+    init() {
+      self = .bondBonding
+    }
+
+    init?(rawValue: Int) {
+      switch rawValue {
+      case 0: self = .bondBonding
+      case 1: self = .bondBonded
+      case 2: self = .bondNone
+      default: self = .UNRECOGNIZED(rawValue)
+      }
+    }
+
+    var rawValue: Int {
+      switch self {
+      case .bondBonding: return 0
+      case .bondBonded: return 1
+      case .bondNone: return 2
+      case .UNRECOGNIZED(let i): return i
+      }
+    }
+
+  }
+
+  init() {}
+}
+
+#if swift(>=4.2)
+
+extension EstablishBondInfo.BondState: CaseIterable {
+  // The compiler won't synthesize support with the UNRECOGNIZED case.
+  static var allCases: [EstablishBondInfo.BondState] = [
+    .bondBonding,
+    .bondBonded,
+    .bondNone,
+  ]
+}
+
+#endif  // swift(>=4.2)
+
 struct ConnectToDeviceRequest {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
@@ -124,8 +192,6 @@ struct ConnectToDeviceRequest {
   mutating func clearServicesWithCharacteristicsToDiscover() {self._servicesWithCharacteristicsToDiscover = nil}
 
   var timeoutInMs: Int32 = 0
-
-  var bondingMode: Int32 = 0
 
   var unknownFields = SwiftProtobuf.UnknownStorage()
 
@@ -696,6 +762,9 @@ extension LaunchCompanionRequest: @unchecked Sendable {}
 extension AssociationInfo: @unchecked Sendable {}
 extension ScanForDevicesRequest: @unchecked Sendable {}
 extension DeviceScanInfo: @unchecked Sendable {}
+extension EstablishBondRequest: @unchecked Sendable {}
+extension EstablishBondInfo: @unchecked Sendable {}
+extension EstablishBondInfo.BondState: @unchecked Sendable {}
 extension ConnectToDeviceRequest: @unchecked Sendable {}
 extension DeviceInfo: @unchecked Sendable {}
 extension GetDeviceNameRequest: @unchecked Sendable {}
@@ -927,13 +996,84 @@ extension DeviceScanInfo: SwiftProtobuf.Message, SwiftProtobuf._MessageImplement
   }
 }
 
+extension EstablishBondRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  static let protoMessageName: String = "EstablishBondRequest"
+  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "deviceId"),
+  ]
+
+  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeSingularStringField(value: &self.deviceID) }()
+      default: break
+      }
+    }
+  }
+
+  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    if !self.deviceID.isEmpty {
+      try visitor.visitSingularStringField(value: self.deviceID, fieldNumber: 1)
+    }
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  static func ==(lhs: EstablishBondRequest, rhs: EstablishBondRequest) -> Bool {
+    if lhs.deviceID != rhs.deviceID {return false}
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+extension EstablishBondInfo: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  static let protoMessageName: String = "EstablishBondInfo"
+  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "status"),
+  ]
+
+  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeSingularEnumField(value: &self.status) }()
+      default: break
+      }
+    }
+  }
+
+  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    if self.status != .bondBonding {
+      try visitor.visitSingularEnumField(value: self.status, fieldNumber: 1)
+    }
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  static func ==(lhs: EstablishBondInfo, rhs: EstablishBondInfo) -> Bool {
+    if lhs.status != rhs.status {return false}
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+extension EstablishBondInfo.BondState: SwiftProtobuf._ProtoNameProviding {
+  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    0: .same(proto: "BOND_BONDING"),
+    1: .same(proto: "BOND_BONDED"),
+    2: .same(proto: "BOND_NONE"),
+  ]
+}
+
 extension ConnectToDeviceRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = "ConnectToDeviceRequest"
   static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "deviceId"),
     2: .same(proto: "servicesWithCharacteristicsToDiscover"),
     3: .same(proto: "timeoutInMs"),
-    4: .same(proto: "bondingMode"),
   ]
 
   mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -945,7 +1085,6 @@ extension ConnectToDeviceRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageI
       case 1: try { try decoder.decodeSingularStringField(value: &self.deviceID) }()
       case 2: try { try decoder.decodeSingularMessageField(value: &self._servicesWithCharacteristicsToDiscover) }()
       case 3: try { try decoder.decodeSingularInt32Field(value: &self.timeoutInMs) }()
-      case 4: try { try decoder.decodeSingularInt32Field(value: &self.bondingMode) }()
       default: break
       }
     }
@@ -965,9 +1104,6 @@ extension ConnectToDeviceRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageI
     if self.timeoutInMs != 0 {
       try visitor.visitSingularInt32Field(value: self.timeoutInMs, fieldNumber: 3)
     }
-    if self.bondingMode != 0 {
-      try visitor.visitSingularInt32Field(value: self.bondingMode, fieldNumber: 4)
-    }
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -975,7 +1111,6 @@ extension ConnectToDeviceRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageI
     if lhs.deviceID != rhs.deviceID {return false}
     if lhs._servicesWithCharacteristicsToDiscover != rhs._servicesWithCharacteristicsToDiscover {return false}
     if lhs.timeoutInMs != rhs.timeoutInMs {return false}
-    if lhs.bondingMode != rhs.bondingMode {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }

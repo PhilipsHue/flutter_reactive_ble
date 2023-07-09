@@ -83,6 +83,43 @@ final $typed_data.Uint8List deviceScanInfoDescriptor = $convert.base64Decode(
     'DHNlcnZpY2VVdWlkcxISCgRyc3NpGAUgASgFUgRyc3NpEjQKDWlzQ29ubmVjdGFibGUYCCABKA'
     'syDi5Jc0Nvbm5lY3RhYmxlUg1pc0Nvbm5lY3RhYmxl');
 
+@$core.Deprecated('Use establishBondRequestDescriptor instead')
+const EstablishBondRequest$json = {
+  '1': 'EstablishBondRequest',
+  '2': [
+    {'1': 'deviceId', '3': 1, '4': 1, '5': 9, '10': 'deviceId'},
+  ],
+};
+
+/// Descriptor for `EstablishBondRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List establishBondRequestDescriptor = $convert.base64Decode(
+    'ChRFc3RhYmxpc2hCb25kUmVxdWVzdBIaCghkZXZpY2VJZBgBIAEoCVIIZGV2aWNlSWQ=');
+
+@$core.Deprecated('Use establishBondInfoDescriptor instead')
+const EstablishBondInfo$json = {
+  '1': 'EstablishBondInfo',
+  '2': [
+    {'1': 'status', '3': 1, '4': 1, '5': 14, '6': '.EstablishBondInfo.BondState', '10': 'status'},
+  ],
+  '4': [EstablishBondInfo_BondState$json],
+};
+
+@$core.Deprecated('Use establishBondInfoDescriptor instead')
+const EstablishBondInfo_BondState$json = {
+  '1': 'BondState',
+  '2': [
+    {'1': 'BOND_BONDING', '2': 0},
+    {'1': 'BOND_BONDED', '2': 1},
+    {'1': 'BOND_NONE', '2': 2},
+  ],
+};
+
+/// Descriptor for `EstablishBondInfo`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List establishBondInfoDescriptor = $convert.base64Decode(
+    'ChFFc3RhYmxpc2hCb25kSW5mbxI0CgZzdGF0dXMYASABKA4yHC5Fc3RhYmxpc2hCb25kSW5mby'
+    '5Cb25kU3RhdGVSBnN0YXR1cyI9CglCb25kU3RhdGUSEAoMQk9ORF9CT05ESU5HEAASDwoLQk9O'
+    'RF9CT05ERUQQARINCglCT05EX05PTkUQAg==');
+
 @$core.Deprecated('Use connectToDeviceRequestDescriptor instead')
 const ConnectToDeviceRequest$json = {
   '1': 'ConnectToDeviceRequest',
@@ -90,7 +127,6 @@ const ConnectToDeviceRequest$json = {
     {'1': 'deviceId', '3': 1, '4': 1, '5': 9, '10': 'deviceId'},
     {'1': 'servicesWithCharacteristicsToDiscover', '3': 2, '4': 1, '5': 11, '6': '.ServicesWithCharacteristics', '10': 'servicesWithCharacteristicsToDiscover'},
     {'1': 'timeoutInMs', '3': 3, '4': 1, '5': 5, '10': 'timeoutInMs'},
-    {'1': 'bondingMode', '3': 4, '4': 1, '5': 5, '10': 'bondingMode'},
   ],
 };
 
@@ -99,8 +135,7 @@ final $typed_data.Uint8List connectToDeviceRequestDescriptor = $convert.base64De
     'ChZDb25uZWN0VG9EZXZpY2VSZXF1ZXN0EhoKCGRldmljZUlkGAEgASgJUghkZXZpY2VJZBJyCi'
     'VzZXJ2aWNlc1dpdGhDaGFyYWN0ZXJpc3RpY3NUb0Rpc2NvdmVyGAIgASgLMhwuU2VydmljZXNX'
     'aXRoQ2hhcmFjdGVyaXN0aWNzUiVzZXJ2aWNlc1dpdGhDaGFyYWN0ZXJpc3RpY3NUb0Rpc2Nvdm'
-    'VyEiAKC3RpbWVvdXRJbk1zGAMgASgFUgt0aW1lb3V0SW5NcxIgCgtib25kaW5nTW9kZRgEIAEo'
-    'BVILYm9uZGluZ01vZGU=');
+    'VyEiAKC3RpbWVvdXRJbk1zGAMgASgFUgt0aW1lb3V0SW5Ncw==');
 
 @$core.Deprecated('Use deviceInfoDescriptor instead')
 const DeviceInfo$json = {

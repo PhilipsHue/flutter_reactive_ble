@@ -97,6 +97,11 @@ abstract class ReactiveBlePlatform extends PlatformInterface {
     throw UnimplementedError('clearGattCache() has not been implemented.');
   }
 
+  /// Creates a bond with the peripheral. This is a Android-only operation.
+  Future<BondingStatus> establishBond(String deviceId) {
+    throw UnimplementedError('establishBond() has not been implemented.');
+  }
+
   /// Connects to a specific device and the connection remains `established` until
   /// the stream is `cancelled` or the connection is closed by the peripheral.
   ///
@@ -105,7 +110,6 @@ abstract class ReactiveBlePlatform extends PlatformInterface {
     String id,
     Map<Uuid, List<Uuid>>? servicesWithCharacteristicsToDiscover,
     Duration? connectionTimeout,
-    BondingMode? bondingMode,
   ) {
     throw UnimplementedError('connectToDevice has not been implemented.');
   }

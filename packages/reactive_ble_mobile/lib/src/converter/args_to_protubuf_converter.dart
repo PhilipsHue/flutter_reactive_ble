@@ -3,11 +3,12 @@ import 'package:reactive_ble_platform_interface/reactive_ble_platform_interface.
 import '../generated/bledata.pb.dart' as pb;
 
 abstract class ArgsToProtobufConverter {
+  pb.EstablishBondRequest createEstablishBondArgs(String id);
+
   pb.ConnectToDeviceRequest createConnectToDeviceArgs(
     String id,
     Map<Uuid, List<Uuid>>? servicesWithCharacteristicsToDiscover,
     Duration? connectionTimeout,
-    BondingMode? bondingMode,
   );
 
   pb.GetDeviceNameRequest createGetDeviceNameArgs(String id);
@@ -62,11 +63,14 @@ class ArgsToProtobufConverterImpl implements ArgsToProtobufConverter {
   const ArgsToProtobufConverterImpl();
 
   @override
+  pb.EstablishBondRequest createEstablishBondArgs(String id) =>
+      pb.EstablishBondRequest()..deviceId = id;
+
+  @override
   pb.ConnectToDeviceRequest createConnectToDeviceArgs(
     String id,
     Map<Uuid, List<Uuid>>? servicesWithCharacteristicsToDiscover,
     Duration? connectionTimeout,
-    BondingMode? bondingMode,
   ) {
     final args = pb.ConnectToDeviceRequest()..deviceId = id;
 
@@ -89,8 +93,6 @@ class ArgsToProtobufConverterImpl implements ArgsToProtobufConverter {
       args.servicesWithCharacteristicsToDiscover =
           pb.ServicesWithCharacteristics()..items.addAll(items);
     }
-
-    args.bondingMode = bondingMode?.index ?? BondingMode.none.index;
 
     return args;
   }
