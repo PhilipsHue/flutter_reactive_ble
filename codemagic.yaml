@@ -56,6 +56,6 @@ workflows:
           find . -name "Podfile" -execdir pod install \;
           cd example && flutter build ios --debug --no-codesign
     artifacts:
-      - example/build/**/outputs/**/*.apk
+      - example/build/**/outputs/apk/*.apk
       - example/build/**/outputs/**/mapping.txt
       - example/build/ios/ipa/*.ipa
