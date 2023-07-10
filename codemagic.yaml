@@ -44,9 +44,7 @@ workflows:
         script: |
           ./bin/quality_checks.sh
       - name: Android native tests
-        script: |
-          #!/bin/bash -ex
-          cd example/android && ls && ./gradlew detekt && ./gradlew testDebugUnitTest
+        script: cd example/android && ls && ./gradlew detekt && ./gradlew testDebugUnitTest
       - name: Build android app
         script: cd example && flutter build apk --debug
       - name: Build iOS app
