@@ -108,18 +108,17 @@ const EstablishBondingInfo$json = {
 const EstablishBondingInfo_BondState$json = {
   '1': 'BondState',
   '2': [
-    {'1': 'UNKNOWN', '2': 0},
-    {'1': 'BOND_NONE', '2': 10},
-    {'1': 'BOND_BONDING', '2': 11},
-    {'1': 'BOND_BONDED', '2': 12},
+    {'1': 'NONE', '2': 0},
+    {'1': 'BONDING', '2': 1},
+    {'1': 'BONDED', '2': 2},
   ],
 };
 
 /// Descriptor for `EstablishBondingInfo`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List establishBondingInfoDescriptor = $convert.base64Decode(
     'ChRFc3RhYmxpc2hCb25kaW5nSW5mbxI3CgZzdGF0dXMYASABKA4yHy5Fc3RhYmxpc2hCb25kaW'
-    '5nSW5mby5Cb25kU3RhdGVSBnN0YXR1cyJKCglCb25kU3RhdGUSCwoHVU5LTk9XThAAEg0KCUJP'
-    'TkRfTk9ORRAKEhAKDEJPTkRfQk9ORElORxALEg8KC0JPTkRfQk9OREVEEAw=');
+    '5nSW5mby5Cb25kU3RhdGVSBnN0YXR1cyIuCglCb25kU3RhdGUSCAoETk9ORRAAEgsKB0JPTkRJ'
+    'TkcQARIKCgZCT05ERUQQAg==');
 
 @$core.Deprecated('Use connectToDeviceRequestDescriptor instead')
 const ConnectToDeviceRequest$json = {

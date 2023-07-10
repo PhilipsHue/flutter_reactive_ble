@@ -104,16 +104,23 @@ class MockReactiveBlePlatform extends _i1.Mock
         returnValueForMissingStub: _i4.Future<void>.value(),
       ) as _i4.Future<void>);
   @override
-  _i4.Future<void> launchCompanionWorkflow({required String? pattern}) =>
+  _i4.Future<_i2.DeviceAssociationInfo?> launchCompanionWorkflow({
+    required String? pattern,
+    required bool? singleDeviceScan,
+    required bool? forceConfirmation,
+  }) =>
       (super.noSuchMethod(
         Invocation.method(
           #launchCompanionWorkflow,
           [],
-          {#pattern: pattern},
+          {
+            #pattern: pattern,
+            #singleDeviceScan: singleDeviceScan,
+            #forceConfirmation: forceConfirmation,
+          },
         ),
-        returnValue: _i4.Future<void>.value(),
-        returnValueForMissingStub: _i4.Future<void>.value(),
-      ) as _i4.Future<void>);
+        returnValue: _i4.Future<_i2.DeviceAssociationInfo?>.value(),
+      ) as _i4.Future<_i2.DeviceAssociationInfo?>);
   @override
   _i4.Stream<void> scanForDevices({
     required List<_i2.Uuid>? withServices,
@@ -154,6 +161,16 @@ class MockReactiveBlePlatform extends _i1.Mock
               _i2.Result<_i2.Unit,
                   _i2.GenericFailure<_i2.ClearGattCacheError>?>>);
   @override
+  _i4.Future<_i2.BondingStatus> establishBonding(String? deviceId) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #establishBonding,
+          [deviceId],
+        ),
+        returnValue:
+            _i4.Future<_i2.BondingStatus>.value(_i2.BondingStatus.none),
+      ) as _i4.Future<_i2.BondingStatus>);
+  @override
   _i4.Stream<void> connectToDevice(
     String? id,
     Map<_i2.Uuid, List<_i2.Uuid>>? servicesWithCharacteristicsToDiscover,
@@ -170,6 +187,14 @@ class MockReactiveBlePlatform extends _i1.Mock
         ),
         returnValue: _i4.Stream<void>.empty(),
       ) as _i4.Stream<void>);
+  @override
+  _i4.Future<String?> retrieveDeviceName(String? id) => (super.noSuchMethod(
+        Invocation.method(
+          #retrieveDeviceName,
+          [id],
+        ),
+        returnValue: _i4.Future<String?>.value(),
+      ) as _i4.Future<String?>);
   @override
   _i4.Future<void> disconnectDevice(String? deviceId) => (super.noSuchMethod(
         Invocation.method(

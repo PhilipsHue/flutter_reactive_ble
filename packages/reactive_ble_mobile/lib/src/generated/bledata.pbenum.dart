@@ -14,16 +14,14 @@ import 'dart:core' as $core;
 import 'package:protobuf/protobuf.dart' as $pb;
 
 class EstablishBondingInfo_BondState extends $pb.ProtobufEnum {
-  static const EstablishBondingInfo_BondState UNKNOWN = EstablishBondingInfo_BondState._(0, _omitEnumNames ? '' : 'UNKNOWN');
-  static const EstablishBondingInfo_BondState BOND_NONE = EstablishBondingInfo_BondState._(10, _omitEnumNames ? '' : 'BOND_NONE');
-  static const EstablishBondingInfo_BondState BOND_BONDING = EstablishBondingInfo_BondState._(11, _omitEnumNames ? '' : 'BOND_BONDING');
-  static const EstablishBondingInfo_BondState BOND_BONDED = EstablishBondingInfo_BondState._(12, _omitEnumNames ? '' : 'BOND_BONDED');
+  static const EstablishBondingInfo_BondState NONE = EstablishBondingInfo_BondState._(0, _omitEnumNames ? '' : 'NONE');
+  static const EstablishBondingInfo_BondState BONDING = EstablishBondingInfo_BondState._(1, _omitEnumNames ? '' : 'BONDING');
+  static const EstablishBondingInfo_BondState BONDED = EstablishBondingInfo_BondState._(2, _omitEnumNames ? '' : 'BONDED');
 
   static const $core.List<EstablishBondingInfo_BondState> values = <EstablishBondingInfo_BondState> [
-    UNKNOWN,
-    BOND_NONE,
-    BOND_BONDING,
-    BOND_BONDED,
+    NONE,
+    BONDING,
+    BONDED,
   ];
 
   static final $core.Map<$core.int, EstablishBondingInfo_BondState> _byValue = $pb.ProtobufEnum.initByValue(values);

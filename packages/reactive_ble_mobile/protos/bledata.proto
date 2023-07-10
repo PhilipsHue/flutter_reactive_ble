@@ -35,10 +35,9 @@ message EstablishBondingRequest {
 
 message EstablishBondingInfo {
     enum BondState {
-        UNKNOWN = 0;
-        BOND_NONE = 10;
-        BOND_BONDING = 11;
-        BOND_BONDED = 12;
+        NONE = 0;
+        BONDING = 1;
+        BONDED = 2;
     }
 
     BondState status = 1;

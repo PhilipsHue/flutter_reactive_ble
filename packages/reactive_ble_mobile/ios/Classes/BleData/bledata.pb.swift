@@ -124,38 +124,35 @@ struct EstablishBondingInfo {
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  var status: EstablishBondingInfo.BondState = .unknown
+  var status: EstablishBondingInfo.BondState = .none
 
   var unknownFields = SwiftProtobuf.UnknownStorage()
 
   enum BondState: SwiftProtobuf.Enum {
     typealias RawValue = Int
-    case unknown // = 0
-    case bondNone // = 10
-    case bondBonding // = 11
-    case bondBonded // = 12
+    case none // = 0
+    case bonding // = 1
+    case bonded // = 2
     case UNRECOGNIZED(Int)
 
     init() {
-      self = .unknown
+      self = .none
     }
 
     init?(rawValue: Int) {
       switch rawValue {
-      case 0: self = .unknown
-      case 10: self = .bondNone
-      case 11: self = .bondBonding
-      case 12: self = .bondBonded
+      case 0: self = .none
+      case 1: self = .bonding
+      case 2: self = .bonded
       default: self = .UNRECOGNIZED(rawValue)
       }
     }
 
     var rawValue: Int {
       switch self {
-      case .unknown: return 0
-      case .bondNone: return 10
-      case .bondBonding: return 11
-      case .bondBonded: return 12
+      case .none: return 0
+      case .bonding: return 1
+      case .bonded: return 2
       case .UNRECOGNIZED(let i): return i
       }
     }
@@ -170,10 +167,9 @@ struct EstablishBondingInfo {
 extension EstablishBondingInfo.BondState: CaseIterable {
   // The compiler won't synthesize support with the UNRECOGNIZED case.
   static var allCases: [EstablishBondingInfo.BondState] = [
-    .unknown,
-    .bondNone,
-    .bondBonding,
-    .bondBonded,
+    .none,
+    .bonding,
+    .bonded,
   ]
 }
 
@@ -1051,7 +1047,7 @@ extension EstablishBondingInfo: SwiftProtobuf.Message, SwiftProtobuf._MessageImp
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if self.status != .unknown {
+    if self.status != .none {
       try visitor.visitSingularEnumField(value: self.status, fieldNumber: 1)
     }
     try unknownFields.traverse(visitor: &visitor)
@@ -1066,10 +1062,9 @@ extension EstablishBondingInfo: SwiftProtobuf.Message, SwiftProtobuf._MessageImp
 
 extension EstablishBondingInfo.BondState: SwiftProtobuf._ProtoNameProviding {
   static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
-    0: .same(proto: "UNKNOWN"),
-    10: .same(proto: "BOND_NONE"),
-    11: .same(proto: "BOND_BONDING"),
-    12: .same(proto: "BOND_BONDED"),
+    0: .same(proto: "NONE"),
+    1: .same(proto: "BONDING"),
+    2: .same(proto: "BONDED"),
   ]
 }
 

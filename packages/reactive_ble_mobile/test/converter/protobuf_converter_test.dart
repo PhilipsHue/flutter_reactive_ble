@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:reactive_ble_mobile/src/converter/protobuf_converter.dart';
 import 'package:reactive_ble_mobile/src/generated/bledata.pb.dart' as pb;
+import 'package:reactive_ble_mobile/src/generated/bledata.pbenum.dart';
 import 'package:reactive_ble_platform_interface/reactive_ble_platform_interface.dart';
 
 void main() {
@@ -460,6 +461,15 @@ void main() {
                 success: (_) => throw AssertionError("Not expected to succeed"),
                 failure: (f) => f!);
         expect(result.code, ConnectionPriorityFailure.unknown);
+      });
+    });
+
+    group('decoding ${pb.EstablishBondingInfo}', () {
+      test('converts valid status', () {
+        final message = pb.EstablishBondingInfo()
+          ..status = EstablishBondingInfo_BondState.BONDED;
+        expect(sut.bondingStatusFrom(message.writeToBuffer()),
+            BondingStatus.bonded);
       });
     });
 

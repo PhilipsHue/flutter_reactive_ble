@@ -1,10 +1,12 @@
 package com.signify.hue.flutterreactiveble.converters
 
+import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothGattCharacteristic
 import android.bluetooth.BluetoothGattService
 import com.google.protobuf.ByteString
 import com.polidea.rxandroidble2.RxBleDeviceServices
 import com.signify.hue.flutterreactiveble.ProtobufModel
+import com.signify.hue.flutterreactiveble.ProtobufModel.EstablishBondingInfo.BondState
 import com.signify.hue.flutterreactiveble.ble.ConnectionUpdateSuccess
 import com.signify.hue.flutterreactiveble.ble.MtuNegotiateFailed
 import com.signify.hue.flutterreactiveble.ble.MtuNegotiateResult
@@ -262,8 +264,13 @@ class ProtobufMessageConverter {
     }
 
     fun convertBondInfo(status: Int): pb.EstablishBondingInfo {
-        return pb.EstablishBondingInfo.newBuilder()
-            .setStatus(ProtobufModel.EstablishBondingInfo.BondState.forNumber(status))
-            .build()
+        val bondState = when (status) {
+            BluetoothDevice.BOND_BONDED -> BondState.BONDED
+            BluetoothDevice.BOND_BONDING -> BondState.BONDING
+            BluetoothDevice.BOND_NONE -> BondState.NONE
+            else -> BondState.NONE
+        }
+
+        return pb.EstablishBondingInfo.newBuilder().setStatus(bondState).build()
     }
 }

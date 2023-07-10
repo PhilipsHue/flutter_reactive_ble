@@ -330,7 +330,7 @@ class EstablishBondingInfo extends $pb.GeneratedMessage {
   factory EstablishBondingInfo.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'EstablishBondingInfo', createEmptyInstance: create)
-    ..e<EstablishBondingInfo_BondState>(1, _omitFieldNames ? '' : 'status', $pb.PbFieldType.OE, defaultOrMaker: EstablishBondingInfo_BondState.UNKNOWN, valueOf: EstablishBondingInfo_BondState.valueOf, enumValues: EstablishBondingInfo_BondState.values)
+    ..e<EstablishBondingInfo_BondState>(1, _omitFieldNames ? '' : 'status', $pb.PbFieldType.OE, defaultOrMaker: EstablishBondingInfo_BondState.NONE, valueOf: EstablishBondingInfo_BondState.valueOf, enumValues: EstablishBondingInfo_BondState.values)
     ..hasRequiredFields = false
   ;
 

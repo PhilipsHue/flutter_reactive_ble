@@ -7,6 +7,19 @@ void main() {
   group('$ArgsToProtobufConverter', () {
     const _sut = ArgsToProtobufConverterImpl();
 
+    group('Establish bonding args', () {
+      const deviceId = '123';
+      late pb.EstablishBondingRequest result;
+
+      setUp(() {
+        result = _sut.createEstablishBondingArgs(deviceId);
+      });
+
+      test('It converts deviceId', () {
+        expect(result.deviceId, deviceId);
+      });
+    });
+
     group('Connect to device args', () {
       const deviceId = '123';
       Map<Uuid, List<Uuid>>? servicesToDiscover;
@@ -68,6 +81,19 @@ void main() {
           expect(result.servicesWithCharacteristicsToDiscover,
               pb.ServicesWithCharacteristics());
         });
+      });
+    });
+
+    group('Get Device Name', () {
+      const deviceId = '123';
+      late pb.GetDeviceNameRequest result;
+
+      setUp(() {
+        result = _sut.createGetDeviceNameArgs(deviceId);
+      });
+
+      test('It converts deviceId', () {
+        expect(result.deviceId, deviceId);
       });
     });
 
@@ -214,6 +240,31 @@ void main() {
 
       test('It converts priority', () {
         expect(result.priority, 1);
+      });
+    });
+
+    group('Launch Companion Workflow', () {
+      const deviceNamePattern = '123';
+      const singleDeviceScan = true;
+      const forceConfirmation = false;
+      late pb.LaunchCompanionRequest result;
+
+      setUp(() {
+        result = _sut.createLaunchCompanionWorkflowRequest(
+          deviceNamePattern: deviceNamePattern,
+          singleDeviceScan: singleDeviceScan,
+          forceConfirmation: forceConfirmation,
+        );
+      });
+
+      test('It converts device name pattern', () {
+        expect(result.deviceNamePattern, deviceNamePattern);
+      });
+      test('It converts single device scan flag', () {
+        expect(result.singleDeviceScan, singleDeviceScan);
+      });
+      test('It converts force confirmation flag', () {
+        expect(result.forceConfirmation, forceConfirmation);
       });
     });
 

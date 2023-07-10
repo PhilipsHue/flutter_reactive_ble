@@ -1,7 +1,9 @@
 package com.signify.hue.flutterreactiveble.converters
 
+import android.bluetooth.BluetoothDevice
 import com.google.common.truth.Truth.assertThat
 import com.google.protobuf.ByteString
+import com.signify.hue.flutterreactiveble.ProtobufModel.EstablishBondingInfo.BondState
 import com.signify.hue.flutterreactiveble.ble.Connectable
 import com.signify.hue.flutterreactiveble.ble.ConnectionUpdateSuccess
 import com.signify.hue.flutterreactiveble.ble.MtuNegotiateFailed
@@ -11,8 +13,12 @@ import com.signify.hue.flutterreactiveble.model.NegotiateMtuErrorType
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
 import java.util.UUID
+import java.util.stream.Stream
 import com.signify.hue.flutterreactiveble.ProtobufModel as pb
+
 
 class ProtobufMessageConverterTest {
     val protobufConverter = ProtobufMessageConverter()
@@ -119,7 +125,9 @@ class ProtobufMessageConverterTest {
         fun `converts result as parameter in device connection message`() {
             val result = 0
             val connection = ConnectionUpdateSuccess("", result)
-            assertThat(protobufConverter.convertToDeviceInfo(connection).connectionState).isEqualTo(result)
+            assertThat(protobufConverter.convertToDeviceInfo(connection).connectionState).isEqualTo(
+                result
+            )
         }
     }
 
@@ -131,15 +139,21 @@ class ProtobufMessageConverterTest {
         fun `converts to a characteristicvalueInfo object `() {
             val request = createCharacteristicRequest("a", UUID.randomUUID())
 
-            assertThat(protobufConverter.convertCharacteristicInfo(request.characteristic, byteArrayOf(1)))
-                    .isInstanceOf(pb.CharacteristicValueInfo::class.java)
+            assertThat(
+                protobufConverter.convertCharacteristicInfo(
+                    request.characteristic,
+                    byteArrayOf(1)
+                )
+            )
+                .isInstanceOf(pb.CharacteristicValueInfo::class.java)
         }
 
         @Test
         fun `converts a char value and request into a characteristic info value `() {
             val request = createCharacteristicRequest("a", UUID.randomUUID())
             val expectedValue = byteArrayOf(1)
-            val valueInfo = protobufConverter.convertCharacteristicInfo(request.characteristic, expectedValue)
+            val valueInfo =
+                protobufConverter.convertCharacteristicInfo(request.characteristic, expectedValue)
 
             assertThat(valueInfo.value).isEqualTo(ByteString.copyFrom(expectedValue))
         }
@@ -171,7 +185,9 @@ class ProtobufMessageConverterTest {
         @Test
         fun `sets default value for error in case no error occurred`() {
             val result = MtuNegotiateSuccesful("id", 3)
-            assertThat(protobufConverter.convertNegotiateMtuInfo(result).failure.message).isEqualTo("")
+            assertThat(protobufConverter.convertNegotiateMtuInfo(result).failure.message).isEqualTo(
+                ""
+            )
         }
 
         @Test
@@ -179,14 +195,38 @@ class ProtobufMessageConverterTest {
             val errorMessage = "whoops"
             val result = MtuNegotiateFailed("id", errorMessage)
             assertThat(protobufConverter.convertNegotiateMtuInfo(result).failure.message)
-                    .isEqualTo(errorMessage)
+                .isEqualTo(errorMessage)
         }
 
         @Test
         fun `converts error code`() {
             val result = MtuNegotiateFailed("id", "")
             assertThat(protobufConverter.convertNegotiateMtuInfo(result).failure.code)
-                    .isEqualTo(NegotiateMtuErrorType.UNKNOWN.code)
+                .isEqualTo(NegotiateMtuErrorType.UNKNOWN.code)
+        }
+    }
+
+    @DisplayName("Convert to bondinfo")
+    inner class BondInfoTest {
+        @Test
+        @MethodSource("provideParameters")
+        fun `converts bonded`(bondState: BondState, androidConstant: Int) {
+            assertThat(protobufConverter.convertBondInfo(androidConstant)).isEqualTo(bondState)
+        }
+
+        private fun provideParameters(): Stream<Arguments?>? {
+            return Stream.of(
+                Arguments.of(BondState.BONDED, BluetoothDevice.BOND_BONDED),
+                Arguments.of(BondState.BONDING, BluetoothDevice.BOND_BONDING),
+                Arguments.of(BondState.NONE, BluetoothDevice.BOND_NONE)
+            )
+        }
+
+        @Test
+        fun `converts unknown to none`() {
+            val result = BluetoothDevice.BOND_BONDED
+
+            assertThat(protobufConverter.convertBondInfo(result)).isEqualTo(pb.EstablishBondingInfo.BondState.BONDED)
         }
     }
 
@@ -204,29 +244,32 @@ class ProtobufMessageConverterTest {
         val manufacturerData = "123".toByteArray()
 
         return ScanInfo(
-                deviceId = macAdress,
-                name = deviceName,
-                rssi = rssi,
-                connectable = Connectable.UNKNOWN,
-                serviceData = serviceData,
-                manufacturerData = manufacturerData,
-                serviceUuids = listOf(serviceUuid),
+            deviceId = macAdress,
+            name = deviceName,
+            rssi = rssi,
+            connectable = Connectable.UNKNOWN,
+            serviceData = serviceData,
+            manufacturerData = manufacturerData,
+            serviceUuids = listOf(serviceUuid),
         )
     }
 
-    private fun createCharacteristicRequest(deviceId: String, serviceUuid: UUID): pb.ReadCharacteristicRequest {
+    private fun createCharacteristicRequest(
+        deviceId: String,
+        serviceUuid: UUID
+    ): pb.ReadCharacteristicRequest {
         val uuidConverter = UuidConverter()
         val uuid = pb.Uuid.newBuilder()
-                .setData(ByteString.copyFrom(uuidConverter.byteArrayFromUuid(serviceUuid)))
+            .setData(ByteString.copyFrom(uuidConverter.byteArrayFromUuid(serviceUuid)))
 
         val characteristicAddress = pb.CharacteristicAddress.newBuilder()
-                .setDeviceId(deviceId)
-                .setServiceUuid(uuid)
-                .setCharacteristicUuid(uuid)
+            .setDeviceId(deviceId)
+            .setServiceUuid(uuid)
+            .setCharacteristicUuid(uuid)
 
         return pb.ReadCharacteristicRequest.newBuilder()
-                .setCharacteristic(characteristicAddress)
-                .build()
+            .setCharacteristic(characteristicAddress)
+            .build()
     }
 }
 
