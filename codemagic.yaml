@@ -40,13 +40,13 @@ workflows:
         script: |
           # set up local properties
           echo "flutter.sdk=$HOME/programs/flutter" > "$FCI_BUILD_DIR/example/android/local.properties"
+          echo "org.gradle.java.home=$JAVA_HOME" >> "$FCI_BUILD_DIR/example/android/local.properties"
       - name: Quality checks monorepo
         script: |
           ./bin/quality_checks.sh
       - name: Android native tests
         script: |
           #!/bin/bash -ex
-          export PATH=$JAVA_HOME/bin:$PATH
           cd example/android && ls && ./gradlew detekt && ./gradlew testDebugUnitTest
       - name: Build android app
         script: cd example && flutter build apk --debug
