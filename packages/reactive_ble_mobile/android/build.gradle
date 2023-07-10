@@ -14,7 +14,7 @@ buildscript {
 
     dependencies {
         classpath 'com.android.tools.build:gradle:7.0.3'
-        classpath 'com.google.protobuf:protobuf-gradle-plugin:0.8.17'
+        classpath 'com.google.protobuf:protobuf-gradle-plugin:0.9.3'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath "io.gitlab.arturbosch.detekt:detekt-gradle-plugin:$detekt_version"
         classpath "de.mannodermaus.gradle.plugins:android-junit5:1.7.1.1"
@@ -96,7 +96,7 @@ protobuf {
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'com.polidea.rxandroidble2:rxandroidble:1.16.0'
-    implementation 'com.google.protobuf:protobuf-javalite:3.18.1'
+    implementation 'com.google.protobuf:protobuf-javalite:3.20.0'
     implementation 'io.reactivex.rxjava2:rxkotlin:2.4.0'
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
 
