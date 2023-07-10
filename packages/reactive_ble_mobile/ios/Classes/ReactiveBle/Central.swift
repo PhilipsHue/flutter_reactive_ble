@@ -171,9 +171,7 @@ final class Central {
     func retrievePeripheralName(
         for peripheralID: PeripheralID
     ) throws -> String? {
-        let peripheral = try resolve(known: peripheralID)
-        
-        return peripheral.name
+        return try resolve(known: peripheralID).name
     }
 
     func discoverServicesWithCharacteristics(
