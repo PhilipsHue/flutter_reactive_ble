@@ -79,7 +79,7 @@ detekt {
 
 protobuf {
     protoc {
-        artifact = 'com.google.protobuf:protoc:3.18.1'
+        artifact = 'com.google.protobuf:protoc:3.23.4'
     }
 
     generateProtoTasks {
