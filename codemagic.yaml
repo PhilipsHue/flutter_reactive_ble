@@ -10,7 +10,7 @@ workflows:
       flutter: stable
       xcode: 13.3
       cocoapods: default
-      java: 19
+      java: 19.0.2
     cache:
       cache_paths: []
     triggering:
