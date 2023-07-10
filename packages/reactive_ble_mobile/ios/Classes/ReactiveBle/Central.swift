@@ -143,7 +143,7 @@ final class Central {
                         discover: servicesWithCharacteristicsToDiscover,
                         completion: central.onServicesWithCharacteristicsInitialDiscovery
                     )
-                case .failedToConnect(_), .disconnected(_):
+                case .failedToConnect, .disconnected:
                     break
                 }
             }
@@ -167,7 +167,7 @@ final class Central {
             .values
             .forEach(centralManager.cancelPeripheralConnection)
     }
-    
+
     func retrievePeripheralName(
         for peripheralID: PeripheralID
     ) throws -> String? {
@@ -178,7 +178,7 @@ final class Central {
         for peripheralID: PeripheralID,
         discover servicesWithCharacteristicsToDiscover: ServicesWithCharacteristicsToDiscover,
         completion: @escaping ServicesWithCharacteristicsDiscoveryHandler
-    ) throws -> Void {
+    ) throws {
         let peripheral = try resolve(connected: peripheralID)
 
         discoverServicesWithCharacteristics(
@@ -192,7 +192,7 @@ final class Central {
         for peripheral: CBPeripheral,
         discover servicesWithCharacteristicsToDiscover: ServicesWithCharacteristicsToDiscover,
         completion: @escaping ServicesWithCharacteristicsDiscoveryHandler
-    ) -> Void {
+    ) {
         servicesWithCharacteristicsDiscoveryRegistry.registerTask(
             key: peripheral.identifier,
             params: .init(servicesWithCharacteristicsToDiscover: servicesWithCharacteristicsToDiscover),
@@ -232,10 +232,10 @@ final class Central {
 
         guard characteristic.properties.contains(.read)
         else { throw Failure.notReadable(qualifiedCharacteristic) }
-        
+
         guard let peripheral = characteristic.service?.peripheral
         else { throw Failure.peripheralIsUnknown(qualifiedCharacteristic.peripheralID) }
-        
+
         peripheral.readValue(for: characteristic)
 
     }
@@ -257,16 +257,16 @@ final class Central {
                 completion(central, qualifiedCharacteristic, error)
             }
         )
-        
+
         guard let peripheral = characteristic.service?.peripheral
-        else{ throw Failure.peripheralIsUnknown(qualifiedCharacteristic.peripheralID) }
+        else { throw Failure.peripheralIsUnknown(qualifiedCharacteristic.peripheralID) }
 
         characteristicWriteRegistry.updateTask(
             key: qualifiedCharacteristic,
             action: { $0.start(peripheral: peripheral) }
         )
     }
-    
+
     func writeWithoutResponse(
         value: Data,
         characteristic qualifiedCharacteristic: QualifiedCharacteristic
@@ -275,10 +275,10 @@ final class Central {
 
         guard characteristic.properties.contains(.writeWithoutResponse)
         else { throw Failure.notWritable(qualifiedCharacteristic) }
-        
+
         guard let response = characteristic.service?.peripheral?.writeValue(value, for: characteristic, type: .withoutResponse)
         else { throw Failure.characteristicNotFound(qualifiedCharacteristic) }
-        
+
         return response
     }
 

@@ -22,7 +22,7 @@ final class PluginController {
             }
         }
     }
-    var messageQueue: [CharacteristicValueInfo] = [];
+    var messageQueue: [CharacteristicValueInfo] = []
     var connectedDeviceSink: EventSink?
     var characteristicValueUpdateSink: EventSink?
 
@@ -128,11 +128,11 @@ final class PluginController {
                     }
                 }
                 let sink = context.characteristicValueUpdateSink
-                if (sink != nil) {
+                if sink != nil {
                     sink!.add(.success(message))
                 } else {
                     // In case message arrives before sink is created
-                    context.messageQueue.append(message);
+                    context.messageQueue.append(message)
                 }
 
             }
@@ -205,8 +205,7 @@ final class PluginController {
         let servicesWithCharacteristicsToDiscover: ServicesWithCharacteristicsToDiscover
         if args.hasServicesWithCharacteristicsToDiscover {
             let items = args.servicesWithCharacteristicsToDiscover.items.reduce(
-                into: [ServiceID: [CharacteristicID]](),
-                { dict, item in
+                into: [ServiceID: [CharacteristicID]](), { dict, item in
                     let serviceID = CBUUID(data: item.serviceID.data)
                     let characteristicIDs = item.characteristics.map { CBUUID(data: $0.data) }
 
@@ -221,7 +220,7 @@ final class PluginController {
         let timeout = args.timeoutInMs > 0 ? TimeInterval(args.timeoutInMs) / 1000 : nil
 
         completion(.success(nil))
-        
+
         if let sink = connectedDeviceSink {
             let message = DeviceInfo.with {
                 $0.id = args.deviceID
@@ -231,7 +230,7 @@ final class PluginController {
         } else {
             print("Warning! No event channel set up to report a connection update")
         }
-        
+
         do {
             try central.connect(
                 to: deviceID,
@@ -321,10 +320,10 @@ final class PluginController {
                     Uuid.with { $0.data = characteristic.uuid.data }
                 }
                 $0.characteristics = (service.characteristics ?? []).map { characteristic in
-                    DiscoveredCharacteristic.with{
-                        $0.characteristicID = Uuid.with{$0.data = characteristic.uuid.data}
+                    DiscoveredCharacteristic.with {
+                        $0.characteristicID = Uuid.with {$0.data = characteristic.uuid.data}
                         if characteristic.service?.uuid.data != nil {
-                            $0.serviceID = Uuid.with{$0.data = characteristic.service!.uuid.data}
+                            $0.serviceID = Uuid.with {$0.data = characteristic.service!.uuid.data}
                         }
                         $0.isReadable = characteristic.properties.contains(.read)
                         $0.isWritableWithResponse = characteristic.properties.contains(.write)
@@ -333,7 +332,7 @@ final class PluginController {
                         $0.isIndicatable = characteristic.properties.contains(.indicate)
                     }
                 }
- 
+
                 $0.includedServices = (service.includedServices ?? []).map(makeDiscoveredService)
             }
         }
@@ -488,20 +487,20 @@ final class PluginController {
             completion(.success(result))
         }
     }
-    
+
     func writeCharacteristicWithoutResponse(name: String, args: WriteCharacteristicRequest, completion: @escaping PlatformMethodCompletionHandler) {
         guard let central = central
         else {
             completion(.failure(PluginError.notInitialized.asFlutterError))
             return
         }
-        
+
         guard let characteristic = QualifiedCharacteristicIDFactory().make(from: args.characteristic)
         else {
             completion(.failure(PluginError.invalidMethodCall(method: name, details: "characteristic, service, and peripheral IDs are required").asFlutterError))
             return
         }
-        
+
         let result: WriteCharacteristicInfo
         do {
             try central.writeWithoutResponse(
