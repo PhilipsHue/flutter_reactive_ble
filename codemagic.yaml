@@ -8,7 +8,7 @@ workflows:
     instance_type: mac_mini_m1
     environment:
       flutter: stable
-      xcode: 13.3
+      xcode: 14.3
       cocoapods: default
       java: 19.0.2
     cache:
