@@ -40,7 +40,8 @@ workflows:
         script: |
           # set up local properties
           echo "flutter.sdk=$HOME/programs/flutter" > "$FCI_BUILD_DIR/example/android/local.properties"
-          echo "org.gradle.java.home=$JAVA_HOME" >> "$FCI_BUILD_DIR/example/android/local.properties"
+          echo "$JAVA_HOME"
+          echo "org.gradle.java.home=$JAVA_HOME" >> "$FCI_BUILD_DIR/example/android/gradle.properties"
       - name: Quality checks monorepo
         script: |
           ./bin/quality_checks.sh
