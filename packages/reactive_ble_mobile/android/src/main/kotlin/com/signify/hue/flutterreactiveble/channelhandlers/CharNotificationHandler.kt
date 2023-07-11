@@ -1,5 +1,6 @@
 package com.signify.hue.flutterreactiveble.channelhandlers
 
+import com.polidea.rxandroidble2.exceptions.BleDisconnectedException
 import com.signify.hue.flutterreactiveble.ProtobufModel as pb
 import com.signify.hue.flutterreactiveble.converters.ProtobufMessageConverter
 import com.signify.hue.flutterreactiveble.converters.UuidConverter
@@ -36,7 +37,14 @@ class CharNotificationHandler(private val bleClient: com.signify.hue.flutterreac
             .subscribe({ value ->
                 handleNotificationValue(request.characteristic, value)
             }, {
-                handleNotificationError(request.characteristic, it)
+                when (it) {
+                    is BleDisconnectedException -> {
+                        subscriptionMap.remove(request.characteristic)?.dispose()
+                    }
+                    else -> {
+                        handleNotificationError(request.characteristic, it)
+                    }
+                }
             })
         subscriptionMap[request.characteristic] = subscription
     }
