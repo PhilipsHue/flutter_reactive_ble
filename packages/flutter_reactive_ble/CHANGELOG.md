@@ -1,3 +1,8 @@
+## 5.1.2
+
+* Bumps to Dart 2.17 minimum and upgrades melos to 3.1.0 (#762)
+* Cancel subscription when a disconnect event has been thrown (#769)
+
 ## 5.1.1
 
 * Make Connectable backwards compatible #757, #750
