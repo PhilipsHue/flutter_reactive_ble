@@ -1,6 +1,6 @@
 library flutter_reactive_ble;
 
-export 'package:reactive_ble_platform_interface/reactive_ble_platform_interface.dart';
+export 'package:reactive_ble_platform_interface/reactive_ble_platform_interface.dart' hide CharacteristicInstance;
 
 export 'src/reactive_ble.dart';
 export 'src/rx_ext/repeater.dart';

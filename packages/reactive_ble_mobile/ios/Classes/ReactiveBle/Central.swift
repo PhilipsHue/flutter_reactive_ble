@@ -4,7 +4,9 @@ typealias RSSI = Int
 
 typealias PeripheralID = UUID
 typealias ServiceID = CBUUID
+typealias ServiceInstanceID = String
 typealias CharacteristicID = CBUUID
+typealias CharacteristicInstanceID = String
 
 typealias ServiceData = [ServiceID: Data]
 typealias AdvertisementData = [String: Any]
@@ -82,17 +84,27 @@ final class Central {
                 )
             },
             onCharacteristicNotificationStateUpdate: papply(weak: self) { central, characteristic, error in
+                guard let q = try? QualifiedCharacteristic(characteristic)
+                else {
+                    return
+                }
+                
                 central.characteristicNotifyRegistry.updateTask(
-                    key: QualifiedCharacteristic(characteristic),
+                    key: q,
                     action: { $0.complete(error: error) }
                 )
             },
             onCharacteristicValueUpdate: papply(weak: self) { central, characteristic, error in
-                onCharacteristicValueUpdate(central, QualifiedCharacteristic(characteristic), characteristic.value, error)
+                onCharacteristicValueUpdate(central, try! QualifiedCharacteristic(characteristic), characteristic.value, error)
             },
             onCharacteristicValueWrite: papply(weak: self) { central, characteristic, error in
+                guard let q = try? QualifiedCharacteristic(characteristic)
+                else {
+                    return
+                }
+                
                 central.characteristicWriteRegistry.updateTask(
-                    key: QualifiedCharacteristic(characteristic),
+                    key: q,
                     action: { $0.handleWrite(error: error) }
                 )
             }
@@ -182,6 +194,10 @@ final class Central {
         )
     }
 
+    func peripheral(for peripheralID: PeripheralID) throws -> CBPeripheral {
+        return try resolve(connected: peripheralID)
+    }
+
     private func discoverServicesWithCharacteristics(
         for peripheral: CBPeripheral,
         discover servicesWithCharacteristicsToDiscover: ServicesWithCharacteristicsToDiscover,
@@ -231,7 +247,6 @@ final class Central {
         else { throw Failure.peripheralIsUnknown(qualifiedCharacteristic.peripheralID) }
 
         peripheral.readValue(for: characteristic)
-
     }
 
     func writeWithResponse(
@@ -244,19 +259,21 @@ final class Central {
         guard characteristic.properties.contains(.write)
         else { throw Failure.notWritable(qualifiedCharacteristic) }
 
+        let qualifiedChar = try QualifiedCharacteristic(characteristic)
+
         characteristicWriteRegistry.registerTask(
-            key: qualifiedCharacteristic,
+            key: qualifiedChar,
             params: .init(value: value),
             completion: papply(weak: self) { central, error in
-                completion(central, qualifiedCharacteristic, error)
+                completion(central, qualifiedChar, error)
             }
         )
 
         guard let peripheral = characteristic.service?.peripheral
-        else { throw Failure.peripheralIsUnknown(qualifiedCharacteristic.peripheralID) }
+        else { throw Failure.peripheralIsUnknown(qualifiedChar.peripheralID) }
 
         characteristicWriteRegistry.updateTask(
-            key: qualifiedCharacteristic,
+            key: qualifiedChar,
             action: { $0.start(peripheral: peripheral) }
         )
     }
@@ -319,10 +336,10 @@ final class Central {
     private func resolve(characteristic qualifiedCharacteristic: QualifiedCharacteristic) throws -> CBCharacteristic {
         let peripheral = try resolve(connected: qualifiedCharacteristic.peripheralID)
 
-        guard let service = peripheral.services?.first(where: { $0.uuid == qualifiedCharacteristic.serviceID })
+        guard let service = peripheral.services?.filter({ $0.uuid == qualifiedCharacteristic.serviceID })[Int(qualifiedCharacteristic.serviceInstanceID) ?? 0]
         else { throw Failure.serviceNotFound(qualifiedCharacteristic.serviceID, qualifiedCharacteristic.peripheralID) }
 
-        guard let characteristic = service.characteristics?.first(where: { $0.uuid == qualifiedCharacteristic.id })
+        guard let characteristic = service.characteristics?.filter({ $0.uuid == qualifiedCharacteristic.id })[Int(qualifiedCharacteristic.instanceID) ?? 0]
         else { throw Failure.characteristicNotFound(qualifiedCharacteristic) }
 
         return characteristic
