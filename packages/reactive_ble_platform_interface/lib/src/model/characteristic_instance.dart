@@ -28,26 +28,25 @@ class CharacteristicInstance {
   });
 
   @override
-  String toString() => "$runtimeType(characteristicId: $characteristicId, serviceId: $serviceId, deviceId: $deviceId)";
+  String toString() => "$runtimeType(characteristicId: $characteristicId($characteristicInstanceId), "
+      "serviceId: $serviceId($serviceInstanceId), deviceId: $deviceId)";
 
-  // @override
-  // int get hashCode => Object.hash(
-  //       characteristicId,
-  //       characteristicInstanceId,
-  //       serviceId,
-  //       serviceInstanceId,
-  //       deviceId,
-  //     );
+  @override
+  int get hashCode => Object.hash(
+        characteristicId.expanded,
+        characteristicInstanceId,
+        serviceId.expanded,
+        serviceInstanceId,
+        deviceId,
+      );
 
   @override
   bool operator ==(Object other) =>
       other is CharacteristicInstance &&
       runtimeType == other.runtimeType &&
-      characteristicId == other.characteristicId &&
-      (characteristicInstanceId == other.characteristicInstanceId ||
-          characteristicInstanceId.isEmpty ||
-          other.characteristicInstanceId.isEmpty) &&
-      serviceId == other.serviceId &&
-      (serviceInstanceId == other.serviceInstanceId || serviceInstanceId.isEmpty || other.serviceInstanceId.isEmpty) &&
+      characteristicId.expanded == other.characteristicId.expanded &&
+      characteristicInstanceId == other.characteristicInstanceId &&
+      serviceId.expanded == other.serviceId.expanded &&
+      serviceInstanceId == other.serviceInstanceId &&
       deviceId == other.deviceId;
 }

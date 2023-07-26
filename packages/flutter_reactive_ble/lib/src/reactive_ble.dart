@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:collection/collection.dart';
 import 'package:flutter_reactive_ble/src/connected_device_operation.dart';
 import 'package:flutter_reactive_ble/src/debug_logger.dart';
 import 'package:flutter_reactive_ble/src/device_connector.dart';
@@ -154,7 +155,7 @@ class FlutterReactiveBle {
   /// read response arrives (due to the design of iOS BLE API).
   Future<List<int>> readCharacteristic(QualifiedCharacteristic characteristic) async {
     await initialize();
-    return _connectedDeviceOperator.readCharacteristic(characteristic.asInstance);
+    return (await resolveSingle(characteristic)).read();
   }
 
   /// Writes a value to the specified characteristic awaiting for an acknowledgement.
@@ -165,10 +166,7 @@ class FlutterReactiveBle {
     required List<int> value,
   }) async {
     await initialize();
-    return _connectedDeviceOperator.writeCharacteristicWithResponse(
-      characteristic.asInstance,
-      value: value,
-    );
+    await (await resolveSingle(characteristic)).write(value, withResponse: true);
   }
 
   /// Writes a value to the specified characteristic without waiting for an acknowledgement.
@@ -184,10 +182,7 @@ class FlutterReactiveBle {
     required List<int> value,
   }) async {
     await initialize();
-    return _connectedDeviceOperator.writeCharacteristicWithoutResponse(
-      characteristic.asInstance,
-      value: value,
-    );
+    await (await resolveSingle(characteristic)).write(value, withResponse: false);
   }
 
   /// Request a specific MTU for a connected device.
@@ -304,17 +299,18 @@ class FlutterReactiveBle {
   ///
   /// When discovery fails this method throws an [Exception].
   ///
-  /// Use [getDiscoverServices] to get the discovered services
-  Future<void> discoverAllServices(String deviceId) =>
-      _connectedDeviceOperator.discoverServices(deviceId);
+  /// Use [getDiscoveredServices] to get the discovered services
+  Future<void> discoverAllServices(String deviceId) => _connectedDeviceOperator.discoverServices(deviceId);
 
   /// Services can be discovered by:
-  /// - specificy `servicesWithCharacteristicsToDiscover` in [connectToDevice] or [connectToAdvertisingDevice]. Or,
+  /// - specify `servicesWithCharacteristicsToDiscover` in [connectToDevice] or [connectToAdvertisingDevice]. Or,
   /// - by calling [discoverAllServices]
   ///
   /// Discovered services and charactersitcs remain valid for as long as the device stays connected. After reconnecting
-  /// to a device, [getDiscoverServices] must be called again to get updated services and characteristics.
-  Future<List<Service>> getDiscoverServices(String deviceId) async {
+  /// to a device, [getDiscoveredServices] must be called again to get updated services and characteristics.
+  ///
+  /// Note: On Android, this method performs service discovery if one was done yet after connecting the device.
+  Future<List<Service>> getDiscoveredServices(String deviceId) async {
     final discoveredServices = await _connectedDeviceOperator.getDiscoverServices(deviceId);
 
     final services = _services[deviceId] ?? [];
@@ -343,6 +339,11 @@ class FlutterReactiveBle {
             instanceId: discoveredCharacteristic.characteristicInstanceId,
             service: service,
             lib: this,
+            isReadable: discoveredCharacteristic.isReadable,
+            isWritableWithoutResponse: discoveredCharacteristic.isWritableWithoutResponse,
+            isWritableWithResponse: discoveredCharacteristic.isWritableWithResponse,
+            isNotifiable: discoveredCharacteristic.isNotifiable,
+            isIndicatable: discoveredCharacteristic.isIndicatable,
           ));
         }
       }
@@ -377,23 +378,21 @@ class FlutterReactiveBle {
   /// Subscribes to updates from the characteristic specified.
   ///
   /// This stream terminates automatically when the device is disconnected.
-  Stream<List<int>> subscribeToCharacteristic(
-    QualifiedCharacteristic characteristic,
-  ) {
-    final isDisconnected = connectedDeviceStream
-        .where((update) =>
-            update.deviceId == characteristic.deviceId &&
-            (update.connectionState == DeviceConnectionState.disconnecting ||
-                update.connectionState == DeviceConnectionState.disconnected))
-        .cast<void>()
-        .firstWhere((_) => true, orElse: () {});
+  Stream<List<int>> subscribeToCharacteristic(QualifiedCharacteristic characteristic) async* {
+    yield* (await resolveSingle(characteristic)).subscribe();
+  }
 
-    return initialize().asStream().asyncExpand(
-          (_) => _connectedDeviceOperator.subscribeToCharacteristic(
-            characteristic.asInstance,
-            isDisconnected,
-          ),
-        );
+  Future<Iterable<Characteristic>> resolve(QualifiedCharacteristic characteristic) async {
+    final services = await getDiscoveredServices(characteristic.deviceId);
+    return services
+        .withId(characteristic.serviceId)
+        .expand((service) => service.characteristics.withId(characteristic.characteristicId));
+  }
+
+  Future<Characteristic> resolveSingle(QualifiedCharacteristic characteristic) async {
+    final char = (await resolve(characteristic)).singleOrNull;
+    if (char == null) throw Exception("Characteristic not found or discovered: $characteristic");
+    return char;
   }
 
   /// Sets the verbosity of debug output.
@@ -435,6 +434,11 @@ class Characteristic {
     required String instanceId,
     required this.service,
     required FlutterReactiveBle lib,
+    required this.isReadable,
+    required this.isWritableWithoutResponse,
+    required this.isWritableWithResponse,
+    required this.isNotifiable,
+    required this.isIndicatable,
   })  : _instanceId = instanceId,
         _lib = lib;
 
@@ -447,6 +451,12 @@ class Characteristic {
   // characteristics. Instead, characteristics have to be discovered after connecting and looked up via
   // [FlutterReactiveBle.getDiscoverServices]
   final String _instanceId;
+
+  final bool isReadable;
+  final bool isWritableWithoutResponse;
+  final bool isWritableWithResponse;
+  final bool isNotifiable;
+  final bool isIndicatable;
 
   /// Reads the value of the specified characteristic.
   ///
@@ -462,7 +472,7 @@ class Characteristic {
   /// WHen [withResponse] is false, writing is done without waiting for an acknowledgement.
   /// Use this in case client does not need an acknowledgement
   /// that the write was successfully performed. For consequitive write operations it is
-  /// recommended to execute a [writeCharacteristicWithResponse] each n times to make sure
+  /// recommended to execute a write with [withResponse] true each n times to make sure
   /// the BLE device is still responsive.
   ///
   /// The returned future completes with an error in case of a failure during writing.
@@ -514,12 +524,10 @@ class Characteristic {
   String toString() => "Characteristic($id; $_instanceId; ${service._instanceId})";
 }
 
-extension on QualifiedCharacteristic {
-  CharacteristicInstance get asInstance => CharacteristicInstance(
-        deviceId: deviceId,
-        characteristicId: characteristicId,
-        characteristicInstanceId: "",
-        serviceId: serviceId,
-        serviceInstanceId: "",
-      );
+extension ServiceWithId on Iterable<Service> {
+  Iterable<Service> withId(Uuid id) => where((s) => s.id.expanded == id.expanded);
+}
+
+extension CharacteristicWithId on Iterable<Characteristic> {
+  Iterable<Characteristic> withId(Uuid id) => where((c) => c.id.expanded == id.expanded);
 }
