@@ -182,7 +182,7 @@ class _ServiceDiscoveryListState extends State<_ServiceDiscoveryList> {
     super.initState();
   }
 
-  String _charactisticsSummary(DiscoveredCharacteristic c) {
+  String _characteristicsSummary(DiscoveredCharacteristic c) {
     final props = <String>[];
     if (c.isReadable) {
       props.add("read");
@@ -215,7 +215,7 @@ class _ServiceDiscoveryListState extends State<_ServiceDiscoveryList> {
                       deviceId: deviceId),
                 )),
         title: Text(
-          '${characteristic.characteristicId}\n(${_charactisticsSummary(characteristic)})',
+          '${characteristic.characteristicId}\n(${_characteristicsSummary(characteristic)})',
           style: const TextStyle(
             fontSize: 14,
           ),
