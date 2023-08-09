@@ -48,7 +48,7 @@ class BleDeviceInteractor {
       _logMessage('Discovering services finished');
       return result;
     } on Exception catch (e) {
-      _logMessage('Error occured when discovering services: $e');
+      _logMessage('Error occurred when discovering services: $e');
       rethrow;
     }
   }
@@ -62,7 +62,7 @@ class BleDeviceInteractor {
       return result;
     } on Exception catch (e, s) {
       _logMessage(
-        'Error occured when reading ${characteristic.characteristicId} : $e',
+        'Error occurred when reading ${characteristic.characteristicId} : $e',
       );
       // ignore: avoid_print
       print(s);
@@ -70,7 +70,7 @@ class BleDeviceInteractor {
     }
   }
 
-  Future<void> writeCharacterisiticWithResponse(
+  Future<void> writeCharacteristicWithResponse(
       QualifiedCharacteristic characteristic, List<int> value) async {
     try {
       _logMessage(
@@ -78,7 +78,7 @@ class BleDeviceInteractor {
       await _writeWithResponse(characteristic, value: value);
     } on Exception catch (e, s) {
       _logMessage(
-        'Error occured when writing ${characteristic.characteristicId} : $e',
+        'Error occurred when writing ${characteristic.characteristicId} : $e',
       );
       // ignore: avoid_print
       print(s);
@@ -86,7 +86,7 @@ class BleDeviceInteractor {
     }
   }
 
-  Future<void> writeCharacterisiticWithoutResponse(
+  Future<void> writeCharacteristicWithoutResponse(
       QualifiedCharacteristic characteristic, List<int> value) async {
     try {
       await _writeWithoutResponse(characteristic, value: value);
@@ -94,7 +94,7 @@ class BleDeviceInteractor {
           'Write without response value: $value to ${characteristic.characteristicId}');
     } on Exception catch (e, s) {
       _logMessage(
-        'Error occured when writing ${characteristic.characteristicId} : $e',
+        'Error occurred when writing ${characteristic.characteristicId} : $e',
       );
       // ignore: avoid_print
       print(s);
