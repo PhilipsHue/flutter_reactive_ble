@@ -207,7 +207,7 @@ packages:
     source: sdk
     version: "0.0.0"
   flutter_lints:
-    dependency: "direct main"
+    dependency: "direct dev"
     description:
       name: flutter_lints
       sha256: b543301ad291598523947dc534aaddc5aaad597b709d2426d3a0e0d44c5cb493
@@ -217,9 +217,10 @@ packages:
   flutter_reactive_ble:
     dependency: "direct main"
     description:
-      path: "../packages/flutter_reactive_ble"
-      relative: false
-    source: path
+      name: flutter_reactive_ble
+      sha256: dfcd3cca271a054121ef96fde0fdad43274a5a38b423fc3f519fd9edc43e42c9
+      url: "https://pub.dev"
+    source: hosted
     version: "5.1.1"
   flutter_test:
     dependency: "direct dev"
@@ -435,18 +436,20 @@ packages:
     source: hosted
     version: "1.2.3"
   reactive_ble_mobile:
-    dependency: "direct overridden"
+    dependency: transitive
     description:
-      path: "../packages/reactive_ble_mobile"
-      relative: false
-    source: path
+      name: reactive_ble_mobile
+      sha256: "2fdd8bcd00533f3e1e544030edeba723ce2dfdd24c3b22a04103b410b1272290"
+      url: "https://pub.dev"
+    source: hosted
     version: "5.1.1"
   reactive_ble_platform_interface:
-    dependency: "direct overridden"
+    dependency: transitive
     description:
-      path: "../packages/reactive_ble_platform_interface"
-      relative: true
-    source: path
+      name: reactive_ble_platform_interface
+      sha256: d0c0041de584df5c697d276ae8c3ddc767b2c364ed29b4ae25126c57e4467cba
+      url: "https://pub.dev"
+    source: hosted
     version: "5.1.1"
   shelf:
     dependency: transitive
@@ -583,4 +586,4 @@ packages:
     version: "3.1.2"
 sdks:
   dart: ">=3.0.0 <4.0.0"
-  flutter: ">=1.16.0"
+  flutter: ">=2.0.0"
