@@ -2,7 +2,7 @@ import class CoreBluetooth.CBUUID
 import class CoreBluetooth.CBCharacteristic
 import class CoreBluetooth.CBService
 
-struct QualifiedCharacteristic: Equatable {
+struct CharacteristicInstance: Equatable {
 
     let id: CharacteristicID
     let instanceID: CharacteristicInstanceID
@@ -11,7 +11,7 @@ struct QualifiedCharacteristic: Equatable {
     let peripheralID: PeripheralID
 }
 
-extension QualifiedCharacteristic {
+extension CharacteristicInstance {
     
     init(_ characteristic: CBCharacteristic) throws {
         guard let service = characteristic.service
@@ -64,9 +64,9 @@ extension QualifiedCharacteristic {
     }
 }
 
-struct QualifiedCharacteristicIDFactory {
+struct CharacteristicInstanceIDFactory {
     
-    func make(from message: CharacteristicAddress) -> QualifiedCharacteristic? {
+    func make(from message: CharacteristicAddress) -> CharacteristicInstance? {
         guard
             message.hasCharacteristicUuid,
             message.hasServiceUuid,
@@ -76,7 +76,7 @@ struct QualifiedCharacteristicIDFactory {
         let characteristicID = CBUUID(data: message.characteristicUuid.data)
         let serviceID = CBUUID(data: message.serviceUuid.data)
         
-        return QualifiedCharacteristic(
+        return CharacteristicInstance(
             id: characteristicID,
             instanceID: message.characteristicInstanceID,
             serviceID: serviceID,

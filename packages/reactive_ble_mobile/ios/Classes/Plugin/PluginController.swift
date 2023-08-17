@@ -389,7 +389,7 @@ final class PluginController {
             return
         }
 
-        guard let characteristic = QualifiedCharacteristicIDFactory().make(from: args.characteristic)
+        guard let characteristic = CharacteristicInstanceIDFactory().make(from: args.characteristic)
         else {
             completion(.failure(PluginError.invalidMethodCall(method: name, details: "characteristic, service, and peripheral IDs are required").asFlutterError))
             return
@@ -415,7 +415,7 @@ final class PluginController {
             return
         }
 
-        guard let characteristic = QualifiedCharacteristicIDFactory().make(from: args.characteristic)
+        guard let characteristic = CharacteristicInstanceIDFactory().make(from: args.characteristic)
         else {
             completion(.failure(PluginError.invalidMethodCall(method: name, details: "characteristic, service, and peripheral IDs are required").asFlutterError))
             return
@@ -441,7 +441,7 @@ final class PluginController {
             return
         }
 
-        guard let characteristic = QualifiedCharacteristicIDFactory().make(from: args.characteristic)
+        guard let characteristic = CharacteristicInstanceIDFactory().make(from: args.characteristic)
         else {
             completion(.failure(PluginError.invalidMethodCall(method: name, details: "characteristic, service, and peripheral IDs are required").asFlutterError))
             return
@@ -476,7 +476,7 @@ final class PluginController {
             return
         }
 
-        guard let characteristic = QualifiedCharacteristicIDFactory().make(from: args.characteristic)
+        guard let characteristic = CharacteristicInstanceIDFactory().make(from: args.characteristic)
         else {
             completion(.failure(PluginError.invalidMethodCall(method: name, details: "characteristic, service, and peripheral IDs are required").asFlutterError))
             return
@@ -520,7 +520,7 @@ final class PluginController {
             return
         }
 
-        guard let characteristic = QualifiedCharacteristicIDFactory().make(from: args.characteristic)
+        guard let characteristic = CharacteristicInstanceIDFactory().make(from: args.characteristic)
         else {
             completion(.failure(PluginError.invalidMethodCall(method: name, details: "characteristic, service, and peripheral IDs are required").asFlutterError))
             return

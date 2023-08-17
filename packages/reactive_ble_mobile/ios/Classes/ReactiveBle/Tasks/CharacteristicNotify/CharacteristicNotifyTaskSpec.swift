@@ -1,6 +1,6 @@
 struct CharacteristicNotifyTaskSpec: PeripheralTaskSpec {
 
-    typealias Key = QualifiedCharacteristic
+    typealias Key = CharacteristicInstance
 
     struct Params {
 
