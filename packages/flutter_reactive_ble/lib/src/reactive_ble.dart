@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:collection/collection.dart';
 import 'package:flutter_reactive_ble/src/connected_device_operation.dart';
 import 'package:flutter_reactive_ble/src/debug_logger.dart';
 import 'package:flutter_reactive_ble/src/device_connector.dart';
@@ -153,6 +152,10 @@ class FlutterReactiveBle {
   /// Be aware that a read request could be satisfied by a notification delivered
   /// for the same characteristic via [characteristicValueStream] before the actual
   /// read response arrives (due to the design of iOS BLE API).
+  ///
+  /// This method assumes there is a single characteristic with the ids specified in [characteristic]. If there are
+  /// multiple characteristics with the same id on a device, use [resolve] to find them all. Or use
+  /// [getDiscoveredServices] to select the [Service]s and [Characteristic]s you're interested in.
   Future<List<int>> readCharacteristic(QualifiedCharacteristic characteristic) async {
     await initialize();
     return (await resolveSingle(characteristic)).read();
@@ -161,6 +164,10 @@ class FlutterReactiveBle {
   /// Writes a value to the specified characteristic awaiting for an acknowledgement.
   ///
   /// The returned future completes with an error in case of a failure during writing.
+  ///
+  /// This method assumes there is a single characteristic with the ids specified in [characteristic]. If there are
+  /// multiple characteristics with the same id on a device, use [resolve] to find them all. Or use
+  /// [getDiscoveredServices] to select the [Service]s and [Characteristic]s you're interested in.
   Future<void> writeCharacteristicWithResponse(
     QualifiedCharacteristic characteristic, {
     required List<int> value,
@@ -177,6 +184,10 @@ class FlutterReactiveBle {
   /// the BLE device is still responsive.
   ///
   /// The returned future completes with an error in case of a failure during writing.
+  ///
+  /// This method assumes there is a single characteristic with the ids specified in [characteristic]. If there are
+  /// multiple characteristics with the same id on a device, use [resolve] to find them all. Or use
+  /// [getDiscoveredServices] to select the [Service]s and [Characteristic]s you're interested in.
   Future<void> writeCharacteristicWithoutResponse(
     QualifiedCharacteristic characteristic, {
     required List<int> value,
@@ -378,6 +389,10 @@ class FlutterReactiveBle {
   /// Subscribes to updates from the characteristic specified.
   ///
   /// This stream terminates automatically when the device is disconnected.
+  ///
+  /// This method assumes there is a single characteristic with the ids specified in [characteristic]. If there are
+  /// multiple characteristics with the same id on a device, use [resolve] to find them all. Or use
+  /// [getDiscoveredServices] to select the [Service]s and [Characteristic]s you're interested in.
   Stream<List<int>> subscribeToCharacteristic(QualifiedCharacteristic characteristic) async* {
     yield* (await resolveSingle(characteristic)).subscribe();
   }
@@ -390,9 +405,10 @@ class FlutterReactiveBle {
   }
 
   Future<Characteristic> resolveSingle(QualifiedCharacteristic characteristic) async {
-    final char = (await resolve(characteristic)).singleOrNull;
-    if (char == null) throw Exception("Characteristic not found or discovered: $characteristic");
-    return char;
+    final chars = await resolve(characteristic);
+    if (chars.isEmpty) throw Exception("Characteristic not found or discovered: $characteristic");
+    if (chars.length > 1) throw Exception("Multiple matching characteristics found: $characteristic");
+    return chars.single;
   }
 
   /// Sets the verbosity of debug output.
