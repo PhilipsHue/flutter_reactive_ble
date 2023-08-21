@@ -12,11 +12,16 @@ dependencies:
     sdk: flutter
   protobuf: ^2.0.0
   reactive_ble_platform_interface: ^5.1.1
+
 dev_dependencies:
   build_runner: ^2.3.3
   flutter_test:
     sdk: flutter
   mockito: ^5.0.14
+
+dependency_overrides:
+  reactive_ble_platform_interface:
+    path: ../reactive_ble_platform_interface
 
 flutter:
   plugin:

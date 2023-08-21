@@ -328,8 +328,7 @@ class FlutterReactiveBle {
 
     for (final discoveredService in discoveredServices) {
       final service = services.firstWhere(
-        (service) =>
-            service.id == discoveredService.serviceId && service._instanceId == discoveredService.serviceInstanceId,
+        (service) => _isMatchingService(service, discoveredService),
         orElse: () {
           final newService = Service._(
             id: discoveredService.serviceId,
@@ -342,9 +341,7 @@ class FlutterReactiveBle {
       );
 
       for (final discoveredCharacteristic in discoveredService.characteristics) {
-        if (!service._characteristics.any((char) =>
-            char.id == discoveredCharacteristic.characteristicId &&
-            char._instanceId == discoveredCharacteristic.characteristicInstanceId)) {
+        if (!service._characteristics.any((char) => _isMatchingCharacteristic(char, discoveredCharacteristic))) {
           service._characteristics.add(Characteristic._(
             id: discoveredCharacteristic.characteristicId,
             instanceId: discoveredCharacteristic.characteristicInstanceId,
@@ -359,22 +356,27 @@ class FlutterReactiveBle {
         }
       }
       for (final char in service._characteristics.toList()) {
-        if (!discoveredService.characteristics.any((discoveredCharacteristic) =>
-            char.id == discoveredCharacteristic.characteristicId &&
-            char._instanceId == discoveredCharacteristic.characteristicInstanceId)) {
+        if (!discoveredService.characteristics
+            .any((discoveredCharacteristic) => _isMatchingCharacteristic(char, discoveredCharacteristic))) {
           service._characteristics.remove(char);
         }
       }
     }
     for (final service in services.toList()) {
-      if (!discoveredServices.any((discoveredService) =>
-          service.id == discoveredService.serviceId && service._instanceId == discoveredService.serviceInstanceId)) {
+      if (!discoveredServices.any((discoveredService) => _isMatchingService(service, discoveredService))) {
         services.remove(service);
       }
     }
 
     return services.toList();
   }
+
+  bool _isMatchingService(Service service, DiscoveredService discoveredService) =>
+      service.id == discoveredService.serviceId && service._instanceId == discoveredService.serviceInstanceId;
+
+  bool _isMatchingCharacteristic(Characteristic char, DiscoveredCharacteristic discoveredCharacteristic) =>
+      char.id == discoveredCharacteristic.characteristicId &&
+      char._instanceId == discoveredCharacteristic.characteristicInstanceId;
 
   final _services = <String, List<Service>>{};
 
