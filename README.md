@@ -27,6 +27,7 @@ To update the kotlin version open Android studio and go to `Tools > Kotlin > Con
 The reactive BLE lib supports the following:
 
 - BLE device discovery
+- Permission-less connection on Android using the `CompanionDeviceManager` framework.
 - Observe host device BLE status
 - Establishing a BLE connection
 - Maintaining connection status of multiple BLE devices 

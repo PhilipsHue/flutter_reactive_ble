@@ -97,6 +97,11 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
             }
     }
 
+    override fun establishBond(deviceId: String): Single<Int> {
+        val device = rxBleClient.getBleDevice(deviceId)
+        return BondingManager(context).bondWithDevice(device)
+    }
+
     override fun connectToDevice(deviceId: String, timeout: Duration) {
         allConnections.add(getConnection(deviceId, timeout)
             .subscribe({ result ->
@@ -245,7 +250,7 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
 
     private fun getConnection(
         deviceId: String,
-        timeout: Duration = Duration(0, TimeUnit.MILLISECONDS)
+        timeout: Duration = Duration(0, TimeUnit.MILLISECONDS),
     ): Observable<EstablishConnectionResult> {
         val device = rxBleClient.getBleDevice(deviceId)
         val connector =

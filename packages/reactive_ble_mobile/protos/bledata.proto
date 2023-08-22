@@ -2,6 +2,16 @@ syntax = "proto3";
 option java_package = "com.signify.hue.flutterreactiveble";
 option java_outer_classname = "ProtobufModel";
 
+message LaunchCompanionRequest {
+    string deviceNamePattern = 1;
+    bool singleDeviceScan = 2;
+    bool forceConfirmation = 3;
+}
+
+message DeviceAssociationInfo {
+    string macAddress = 1;
+}
+
 message ScanForDevicesRequest {
     repeated Uuid serviceUuids = 1;
     int32 scanMode = 2;
@@ -19,6 +29,20 @@ message DeviceScanInfo {
     IsConnectable isConnectable = 8;
 }
 
+message EstablishBondingRequest {
+    string deviceId = 1;
+}
+
+message EstablishBondingInfo {
+    enum BondState {
+        NONE = 0;
+        BONDING = 1;
+        BONDED = 2;
+    }
+
+    BondState status = 1;
+}
+
 message ConnectToDeviceRequest {
     string deviceId = 1;
     ServicesWithCharacteristics servicesWithCharacteristicsToDiscover = 2;
@@ -29,6 +53,15 @@ message DeviceInfo {
     string id = 1;
     int32 connectionState = 2;
     GenericFailure failure = 3;
+}
+
+message GetDeviceNameRequest {
+    string deviceId = 1;
+}
+
+message DeviceNameInfo {
+    string id = 1;
+    string deviceName = 2;
 }
 
 message DisconnectFromDeviceRequest {

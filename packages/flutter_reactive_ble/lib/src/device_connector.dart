@@ -6,11 +6,17 @@ import 'package:reactive_ble_platform_interface/reactive_ble_platform_interface.
 abstract class DeviceConnector {
   Stream<ConnectionStateUpdate> get deviceConnectionStateUpdateStream;
 
+  Future<BondingStatus> establishBonding({
+    required String deviceId,
+  });
+
   Stream<ConnectionStateUpdate> connect({
     required String id,
     Map<Uuid, List<Uuid>>? servicesWithCharacteristicsToDiscover,
     Duration? connectionTimeout,
   });
+
+  Future<String?> retrieveDeviceName(String id);
 
   Stream<ConnectionStateUpdate> connectToAdvertisingDevice({
     required String id,
@@ -49,6 +55,10 @@ class DeviceConnectorImpl implements DeviceConnector {
       _blePlatform.connectionUpdateStream;
 
   @override
+  Future<BondingStatus> establishBonding({required String deviceId}) async =>
+      _blePlatform.establishBonding(deviceId);
+
+  @override
   Stream<ConnectionStateUpdate> connect({
     required String id,
     Map<Uuid, List<Uuid>>? servicesWithCharacteristicsToDiscover,
@@ -76,6 +86,10 @@ class DeviceConnectorImpl implements DeviceConnector {
 
     return autoconnectingRepeater.stream;
   }
+
+  @override
+  Future<String?> retrieveDeviceName(String id) =>
+      _blePlatform.retrieveDeviceName(id);
 
   @override
   Stream<ConnectionStateUpdate> connectToAdvertisingDevice({

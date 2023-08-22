@@ -218,7 +218,7 @@ packages:
     dependency: "direct main"
     description:
       path: "../packages/flutter_reactive_ble"
-      relative: false
+      relative: true
     source: path
     version: "5.1.1"
   flutter_test:
@@ -438,7 +438,7 @@ packages:
     dependency: "direct overridden"
     description:
       path: "../packages/reactive_ble_mobile"
-      relative: false
+      relative: true
     source: path
     version: "5.1.1"
   reactive_ble_platform_interface:

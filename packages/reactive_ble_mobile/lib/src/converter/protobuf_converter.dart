@@ -5,9 +5,15 @@ import '../generated/bledata.pb.dart' as pb;
 import '../select_from.dart';
 
 abstract class ProtobufConverter {
+  BondingStatus bondingStatusFrom(List<int> data);
+
   BleStatus bleStatusFrom(List<int> data);
 
+  DeviceAssociationInfo associationInfoFrom(List<int> data);
+
   ScanResult scanResultFrom(List<int> data);
+
+  String deviceNameFrom(List<int> data);
 
   ConnectionStateUpdate connectionStateUpdateFrom(List<int> data);
 
@@ -31,6 +37,25 @@ class ProtobufConverterImpl implements ProtobufConverter {
   const ProtobufConverterImpl();
 
   @override
+  BondingStatus bondingStatusFrom(List<int> data) {
+    final message = pb.EstablishBondingInfo.fromBuffer(data);
+    switch (message.status) {
+      case pb.EstablishBondingInfo_BondState.BONDING:
+        return BondingStatus.bonding;
+      case pb.EstablishBondingInfo_BondState.BONDED:
+        return BondingStatus.bonded;
+      case pb.EstablishBondingInfo_BondState.NONE:
+        return BondingStatus.none;
+    }
+
+    throw ArgumentError.value(
+      message.status,
+      'message.status',
+      'Unknown bonding status',
+    );
+  }
+
+  @override
   BleStatus bleStatusFrom(List<int> data) {
     final message = pb.BleStatusInfo.fromBuffer(data);
     return selectFrom(
@@ -38,6 +63,13 @@ class ProtobufConverterImpl implements ProtobufConverter {
       index: message.status,
       fallback: (_) => BleStatus.unknown,
     );
+  }
+
+  @override
+  DeviceAssociationInfo associationInfoFrom(List<int> data) {
+    final pbVersion = pb.DeviceAssociationInfo.fromBuffer(data);
+
+    return DeviceAssociationInfo(macAddress: pbVersion.macAddress);
   }
 
   @override
@@ -71,6 +103,12 @@ class ProtobufConverterImpl implements ProtobufConverter {
             fallback: (rawOrNull) => ScanFailure.unknown),
       ),
     );
+  }
+
+  @override
+  String deviceNameFrom(List<int> data) {
+    final deviceNameInfo = pb.DeviceNameInfo.fromBuffer(data);
+    return deviceNameInfo.deviceName;
   }
 
   @override

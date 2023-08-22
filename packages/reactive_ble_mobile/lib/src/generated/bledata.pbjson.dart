@@ -13,6 +13,35 @@ import 'dart:convert' as $convert;
 import 'dart:core' as $core;
 import 'dart:typed_data' as $typed_data;
 
+@$core.Deprecated('Use launchCompanionRequestDescriptor instead')
+const LaunchCompanionRequest$json = {
+  '1': 'LaunchCompanionRequest',
+  '2': [
+    {'1': 'deviceNamePattern', '3': 1, '4': 1, '5': 9, '10': 'deviceNamePattern'},
+    {'1': 'singleDeviceScan', '3': 2, '4': 1, '5': 8, '10': 'singleDeviceScan'},
+    {'1': 'forceConfirmation', '3': 3, '4': 1, '5': 8, '10': 'forceConfirmation'},
+  ],
+};
+
+/// Descriptor for `LaunchCompanionRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List launchCompanionRequestDescriptor = $convert.base64Decode(
+    'ChZMYXVuY2hDb21wYW5pb25SZXF1ZXN0EiwKEWRldmljZU5hbWVQYXR0ZXJuGAEgASgJUhFkZX'
+    'ZpY2VOYW1lUGF0dGVybhIqChBzaW5nbGVEZXZpY2VTY2FuGAIgASgIUhBzaW5nbGVEZXZpY2VT'
+    'Y2FuEiwKEWZvcmNlQ29uZmlybWF0aW9uGAMgASgIUhFmb3JjZUNvbmZpcm1hdGlvbg==');
+
+@$core.Deprecated('Use deviceAssociationInfoDescriptor instead')
+const DeviceAssociationInfo$json = {
+  '1': 'DeviceAssociationInfo',
+  '2': [
+    {'1': 'macAddress', '3': 1, '4': 1, '5': 9, '10': 'macAddress'},
+  ],
+};
+
+/// Descriptor for `DeviceAssociationInfo`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List deviceAssociationInfoDescriptor = $convert.base64Decode(
+    'ChVEZXZpY2VBc3NvY2lhdGlvbkluZm8SHgoKbWFjQWRkcmVzcxgBIAEoCVIKbWFjQWRkcmVzcw'
+    '==');
+
 @$core.Deprecated('Use scanForDevicesRequestDescriptor instead')
 const ScanForDevicesRequest$json = {
   '1': 'ScanForDevicesRequest',
@@ -54,6 +83,43 @@ final $typed_data.Uint8List deviceScanInfoDescriptor = $convert.base64Decode(
     'DHNlcnZpY2VVdWlkcxISCgRyc3NpGAUgASgFUgRyc3NpEjQKDWlzQ29ubmVjdGFibGUYCCABKA'
     'syDi5Jc0Nvbm5lY3RhYmxlUg1pc0Nvbm5lY3RhYmxl');
 
+@$core.Deprecated('Use establishBondingRequestDescriptor instead')
+const EstablishBondingRequest$json = {
+  '1': 'EstablishBondingRequest',
+  '2': [
+    {'1': 'deviceId', '3': 1, '4': 1, '5': 9, '10': 'deviceId'},
+  ],
+};
+
+/// Descriptor for `EstablishBondingRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List establishBondingRequestDescriptor = $convert.base64Decode(
+    'ChdFc3RhYmxpc2hCb25kaW5nUmVxdWVzdBIaCghkZXZpY2VJZBgBIAEoCVIIZGV2aWNlSWQ=');
+
+@$core.Deprecated('Use establishBondingInfoDescriptor instead')
+const EstablishBondingInfo$json = {
+  '1': 'EstablishBondingInfo',
+  '2': [
+    {'1': 'status', '3': 1, '4': 1, '5': 14, '6': '.EstablishBondingInfo.BondState', '10': 'status'},
+  ],
+  '4': [EstablishBondingInfo_BondState$json],
+};
+
+@$core.Deprecated('Use establishBondingInfoDescriptor instead')
+const EstablishBondingInfo_BondState$json = {
+  '1': 'BondState',
+  '2': [
+    {'1': 'NONE', '2': 0},
+    {'1': 'BONDING', '2': 1},
+    {'1': 'BONDED', '2': 2},
+  ],
+};
+
+/// Descriptor for `EstablishBondingInfo`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List establishBondingInfoDescriptor = $convert.base64Decode(
+    'ChRFc3RhYmxpc2hCb25kaW5nSW5mbxI3CgZzdGF0dXMYASABKA4yHy5Fc3RhYmxpc2hCb25kaW'
+    '5nSW5mby5Cb25kU3RhdGVSBnN0YXR1cyIuCglCb25kU3RhdGUSCAoETk9ORRAAEgsKB0JPTkRJ'
+    'TkcQARIKCgZCT05ERUQQAg==');
+
 @$core.Deprecated('Use connectToDeviceRequestDescriptor instead')
 const ConnectToDeviceRequest$json = {
   '1': 'ConnectToDeviceRequest',
@@ -86,6 +152,32 @@ final $typed_data.Uint8List deviceInfoDescriptor = $convert.base64Decode(
     'CgpEZXZpY2VJbmZvEg4KAmlkGAEgASgJUgJpZBIoCg9jb25uZWN0aW9uU3RhdGUYAiABKAVSD2'
     'Nvbm5lY3Rpb25TdGF0ZRIpCgdmYWlsdXJlGAMgASgLMg8uR2VuZXJpY0ZhaWx1cmVSB2ZhaWx1'
     'cmU=');
+
+@$core.Deprecated('Use getDeviceNameRequestDescriptor instead')
+const GetDeviceNameRequest$json = {
+  '1': 'GetDeviceNameRequest',
+  '2': [
+    {'1': 'deviceId', '3': 1, '4': 1, '5': 9, '10': 'deviceId'},
+  ],
+};
+
+/// Descriptor for `GetDeviceNameRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List getDeviceNameRequestDescriptor = $convert.base64Decode(
+    'ChRHZXREZXZpY2VOYW1lUmVxdWVzdBIaCghkZXZpY2VJZBgBIAEoCVIIZGV2aWNlSWQ=');
+
+@$core.Deprecated('Use deviceNameInfoDescriptor instead')
+const DeviceNameInfo$json = {
+  '1': 'DeviceNameInfo',
+  '2': [
+    {'1': 'id', '3': 1, '4': 1, '5': 9, '10': 'id'},
+    {'1': 'deviceName', '3': 2, '4': 1, '5': 9, '10': 'deviceName'},
+  ],
+};
+
+/// Descriptor for `DeviceNameInfo`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List deviceNameInfoDescriptor = $convert.base64Decode(
+    'Cg5EZXZpY2VOYW1lSW5mbxIOCgJpZBgBIAEoCVICaWQSHgoKZGV2aWNlTmFtZRgCIAEoCVIKZG'
+    'V2aWNlTmFtZQ==');
 
 @$core.Deprecated('Use disconnectFromDeviceRequestDescriptor instead')
 const DisconnectFromDeviceRequest$json = {

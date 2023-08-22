@@ -9,7 +9,6 @@ import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.verify
-import io.mockk.verifySequence
 import io.reactivex.Observable
 import io.reactivex.subjects.BehaviorSubject
 import org.junit.jupiter.api.AfterEach

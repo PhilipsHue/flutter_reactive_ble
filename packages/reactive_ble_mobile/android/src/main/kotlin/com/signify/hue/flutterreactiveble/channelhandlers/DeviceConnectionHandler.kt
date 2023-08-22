@@ -4,6 +4,7 @@ import com.signify.hue.flutterreactiveble.ProtobufModel as pb
 import com.signify.hue.flutterreactiveble.converters.ProtobufMessageConverter
 import com.signify.hue.flutterreactiveble.utils.Duration
 import io.flutter.plugin.common.EventChannel
+import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import java.util.concurrent.TimeUnit
@@ -24,6 +25,10 @@ class DeviceConnectionHandler(private val bleClient: com.signify.hue.flutterreac
     override fun onCancel(objectSink: Any?) {
         disconnectAll()
         connectionUpdatesDisposable.dispose()
+    }
+
+    fun establishBonding(connectToDeviceMessage: pb.EstablishBondingRequest): Single<Int> {
+        return bleClient.establishBond(connectToDeviceMessage.deviceId)
     }
 
     fun connectToDevice(connectToDeviceMessage: pb.ConnectToDeviceRequest) {
