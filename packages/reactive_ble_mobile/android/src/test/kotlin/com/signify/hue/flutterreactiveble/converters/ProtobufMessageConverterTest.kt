@@ -211,7 +211,7 @@ class ProtobufMessageConverterTest {
         @Test
         @MethodSource("provideParameters")
         fun `converts bonded`(bondState: BondState, androidConstant: Int) {
-            assertThat(protobufConverter.convertBondInfo(androidConstant)).isEqualTo(bondState)
+            assertThat(protobufConverter.convertBondingInfo(androidConstant)).isEqualTo(bondState)
         }
 
         private fun provideParameters(): Stream<Arguments?>? {
@@ -226,7 +226,7 @@ class ProtobufMessageConverterTest {
         fun `converts unknown to none`() {
             val result = BluetoothDevice.BOND_BONDED
 
-            assertThat(protobufConverter.convertBondInfo(result)).isEqualTo(pb.EstablishBondingInfo.BondState.BONDED)
+            assertThat(protobufConverter.convertBondingInfo(result)).isEqualTo(pb.EstablishBondingInfo.BondState.BONDED)
         }
     }
 

@@ -5,7 +5,6 @@ import android.bluetooth.BluetoothGattCharacteristic
 import android.bluetooth.BluetoothGattService
 import com.google.protobuf.ByteString
 import com.polidea.rxandroidble2.RxBleDeviceServices
-import com.signify.hue.flutterreactiveble.ProtobufModel
 import com.signify.hue.flutterreactiveble.ProtobufModel.EstablishBondingInfo.BondState
 import com.signify.hue.flutterreactiveble.ble.ConnectionUpdateSuccess
 import com.signify.hue.flutterreactiveble.ble.MtuNegotiateFailed
@@ -263,7 +262,7 @@ class ProtobufMessageConverter {
         return pb.Uuid.newBuilder().setData(ByteString.copyFrom(convertedUuid)).build()
     }
 
-    fun convertBondInfo(status: Int): pb.EstablishBondingInfo {
+    fun convertBondingInfo(status: Int): pb.EstablishBondingInfo {
         val bondState = when (status) {
             BluetoothDevice.BOND_BONDED -> BondState.BONDED
             BluetoothDevice.BOND_BONDING -> BondState.BONDING

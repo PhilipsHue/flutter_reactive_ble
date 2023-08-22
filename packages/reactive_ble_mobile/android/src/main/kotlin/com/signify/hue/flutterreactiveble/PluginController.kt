@@ -4,7 +4,6 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Build
-import android.util.Log
 import com.signify.hue.flutterreactiveble.ble.RequestConnectionPriorityFailed
 import com.signify.hue.flutterreactiveble.channelhandlers.BleStatusHandler
 import com.signify.hue.flutterreactiveble.channelhandlers.CharNotificationHandler
@@ -37,7 +36,7 @@ class PluginController : PluginRegistry.ActivityResultListener {
         "deinitialize" to this::deinitializeClient,
         "launchCompanionWorkflow" to this::launchCompanionFlow,
         "scanForDevices" to this::scanForDevices,
-        "establishBond" to this::establishBond,
+        "establishBonding" to this::establishBonding,
         "connectToDevice" to this::connectToDevice,
         "clearGattCache" to this::clearGattCache,
         "disconnectFromDevice" to this::disconnectFromDevice,
@@ -73,7 +72,7 @@ class PluginController : PluginRegistry.ActivityResultListener {
         charNotificationChannel = EventChannel(messenger, "flutter_reactive_ble_char_update")
         val bleStatusChannel = EventChannel(messenger, "flutter_reactive_ble_status")
 
-        companionHandler = CompanionHandler(context, bleClient)
+        companionHandler = CompanionHandler()
         scandevicesHandler = ScanDevicesHandler(bleClient)
         deviceConnectionHandler = DeviceConnectionHandler(bleClient)
         charNotificationHandler = CharNotificationHandler(bleClient)
@@ -124,12 +123,12 @@ class PluginController : PluginRegistry.ActivityResultListener {
         result.success(null)
     }
 
-    private fun establishBond(call: MethodCall, result: Result) {
-        val establishBondMessage = pb.EstablishBondingRequest.parseFrom(call.arguments as ByteArray)
-        deviceConnectionHandler.establishBond(establishBondMessage).subscribe({
-            result.success(protoConverter.convertBondInfo(it).toByteArray())
+    private fun establishBonding(call: MethodCall, result: Result) {
+        val establishBondingMessage = pb.EstablishBondingRequest.parseFrom(call.arguments as ByteArray)
+        deviceConnectionHandler.establishBonding(establishBondingMessage).subscribe({
+            result.success(protoConverter.convertBondingInfo(it).toByteArray())
         }, {
-            result.error("establish_bond_error", it.message, null)
+            result.error("establish_bonding_error", it.message, null)
         }).discard()
     }
 
@@ -364,20 +363,14 @@ class PluginController : PluginRegistry.ActivityResultListener {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?): Boolean {
         if (requestCode == CompanionHandler.SELECT_DEVICE_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
-            Log.d(
-                TAG,
-                "received result from device selection activity, parsing via companion handler"
-            )
-
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-                Log.d(TAG, "not running on Android O, ignoring result")
                 return false;
             }
 
-            Log.d(TAG, "running on Android O, parsing result")
+            // When
+            companionHandler.onActivityResult(data) ?: return false
 
-            val scanResult = companionHandler.onActivityResult(data) ?: return false
-            Log.d(TAG, "got the scan result: ${scanResult.device.address}")
+            return true
         }
 
         return false
