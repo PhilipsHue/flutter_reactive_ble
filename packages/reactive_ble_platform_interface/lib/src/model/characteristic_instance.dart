@@ -7,13 +7,17 @@ class CharacteristicInstance {
   /// Unique uuid of the specific characteristic
   final Uuid characteristicId;
 
-  /// When empty, the first characteristic with [characteristicId] is used
+  /// The id that identifies the specific instance of all characteristics with [characteristicId] in a given service.
+  /// This should no be exposed to user of the plugin as it may be different each time a device is connected to, so it
+  /// should not be used to identify characteristics across sessions.
   final String characteristicInstanceId;
 
   /// Service uuid of the characteristic
   final Uuid serviceId;
 
-  /// When empty, the first service with [serviceId] is used
+  /// The id that identifies the specific instance of all services with [serviceId] in a given device.
+  /// This should no be exposed to user of the plugin as it may be different each time a device is connected to, so it
+  /// should not be used to identify characteristics across sessions.
   final String serviceInstanceId;
 
   /// Device id of the BLE device

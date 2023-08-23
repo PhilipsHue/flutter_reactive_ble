@@ -88,21 +88,26 @@ final class Central {
                 else {
                     return
                 }
-                
+
                 central.characteristicNotifyRegistry.updateTask(
                     key: q,
                     action: { $0.complete(error: error) }
                 )
             },
             onCharacteristicValueUpdate: papply(weak: self) { central, characteristic, error in
-                onCharacteristicValueUpdate(central, try! CharacteristicInstance(characteristic), characteristic.value, error)
+                guard let q = try? CharacteristicInstance(characteristic)
+                else {
+                    return
+                }
+
+                onCharacteristicValueUpdate(central, q, characteristic.value, error)
             },
             onCharacteristicValueWrite: papply(weak: self) { central, characteristic, error in
                 guard let q = try? CharacteristicInstance(characteristic)
                 else {
                     return
                 }
-                
+
                 central.characteristicWriteRegistry.updateTask(
                     key: q,
                     action: { $0.handleWrite(error: error) }

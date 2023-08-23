@@ -173,6 +173,7 @@ void main() {
               )
             ]);
         when(_deviceOperation.readCharacteristic(any)).thenAnswer((_) async => [1]);
+        when(_deviceConnector.deviceConnectionStateUpdateStream).thenAnswer((_) => const Stream.empty());
 
         result = await _sut.readCharacteristic(characteristic);
       });
@@ -233,6 +234,7 @@ void main() {
                 ],
               )
             ]);
+        when(_deviceConnector.deviceConnectionStateUpdateStream).thenAnswer((_) => const Stream.empty());
 
         await _sut.writeCharacteristicWithResponse(characteristic, value: value);
       });
@@ -292,6 +294,7 @@ void main() {
                 ],
               )
             ]);
+        when(_deviceConnector.deviceConnectionStateUpdateStream).thenAnswer((_) => const Stream.empty());
 
         await _sut.writeCharacteristicWithoutResponse(
           characteristic,
@@ -648,6 +651,7 @@ void main() {
                 )
               ]);
           when(_deviceOperation.readCharacteristic(any)).thenAnswer((_) async => [42]);
+          when(_deviceConnector.deviceConnectionStateUpdateStream).thenAnswer((_) => const Stream.empty());
         });
 
         test("reading first instance of characteristic", () async {
@@ -719,6 +723,7 @@ void main() {
               ],
             ),
           ]);
+          when(_deviceConnector.deviceConnectionStateUpdateStream).thenAnswer((_) => const Stream.empty());
           when(_deviceOperation.readCharacteristic(any)).thenAnswer((_) async => [42]);
         });
 

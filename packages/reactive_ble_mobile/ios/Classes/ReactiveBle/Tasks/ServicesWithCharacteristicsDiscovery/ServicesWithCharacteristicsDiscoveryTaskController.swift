@@ -103,7 +103,7 @@ struct ServicesWithCharacteristicsDiscoveryTaskController: PeripheralTaskControl
                     knownServices?
                         .filter({ $0.uuid == item.key })
                         .map { service in (service, item.value) }
-                }.flatMap({ x in x })
+                }.flatMap { $0 }
         }
 
         items?.forEach(body)

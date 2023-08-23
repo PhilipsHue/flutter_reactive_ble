@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:collection';
 import 'dart:io';
 
 import 'package:flutter_reactive_ble/src/connected_device_operation.dart';
@@ -141,6 +142,8 @@ class FlutterReactiveBle {
   Future<void> deinitialize() async {
     if (_initialization != null) {
       _initialization = null;
+      await _disconnectionUpdates?.cancel();
+      _disconnectionUpdates = null;
       await _blePlatform.deinitialize();
     }
   }
@@ -322,6 +325,13 @@ class FlutterReactiveBle {
   ///
   /// Note: On Android, this method performs service discovery if one was done yet after connecting the device.
   Future<List<Service>> getDiscoveredServices(String deviceId) async {
+    _disconnectionUpdates ??= connectedDeviceStream
+        .where((update) => update.connectionState == DeviceConnectionState.disconnected)
+        .listen((update) {
+      _services[update.deviceId]?.forEach((service) => service._markInvalid());
+      _services[update.deviceId]?.clear();
+    });
+
     final discoveredServices = await _connectedDeviceOperator.getDiscoverServices(deviceId);
 
     final services = _services[deviceId] ?? [];
@@ -355,21 +365,18 @@ class FlutterReactiveBle {
           ));
         }
       }
-      for (final char in service._characteristics.toList()) {
-        if (!discoveredService.characteristics
-            .any((discoveredCharacteristic) => _isMatchingCharacteristic(char, discoveredCharacteristic))) {
-          service._characteristics.remove(char);
-        }
-      }
+      service._characteristics.removeWhere((char) => !discoveredService.characteristics.any(
+            (discoveredCharacteristic) => _isMatchingCharacteristic(char, discoveredCharacteristic),
+          ));
     }
-    for (final service in services.toList()) {
-      if (!discoveredServices.any((discoveredService) => _isMatchingService(service, discoveredService))) {
-        services.remove(service);
-      }
-    }
+    services.removeWhere(
+      (service) => !discoveredServices.any((discoveredService) => _isMatchingService(service, discoveredService)),
+    );
 
-    return services.toList();
+    return UnmodifiableListView(services);
   }
+
+  StreamSubscription<ConnectionStateUpdate>? _disconnectionUpdates;
 
   bool _isMatchingService(Service service, DiscoveredService discoveredService) =>
       service.id == discoveredService.serviceId && service._instanceId == discoveredService.serviceInstanceId;
@@ -432,14 +439,25 @@ class Service {
 
   final Uuid id;
 
+  // Not exposed as it may be different each time a device is connected to, so it should not be used to identify
+  // services. Instead, services have to be discovered after connecting and looked up via
+  // [FlutterReactiveBle.getDiscoverServices]
   final String _instanceId;
 
   final String deviceId;
 
   /// Discovered characteristics
-  List<Characteristic> get characteristics => _characteristics;
+  List<Characteristic> get characteristics => UnmodifiableListView(_characteristics);
 
   final List<Characteristic> _characteristics = [];
+
+  // A Service becomes invalid when its device gets disconnected. After reconnecting to the device, services have to be
+  // rediscovered
+  void _markInvalid() {
+    for (final characteristic in _characteristics) {
+      characteristic._markInvalid();
+    }
+  }
 
   @override
   String toString() => "Service($id)";
@@ -483,11 +501,14 @@ class Characteristic {
   /// Be aware that a read request could be satisfied by a notification delivered
   /// for the same characteristic via [FlutterReactiveBle.characteristicValueStream] before the actual
   /// read response arrives (due to the design of iOS BLE API).
-  Future<List<int>> read() => _lib._connectedDeviceOperator.readCharacteristic(_ids);
+  Future<List<int>> read() {
+    _assertValidity();
+    return _lib._connectedDeviceOperator.readCharacteristic(_ids);
+  }
 
   /// Writes a value to the specified characteristic.
   ///
-  /// WHen [withResponse] is false, writing is done without waiting for an acknowledgement.
+  /// When [withResponse] is false, writing is done without waiting for an acknowledgement.
   /// Use this in case client does not need an acknowledgement
   /// that the write was successfully performed. For consequitive write operations it is
   /// recommended to execute a write with [withResponse] true each n times to make sure
@@ -495,6 +516,8 @@ class Characteristic {
   ///
   /// The returned future completes with an error in case of a failure during writing.
   Future<void> write(List<int> value, {bool withResponse = true}) async {
+    _assertValidity();
+
     if (withResponse) {
       await _lib._connectedDeviceOperator.writeCharacteristicWithResponse(_ids, value: value);
     } else {
@@ -506,6 +529,8 @@ class Characteristic {
   ///
   /// This stream terminates automatically when the device is disconnected.
   Stream<List<int>> subscribe() {
+    _assertValidity();
+
     final isDisconnected = _lib.connectedDeviceStream
         .where((update) =>
             update.deviceId == service.deviceId &&
@@ -526,6 +551,23 @@ class Characteristic {
             isDisconnected,
           ),
         );
+  }
+
+  // A Characteristic becomes invalid when its device gets disconnected. After reconnecting to the device,
+  // services and characteristics have to be rediscovered
+  bool _valid = true;
+
+  void _markInvalid() {
+    _valid = false;
+  }
+
+  void _assertValidity() {
+    if (!_valid) {
+      throw Exception(
+        "Characteristic no longer valid. Characteristics lose their validity after a device gets disconnected. "
+        "Rediscover services and characteristics after reconnecting to the device.",
+      );
+    }
   }
 
   final FlutterReactiveBle _lib;
