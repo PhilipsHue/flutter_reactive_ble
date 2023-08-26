@@ -18,7 +18,7 @@ class FlutterReactiveBle {
 
   factory FlutterReactiveBle() => _sharedInstance;
 
-  ///Create a new instance where injected depedencies are used.
+  ///Create a new instance where injected dependencies are used.
   @visibleForTesting
   FlutterReactiveBle.witDependencies({
     required DeviceScanner deviceScanner,
@@ -247,7 +247,7 @@ class FlutterReactiveBle {
   /// Disconnecting the device is achieved by cancelling the stream subscription.
   ///
   /// [id] is the unique device id of the BLE device: in iOS this is a uuid and on Android this is
-  /// a Mac-Adress.
+  /// a Mac-Address.
   /// Use [servicesWithCharacteristicsToDiscover] to scan only for the specific services mentioned in this map,
   /// this can improve the connection speed on iOS since no full service discovery will be executed. On Android
   /// this variable is ignored since partial discovery is not possible.
@@ -273,7 +273,7 @@ class FlutterReactiveBle {
   ///
   /// Disconnecting the device is achieved by cancelling the stream subscription.
   ///
-  /// The [prescanDuration] is the amount of time BLE disovery should run in order to find the device.
+  /// The [prescanDuration] is the amount of time BLE discovery should run in order to find the device.
   /// Use [servicesWithCharacteristicsToDiscover] to scan only for the specific services mentioned in this map,
   /// this can improve the connection speed on iOS since no full service discovery will be executed. On Android
   /// this variable is ignored since partial discovery is not possible.

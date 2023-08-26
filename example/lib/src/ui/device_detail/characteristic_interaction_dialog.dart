@@ -17,9 +17,8 @@ class CharacteristicInteractionDialog extends StatelessWidget {
       builder: (context, interactor, _) => _CharacteristicInteractionDialog(
             characteristic: characteristic,
             readCharacteristic: interactor.readCharacteristic,
-            writeWithResponse: interactor.writeCharacterisiticWithResponse,
-            writeWithoutResponse:
-                interactor.writeCharacterisiticWithoutResponse,
+            writeWithResponse: interactor.writeCharacteristicWithResponse,
+            writeWithoutResponse: interactor.writeCharacteristicWithoutResponse,
             subscribeToCharacteristic: interactor.subScribeToCharacteristic,
           ));
 }

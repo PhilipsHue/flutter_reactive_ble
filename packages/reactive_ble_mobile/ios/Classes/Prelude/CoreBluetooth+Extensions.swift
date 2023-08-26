@@ -13,7 +13,7 @@ import class CoreBluetooth.CBPeripheral
 //
 // Thus this code shadows original property declarations in CoreBluetooth
 // and changes their semantics from `unsafe non-optional` to `weak optional`
-// to mimic Xcode 13 behaviour.
+// to mimic Xcode 13 behavior.
 //
 // - Note: This code compiles only when using Xcode 12 and below.
 // - SeeAlso: https://forums.swift.org/t/is-unowned-unsafe-t-weak-t-a-breaking-change/49917

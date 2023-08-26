@@ -1,7 +1,7 @@
 struct ConnectTaskSpec: PeripheralTaskSpec {
 
     typealias Key = PeripheralID
-    
+
     struct Params {}
 
     enum Stage {

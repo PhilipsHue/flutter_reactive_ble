@@ -46,8 +46,7 @@ final class PeripheralTaskRegistry<Controller: PeripheralTaskController> {
                 tasks.update(record.with(task: updatedTask))
                 if  case .pending = record.task.state,
                     case .processing = updatedTask.state,
-                    let timeout = record.task.timeout
-                {
+                    let timeout = record.task.timeout {
                     scheduleTaskTimeout(record.uniqueID, timeout)
                 }
             }
