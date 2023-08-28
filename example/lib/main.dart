@@ -24,11 +24,10 @@ void main() {
     logMessage: _bleLogger.addToLog,
   );
   final _serviceDiscoverer = BleDeviceInteractor(
-    bleDiscoverServices: _ble.discoverServices,
-    readCharacteristic: _ble.readCharacteristic,
-    writeWithResponse: _ble.writeCharacteristicWithResponse,
-    writeWithOutResponse: _ble.writeCharacteristicWithoutResponse,
-    subscribeToCharacteristic: _ble.subscribeToCharacteristic,
+    bleDiscoverServices: (deviceId) async {
+      await _ble.discoverAllServices(deviceId);
+      return _ble.getDiscoveredServices(deviceId);
+    },
     logMessage: _bleLogger.addToLog,
   );
   runApp(

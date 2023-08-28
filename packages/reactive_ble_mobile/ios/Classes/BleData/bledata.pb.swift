@@ -437,6 +437,10 @@ struct CharacteristicAddress {
   /// Clears the value of `characteristicUuid`. Subsequent reads from it will return its default value.
   mutating func clearCharacteristicUuid() {self._characteristicUuid = nil}
 
+  var serviceInstanceID: String = String()
+
+  var characteristicInstanceID: String = String()
+
   var unknownFields = SwiftProtobuf.UnknownStorage()
 
   init() {}
@@ -549,6 +553,8 @@ struct DiscoveredService {
 
   var characteristics: [DiscoveredCharacteristic] = []
 
+  var serviceInstanceID: String = String()
+
   var unknownFields = SwiftProtobuf.UnknownStorage()
 
   init() {}
@@ -588,6 +594,8 @@ struct DiscoveredCharacteristic {
   var isNotifiable: Bool = false
 
   var isIndicatable: Bool = false
+
+  var characteristicInstanceID: String = String()
 
   var unknownFields = SwiftProtobuf.UnknownStorage()
 
@@ -1431,6 +1439,8 @@ extension CharacteristicAddress: SwiftProtobuf.Message, SwiftProtobuf._MessageIm
     1: .same(proto: "deviceId"),
     2: .same(proto: "serviceUuid"),
     3: .same(proto: "characteristicUuid"),
+    4: .same(proto: "serviceInstanceId"),
+    5: .same(proto: "characteristicInstanceId"),
   ]
 
   mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -1442,6 +1452,8 @@ extension CharacteristicAddress: SwiftProtobuf.Message, SwiftProtobuf._MessageIm
       case 1: try { try decoder.decodeSingularStringField(value: &self.deviceID) }()
       case 2: try { try decoder.decodeSingularMessageField(value: &self._serviceUuid) }()
       case 3: try { try decoder.decodeSingularMessageField(value: &self._characteristicUuid) }()
+      case 4: try { try decoder.decodeSingularStringField(value: &self.serviceInstanceID) }()
+      case 5: try { try decoder.decodeSingularStringField(value: &self.characteristicInstanceID) }()
       default: break
       }
     }
@@ -1461,6 +1473,12 @@ extension CharacteristicAddress: SwiftProtobuf.Message, SwiftProtobuf._MessageIm
     try { if let v = self._characteristicUuid {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 3)
     } }()
+    if !self.serviceInstanceID.isEmpty {
+      try visitor.visitSingularStringField(value: self.serviceInstanceID, fieldNumber: 4)
+    }
+    if !self.characteristicInstanceID.isEmpty {
+      try visitor.visitSingularStringField(value: self.characteristicInstanceID, fieldNumber: 5)
+    }
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -1468,6 +1486,8 @@ extension CharacteristicAddress: SwiftProtobuf.Message, SwiftProtobuf._MessageIm
     if lhs.deviceID != rhs.deviceID {return false}
     if lhs._serviceUuid != rhs._serviceUuid {return false}
     if lhs._characteristicUuid != rhs._characteristicUuid {return false}
+    if lhs.serviceInstanceID != rhs.serviceInstanceID {return false}
+    if lhs.characteristicInstanceID != rhs.characteristicInstanceID {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
@@ -1666,6 +1686,7 @@ extension DiscoveredService: SwiftProtobuf.Message, SwiftProtobuf._MessageImplem
     2: .same(proto: "characteristicUuids"),
     3: .same(proto: "includedServices"),
     4: .same(proto: "characteristics"),
+    5: .same(proto: "serviceInstanceId"),
   ]
 
   mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -1678,6 +1699,7 @@ extension DiscoveredService: SwiftProtobuf.Message, SwiftProtobuf._MessageImplem
       case 2: try { try decoder.decodeRepeatedMessageField(value: &self.characteristicUuids) }()
       case 3: try { try decoder.decodeRepeatedMessageField(value: &self.includedServices) }()
       case 4: try { try decoder.decodeRepeatedMessageField(value: &self.characteristics) }()
+      case 5: try { try decoder.decodeSingularStringField(value: &self.serviceInstanceID) }()
       default: break
       }
     }
@@ -1700,6 +1722,9 @@ extension DiscoveredService: SwiftProtobuf.Message, SwiftProtobuf._MessageImplem
     if !self.characteristics.isEmpty {
       try visitor.visitRepeatedMessageField(value: self.characteristics, fieldNumber: 4)
     }
+    if !self.serviceInstanceID.isEmpty {
+      try visitor.visitSingularStringField(value: self.serviceInstanceID, fieldNumber: 5)
+    }
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -1708,6 +1733,7 @@ extension DiscoveredService: SwiftProtobuf.Message, SwiftProtobuf._MessageImplem
     if lhs.characteristicUuids != rhs.characteristicUuids {return false}
     if lhs.includedServices != rhs.includedServices {return false}
     if lhs.characteristics != rhs.characteristics {return false}
+    if lhs.serviceInstanceID != rhs.serviceInstanceID {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
@@ -1723,6 +1749,7 @@ extension DiscoveredCharacteristic: SwiftProtobuf.Message, SwiftProtobuf._Messag
     5: .same(proto: "isWritableWithoutResponse"),
     6: .same(proto: "isNotifiable"),
     7: .same(proto: "isIndicatable"),
+    8: .same(proto: "characteristicInstanceId"),
   ]
 
   mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -1738,6 +1765,7 @@ extension DiscoveredCharacteristic: SwiftProtobuf.Message, SwiftProtobuf._Messag
       case 5: try { try decoder.decodeSingularBoolField(value: &self.isWritableWithoutResponse) }()
       case 6: try { try decoder.decodeSingularBoolField(value: &self.isNotifiable) }()
       case 7: try { try decoder.decodeSingularBoolField(value: &self.isIndicatable) }()
+      case 8: try { try decoder.decodeSingularStringField(value: &self.characteristicInstanceID) }()
       default: break
       }
     }
@@ -1769,6 +1797,9 @@ extension DiscoveredCharacteristic: SwiftProtobuf.Message, SwiftProtobuf._Messag
     if self.isIndicatable != false {
       try visitor.visitSingularBoolField(value: self.isIndicatable, fieldNumber: 7)
     }
+    if !self.characteristicInstanceID.isEmpty {
+      try visitor.visitSingularStringField(value: self.characteristicInstanceID, fieldNumber: 8)
+    }
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -1780,6 +1811,7 @@ extension DiscoveredCharacteristic: SwiftProtobuf.Message, SwiftProtobuf._Messag
     if lhs.isWritableWithoutResponse != rhs.isWritableWithoutResponse {return false}
     if lhs.isNotifiable != rhs.isNotifiable {return false}
     if lhs.isIndicatable != rhs.isIndicatable {return false}
+    if lhs.characteristicInstanceID != rhs.characteristicInstanceID {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }

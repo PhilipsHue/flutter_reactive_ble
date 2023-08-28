@@ -9,6 +9,8 @@ class DiscoveredCharacteristic {
   /// Unique uuid of the specific characteristic
   final Uuid characteristicId;
 
+  final String characteristicInstanceId;
+
   /// Service uuid of the characteristic
   final Uuid serviceId;
 
@@ -21,6 +23,7 @@ class DiscoveredCharacteristic {
 
   const DiscoveredCharacteristic({
     required this.characteristicId,
+    required this.characteristicInstanceId,
     required this.serviceId,
     required this.isReadable,
     required this.isWritableWithResponse,

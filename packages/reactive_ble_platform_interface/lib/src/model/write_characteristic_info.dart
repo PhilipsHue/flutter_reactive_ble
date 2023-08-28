@@ -1,13 +1,13 @@
 import 'package:meta/meta.dart';
 
+import 'characteristic_instance.dart';
 import 'generic_failure.dart';
-import 'qualified_characteristic.dart';
 import 'result.dart';
 import 'unit.dart';
 
 @immutable
 class WriteCharacteristicInfo {
-  final QualifiedCharacteristic characteristic;
+  final CharacteristicInstance characteristic;
   final Result<Unit, GenericFailure<WriteCharacteristicFailure>?> result;
 
   const WriteCharacteristicInfo({

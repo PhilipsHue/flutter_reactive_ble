@@ -504,9 +504,11 @@ void main() {
 
           final discoveredInternalServices = pb.DiscoveredService()
             ..serviceUuid = internalServiceUuid
+            ..serviceInstanceId = '11'
             ..characteristics.add(
               pb.DiscoveredCharacteristic()
                 ..characteristicId = internalCharUuid
+                ..characteristicInstanceId = '102'
                 ..serviceId = internalServiceUuid
                 ..isReadable = true,
             )
@@ -514,10 +516,12 @@ void main() {
 
           final discoveredService = pb.DiscoveredService()
             ..serviceUuid = serviceUuid
+            ..serviceInstanceId = '10'
             ..characteristicUuids.add(charUuid)
             ..characteristics.add(
               pb.DiscoveredCharacteristic()
                 ..characteristicId = charUuid
+                ..characteristicInstanceId = '101'
                 ..serviceId = serviceUuid
                 ..isWritableWithResponse = true,
             )
@@ -536,12 +540,14 @@ void main() {
             [
               DiscoveredService(
                 serviceId: Uuid([0]),
+                serviceInstanceId: '10',
                 characteristicIds: [
                   Uuid([0, 1, 1])
                 ],
                 characteristics: [
                   DiscoveredCharacteristic(
                     characteristicId: Uuid([0, 1, 1]),
+                    characteristicInstanceId: '101',
                     serviceId: Uuid([0]),
                     isReadable: false,
                     isWritableWithResponse: true,
@@ -552,12 +558,14 @@ void main() {
                 ],
                 includedServices: [
                   DiscoveredService(
+                    serviceInstanceId: '11',
                     serviceId: Uuid([1]),
                     characteristicIds: [
                       Uuid([1, 1])
                     ],
                     characteristics: [
                       DiscoveredCharacteristic(
+                        characteristicInstanceId: '102',
                         characteristicId: Uuid([1, 1]),
                         serviceId: Uuid([1]),
                         isReadable: true,
