@@ -13,14 +13,14 @@ abstract class $DeviceInteractionViewModel {
   Connectable get connectableStatus;
   DeviceConnectionState get connectionStatus;
   BleDeviceConnector get deviceConnector;
-  Future<List<DiscoveredService>> Function() get discoverServices;
+  Future<List<Service>> Function() get discoverServices;
 
   DeviceInteractionViewModel copyWith({
     String? deviceId,
     Connectable? connectableStatus,
     DeviceConnectionState? connectionStatus,
     BleDeviceConnector? deviceConnector,
-    Future<List<DiscoveredService>> Function()? discoverServices,
+    Future<List<Service>> Function()? discoverServices,
   }) =>
       DeviceInteractionViewModel(
         deviceId: deviceId ?? this.deviceId,
@@ -90,7 +90,7 @@ class DeviceInteractionViewModel$Change {
   Connectable connectableStatus;
   DeviceConnectionState connectionStatus;
   BleDeviceConnector deviceConnector;
-  Future<List<DiscoveredService>> Function() discoverServices;
+  Future<List<Service>> Function() discoverServices;
 }
 
 // ignore: avoid_classes_with_only_static_members
@@ -125,7 +125,7 @@ class DeviceInteractionViewModel$ {
   );
 
   static final discoverServices = Lens<DeviceInteractionViewModel,
-      Future<List<DiscoveredService>> Function()>(
+      Future<List<Service>> Function()>(
     (discoverServicesContainer) => discoverServicesContainer.discoverServices,
     (discoverServicesContainer, discoverServices) =>
         discoverServicesContainer.copyWith(discoverServices: discoverServices),

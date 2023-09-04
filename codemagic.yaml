@@ -8,7 +8,7 @@ workflows:
     instance_type: mac_mini_m1
     environment:
       flutter: stable
-      xcode: 13.3
+      xcode: 14.0
       cocoapods: default
     cache:
       cache_paths: []

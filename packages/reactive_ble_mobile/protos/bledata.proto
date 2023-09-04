@@ -100,6 +100,8 @@ message CharacteristicAddress {
     string deviceId = 1;
     Uuid serviceUuid = 2;
     Uuid characteristicUuid = 3;
+    string serviceInstanceId = 4;
+    string characteristicInstanceId = 5;
 }
 
 message ServiceDataEntry {
@@ -130,6 +132,7 @@ message DiscoveredService {
     repeated Uuid characteristicUuids = 2;
     repeated DiscoveredService includedServices = 3;
     repeated DiscoveredCharacteristic characteristics = 4;
+    string serviceInstanceId = 5;
 }
 
 message DiscoveredCharacteristic {
@@ -140,6 +143,7 @@ message DiscoveredCharacteristic {
     bool isWritableWithoutResponse = 5;
     bool isNotifiable = 6;
     bool isIndicatable = 7;
+    string characteristicInstanceId = 8;
 }
 
 message Uuid {
