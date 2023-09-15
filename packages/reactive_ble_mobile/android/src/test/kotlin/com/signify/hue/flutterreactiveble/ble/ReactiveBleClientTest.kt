@@ -135,8 +135,9 @@ class ReactiveBleClientTest {
         fun `should not call readcharacteristic in case the connection is not established`() {
             subject.onNext(EstablishConnectionFailure("test", "error"))
 
-            sut.readCharacteristic("test", UUID.randomUUID(), 11).test()
+            val result = sut.readCharacteristic("test", UUID.randomUUID(), 11).test()
 
+            assertThat(result.values().first()).isInstanceOf(CharOperationFailed::class.java)
             verify(exactly = 0) { rxConnection.readCharacteristic(any<BluetoothGattCharacteristic>()) }
         }
 
@@ -192,7 +193,8 @@ class ReactiveBleClientTest {
             val bytes = byteArrayOf(byteMin, byteMax)
             subject.onNext(EstablishConnectionFailure("test", "error"))
 
-            sut.writeCharacteristicWithResponse("test", UUID.randomUUID(), 11, bytes).test()
+            val result = sut.writeCharacteristicWithResponse("test", UUID.randomUUID(), 11, bytes).test()
+            assertThat(result.values().first()).isInstanceOf(CharOperationFailed::class.java)
 
             verify(exactly = 0) { rxConnection.writeCharWithResponse(any(), any()) }
         }
@@ -216,9 +218,9 @@ class ReactiveBleClientTest {
             val bytes = byteArrayOf(byteMin, byteMax)
             subject.onNext(EstablishConnectionFailure("test", "error"))
 
+            val result = sut.writeCharacteristicWithoutResponse("test", UUID.randomUUID(), 11, bytes).test()
 
-            sut.writeCharacteristicWithoutResponse("test", UUID.randomUUID(), 11, bytes).test()
-
+            assertThat(result.values().first()).isInstanceOf(CharOperationFailed::class.java)
             verify(exactly = 0) { rxConnection.writeCharWithoutResponse(any(), any()) }
         }
 
@@ -261,7 +263,7 @@ class ReactiveBleClientTest {
 
             val result = sut.negotiateMtuSize("", mtuSize).test()
 
-            assertThat(result.values().first()).isInstanceOf(MtuNegotiateSuccesful::class.java)
+            assertThat(result.values().first()).isInstanceOf(MtuNegotiateSuccessful::class.java)
         }
 
         @Test
@@ -272,6 +274,30 @@ class ReactiveBleClientTest {
             val result = sut.negotiateMtuSize("", mtuSize).test()
 
             assertThat(result.values().first()).isInstanceOf(MtuNegotiateFailed::class.java)
+        }
+    }
+
+    @Nested
+    @DisplayName("Read RSSI")
+    inner class ReadRssiTest {
+
+        @Test
+        fun `should return RSSI in case it succeeds`() {
+            val rssi = -42
+            every { rxConnection.readRssi() }.returns(Single.just(rssi))
+
+            val result = sut.readRssi("").test()
+
+            assertThat(result.values().first()).isEqualTo(rssi)
+        }
+
+        @Test
+        fun `should return error in case it fails`() {
+            every { rxConnection.readRssi() }.returns(Single.error(IllegalStateException("boom")))
+
+            val result = sut.readRssi("").test()
+
+            assertThat(result.errors().first()).isInstanceOf(IllegalStateException::class.java)
         }
     }
 
@@ -309,7 +335,7 @@ class ReactiveBleClientTest {
     inner class ChangePriorityTest {
 
         @Test
-        fun `returns prioritysuccess when  completed`() {
+        fun `returns prioritysuccess when completed`() {
             val completer = Completable.fromCallable { true }
 
             every { rxConnection.requestConnectionPriority(any(), any(), any()) }.returns(completer)

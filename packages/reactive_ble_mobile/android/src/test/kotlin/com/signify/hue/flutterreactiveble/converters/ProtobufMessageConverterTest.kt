@@ -5,7 +5,7 @@ import com.google.protobuf.ByteString
 import com.signify.hue.flutterreactiveble.ble.Connectable
 import com.signify.hue.flutterreactiveble.ble.ConnectionUpdateSuccess
 import com.signify.hue.flutterreactiveble.ble.MtuNegotiateFailed
-import com.signify.hue.flutterreactiveble.ble.MtuNegotiateSuccesful
+import com.signify.hue.flutterreactiveble.ble.MtuNegotiateSuccessful
 import com.signify.hue.flutterreactiveble.ble.ScanInfo
 import com.signify.hue.flutterreactiveble.model.NegotiateMtuErrorType
 import org.junit.jupiter.api.DisplayName
@@ -137,7 +137,7 @@ class ProtobufMessageConverterTest {
 
         @Test
         fun `converts a char value and request into a characteristic info value `() {
-            val request = createCharacteristicRequest("a", UUID.randomUUID())
+            val request = createCharacteristicRequest("b", UUID.randomUUID())
             val expectedValue = byteArrayOf(1)
             val valueInfo = protobufConverter.convertCharacteristicInfo(request.characteristic, expectedValue)
 
@@ -151,26 +151,26 @@ class ProtobufMessageConverterTest {
 
         @Test
         fun `converts to negotiatemtuinfo object`() {
-            val result = MtuNegotiateSuccesful("", 3)
+            val result = MtuNegotiateSuccessful("", 3)
 
             assertThat(protobufConverter.convertNegotiateMtuInfo(result)).isInstanceOf(pb.NegotiateMtuInfo::class.java)
         }
 
         @Test
         fun `converts deviceId`() {
-            val result = MtuNegotiateSuccesful("id", 3)
+            val result = MtuNegotiateSuccessful("id", 3)
             assertThat(protobufConverter.convertNegotiateMtuInfo(result).deviceId).isEqualTo(result.deviceId)
         }
 
         @Test
         fun `converts mtusize`() {
-            val result = MtuNegotiateSuccesful("id", 3)
+            val result = MtuNegotiateSuccessful("id", 3)
             assertThat(protobufConverter.convertNegotiateMtuInfo(result).mtuSize).isEqualTo(result.size)
         }
 
         @Test
         fun `sets default value for error in case no error occurred`() {
-            val result = MtuNegotiateSuccesful("id", 3)
+            val result = MtuNegotiateSuccessful("id", 3)
             assertThat(protobufConverter.convertNegotiateMtuInfo(result).failure.message).isEqualTo("")
         }
 
@@ -191,7 +191,7 @@ class ProtobufMessageConverterTest {
     }
 
     private fun createScanInfo(): ScanInfo {
-        val macAdress = "123"
+        val macAddress = "123"
         val deviceName = "Testdevice"
         val rssi = 200
         val uuid = UUID.randomUUID()
@@ -204,7 +204,7 @@ class ProtobufMessageConverterTest {
         val manufacturerData = "123".toByteArray()
 
         return ScanInfo(
-                deviceId = macAdress,
+                deviceId = macAddress,
                 name = deviceName,
                 rssi = rssi,
                 connectable = Connectable.UNKNOWN,

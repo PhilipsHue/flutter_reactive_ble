@@ -314,14 +314,12 @@ final class Central {
     func readRssi(for peripheralId: PeripheralID, completion: @escaping (Failable<Int>) -> Void) throws {
         let peripheral = try resolve(connected: peripheralId)
 
-        // register task, completion goes straight to the caller
         readRssiRegistry.registerTask(
             key: peripheralId,
             params: .init(),
             completion: completion
         )
 
-        // update task to kick things off
         readRssiRegistry.updateTask(
             key: peripheralId,
             action: {

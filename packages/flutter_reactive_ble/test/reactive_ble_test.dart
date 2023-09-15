@@ -486,6 +486,14 @@ void main() {
       });
     });
 
+    test('Read RSSI', () async {
+      const deviceId = '123';
+
+      when(_blePlatform.readRssi(deviceId)).thenAnswer((_) async => -42);
+
+      expect(await _sut.readRssi(deviceId), -42);
+    });
+
     group('ConnecteddeviceStream stream', () {
       const update = ConnectionStateUpdate(
         deviceId: '123',

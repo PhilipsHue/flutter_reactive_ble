@@ -237,7 +237,7 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
         getConnection(deviceId).flatMapSingle { connectionResult ->
             when (connectionResult) {
                 is EstablishedConnection -> connectionResult.rxConnection.requestMtu(size)
-                    .map { value -> MtuNegotiateSuccesful(deviceId, value) }
+                    .map { value -> MtuNegotiateSuccessful(deviceId, value) }
 
                 is EstablishConnectionFailure ->
                     Single.just(
@@ -354,8 +354,19 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
         }.first(RequestConnectionPriorityFailed(deviceId, "Unknown failure"))
 
     override fun readRssi(deviceId: String): Single<Int> =
-            activeConnections[deviceId]?.let(DeviceConnector::readRssi)
-                    ?: Single.error(IllegalStateException("Device is not connected"))
+            getConnection(deviceId).flatMapSingle { connectionResult ->
+                when (connectionResult) {
+                    is EstablishedConnection -> {
+                        connectionResult.rxConnection.readRssi()
+                    }
+                    is EstablishConnectionFailure ->
+                        Single.error(
+                            java.lang.IllegalStateException(
+                                    "Reading RSSI failed. Device is not connected"
+                            )
+                        )
+                }
+            }.firstOrError()
 
     // enable this for extra debug output on the android stack
     private fun enableDebugLogging() = RxBleClient

@@ -13,7 +13,7 @@ abstract class $DeviceInteractionViewModel {
   Connectable get connectableStatus;
   DeviceConnectionState get connectionStatus;
   BleDeviceConnector get deviceConnector;
-<<<<<<< HEAD
+  Future<int> Function() get readRssi;
   Future<List<Service>> Function() get discoverServices;
 
   DeviceInteractionViewModel copyWith({
@@ -21,6 +21,7 @@ abstract class $DeviceInteractionViewModel {
     Connectable? connectableStatus,
     DeviceConnectionState? connectionStatus,
     BleDeviceConnector? deviceConnector,
+    Future<int> Function()? readRssi,
     Future<List<Service>> Function()? discoverServices,
   }) =>
       DeviceInteractionViewModel(
@@ -28,67 +29,34 @@ abstract class $DeviceInteractionViewModel {
         connectableStatus: connectableStatus ?? this.connectableStatus,
         connectionStatus: connectionStatus ?? this.connectionStatus,
         deviceConnector: deviceConnector ?? this.deviceConnector,
-        discoverServices: discoverServices ?? this.discoverServices,
-=======
-  Future<List<DiscoveredService>> Function() get discoverServices;
-  Future<int> Function() get readRssi;
-
-  DeviceInteractionViewModel copyWith({
-    String? deviceId,
-    DeviceConnectionState? connectionStatus,
-    BleDeviceConnector? deviceConnector,
-    Future<List<DiscoveredService>> Function()? discoverServices,
-    Future<int> Function()? readRssi,
-  }) =>
-      DeviceInteractionViewModel(
-        deviceId: deviceId ?? this.deviceId,
-        connectionStatus: connectionStatus ?? this.connectionStatus,
-        deviceConnector: deviceConnector ?? this.deviceConnector,
-        discoverServices: discoverServices ?? this.discoverServices,
         readRssi: readRssi ?? this.readRssi,
->>>>>>> c451aba (Read RSSI of connected device)
+        discoverServices: discoverServices ?? this.discoverServices,
       );
 
   DeviceInteractionViewModel copyUsing(
       void Function(DeviceInteractionViewModel$Change change) mutator) {
     final change = DeviceInteractionViewModel$Change._(
       this.deviceId,
-<<<<<<< HEAD
       this.connectableStatus,
       this.connectionStatus,
       this.deviceConnector,
-      this.discoverServices,
-=======
-      this.connectionStatus,
-      this.deviceConnector,
-      this.discoverServices,
       this.readRssi,
->>>>>>> c451aba (Read RSSI of connected device)
+      this.discoverServices,
     );
     mutator(change);
     return DeviceInteractionViewModel(
       deviceId: change.deviceId,
-<<<<<<< HEAD
       connectableStatus: change.connectableStatus,
       connectionStatus: change.connectionStatus,
       deviceConnector: change.deviceConnector,
-      discoverServices: change.discoverServices,
-=======
-      connectionStatus: change.connectionStatus,
-      deviceConnector: change.deviceConnector,
-      discoverServices: change.discoverServices,
       readRssi: change.readRssi,
->>>>>>> c451aba (Read RSSI of connected device)
+      discoverServices: change.discoverServices,
     );
   }
 
   @override
   String toString() =>
-<<<<<<< HEAD
-      "DeviceInteractionViewModel(deviceId: $deviceId, connectableStatus: $connectableStatus, connectionStatus: $connectionStatus, deviceConnector: $deviceConnector, discoverServices: $discoverServices)";
-=======
-      "DeviceInteractionViewModel(deviceId: $deviceId, connectionStatus: $connectionStatus, deviceConnector: $deviceConnector, discoverServices: $discoverServices, readRssi: $readRssi)";
->>>>>>> c451aba (Read RSSI of connected device)
+      "DeviceInteractionViewModel(deviceId: $deviceId, connectableStatus: $connectableStatus, connectionStatus: $connectionStatus, deviceConnector: $deviceConnector, readRssi: $readRssi, discoverServices: $discoverServices)";
 
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
@@ -99,12 +67,8 @@ abstract class $DeviceInteractionViewModel {
       connectableStatus == other.connectableStatus &&
       connectionStatus == other.connectionStatus &&
       deviceConnector == other.deviceConnector &&
-<<<<<<< HEAD
+      readRssi == other.readRssi &&
       const Ignore().equals(discoverServices, other.discoverServices);
-=======
-      const Ignore().equals(discoverServices, other.discoverServices) &&
-      readRssi == other.readRssi;
->>>>>>> c451aba (Read RSSI of connected device)
 
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
@@ -114,8 +78,8 @@ abstract class $DeviceInteractionViewModel {
     result = 37 * result + connectableStatus.hashCode;
     result = 37 * result + connectionStatus.hashCode;
     result = 37 * result + deviceConnector.hashCode;
-    result = 37 * result + const Ignore().hash(discoverServices);
     result = 37 * result + readRssi.hashCode;
+    result = 37 * result + const Ignore().hash(discoverServices);
     return result;
   }
 }
@@ -123,10 +87,10 @@ abstract class $DeviceInteractionViewModel {
 class DeviceInteractionViewModel$Change {
   DeviceInteractionViewModel$Change._(
     this.deviceId,
-<<<<<<< HEAD
     this.connectableStatus,
     this.connectionStatus,
     this.deviceConnector,
+    this.readRssi,
     this.discoverServices,
   );
 
@@ -134,20 +98,8 @@ class DeviceInteractionViewModel$Change {
   Connectable connectableStatus;
   DeviceConnectionState connectionStatus;
   BleDeviceConnector deviceConnector;
-  Future<List<Service>> Function() discoverServices;
-=======
-    this.connectionStatus,
-    this.deviceConnector,
-    this.discoverServices,
-    this.readRssi,
-  );
-
-  String deviceId;
-  DeviceConnectionState connectionStatus;
-  BleDeviceConnector deviceConnector;
-  Future<List<DiscoveredService>> Function() discoverServices;
   Future<int> Function() readRssi;
->>>>>>> c451aba (Read RSSI of connected device)
+  Future<List<Service>> Function() discoverServices;
 }
 
 // ignore: avoid_classes_with_only_static_members
@@ -158,7 +110,6 @@ class DeviceInteractionViewModel$ {
         deviceIdContainer.copyWith(deviceId: deviceId),
   );
 
-<<<<<<< HEAD
   static final connectableStatus =
       Lens<DeviceInteractionViewModel, Connectable>(
     (connectableStatusContainer) =>
@@ -168,8 +119,6 @@ class DeviceInteractionViewModel$ {
             connectableStatus: connectableStatus),
   );
 
-=======
->>>>>>> c451aba (Read RSSI of connected device)
   static final connectionStatus =
       Lens<DeviceInteractionViewModel, DeviceConnectionState>(
     (connectionStatusContainer) => connectionStatusContainer.connectionStatus,
@@ -184,24 +133,17 @@ class DeviceInteractionViewModel$ {
         deviceConnectorContainer.copyWith(deviceConnector: deviceConnector),
   );
 
-  static final discoverServices = Lens<DeviceInteractionViewModel,
-<<<<<<< HEAD
-      Future<List<Service>> Function()>(
-=======
-      Future<List<DiscoveredService>> Function()>(
->>>>>>> c451aba (Read RSSI of connected device)
-    (discoverServicesContainer) => discoverServicesContainer.discoverServices,
-    (discoverServicesContainer, discoverServices) =>
-        discoverServicesContainer.copyWith(discoverServices: discoverServices),
-  );
-<<<<<<< HEAD
-=======
-
   static final readRssi =
       Lens<DeviceInteractionViewModel, Future<int> Function()>(
     (readRssiContainer) => readRssiContainer.readRssi,
     (readRssiContainer, readRssi) =>
         readRssiContainer.copyWith(readRssi: readRssi),
   );
->>>>>>> c451aba (Read RSSI of connected device)
+
+  static final discoverServices =
+      Lens<DeviceInteractionViewModel, Future<List<Service>> Function()>(
+    (discoverServicesContainer) => discoverServicesContainer.discoverServices,
+    (discoverServicesContainer, discoverServices) =>
+        discoverServicesContainer.copyWith(discoverServices: discoverServices),
+  );
 }

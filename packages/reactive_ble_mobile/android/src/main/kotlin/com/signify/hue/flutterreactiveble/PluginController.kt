@@ -37,7 +37,7 @@ class PluginController {
             "negotiateMtuSize" to this::negotiateMtuSize,
             "requestConnectionPriority" to this::requestConnectionPriority,
             "discoverServices" to this::discoverServices,
-            "getDiscoveredServices" to this::discoverServices
+            "getDiscoveredServices" to this::discoverServices,
             "readRssi" to this::readRssi,
     )
 
@@ -276,7 +276,7 @@ class PluginController {
     }
 
     private fun readRssi(call: MethodCall, result: Result) {
-        val args = pb.ClearGattCacheRequest.parseFrom(call.arguments as ByteArray)
+        val args = pb.ReadRssiRequest.parseFrom(call.arguments as ByteArray)
 
         bleClient.readRssi(args.deviceId)
                 .observeOn(AndroidSchedulers.mainThread())
