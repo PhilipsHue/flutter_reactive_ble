@@ -2,12 +2,14 @@ import 'package:meta/meta.dart';
 
 import 'uuid.dart';
 
-/// Specific BLE characteristic for a BLE device characterised by [deviceId], [serviceId] and
+/// Specific BLE characteristic for a BLE device characterized by [deviceId], [serviceId] and
 /// [characteristicId].
 @immutable
 class DiscoveredCharacteristic {
   /// Unique uuid of the specific characteristic
   final Uuid characteristicId;
+
+  final String characteristicInstanceId;
 
   /// Service uuid of the characteristic
   final Uuid serviceId;
@@ -21,6 +23,7 @@ class DiscoveredCharacteristic {
 
   const DiscoveredCharacteristic({
     required this.characteristicId,
+    required this.characteristicInstanceId,
     required this.serviceId,
     required this.isReadable,
     required this.isWritableWithResponse,

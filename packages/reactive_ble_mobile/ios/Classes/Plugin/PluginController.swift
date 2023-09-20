@@ -114,7 +114,9 @@ final class PluginController {
                 let message = CharacteristicValueInfo.with {
                     $0.characteristic = CharacteristicAddress.with {
                         $0.characteristicUuid = Uuid.with { $0.data = characteristic.id.data }
+                        $0.characteristicInstanceID = characteristic.instanceID
                         $0.serviceUuid = Uuid.with { $0.data = characteristic.serviceID.data }
+                        $0.serviceInstanceID = characteristic.serviceInstanceID
                         $0.deviceID = characteristic.peripheralID.uuidString
                     }
                     if let value = value {
@@ -134,7 +136,6 @@ final class PluginController {
                     // In case message arrives before sink is created
                     context.messageQueue.append(message)
                 }
-
             }
         )
 
@@ -291,12 +292,14 @@ final class PluginController {
         func makeDiscoveredService(service: CBService) -> DiscoveredService {
             DiscoveredService.with {
                 $0.serviceUuid = Uuid.with { $0.data = service.uuid.data }
+                $0.serviceInstanceID = service.instanceId?.description ?? ""
                 $0.characteristicUuids = (service.characteristics ?? []).map { characteristic in
                     Uuid.with { $0.data = characteristic.uuid.data }
                 }
                 $0.characteristics = (service.characteristics ?? []).map { characteristic in
                     DiscoveredCharacteristic.with {
                         $0.characteristicID = Uuid.with {$0.data = characteristic.uuid.data}
+                        $0.characteristicInstanceID = characteristic.instanceId?.description ?? ""
                         if characteristic.service?.uuid.data != nil {
                             $0.serviceID = Uuid.with {$0.data = characteristic.service!.uuid.data}
                         }
@@ -328,6 +331,57 @@ final class PluginController {
         }
     }
 
+    func getDiscoveredServices(name: String, args: DiscoverServicesRequest, completion: @escaping PlatformMethodCompletionHandler) {
+        guard let central = central
+        else {
+            completion(.failure(PluginError.notInitialized.asFlutterError))
+            return
+        }
+
+        guard let deviceID = UUID(uuidString: args.deviceID)
+        else {
+            completion(.failure(PluginError.invalidMethodCall(method: name, details: "\"deviceID\" is invalid").asFlutterError))
+            return
+        }
+
+        func makeDiscoveredService(service: CBService) -> DiscoveredService {
+            DiscoveredService.with {
+                $0.serviceUuid = Uuid.with { $0.data = service.uuid.data }
+                $0.serviceInstanceID = service.instanceId?.description ?? ""
+                $0.characteristicUuids = (service.characteristics ?? []).map { characteristic in
+                    Uuid.with { $0.data = characteristic.uuid.data }
+                }
+                $0.characteristics = (service.characteristics ?? []).map { characteristic in
+                    DiscoveredCharacteristic.with {
+                        $0.characteristicID = Uuid.with {$0.data = characteristic.uuid.data}
+                        $0.characteristicInstanceID = characteristic.instanceId?.description ?? ""
+                        if characteristic.service?.uuid.data != nil {
+                            $0.serviceID = Uuid.with {$0.data = characteristic.service!.uuid.data}
+                        }
+                        $0.isReadable = characteristic.properties.contains(.read)
+                        $0.isWritableWithResponse = characteristic.properties.contains(.write)
+                        $0.isWritableWithoutResponse = characteristic.properties.contains(.writeWithoutResponse)
+                        $0.isNotifiable = characteristic.properties.contains(.notify)
+                        $0.isIndicatable = characteristic.properties.contains(.indicate)
+                    }
+                }
+
+                $0.includedServices = (service.includedServices ?? []).map(makeDiscoveredService)
+            }
+        }
+
+        do {
+            let peripheral = try central.peripheral(for: deviceID)
+            completion(.success(DiscoverServicesInfo.with {
+                        $0.deviceID = deviceID.uuidString
+                        $0.services = (peripheral.services ?? []).map(makeDiscoveredService)
+                    }))
+
+        } catch {
+            completion(.failure(PluginError.unknown(error).asFlutterError))
+        }
+    }
+
     func enableCharacteristicNotifications(name: String, args: NotifyCharacteristicRequest, completion: @escaping PlatformMethodCompletionHandler) {
         guard let central = central
         else {
@@ -335,7 +389,7 @@ final class PluginController {
             return
         }
 
-        guard let characteristic = QualifiedCharacteristicIDFactory().make(from: args.characteristic)
+        guard let characteristic = CharacteristicInstanceIDFactory().make(from: args.characteristic)
         else {
             completion(.failure(PluginError.invalidMethodCall(method: name, details: "characteristic, service, and peripheral IDs are required").asFlutterError))
             return
@@ -361,7 +415,7 @@ final class PluginController {
             return
         }
 
-        guard let characteristic = QualifiedCharacteristicIDFactory().make(from: args.characteristic)
+        guard let characteristic = CharacteristicInstanceIDFactory().make(from: args.characteristic)
         else {
             completion(.failure(PluginError.invalidMethodCall(method: name, details: "characteristic, service, and peripheral IDs are required").asFlutterError))
             return
@@ -387,7 +441,7 @@ final class PluginController {
             return
         }
 
-        guard let characteristic = QualifiedCharacteristicIDFactory().make(from: args.characteristic)
+        guard let characteristic = CharacteristicInstanceIDFactory().make(from: args.characteristic)
         else {
             completion(.failure(PluginError.invalidMethodCall(method: name, details: "characteristic, service, and peripheral IDs are required").asFlutterError))
             return
@@ -422,7 +476,7 @@ final class PluginController {
             return
         }
 
-        guard let characteristic = QualifiedCharacteristicIDFactory().make(from: args.characteristic)
+        guard let characteristic = CharacteristicInstanceIDFactory().make(from: args.characteristic)
         else {
             completion(.failure(PluginError.invalidMethodCall(method: name, details: "characteristic, service, and peripheral IDs are required").asFlutterError))
             return
@@ -431,14 +485,10 @@ final class PluginController {
         do {
             try central.writeWithResponse(
                 value: args.value,
-                characteristic: QualifiedCharacteristic(id: characteristic.id, serviceID: characteristic.serviceID, peripheralID: characteristic.peripheralID),
+                characteristic: characteristic,
                 completion: { _, characteristic, error in
                     let result = WriteCharacteristicInfo.with {
-                        $0.characteristic = CharacteristicAddress.with {
-                            $0.characteristicUuid = Uuid.with { $0.data = characteristic.id.data }
-                            $0.serviceUuid = Uuid.with { $0.data = characteristic.serviceID.data }
-                            $0.deviceID = characteristic.peripheralID.uuidString
-                        }
+                        $0.characteristic = args.characteristic
                         if let error = error {
                             $0.failure = GenericFailure.with {
                                 $0.code = Int32(WriteCharacteristicFailure.unknown.rawValue)
@@ -470,7 +520,7 @@ final class PluginController {
             return
         }
 
-        guard let characteristic = QualifiedCharacteristicIDFactory().make(from: args.characteristic)
+        guard let characteristic = CharacteristicInstanceIDFactory().make(from: args.characteristic)
         else {
             completion(.failure(PluginError.invalidMethodCall(method: name, details: "characteristic, service, and peripheral IDs are required").asFlutterError))
             return
@@ -480,7 +530,7 @@ final class PluginController {
         do {
             try central.writeWithoutResponse(
                 value: args.value,
-                characteristic: QualifiedCharacteristic(id: characteristic.id, serviceID: characteristic.serviceID, peripheralID: characteristic.peripheralID)
+                characteristic: characteristic
             )
             result = WriteCharacteristicInfo.with {
                 $0.characteristic = args.characteristic

@@ -9,7 +9,7 @@ enum ConnectionPriority {
 
   /// high priority, low latency connection.
   highPerformance,
-  // reduced power, low data rate connennection.
+  // reduced power, low data rate connection.
   lowPower,
 }
 
