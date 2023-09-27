@@ -18,7 +18,8 @@ abstract class DiscoveredDevicesRegistry {
 class DiscoveredDevicesRegistryImpl implements DiscoveredDevicesRegistry {
   DiscoveredDevicesRegistryImpl({required this.getTimestamp});
 
-  DiscoveredDevicesRegistryImpl.standard() : this(getTimestamp: DateTime.now);
+  DiscoveredDevicesRegistryImpl.standard()
+      : this(getTimestamp: () => DateTime.now());
 
   @override
   final DateTime Function() getTimestamp;

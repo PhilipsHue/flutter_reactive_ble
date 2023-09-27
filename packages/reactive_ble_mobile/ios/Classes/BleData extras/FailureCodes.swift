@@ -25,6 +25,6 @@ enum MaximumWriteValueLengthRetrieval: Int {
 }
 
 enum RequestConnectionPriorityFailure: Int {
-
+    
     case operationNotSupported = 1
 }

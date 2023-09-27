@@ -2,14 +2,12 @@ package com.signify.hue.flutterreactiveble.ble
 
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothDevice.BOND_BONDED
-import android.bluetooth.BluetoothGattCharacteristic
 import android.content.Context
 import com.google.common.truth.Truth.assertThat
 import com.polidea.rxandroidble2.RxBleClient
 import com.polidea.rxandroidble2.RxBleConnection
 import com.polidea.rxandroidble2.RxBleDevice
 import com.polidea.rxandroidble2.RxBleDeviceServices
-import com.signify.hue.flutterreactiveble.ble.extensions.resolveCharacteristic
 import com.signify.hue.flutterreactiveble.ble.extensions.writeCharWithResponse
 import com.signify.hue.flutterreactiveble.ble.extensions.writeCharWithoutResponse
 import com.signify.hue.flutterreactiveble.utils.Duration
@@ -124,39 +122,36 @@ class ReactiveBleClientTest {
     inner class BleOperationsTest {
         @Test
         fun `should call readcharacteristic in case the connection is established`() {
-            every { rxConnection.resolveCharacteristic(any(), any()) }.returns(Single.just(BluetoothGattCharacteristic(UUID.randomUUID(), 0, 0)))
+            sut.readCharacteristic("test", UUID.randomUUID()).test()
 
-            sut.readCharacteristic("test", UUID.randomUUID(), 11).test()
-
-            verify(exactly = 1) { rxConnection.readCharacteristic(any<BluetoothGattCharacteristic>()) }
+            verify(exactly = 1) { rxConnection.readCharacteristic(any<UUID>()) }
         }
 
         @Test
         fun `should not call readcharacteristic in case the connection is not established`() {
             subject.onNext(EstablishConnectionFailure("test", "error"))
 
-            sut.readCharacteristic("test", UUID.randomUUID(), 11).test()
+            sut.readCharacteristic("test", UUID.randomUUID()).test()
 
-            verify(exactly = 0) { rxConnection.readCharacteristic(any<BluetoothGattCharacteristic>()) }
+            verify(exactly = 0) { rxConnection.readCharacteristic(any<UUID>()) }
         }
 
         @Test
         fun `should report failure in case reading characteristic fails`() {
             subject.onNext(EstablishConnectionFailure("test", "error"))
 
-            val observable = sut.readCharacteristic("test", UUID.randomUUID(), 11).test()
+            val observable = sut.readCharacteristic("test", UUID.randomUUID()).test()
 
             assertThat(observable.values().first()).isInstanceOf(CharOperationFailed::class.java)
         }
 
         @Test
-        fun `should incorporate the value in case readcharacteristic succeeds`() {
+        fun `should incorporate the value in case readcharacteristics succeeds`() {
             val byteMin = Byte.MIN_VALUE
             val byteMax = Byte.MAX_VALUE
 
-            every { rxConnection.readCharacteristic(any<BluetoothGattCharacteristic>()) }.returns(Single.just(byteArrayOf(byteMin, byteMax)))
-            every { rxConnection.resolveCharacteristic(any(), any()) }.returns(Single.just(BluetoothGattCharacteristic(UUID.randomUUID(), 0, 0)))
-            val observable = sut.readCharacteristic("test", UUID.randomUUID(), 11)
+            every { rxConnection.readCharacteristic(any<UUID>()) }.returns(Single.just(byteArrayOf(byteMin, byteMax)))
+            val observable = sut.readCharacteristic("test", UUID.randomUUID())
                     .map { result -> result as CharOperationSuccessful }.test()
 
             assertThat(observable.values().first().value).isEqualTo(listOf(byteMin, byteMax))
@@ -168,10 +163,9 @@ class ReactiveBleClientTest {
             val byteMax = Byte.MAX_VALUE
             val bytes = byteArrayOf(byteMin, byteMax)
 
-            every { rxConnection.resolveCharacteristic(any(), any()) }.returns(Single.just(BluetoothGattCharacteristic(UUID.randomUUID(), 0, 0)))
-            sut.writeCharacteristicWithResponse("test", UUID.randomUUID(), 11, bytes).test()
+            sut.writeCharacteristicWithResponse("test", UUID.randomUUID(), bytes).test()
 
-            verify(exactly = 1) { rxConnection.writeCharWithResponse(any(), any()) }
+            verify(exactly = 1) { rxConnection.writeCharWithResponse(any<UUID>(), any()) }
         }
 
         @Test
@@ -180,9 +174,9 @@ class ReactiveBleClientTest {
             val byteMax = Byte.MAX_VALUE
             val bytes = byteArrayOf(byteMin, byteMax)
 
-            sut.writeCharacteristicWithResponse("test", UUID.randomUUID(), 11, bytes).test()
+            sut.writeCharacteristicWithResponse("test", UUID.randomUUID(), bytes).test()
 
-            verify(exactly = 0) { rxConnection.writeCharWithoutResponse(any(), any()) }
+            verify(exactly = 0) { rxConnection.writeCharWithoutResponse(any<UUID>(), any()) }
         }
 
         @Test
@@ -192,9 +186,9 @@ class ReactiveBleClientTest {
             val bytes = byteArrayOf(byteMin, byteMax)
             subject.onNext(EstablishConnectionFailure("test", "error"))
 
-            sut.writeCharacteristicWithResponse("test", UUID.randomUUID(), 11, bytes).test()
+            sut.writeCharacteristicWithResponse("test", UUID.randomUUID(), bytes).test()
 
-            verify(exactly = 0) { rxConnection.writeCharWithResponse(any(), any()) }
+            verify(exactly = 0) { rxConnection.writeCharWithResponse(any<UUID>(), any()) }
         }
 
         @Test
@@ -203,10 +197,9 @@ class ReactiveBleClientTest {
             val byteMax = Byte.MAX_VALUE
             val bytes = byteArrayOf(byteMin, byteMax)
 
-            every { rxConnection.resolveCharacteristic(any(), any()) }.returns(Single.just(BluetoothGattCharacteristic(UUID.randomUUID(), 0, 0)))
-            sut.writeCharacteristicWithoutResponse("test", UUID.randomUUID(), 11, bytes).test()
+            sut.writeCharacteristicWithoutResponse("test", UUID.randomUUID(), bytes).test()
 
-            verify(exactly = 1) { rxConnection.writeCharWithoutResponse(any(), any()) }
+            verify(exactly = 1) { rxConnection.writeCharWithoutResponse(any<UUID>(), any()) }
         }
 
         @Test
@@ -217,9 +210,9 @@ class ReactiveBleClientTest {
             subject.onNext(EstablishConnectionFailure("test", "error"))
 
 
-            sut.writeCharacteristicWithoutResponse("test", UUID.randomUUID(), 11, bytes).test()
+            sut.writeCharacteristicWithoutResponse("test", UUID.randomUUID(), bytes).test()
 
-            verify(exactly = 0) { rxConnection.writeCharWithoutResponse(any(), any()) }
+            verify(exactly = 0) { rxConnection.writeCharWithoutResponse(any<UUID>(), any()) }
         }
 
         @Test
@@ -230,7 +223,7 @@ class ReactiveBleClientTest {
 
             subject.onNext(EstablishConnectionFailure("test", "error"))
 
-            val observable = sut.writeCharacteristicWithResponse("test", UUID.randomUUID(), 11, bytes).test()
+            val observable = sut.writeCharacteristicWithResponse("test", UUID.randomUUID(), bytes).test()
 
             assertThat(observable.values().first()).isInstanceOf(CharOperationFailed::class.java)
         }
@@ -242,8 +235,7 @@ class ReactiveBleClientTest {
             val bytes = byteArrayOf(byteMin, byteMax)
 
             every { rxConnection.writeCharWithResponse(any(), any()) }.returns(Single.just(byteArrayOf(byteMin, byteMax)))
-            every { rxConnection.resolveCharacteristic(any(), any()) }.returns(Single.just(BluetoothGattCharacteristic(UUID.randomUUID(), 0, 0)))
-            val observable = sut.writeCharacteristicWithResponse("test", UUID.randomUUID(), 11, bytes)
+            val observable = sut.writeCharacteristicWithResponse("test", UUID.randomUUID(), bytes)
                     .map { result -> result as CharOperationSuccessful }.test()
 
             assertThat(observable.values().first().value).isEqualTo(bytes.toList())

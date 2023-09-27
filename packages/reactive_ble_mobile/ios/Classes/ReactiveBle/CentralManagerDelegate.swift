@@ -30,7 +30,7 @@ final class CentralManagerDelegate: NSObject, CBCentralManagerDelegate {
         onStateChange(central.state)
     }
 
-    func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String: Any], rssi: NSNumber) {
+    func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String : Any], rssi: NSNumber) {
         onDiscovery(peripheral, advertisementData, rssi.intValue)
     }
 

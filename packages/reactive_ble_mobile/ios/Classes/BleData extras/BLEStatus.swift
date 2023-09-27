@@ -1,7 +1,7 @@
 import enum CoreBluetooth.CBManagerState
 
 func encode(_ centralState: CBManagerState) -> Int32 {
-    switch centralState {
+    switch (centralState) {
     case .unknown, .resetting:
         return 0
     case .unsupported:

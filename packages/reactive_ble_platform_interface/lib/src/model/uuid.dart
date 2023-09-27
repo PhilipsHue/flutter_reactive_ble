@@ -41,15 +41,6 @@ class Uuid {
     }
   }
 
-  /// Expands a 16 bit uuid to a 128 bit one
-  Uuid get expanded {
-    if (data.length == 2) {
-      return Uuid.parse("0000$this-0000-1000-8000-00805f9b34fb");
-    } else {
-      return this;
-    }
-  }
-
   @override
   String toString() {
     String paddedHex(int num) {
@@ -77,8 +68,7 @@ class Uuid {
       data.fold(17, (hash, octet) => 37 * hash + octet.hashCode);
 
   @override
-  bool operator ==(Object other) =>
-      other is Uuid &&
+  bool operator ==(dynamic other) =>
       other.runtimeType == runtimeType &&
       const DeepCollectionEquality().equals(other.data, data);
 }

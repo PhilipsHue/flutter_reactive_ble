@@ -120,9 +120,6 @@ public class SwiftReactiveBlePlugin: NSObject, FlutterPlugin {
         AnyPlatformMethod(UnaryPlatformMethod(name: "discoverServices") { (name, context, args: DiscoverServicesRequest, completion) in
             context.discoverServices(name: name, args: args, completion: completion)
         }),
-        AnyPlatformMethod(UnaryPlatformMethod(name: "getDiscoveredServices") { (name, context, args: DiscoverServicesRequest, completion) in
-            context.getDiscoveredServices(name: name, args: args, completion: completion)
-        }),
         AnyPlatformMethod(UnaryPlatformMethod(name: "readNotifications") { (name, context, args: NotifyCharacteristicRequest, completion) in
             context.enableCharacteristicNotifications(name: name, args: args, completion: completion)
         }),
@@ -140,7 +137,7 @@ public class SwiftReactiveBlePlugin: NSObject, FlutterPlugin {
         }),
         AnyPlatformMethod(UnaryPlatformMethod(name: "negotiateMtuSize") { (name, context, args: NegotiateMtuRequest, completion) in
             context.reportMaximumWriteValueLength(name: name, args: args, completion: completion)
-        })
+        }),
     ])
 
     public func handle(_ call: FlutterMethodCall, result completion: @escaping FlutterResult) {

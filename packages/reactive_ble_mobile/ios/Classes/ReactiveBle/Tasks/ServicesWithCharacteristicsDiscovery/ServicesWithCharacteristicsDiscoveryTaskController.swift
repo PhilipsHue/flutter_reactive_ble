@@ -101,9 +101,9 @@ struct ServicesWithCharacteristicsDiscoveryTaskController: PeripheralTaskControl
             items = servicesWithCharacteristicsToDiscover
                 .compactMap { item in
                     knownServices?
-                        .filter({ $0.uuid == item.key })
-                        .map { service in (service, item.value) }
-                }.flatMap { $0 }
+                        .first(where: { $0.uuid == item.key })
+                        .flatMap { service in (service, item.value) }
+                }
         }
 
         items?.forEach(body)

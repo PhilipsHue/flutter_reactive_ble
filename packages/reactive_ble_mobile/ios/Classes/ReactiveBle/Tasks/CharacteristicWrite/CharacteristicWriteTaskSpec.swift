@@ -1,6 +1,6 @@
 struct CharacteristicWriteTaskSpec: PeripheralTaskSpec {
 
-    typealias Key = CharacteristicInstance
+    typealias Key = QualifiedCharacteristic
 
     struct Params {
 

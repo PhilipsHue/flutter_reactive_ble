@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
 import 'package:flutter_reactive_ble/src/connected_device_operation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
@@ -25,11 +26,9 @@ void main() {
 
       setUp(() {
         valueUpdate = CharacteristicValue(
-          characteristic: CharacteristicInstance(
+          characteristic: QualifiedCharacteristic(
             characteristicId: Uuid.parse('FEFF'),
-            characteristicInstanceId: "11",
             serviceId: Uuid.parse('FEFF'),
-            serviceInstanceId: "101",
             deviceId: '123',
           ),
           result: const Result.success([1]),
@@ -48,36 +47,30 @@ void main() {
     });
 
     group('Read characteristic', () {
-      late CharacteristicInstance charDevice;
-      CharacteristicInstance charOtherSameDevice;
-      CharacteristicInstance charOtherDevice;
+      late QualifiedCharacteristic charDevice;
+      QualifiedCharacteristic charOtherSameDevice;
+      QualifiedCharacteristic charOtherDevice;
       CharacteristicValue? valueUpdate;
       CharacteristicValue? valueUpdateOtherDevice;
       CharacteristicValue? valueUpdateSameDeviceOtherChar;
       List<int>? result;
 
       setUp(() {
-        charDevice = CharacteristicInstance(
+        charDevice = QualifiedCharacteristic(
           characteristicId: Uuid.parse('FEFF'),
-          characteristicInstanceId: "11",
           serviceId: Uuid.parse('FEFF'),
-          serviceInstanceId: "101",
           deviceId: '123',
         );
 
-        charOtherSameDevice = CharacteristicInstance(
+        charOtherSameDevice = QualifiedCharacteristic(
           characteristicId: Uuid.parse('FEFF'),
-          characteristicInstanceId: "11",
           serviceId: Uuid.parse('FAFF'),
-          serviceInstanceId: "101",
           deviceId: '123',
         );
 
-        charOtherDevice = CharacteristicInstance(
+        charOtherDevice = QualifiedCharacteristic(
           characteristicId: Uuid.parse('FEFF'),
-          characteristicInstanceId: "11",
           serviceId: Uuid.parse('FEFF'),
-          serviceInstanceId: "101",
           deviceId: '456',
         );
 
@@ -139,16 +132,14 @@ void main() {
     });
 
     group('Write characteristic', () {
-      late CharacteristicInstance characteristic;
+      late QualifiedCharacteristic characteristic;
       WriteCharacteristicInfo info;
       const value = [1, 0];
 
       setUp(() {
-        characteristic = CharacteristicInstance(
+        characteristic = QualifiedCharacteristic(
           characteristicId: Uuid.parse('FEFF'),
-          characteristicInstanceId: "11",
           serviceId: Uuid.parse('FEFF'),
-          serviceInstanceId: "101",
           deviceId: '123',
         );
       });
@@ -255,9 +246,9 @@ void main() {
       });
 
       group('Subscribe to characteristic', () {
-        late CharacteristicInstance charDevice;
-        CharacteristicInstance charOtherSameDevice;
-        CharacteristicInstance charOtherDevice;
+        late QualifiedCharacteristic charDevice;
+        QualifiedCharacteristic charOtherSameDevice;
+        QualifiedCharacteristic charOtherDevice;
         late CharacteristicValue valueUpdate1;
         late CharacteristicValue valueUpdate2;
         late CharacteristicValue valueUpdateOtherDevice;
@@ -268,27 +259,21 @@ void main() {
         setUp(() {
           terminateCompleter = Completer();
 
-          charDevice = CharacteristicInstance(
+          charDevice = QualifiedCharacteristic(
             characteristicId: Uuid.parse('FEFF'),
-            characteristicInstanceId: "11",
             serviceId: Uuid.parse('FEFF'),
-            serviceInstanceId: "101",
             deviceId: '123',
           );
 
-          charOtherSameDevice = CharacteristicInstance(
+          charOtherSameDevice = QualifiedCharacteristic(
             characteristicId: Uuid.parse('FEFF'),
-            characteristicInstanceId: "11",
             serviceId: Uuid.parse('FAFF'),
-            serviceInstanceId: "101",
             deviceId: '123',
           );
 
-          charOtherDevice = CharacteristicInstance(
+          charOtherDevice = QualifiedCharacteristic(
             characteristicId: Uuid.parse('FEFF'),
-            characteristicInstanceId: "11",
             serviceId: Uuid.parse('FEFF'),
-            serviceInstanceId: "101",
             deviceId: '456',
           );
 

@@ -13,35 +13,25 @@ import java.util.UUID
 @Suppress("TooManyFunctions")
 interface BleClient {
 
-    val connectionUpdateSubject: BehaviorSubject<ConnectionUpdate>
+    val connectionUpdateSubject: BehaviorSubject<com.signify.hue.flutterreactiveble.ble.ConnectionUpdate>
 
     fun initializeClient()
-    fun scanForDevices(services: List<ParcelUuid>, scanMode: ScanMode, requireLocationServicesEnabled: Boolean): Observable<ScanInfo>
+    fun scanForDevices(services: List<ParcelUuid>, scanMode: ScanMode, requireLocationServicesEnabled: Boolean): Observable<com.signify.hue.flutterreactiveble.ble.ScanInfo>
     fun connectToDevice(deviceId: String, timeout: Duration)
     fun disconnectDevice(deviceId: String)
     fun disconnectAllDevices()
     fun discoverServices(deviceId: String): Single<RxBleDeviceServices>
     fun clearGattCache(deviceId: String): Completable
-    fun readCharacteristic(
-        deviceId: String,
-        characteristicId: UUID,
-        characteristicInstanceId: Int
-    ): Single<CharOperationResult>
-    fun setupNotification(
-        deviceId: String,
-        characteristicId: UUID,
-        characteristicInstanceId: Int
-    ): Observable<ByteArray>
+    fun readCharacteristic(deviceId: String, characteristic: UUID): Single<CharOperationResult>
+    fun setupNotification(deviceId: String, characteristic: UUID): Observable<ByteArray>
     fun writeCharacteristicWithResponse(
         deviceId: String,
-        characteristicId: UUID,
-        characteristicInstanceId: Int,
+        characteristic: UUID,
         value: ByteArray
     ): Single<CharOperationResult>
     fun writeCharacteristicWithoutResponse(
         deviceId: String,
-        characteristicId: UUID,
-        characteristicInstanceId: Int,
+        characteristic: UUID,
         value: ByteArray
     ): Single<CharOperationResult>
     fun negotiateMtuSize(deviceId: String, size: Int): Single<MtuNegotiateResult>

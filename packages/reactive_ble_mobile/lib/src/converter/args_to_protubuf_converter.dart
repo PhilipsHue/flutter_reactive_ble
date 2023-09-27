@@ -12,20 +12,20 @@ abstract class ArgsToProtobufConverter {
   pb.DisconnectFromDeviceRequest createDisconnectDeviceArgs(String deviceId);
 
   pb.ReadCharacteristicRequest createReadCharacteristicRequest(
-    CharacteristicInstance characteristic,
+    QualifiedCharacteristic characteristic,
   );
 
   pb.WriteCharacteristicRequest createWriteCharacteristicRequest(
-      CharacteristicInstance characteristic,
+    QualifiedCharacteristic characteristic,
     List<int> value,
   );
 
   pb.NotifyCharacteristicRequest createNotifyCharacteristicRequest(
-      CharacteristicInstance characteristic,
+    QualifiedCharacteristic characteristic,
   );
 
   pb.NotifyNoMoreCharacteristicRequest createNotifyNoMoreCharacteristicRequest(
-      CharacteristicInstance characteristic,
+    QualifiedCharacteristic characteristic,
   );
 
   pb.NegotiateMtuRequest createNegotiateMtuRequest(
@@ -88,33 +88,29 @@ class ArgsToProtobufConverterImpl implements ArgsToProtobufConverter {
 
   @override
   pb.ReadCharacteristicRequest createReadCharacteristicRequest(
-    CharacteristicInstance characteristic,
+    QualifiedCharacteristic characteristic,
   ) {
     final args = pb.ReadCharacteristicRequest()
       ..characteristic = (pb.CharacteristicAddress()
         ..deviceId = characteristic.deviceId
         ..serviceUuid = (pb.Uuid()..data = characteristic.serviceId.data)
-        ..serviceInstanceId = characteristic.serviceInstanceId
         ..characteristicUuid =
-            (pb.Uuid()..data = characteristic.characteristicId.data)
-        ..characteristicInstanceId = characteristic.characteristicInstanceId);
+            (pb.Uuid()..data = characteristic.characteristicId.data));
 
     return args;
   }
 
   @override
   pb.WriteCharacteristicRequest createWriteCharacteristicRequest(
-    CharacteristicInstance characteristic,
+    QualifiedCharacteristic characteristic,
     List<int> value,
   ) {
     final args = pb.WriteCharacteristicRequest()
       ..characteristic = (pb.CharacteristicAddress()
         ..deviceId = characteristic.deviceId
         ..serviceUuid = (pb.Uuid()..data = characteristic.serviceId.data)
-        ..serviceInstanceId = characteristic.serviceInstanceId
         ..characteristicUuid =
-            (pb.Uuid()..data = characteristic.characteristicId.data)
-        ..characteristicInstanceId = characteristic.characteristicInstanceId)
+            (pb.Uuid()..data = characteristic.characteristicId.data))
       ..value = value;
 
     return args;
@@ -122,32 +118,28 @@ class ArgsToProtobufConverterImpl implements ArgsToProtobufConverter {
 
   @override
   pb.NotifyCharacteristicRequest createNotifyCharacteristicRequest(
-    CharacteristicInstance characteristic,
+    QualifiedCharacteristic characteristic,
   ) {
     final args = pb.NotifyCharacteristicRequest()
       ..characteristic = (pb.CharacteristicAddress()
         ..deviceId = characteristic.deviceId
         ..serviceUuid = (pb.Uuid()..data = characteristic.serviceId.data)
-        ..serviceInstanceId = characteristic.serviceInstanceId
         ..characteristicUuid =
-            (pb.Uuid()..data = characteristic.characteristicId.data)
-        ..characteristicInstanceId = characteristic.characteristicInstanceId);
+            (pb.Uuid()..data = characteristic.characteristicId.data));
 
     return args;
   }
 
   @override
   pb.NotifyNoMoreCharacteristicRequest createNotifyNoMoreCharacteristicRequest(
-    CharacteristicInstance characteristic,
+    QualifiedCharacteristic characteristic,
   ) {
     final args = pb.NotifyNoMoreCharacteristicRequest()
       ..characteristic = (pb.CharacteristicAddress()
         ..deviceId = characteristic.deviceId
         ..serviceUuid = (pb.Uuid()..data = characteristic.serviceId.data)
-        ..serviceInstanceId = characteristic.serviceInstanceId
         ..characteristicUuid =
-            (pb.Uuid()..data = characteristic.characteristicId.data)
-        ..characteristicInstanceId = characteristic.characteristicInstanceId);
+            (pb.Uuid()..data = characteristic.characteristicId.data));
 
     return args;
   }
@@ -188,7 +180,7 @@ class ArgsToProtobufConverterImpl implements ArgsToProtobufConverter {
 
     if (withServices != null) {
       for (final withService in withServices) {
-        args.serviceUuids.add(pb.Uuid()..data = withService.data);
+        args.serviceUuids.add((pb.Uuid()..data = withService.data));
       }
     }
 

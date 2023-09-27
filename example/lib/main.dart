@@ -15,8 +15,8 @@ const _themeColor = Colors.lightGreen;
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
 
+  final _bleLogger = BleLogger();
   final _ble = FlutterReactiveBle();
-  final _bleLogger = BleLogger(ble: _ble);
   final _scanner = BleScanner(ble: _ble, logMessage: _bleLogger.addToLog);
   final _monitor = BleStatusMonitor(_ble);
   final _connector = BleDeviceConnector(
@@ -24,10 +24,11 @@ void main() {
     logMessage: _bleLogger.addToLog,
   );
   final _serviceDiscoverer = BleDeviceInteractor(
-    bleDiscoverServices: (deviceId) async {
-      await _ble.discoverAllServices(deviceId);
-      return _ble.getDiscoveredServices(deviceId);
-    },
+    bleDiscoverServices: _ble.discoverServices,
+    readCharacteristic: _ble.readCharacteristic,
+    writeWithResponse: _ble.writeCharacteristicWithResponse,
+    writeWithOutResponse: _ble.writeCharacteristicWithoutResponse,
+    subscribeToCharacteristic: _ble.subscribeToCharacteristic,
     logMessage: _bleLogger.addToLog,
   );
   runApp(

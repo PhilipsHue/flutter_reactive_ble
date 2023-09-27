@@ -1,7 +1,10 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:reactive_ble_mobile/src/converter/args_to_protubuf_converter.dart';
 import 'package:reactive_ble_mobile/src/generated/bledata.pb.dart' as pb;
-import 'package:reactive_ble_platform_interface/reactive_ble_platform_interface.dart';
+import 'package:reactive_ble_platform_interface/src/model/connection_priority.dart';
+import 'package:reactive_ble_platform_interface/src/model/qualified_characteristic.dart';
+import 'package:reactive_ble_platform_interface/src/model/scan_mode.dart';
+import 'package:reactive_ble_platform_interface/src/model/uuid.dart';
 
 void main() {
   group('$ArgsToProtobufConverter', () {
@@ -89,26 +92,28 @@ void main() {
       const deviceId = '123';
       final serviceUuid = Uuid.parse('FEFF');
       final charUuid = Uuid.parse('FEEF');
-      CharacteristicInstance characteristic;
+      QualifiedCharacteristic characteristic;
 
       setUp(() {
-        characteristic = CharacteristicInstance(
+        characteristic = QualifiedCharacteristic(
           characteristicId: charUuid,
-          characteristicInstanceId: "101",
           serviceId: serviceUuid,
-          serviceInstanceId: "11",
           deviceId: deviceId,
         );
 
         result = _sut.createReadCharacteristicRequest(characteristic);
       });
 
-      test('It converts the ids', () {
+      test('It converts device Id ', () {
         expect(result.characteristic.deviceId, deviceId);
+      });
+
+      test('It converts service Uuid', () {
         expect(result.characteristic.serviceUuid.data, [254, 255]);
-        expect(result.characteristic.serviceInstanceId, "11");
+      });
+
+      test('It converts char Uuid', () {
         expect(result.characteristic.characteristicUuid.data, [254, 239]);
-        expect(result.characteristic.characteristicInstanceId, "101");
       });
     });
 
@@ -117,28 +122,30 @@ void main() {
       const deviceId = '123';
       final serviceUuid = Uuid.parse('FEFF');
       final charUuid = Uuid.parse('FEEF');
-      CharacteristicInstance characteristic;
+      QualifiedCharacteristic characteristic;
 
       const value = [0, 1];
 
       setUp(() {
-        characteristic = CharacteristicInstance(
+        characteristic = QualifiedCharacteristic(
           characteristicId: charUuid,
-          characteristicInstanceId: "101",
           serviceId: serviceUuid,
-          serviceInstanceId: "11",
           deviceId: deviceId,
         );
 
         result = _sut.createWriteCharacteristicRequest(characteristic, value);
       });
 
-      test('It converts the ids', () {
+      test('It converts device Id ', () {
         expect(result.characteristic.deviceId, deviceId);
+      });
+
+      test('It converts service Uuid', () {
         expect(result.characteristic.serviceUuid.data, [254, 255]);
-        expect(result.characteristic.serviceInstanceId, "11");
+      });
+
+      test('It converts char Uuid', () {
         expect(result.characteristic.characteristicUuid.data, [254, 239]);
-        expect(result.characteristic.characteristicInstanceId, "101");
       });
 
       test('It converts value', () {
@@ -151,26 +158,28 @@ void main() {
       const deviceId = '123';
       final serviceUuid = Uuid.parse('FEFF');
       final charUuid = Uuid.parse('FEEF');
-      CharacteristicInstance characteristic;
+      QualifiedCharacteristic characteristic;
 
       setUp(() {
-        characteristic = CharacteristicInstance(
+        characteristic = QualifiedCharacteristic(
           characteristicId: charUuid,
-          characteristicInstanceId: "101",
           serviceId: serviceUuid,
-          serviceInstanceId: "11",
           deviceId: deviceId,
         );
 
         result = _sut.createNotifyCharacteristicRequest(characteristic);
       });
 
-      test('It converts device ids', () {
+      test('It converts device Id ', () {
         expect(result.characteristic.deviceId, deviceId);
+      });
+
+      test('It converts service Uuid', () {
         expect(result.characteristic.serviceUuid.data, [254, 255]);
-        expect(result.characteristic.serviceInstanceId, "11");
+      });
+
+      test('It converts char Uuid', () {
         expect(result.characteristic.characteristicUuid.data, [254, 239]);
-        expect(result.characteristic.characteristicInstanceId, "101");
       });
     });
 
@@ -308,26 +317,28 @@ void main() {
       const deviceId = '123';
       final serviceUuid = Uuid.parse('FEFF');
       final charUuid = Uuid.parse('FEEF');
-      CharacteristicInstance characteristic;
+      QualifiedCharacteristic characteristic;
       late pb.NotifyNoMoreCharacteristicRequest result;
 
       setUp(() {
-        characteristic = CharacteristicInstance(
+        characteristic = QualifiedCharacteristic(
           characteristicId: charUuid,
-          characteristicInstanceId: "101",
           serviceId: serviceUuid,
-          serviceInstanceId: "11",
           deviceId: deviceId,
         );
         result = _sut.createNotifyNoMoreCharacteristicRequest(characteristic);
       });
 
-      test('It converts the ids', () {
+      test('It converts deviceId', () {
         expect(result.characteristic.deviceId, deviceId);
+      });
+
+      test('It converts serviceUuid', () {
         expect(result.characteristic.serviceUuid.data, [254, 255]);
-        expect(result.characteristic.serviceInstanceId, "11");
+      });
+
+      test('It converts characteristicUuid', () {
         expect(result.characteristic.characteristicUuid.data, [254, 239]);
-        expect(result.characteristic.characteristicInstanceId, "101");
       });
     });
 

@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter/foundation.dart';
 import 'package:reactive_ble_platform_interface/reactive_ble_platform_interface.dart';
 
@@ -12,8 +14,7 @@ abstract class ProtobufConverter {
   ConnectionStateUpdate connectionStateUpdateFrom(List<int> data);
 
   Result<Unit, GenericFailure<ClearGattCacheError>?> clearGattCacheResultFrom(
-    List<int> data,
-  );
+      List<int> data);
 
   CharacteristicValue characteristicValueFrom(List<int> data);
 
@@ -62,7 +63,6 @@ class ProtobufConverterImpl implements ProtobufConverter {
           serviceUuids: serviceUuids,
           manufacturerData: Uint8List.fromList(message.manufacturerData),
           rssi: message.rssi,
-          connectable: _connectableFrom(message.isConnectable),
         ),
         failure: genericFailureFrom(
             hasFailure: message.hasFailure(),
@@ -163,12 +163,10 @@ class ProtobufConverterImpl implements ProtobufConverter {
   int mtuSizeFrom(List<int> data) =>
       pb.NegotiateMtuInfo.fromBuffer(data).mtuSize;
 
-  CharacteristicInstance qualifiedCharacteristicFrom(
+  QualifiedCharacteristic qualifiedCharacteristicFrom(
           pb.CharacteristicAddress message) =>
-      CharacteristicInstance(
-        characteristicInstanceId: message.characteristicInstanceId,
+      QualifiedCharacteristic(
         characteristicId: Uuid(message.characteristicUuid.data),
-        serviceInstanceId: message.serviceInstanceId,
         serviceId: Uuid(message.serviceUuid.data),
         deviceId: message.deviceId,
       );
@@ -201,7 +199,6 @@ class ProtobufConverterImpl implements ProtobufConverter {
   DiscoveredService _convertService(pb.DiscoveredService service) =>
       DiscoveredService(
         serviceId: Uuid(service.serviceUuid.data),
-        serviceInstanceId: service.serviceInstanceId,
         characteristicIds: service.characteristicUuids
             .map((c) => Uuid(c.data))
             .toList(growable: false),
@@ -209,7 +206,6 @@ class ProtobufConverterImpl implements ProtobufConverter {
             .map((c) => DiscoveredCharacteristic(
                 characteristicId: Uuid(c.characteristicId.data),
                 serviceId: Uuid(c.serviceId.data),
-                characteristicInstanceId: c.characteristicInstanceId,
                 isReadable: c.isReadable,
                 isWritableWithResponse: c.isWritableWithResponse,
                 isWritableWithoutResponse: c.isWritableWithoutResponse,
@@ -222,26 +218,11 @@ class ProtobufConverterImpl implements ProtobufConverter {
       );
 
   @visibleForTesting
-  Result<Value, Failure> resultFrom<Value, Failure>({
-    required Value Function() getValue,
-    required Failure failure,
-  }) =>
+  Result<Value, Failure> resultFrom<Value, Failure>(
+          {required Value Function() getValue, required Failure failure}) =>
       failure != null
           ? Result<Value, Failure>.failure(failure)
           : Result.success(getValue());
-
-  Connectable _connectableFrom(pb.IsConnectable status) {
-    switch (status.code) {
-      case 0:
-        return Connectable.unknown;
-      case 1:
-        return Connectable.unavailable;
-      case 2:
-        return Connectable.available;
-    }
-
-    return Connectable.unknown;
-  }
 }
 
 class _InvalidConnectionState extends Error {

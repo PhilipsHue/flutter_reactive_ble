@@ -36,9 +36,6 @@ class ProtobufMessageConverter {
                     .setId(scanInfo.deviceId)
                     .setName(scanInfo.name)
                     .setRssi(scanInfo.rssi)
-                    .setIsConnectable(pb.IsConnectable.newBuilder()
-                            .setCode(scanInfo.connectable.code)
-                            .build())
                     .addAllServiceData(createServiceDataEntry(scanInfo.serviceData))
                     .addAllServiceUuids(createServiceUuids(scanInfo.serviceUuids))
                     .setManufacturerData(ByteString.copyFrom(scanInfo.manufacturerData))
@@ -96,13 +93,13 @@ class ProtobufMessageConverter {
             request: pb.CharacteristicAddress,
             error: String?
     ): pb.CharacteristicValueInfo {
-        val characteristicAddress = createCharacteristicAddress(request)
+        val characteristicAdress = createCharacteristicAddress(request)
         val failure = pb.GenericFailure.newBuilder()
                 .setCode(CharacteristicErrorType.UNKNOWN.code)
                 .setMessage(error ?: "Unknown error")
 
         return pb.CharacteristicValueInfo.newBuilder()
-                .setCharacteristic(characteristicAddress)
+                .setCharacteristic(characteristicAdress)
                 .setFailure(failure)
                 .build()
     }
@@ -179,7 +176,6 @@ class ProtobufMessageConverter {
     private fun fromBluetoothGattService(gattService: BluetoothGattService): pb.DiscoveredService {
         return pb.DiscoveredService.newBuilder()
                 .setServiceUuid(createUuidFromParcelUuid(gattService.uuid))
-                .setServiceInstanceId(gattService.instanceId.toString())
                 .addAllCharacteristicUuids(gattService.characteristics.map { createUuidFromParcelUuid(it.uuid) })
                 .addAllCharacteristics(gattService.characteristics.map {
                     val prop = it.properties
@@ -191,7 +187,6 @@ class ProtobufMessageConverter {
 
                     pb.DiscoveredCharacteristic.newBuilder()
                             .setCharacteristicId(createUuidFromParcelUuid(it.uuid))
-                            .setCharacteristicInstanceId(it.instanceId.toString())
                             .setServiceId(createUuidFromParcelUuid(it.service.uuid))
                             .setIsReadable(readable)
                             .setIsWritableWithResponse(write)
@@ -220,12 +215,11 @@ class ProtobufMessageConverter {
         return pb.CharacteristicAddress.newBuilder()
                 .setDeviceId(request.deviceId)
                 .setServiceUuid(request.serviceUuid)
-                .setServiceInstanceId(request.serviceInstanceId)
-                .setCharacteristicInstanceId(request.characteristicInstanceId)
                 .setCharacteristicUuid(request.characteristicUuid)
     }
 
     private fun createServiceDataEntry(serviceData: Map<UUID, ByteArray>): List<pb.ServiceDataEntry> {
+
         val serviceDataEntries = mutableListOf<pb.ServiceDataEntry>()
 
         // Needed ugly for-loop because we support API23 that does not support kotlin foreach

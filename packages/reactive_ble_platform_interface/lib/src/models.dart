@@ -1,5 +1,4 @@
 export './model/ble_status.dart';
-export './model/characteristic_instance.dart';
 export './model/characteristic_value.dart';
 export './model/clear_gatt_cache_error.dart';
 export './model/connection_priority.dart';

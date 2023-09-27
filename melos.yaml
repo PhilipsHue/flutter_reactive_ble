@@ -1,25 +1,9 @@
 name: flutter_reactive_ble
 packages:
-  - packages/*
-  - example
+  - /**
 scripts:
   analyze: melos exec -- flutter analyze
-
   format: melos exec -- flutter format .
-
   get: melos exec -- flutter pub get
-
   unittest: 
     run: melos exec -- flutter test
-
-  generate:
-    run: melos run generate:dart && melos run generate:flutter
-    description: Build all generated files for Dart & Flutter packages in this project.
-
-  generate:dart:
-    run: melos exec -c 1 --depends-on="build_runner" --no-flutter -- "dart run build_runner build --delete-conflicting-outputs"
-    description: Build all generated files for Dart packages in this project.
-
-  generate:flutter:
-    run: melos exec -c 1 --depends-on="build_runner" --flutter -- "flutter pub run build_runner build --delete-conflicting-outputs"
-    description: Build all generated files for Flutter packages in this project.

@@ -1,32 +1,29 @@
 import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
 import 'package:meta/meta.dart';
-import 'package:reactive_ble_platform_interface/reactive_ble_platform_interface.dart';
 
 abstract class ConnectedDeviceOperation {
   Stream<CharacteristicValue> get characteristicValueStream;
 
-  Future<List<int>> readCharacteristic(CharacteristicInstance characteristic);
+  Future<List<int>> readCharacteristic(QualifiedCharacteristic characteristic);
 
   Future<void> writeCharacteristicWithResponse(
-    CharacteristicInstance characteristic, {
+    QualifiedCharacteristic characteristic, {
     required List<int> value,
   });
 
   Future<void> writeCharacteristicWithoutResponse(
-    CharacteristicInstance characteristic, {
+    QualifiedCharacteristic characteristic, {
     required List<int> value,
   });
 
   Stream<List<int>> subscribeToCharacteristic(
-    CharacteristicInstance characteristic,
+    QualifiedCharacteristic characteristic,
     Future<void> isDisconnected,
   );
 
   Future<int> requestMtu(String deviceId, int mtu);
 
   Future<List<DiscoveredService>> discoverServices(String deviceId);
-
-  Future<List<DiscoveredService>> getDiscoverServices(String deviceId);
 
   Future<void> requestConnectionPriority(
       String deviceId, ConnectionPriority priority);
@@ -43,7 +40,7 @@ class ConnectedDeviceOperationImpl implements ConnectedDeviceOperation {
       _blePlatform.charValueUpdateStream;
 
   @override
-  Future<List<int>> readCharacteristic(CharacteristicInstance characteristic) {
+  Future<List<int>> readCharacteristic(QualifiedCharacteristic characteristic) {
     final specificCharacteristicValueStream = characteristicValueStream
         .where((update) => update.characteristic == characteristic)
         .map((update) => update.result.dematerialize());
@@ -57,7 +54,7 @@ class ConnectedDeviceOperationImpl implements ConnectedDeviceOperation {
 
   @override
   Future<void> writeCharacteristicWithResponse(
-    CharacteristicInstance characteristic, {
+    QualifiedCharacteristic characteristic, {
     required List<int> value,
   }) async =>
       _blePlatform
@@ -66,7 +63,7 @@ class ConnectedDeviceOperationImpl implements ConnectedDeviceOperation {
 
   @override
   Future<void> writeCharacteristicWithoutResponse(
-    CharacteristicInstance characteristic, {
+    QualifiedCharacteristic characteristic, {
     required List<int> value,
   }) async =>
       _blePlatform
@@ -75,7 +72,7 @@ class ConnectedDeviceOperationImpl implements ConnectedDeviceOperation {
 
   @override
   Stream<List<int>> subscribeToCharacteristic(
-    CharacteristicInstance characteristic,
+    QualifiedCharacteristic characteristic,
     Future<void> isDisconnected,
   ) {
     final specificCharacteristicValueStream = characteristicValueStream
@@ -105,10 +102,6 @@ class ConnectedDeviceOperationImpl implements ConnectedDeviceOperation {
   @override
   Future<List<DiscoveredService>> discoverServices(String deviceId) =>
       _blePlatform.discoverServices(deviceId);
-
-  @override
-  Future<List<DiscoveredService>> getDiscoverServices(String deviceId) =>
-      _blePlatform.getDiscoverServices(deviceId);
 
   @override
   Future<void> requestConnectionPriority(

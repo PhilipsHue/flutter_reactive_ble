@@ -40,7 +40,7 @@ class _SerialAlreadyDisposed extends Error {
   String toString() => "An instance of $_type has already been disposed";
 }
 
-/// A [SerialDisposable] that contains an underlying stream subscription.
+/// A [SerialDisposable] that constains an underlying stream subscription.
 class StreamSubscriptionSerialDisposable
     extends SerialDisposable<StreamSubscription> {
   StreamSubscriptionSerialDisposable()

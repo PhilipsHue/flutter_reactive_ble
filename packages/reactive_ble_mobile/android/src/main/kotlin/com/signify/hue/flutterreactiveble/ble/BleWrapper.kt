@@ -3,7 +3,7 @@ package com.signify.hue.flutterreactiveble.ble
 import com.polidea.rxandroidble2.RxBleConnection
 import java.util.UUID
 
-data class ScanInfo(val deviceId: String, val name: String, val rssi: Int, val connectable: Connectable, val serviceData: Map<UUID, ByteArray>, val serviceUuids: List<UUID>, val manufacturerData: ByteArray) {
+data class ScanInfo(val deviceId: String, val name: String, val rssi: Int, val serviceData: Map<UUID, ByteArray>, val serviceUuids: List<UUID>, val manufacturerData: ByteArray) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -13,7 +13,6 @@ data class ScanInfo(val deviceId: String, val name: String, val rssi: Int, val c
         if (deviceId != other.deviceId) return false
         if (name != other.name) return false
         if (rssi != other.rssi) return false
-        if (connectable != other.connectable) return false
         if (serviceData != other.serviceData) return false
         if (serviceUuids != other.serviceUuids) return false
         if (!manufacturerData.contentEquals(other.manufacturerData)) return false
@@ -25,7 +24,6 @@ data class ScanInfo(val deviceId: String, val name: String, val rssi: Int, val c
         var result = deviceId.hashCode()
         result = 31 * result + name.hashCode()
         result = 31 * result + rssi
-        result = 31 * result + connectable.hashCode()
         result = 31 * result + serviceData.hashCode()
         result = 31 * result + serviceUuids.hashCode()
         result = 31 * result + manufacturerData.contentHashCode()
@@ -66,10 +64,4 @@ enum class ConnectionPriority(val code: Int) {
     BALANCED(code = 0),
     HIGH_PERFORMACE(code = 1),
     LOW_POWER(code = 2)
-}
-
-enum class Connectable(val code: Int) {
-    UNKNOWN(code = 0),
-    NOT_CONNECTABLE(code = 1),
-    CONNECTABLE(code = 2)
 }

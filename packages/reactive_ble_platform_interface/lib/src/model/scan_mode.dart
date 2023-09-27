@@ -1,16 +1,16 @@
-/// Android only: mode in which BLE discovery is executed.
+///Android only:  mode in which BLE discovery is executed.
 enum ScanMode {
   /// passively listen for other scan results without starting BLE scan itself.
   opportunistic,
 
-  /// Scan mode which has the lowest battery consumption.
+  /// scanmode which has the lowest battery consumption.
   lowPower,
 
-  /// Scan mode that is a good compromise between battery consumption and latency.
+  /// scanmode that is a good compromise between battery consumption and latency.
   balanced,
 
-  /// Scan mode with highest battery consumption and lowest latency.
-  /// Should not be used when scanning for a long time.
+  ///Scanmode with highest battery consumption and lowest latency.
+  ///Should not be used when scanning for a long time.
   lowLatency,
 }
 

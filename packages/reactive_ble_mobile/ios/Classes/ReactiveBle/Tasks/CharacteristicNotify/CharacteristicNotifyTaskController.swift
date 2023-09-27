@@ -13,7 +13,7 @@ struct CharacteristicNotifyTaskController: PeripheralTaskController {
     func start(characteristic: CBCharacteristic) -> SubjectTask {
         guard let peripheral = characteristic.service?.peripheral
         else { return task.with(state: task.state.finished(CharacteristicNotifyError.unExpected)) }
-
+        
         peripheral.setNotifyValue(task.params.state.isOn, for: characteristic)
         return task.with(state: task.state.processing(.applying))
     }
@@ -26,7 +26,7 @@ struct CharacteristicNotifyTaskController: PeripheralTaskController {
         return task.with(state: task.state.finished(error))
     }
 
-    private enum CharacteristicNotifyError: Error {
-            case unExpected
+    private enum CharacteristicNotifyError: Error{
+            case unExpected;
             }
 }

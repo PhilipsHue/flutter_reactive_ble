@@ -2,7 +2,6 @@ package com.signify.hue.flutterreactiveble.converters
 
 import com.google.common.truth.Truth.assertThat
 import com.google.protobuf.ByteString
-import com.signify.hue.flutterreactiveble.ble.Connectable
 import com.signify.hue.flutterreactiveble.ble.ConnectionUpdateSuccess
 import com.signify.hue.flutterreactiveble.ble.MtuNegotiateFailed
 import com.signify.hue.flutterreactiveble.ble.MtuNegotiateSuccesful
@@ -54,14 +53,6 @@ class ProtobufMessageConverterTest {
             val result = protobufConverter.convertScanInfo(scanInfo)
 
             assertThat(result.rssi).isEqualTo(scanInfo.rssi)
-        }
-
-        @Test
-        fun `converts connectable into message connectable`() {
-            val scanInfo = createScanInfo()
-            val result = protobufConverter.convertScanInfo(scanInfo)
-
-            assertThat(result.isConnectable.code).isEqualTo(scanInfo.connectable.code)
         }
 
         @Test
@@ -204,12 +195,8 @@ class ProtobufMessageConverterTest {
         val manufacturerData = "123".toByteArray()
 
         return ScanInfo(
-                deviceId = macAdress,
-                name = deviceName,
-                rssi = rssi,
-                connectable = Connectable.UNKNOWN,
-                serviceData = serviceData,
-                manufacturerData = manufacturerData,
+                deviceId = macAdress, name = deviceName,
+                rssi = rssi, serviceData = serviceData, manufacturerData = manufacturerData,
                 serviceUuids = listOf(serviceUuid),
         )
     }

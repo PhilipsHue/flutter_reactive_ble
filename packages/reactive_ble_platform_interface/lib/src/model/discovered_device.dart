@@ -15,7 +15,6 @@ part 'discovered_device.g.dart';
 @FunctionalData()
 class ScanResult extends $ScanResult {
   final Result<DiscoveredDevice, GenericFailure<ScanFailure>?> result;
-
   const ScanResult({required this.result});
 
   @override
@@ -42,8 +41,6 @@ class DiscoveredDevice extends $DiscoveredDevice {
 
   final int rssi;
 
-  final Connectable connectable;
-
   const DiscoveredDevice({
     required this.id,
     required this.name,
@@ -51,7 +48,6 @@ class DiscoveredDevice extends $DiscoveredDevice {
     required this.manufacturerData,
     required this.rssi,
     required this.serviceUuids,
-    this.connectable = Connectable.unknown,
   });
 }
 
@@ -72,6 +68,3 @@ enum ConnectionStatus {
 
 /// Failure type of device discovery.
 enum ScanFailure { unknown }
-
-/// Shows if the device is ready to be connected to from a discovery perspective
-enum Connectable { unknown, unavailable, available }

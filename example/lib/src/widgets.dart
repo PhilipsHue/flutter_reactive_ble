@@ -5,8 +5,8 @@ class BluetoothIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => const SizedBox(
-        width: 32,
-        height: 32,
+        width: 64,
+        height: 64,
         child: Align(alignment: Alignment.center, child: Icon(Icons.bluetooth)),
       );
 }

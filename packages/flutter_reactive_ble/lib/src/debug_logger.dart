@@ -1,5 +1,11 @@
 import 'package:reactive_ble_platform_interface/reactive_ble_platform_interface.dart';
 
+abstract class Logger {
+  set logLevel(LogLevel logLevel);
+
+  void log(Object message);
+}
+
 class DebugLogger implements Logger {
   DebugLogger(
     String tag,
@@ -9,9 +15,6 @@ class DebugLogger implements Logger {
 
   @override
   set logLevel(LogLevel logLevel) => _logLevel = logLevel;
-
-  @override
-  LogLevel get logLevel => _logLevel;
 
   @override
   void log(Object message) {

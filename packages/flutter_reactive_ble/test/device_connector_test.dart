@@ -99,7 +99,6 @@ void main() {
         serviceUuids: const [],
         name: 'test',
         rssi: -39,
-        connectable: Connectable.unknown,
         serviceData: const {},
       );
 
