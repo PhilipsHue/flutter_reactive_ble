@@ -67,15 +67,17 @@ In case you are using ProGuard add the following snippet to your `proguard-rules
 
 This will prevent issues like [#131](https://github.com/PhilipsHue/flutter_reactive_ble/issues/131).
 
-### iOS
+### iOS / MacOS
 
-For iOS it is required you add the following entries to the `Info.plist` file of your app. It is not allowed to access Core BLuetooth without this. See [our example app](https://github.com/PhilipsHue/flutter_reactive_ble/blob/master/example/ios/Runner/Info.plist) on how to implement this. For more indepth details: [Blog post on iOS bluetooth permissions](https://medium.com/flawless-app-stories/handling-ios-13-bluetooth-permissions-26c6a8cbb816)
+For iOS/MacOS it is required you add the following entries to the `Info.plist` file of your app. It is not allowed to access Core BLuetooth without this. See [our example app](https://github.com/PhilipsHue/flutter_reactive_ble/blob/master/example/ios/Runner/Info.plist) on how to implement this. For more indepth details: [Blog post on iOS bluetooth permissions](https://medium.com/flawless-app-stories/handling-ios-13-bluetooth-permissions-26c6a8cbb816)
 
 iOS13 and higher
 * NSBluetoothAlwaysUsageDescription
 
 iOS12 and lower
 * NSBluetoothPeripheralUsageDescription
+
+For MacOS, make sure to enable Bluetooth from Capabilities
 
 ## Usage
 ### Initialization

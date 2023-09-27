@@ -31,3 +31,7 @@ flutter:
         pluginClass: ReactiveBlePlugin
       ios:
         pluginClass: ReactiveBlePlugin
+        sharedDarwinSource: true
+      macos:
+        pluginClass: ReactiveBlePlugin
+        sharedDarwinSource: true  
