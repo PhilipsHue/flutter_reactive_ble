@@ -30,7 +30,7 @@ The reactive BLE lib supports the following:
 - Observe host device BLE status
 - Establishing a BLE connection
 - Maintaining connection status of multiple BLE devices 
-- Discover services(will be implicit)
+- Discover services (will be implicit)
 - Read / write a characteristic
 - Subscribe to a characteristic
 - Clear GATT cache
