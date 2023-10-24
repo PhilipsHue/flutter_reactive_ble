@@ -36,7 +36,7 @@ class BleDeviceConnector extends ReactiveState<ConnectionStateUpdate> {
 
   Future<void> disconnect(String deviceId) async {
     try {
-      _logMessage('disconnecting to device: $deviceId');
+      _logMessage('disconnecting from device: $deviceId');
       await _connection.cancel();
     } on Exception catch (e, _) {
       _logMessage("Error disconnecting from a device: $e");
