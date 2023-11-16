@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:collection';
 import 'dart:io';
 
+import 'package:flutter/material.dart';
 import 'package:flutter_reactive_ble/src/connected_device_operation.dart';
 import 'package:flutter_reactive_ble/src/debug_logger.dart';
 import 'package:flutter_reactive_ble/src/device_connector.dart';
@@ -238,6 +239,7 @@ class FlutterReactiveBle {
     ScanMode scanMode = ScanMode.balanced,
     bool requireLocationServicesEnabled = true,
   }) async* {
+    debugPrint('scanForDevices!!!');
     await initialize();
 
     yield* _deviceScanner.scanForDevices(
