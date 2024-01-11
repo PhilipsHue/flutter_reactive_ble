@@ -1,0 +1,59 @@
+name: "Build"
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    name: Build
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set Up Java
+        uses: actions/setup-java@v3.12.0
+        with:
+          distribution: 'oracle'
+          java-version: '19.0.2'
+
+      - name: Set Up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.16.3'
+          channel: 'stable'
+
+      - name: Set up debug keystore
+        run: |
+          rm -f ~/.android/debug.keystore
+          keytool -genkeypair \
+            -alias androiddebugkey \
+            -keypass android \
+            -keystore ~/.android/debug.keystore \
+            -storepass android \
+            -dname 'CN=Android Debug,O=Android,C=US' \
+            -keyalg 'RSA' \
+            -keysize 2048 \
+            -validity 10000
+        
+      - name: Quality checks monorepo
+        run: |
+          ./bin/quality_checks.sh
+
+      - name: Android native tests
+        run: |
+          #!/bin/bash -ex
+          cd example/android && ls && ./gradlew detekt && ./gradlew testDebugUnitTest
+
+      - name: Build android app
+        run: |
+          cd example && flutter build apk --debug
+
+      - name: Build iOS app
+        run: |
+          find . -name "Podfile" -execdir pod install \;
+          cd example && flutter build ios --debug --no-codesign
