@@ -1,4 +1,4 @@
-name: "Build & Release"
+name: "Build"
 
 on:
   pull_request:
@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    name: Build & Release
+    name: Build
     runs-on: macos-latest
 
     steps:
@@ -39,11 +39,6 @@ jobs:
             -keyalg 'RSA' \
             -keysize 2048 \
             -validity 10000
-
-      # - name: Setup local properties
-      #   run: |
-      #     touch "$FCI_BUILD_DIR/example/android/local.properties"
-      #     echo "flutter.sdk=$HOME/programs/flutter" > "$FCI_BUILD_DIR/example/android/local.properties"
         
       - name: Quality checks monorepo
         run: |
@@ -62,12 +57,3 @@ jobs:
         run: |
           find . -name "Podfile" -execdir pod install \;
           cd example && flutter build ios --debug --no-codesign
-
-      - name: Upload Artifacts
-        uses: actions/upload-artifact@v2
-        with:
-          name: Releases
-          path: |
-            example/build/**/outputs/**/*.apk
-            example/build/**/outputs/**/mapping.txt
-            eexample/build/ios/ipa/*.ipa
