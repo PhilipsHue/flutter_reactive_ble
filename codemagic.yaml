@@ -8,8 +8,9 @@ workflows:
     instance_type: mac_mini_m1
     environment:
       flutter: stable
-      xcode: 14.0
+      xcode: 14.3
       cocoapods: default
+      java: 19.0.2
     cache:
       cache_paths: []
     triggering:
@@ -39,6 +40,8 @@ workflows:
         script: |
           # set up local properties
           echo "flutter.sdk=$HOME/programs/flutter" > "$FCI_BUILD_DIR/example/android/local.properties"
+          echo "$JAVA_HOME"
+          echo "org.gradle.java.home=$JAVA_HOME" >> "$FCI_BUILD_DIR/example/android/gradle.properties"
       - name: Quality checks monorepo
         script: |
           ./bin/quality_checks.sh
@@ -53,6 +56,6 @@ workflows:
           find . -name "Podfile" -execdir pod install \;
           cd example && flutter build ios --debug --no-codesign
     artifacts:
-      - example/build/**/outputs/**/*.apk
+      - example/build/**/outputs/apk/*.apk
       - example/build/**/outputs/**/mapping.txt
       - example/build/ios/ipa/*.ipa

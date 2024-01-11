@@ -3,7 +3,7 @@ version '1.0-SNAPSHOT'
 
 buildscript {
     ext.detekt_version = '1.17.1'
-    ext.kotlin_version = '1.5.31'
+    ext.kotlin_version = '1.8.21'
     repositories {
         google()
         mavenCentral()
@@ -13,8 +13,8 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.0.3'
-        classpath 'com.google.protobuf:protobuf-gradle-plugin:0.8.17'
+        classpath 'com.android.tools.build:gradle:8.0.2'
+        classpath 'com.google.protobuf:protobuf-gradle-plugin:0.9.3'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath "io.gitlab.arturbosch.detekt:detekt-gradle-plugin:$detekt_version"
         classpath "de.mannodermaus.gradle.plugins:android-junit5:1.7.1.1"
@@ -38,7 +38,7 @@ apply plugin: "io.gitlab.arturbosch.detekt"
 apply plugin: "de.mannodermaus.android-junit5"
 
 android {
-    compileSdkVersion 31
+    compileSdkVersion 33
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
         test.java.srcDirs += 'src/test/kotlin'
@@ -51,11 +51,13 @@ android {
 
     defaultConfig {
         minSdkVersion 21
-        targetSdkVersion 31
+        targetSdkVersion 33
         consumerProguardFiles 'proguard-rules.txt'
     }
 
-    lintOptions {
+    namespace 'com.signify.hue.flutterreactiveble'
+
+    lint {
         disable 'InvalidPackage'
     }
 
@@ -79,7 +81,7 @@ detekt {
 
 protobuf {
     protoc {
-        artifact = 'com.google.protobuf:protoc:3.18.1'
+        artifact = 'com.google.protobuf:protoc:3.23.0'
     }
 
     generateProtoTasks {
@@ -96,7 +98,7 @@ protobuf {
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'com.polidea.rxandroidble2:rxandroidble:1.16.0'
-    implementation 'com.google.protobuf:protobuf-javalite:3.18.1'
+    implementation 'com.google.protobuf:protobuf-javalite:3.23.0'
     implementation 'io.reactivex.rxjava2:rxkotlin:2.4.0'
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
 
