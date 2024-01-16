@@ -25,58 +25,55 @@ class BondingManager(private val context: Context) {
     @SuppressLint("MissingPermission")
     fun bondWithDevice(rxBleDevice: RxBleDevice): Single<Int> {
         return Single.create { completion ->
-            when (rxBleDevice.bluetoothDevice.bondState) {
+            if (rxBleDevice.bluetoothDevice.bondState == BluetoothDevice.BOND_BONDED) {
+                completion.onSuccess(BluetoothDevice.BOND_BONDED)
+                return@create
+            }
 
-                BluetoothDevice.BOND_BONDED -> completion.onSuccess(BluetoothDevice.BOND_BONDED)
-                else -> {
-                    val receiver = object : BroadcastReceiver() {
-                        override fun onReceive(context: Context, intent: Intent) {
-                            val deviceBeingPaired: BluetoothDevice? =
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                                    intent.getParcelableExtra(
-                                        BluetoothDevice.EXTRA_DEVICE,
-                                        BluetoothDevice::class.java
-                                    )
-                                } else {
-                                    @Suppress("DEPRECATION")
-                                    intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE)
-                                }
-
-                            if (deviceBeingPaired?.address == rxBleDevice.bluetoothDevice.address) {
-                                val state = intent.getIntExtra(
-                                    BluetoothDevice.EXTRA_BOND_STATE,
-                                    BluetoothDevice.BOND_NONE
-                                )
-
-                                when (state) {
-                                    BluetoothDevice.BOND_BONDED -> completion.onSuccess(state)
-                                    BluetoothDevice.BOND_NONE -> completion.onSuccess(state)
-                                    // BOND_BONDING is a intermediate state - do not send this back.
-                                }
-                            }
+            val receiver = object : BroadcastReceiver() {
+                override fun onReceive(context: Context, intent: Intent) {
+                    val deviceBeingPaired: BluetoothDevice? =
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                            intent.getParcelableExtra(
+                                BluetoothDevice.EXTRA_DEVICE,
+                                BluetoothDevice::class.java
+                            )
+                        } else {
+                            @Suppress("DEPRECATION")
+                            intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE)
                         }
-                    }
 
-                    completion.setDisposable(Disposables.fromAction {
-                        context.unregisterReceiver(
-                            receiver
+                    if (deviceBeingPaired?.address == rxBleDevice.bluetoothDevice.address) {
+                        val state = intent.getIntExtra(
+                            BluetoothDevice.EXTRA_BOND_STATE,
+                            BluetoothDevice.BOND_NONE
                         )
-                    })
 
-                    context.registerReceiver(
-                        receiver,
-                        IntentFilter(BluetoothDevice.ACTION_BOND_STATE_CHANGED)
-                    )
-
-                    val createBondResult = rxBleDevice.bluetoothDevice.createBond()
-
-                    if (!createBondResult) {
-                        completion.tryOnError(BondingFailedException())
+                        when (state) {
+                            BluetoothDevice.BOND_BONDED -> completion.onSuccess(state)
+                            BluetoothDevice.BOND_NONE -> completion.onSuccess(state)
+                            // BOND_BONDING is a intermediate state - do not send this back.
+                        }
                     }
                 }
             }
 
-        }
+            completion.setDisposable(Disposables.fromAction {
+                context.unregisterReceiver(
+                    receiver
+                )
+            })
 
+            context.registerReceiver(
+                receiver,
+                IntentFilter(BluetoothDevice.ACTION_BOND_STATE_CHANGED)
+            )
+
+            val createBondResult = rxBleDevice.bluetoothDevice.createBond()
+
+            if (!createBondResult) {
+                completion.tryOnError(BondingFailedException())
+            }
+        }
     }
 }
