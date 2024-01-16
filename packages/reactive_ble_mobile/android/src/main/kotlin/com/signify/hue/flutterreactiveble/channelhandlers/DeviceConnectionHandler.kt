@@ -1,12 +1,12 @@
 package com.signify.hue.flutterreactiveble.channelhandlers
 
-import com.signify.hue.flutterreactiveble.ProtobufModel as pb
 import com.signify.hue.flutterreactiveble.converters.ProtobufMessageConverter
 import com.signify.hue.flutterreactiveble.utils.Duration
 import io.flutter.plugin.common.EventChannel
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import java.util.concurrent.TimeUnit
+import com.signify.hue.flutterreactiveble.ProtobufModel as pb
 
 class DeviceConnectionHandler(private val bleClient: com.signify.hue.flutterreactiveble.ble.BleClient) : EventChannel.StreamHandler {
     private var connectDeviceSink: EventChannel.EventSink? = null
@@ -28,8 +28,8 @@ class DeviceConnectionHandler(private val bleClient: com.signify.hue.flutterreac
 
     fun connectToDevice(connectToDeviceMessage: pb.ConnectToDeviceRequest) {
         bleClient.connectToDevice(
-                connectToDeviceMessage.deviceId,
-                Duration(connectToDeviceMessage.timeoutInMs.toLong(), TimeUnit.MILLISECONDS)
+            connectToDeviceMessage.deviceId,
+            Duration(connectToDeviceMessage.timeoutInMs.toLong(), TimeUnit.MILLISECONDS),
         )
     }
 
@@ -43,19 +43,19 @@ class DeviceConnectionHandler(private val bleClient: com.signify.hue.flutterreac
     }
 
     private fun listenToConnectionChanges() = bleClient.connectionUpdateSubject
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe { update ->
-                when (update) {
-                    is com.signify.hue.flutterreactiveble.ble.ConnectionUpdateSuccess -> {
-                        handleDeviceConnectionUpdateResult(converter.convertToDeviceInfo(update))
-                    }
-                    is com.signify.hue.flutterreactiveble.ble.ConnectionUpdateError -> {
-                        handleDeviceConnectionUpdateResult(
-                                converter.convertConnectionErrorToDeviceInfo(update.deviceId, update.errorMessage)
-                        )
-                    }
+        .observeOn(AndroidSchedulers.mainThread())
+        .subscribe { update ->
+            when (update) {
+                is com.signify.hue.flutterreactiveble.ble.ConnectionUpdateSuccess -> {
+                    handleDeviceConnectionUpdateResult(converter.convertToDeviceInfo(update))
+                }
+                is com.signify.hue.flutterreactiveble.ble.ConnectionUpdateError -> {
+                    handleDeviceConnectionUpdateResult(
+                        converter.convertConnectionErrorToDeviceInfo(update.deviceId, update.errorMessage),
+                    )
                 }
             }
+        }
 
     private fun handleDeviceConnectionUpdateResult(connectionUpdateMessage: pb.DeviceInfo) {
         connectDeviceSink?.success(connectionUpdateMessage.toByteArray())

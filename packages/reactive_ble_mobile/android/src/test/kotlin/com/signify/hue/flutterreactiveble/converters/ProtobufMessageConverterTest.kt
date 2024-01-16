@@ -132,7 +132,7 @@ class ProtobufMessageConverterTest {
             val request = createCharacteristicRequest("a", UUID.randomUUID())
 
             assertThat(protobufConverter.convertCharacteristicInfo(request.characteristic, byteArrayOf(1)))
-                    .isInstanceOf(pb.CharacteristicValueInfo::class.java)
+                .isInstanceOf(pb.CharacteristicValueInfo::class.java)
         }
 
         @Test
@@ -179,14 +179,14 @@ class ProtobufMessageConverterTest {
             val errorMessage = "whoops"
             val result = MtuNegotiateFailed("id", errorMessage)
             assertThat(protobufConverter.convertNegotiateMtuInfo(result).failure.message)
-                    .isEqualTo(errorMessage)
+                .isEqualTo(errorMessage)
         }
 
         @Test
         fun `converts error code`() {
             val result = MtuNegotiateFailed("id", "")
             assertThat(protobufConverter.convertNegotiateMtuInfo(result).failure.code)
-                    .isEqualTo(NegotiateMtuErrorType.UNKNOWN.code)
+                .isEqualTo(NegotiateMtuErrorType.UNKNOWN.code)
         }
     }
 
@@ -204,29 +204,28 @@ class ProtobufMessageConverterTest {
         val manufacturerData = "123".toByteArray()
 
         return ScanInfo(
-                deviceId = macAdress,
-                name = deviceName,
-                rssi = rssi,
-                connectable = Connectable.UNKNOWN,
-                serviceData = serviceData,
-                manufacturerData = manufacturerData,
-                serviceUuids = listOf(serviceUuid),
+            deviceId = macAdress,
+            name = deviceName,
+            rssi = rssi,
+            connectable = Connectable.UNKNOWN,
+            serviceData = serviceData,
+            manufacturerData = manufacturerData,
+            serviceUuids = listOf(serviceUuid),
         )
     }
 
     private fun createCharacteristicRequest(deviceId: String, serviceUuid: UUID): pb.ReadCharacteristicRequest {
         val uuidConverter = UuidConverter()
         val uuid = pb.Uuid.newBuilder()
-                .setData(ByteString.copyFrom(uuidConverter.byteArrayFromUuid(serviceUuid)))
+            .setData(ByteString.copyFrom(uuidConverter.byteArrayFromUuid(serviceUuid)))
 
         val characteristicAddress = pb.CharacteristicAddress.newBuilder()
-                .setDeviceId(deviceId)
-                .setServiceUuid(uuid)
-                .setCharacteristicUuid(uuid)
+            .setDeviceId(deviceId)
+            .setServiceUuid(uuid)
+            .setCharacteristicUuid(uuid)
 
         return pb.ReadCharacteristicRequest.newBuilder()
-                .setCharacteristic(characteristicAddress)
-                .build()
+            .setCharacteristic(characteristicAddress)
+            .build()
     }
 }
-

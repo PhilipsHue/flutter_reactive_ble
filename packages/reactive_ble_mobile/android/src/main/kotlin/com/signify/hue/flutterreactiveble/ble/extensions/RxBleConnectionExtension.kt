@@ -6,13 +6,15 @@ import io.reactivex.Single
 import java.util.UUID
 
 fun RxBleConnection.resolveCharacteristic(uuid: UUID, instanceId: Int): Single<BluetoothGattCharacteristic> =
-        discoverServices().flatMap { services ->
-            Single.just(services.bluetoothGattServices.flatMap { service ->
+    discoverServices().flatMap { services ->
+        Single.just(
+            services.bluetoothGattServices.flatMap { service ->
                 service.characteristics.filter {
                     it.uuid == uuid && it.instanceId == instanceId
                 }
-            }.single())
-        }
+            }.single(),
+        )
+    }
 
 fun RxBleConnection.writeCharWithResponse(characteristic: BluetoothGattCharacteristic, value: ByteArray): Single<ByteArray> {
     characteristic.writeType = BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT

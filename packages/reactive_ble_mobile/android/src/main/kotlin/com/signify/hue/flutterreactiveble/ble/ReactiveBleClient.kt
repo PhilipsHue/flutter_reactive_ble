@@ -60,12 +60,12 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
 
     /*yes spread operator is not performant but after kotlin v1.60 it is less bad and it is also the
     recommended way to call varargs in java https://kotlinlang.org/docs/reference/java-interop.html#java-varargs
-    */
+     */
     @Suppress("SpreadOperator")
     override fun scanForDevices(
         services: List<ParcelUuid>,
         scanMode: ScanMode,
-        requireLocationServicesEnabled: Boolean
+        requireLocationServicesEnabled: Boolean,
     ): Observable<ScanInfo> {
         val filters = services.map { service ->
             ScanFilter.Builder()
@@ -80,11 +80,13 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
                 .setCallbackType(ScanSettings.CALLBACK_TYPE_ALL_MATCHES)
                 .setShouldCheckLocationServicesState(requireLocationServicesEnabled)
                 .build(),
-            *filters
+            *filters,
         )
             .map { result ->
-                ScanInfo(result.bleDevice.macAddress, result.scanRecord.deviceName
-                    ?: result.bleDevice.name ?: "",
+                ScanInfo(
+                    result.bleDevice.macAddress,
+                    result.scanRecord.deviceName
+                        ?: result.bleDevice.name ?: "",
                     result.rssi,
                     when (result.isConnectable) {
                         null -> Connectable.UNKNOWN
@@ -94,33 +96,36 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
                     },
                     result.scanRecord.serviceData?.mapKeys { it.key.uuid } ?: emptyMap(),
                     result.scanRecord.serviceUuids?.map { it.uuid } ?: emptyList(),
-                    extractManufacturerData(result.scanRecord.manufacturerSpecificData))
+                    extractManufacturerData(result.scanRecord.manufacturerSpecificData),
+                )
             }
     }
 
     override fun connectToDevice(deviceId: String, timeout: Duration) {
-        allConnections.add(getConnection(deviceId, timeout)
-            .subscribe({ result ->
-                when (result) {
-                    is EstablishedConnection -> {
-                    }
-                    is EstablishConnectionFailure -> {
-                        connectionUpdateBehaviorSubject.onNext(
-                            ConnectionUpdateError(
-                                deviceId,
-                                result.errorMessage
+        allConnections.add(
+            getConnection(deviceId, timeout)
+                .subscribe({ result ->
+                    when (result) {
+                        is EstablishedConnection -> {
+                        }
+                        is EstablishConnectionFailure -> {
+                            connectionUpdateBehaviorSubject.onNext(
+                                ConnectionUpdateError(
+                                    deviceId,
+                                    result.errorMessage,
+                                ),
                             )
-                        )
+                        }
                     }
-                }
-            }, { error ->
-                connectionUpdateBehaviorSubject.onNext(
-                    ConnectionUpdateError(
-                        deviceId, error?.message
-                            ?: "unknown error"
+                }, { error ->
+                    connectionUpdateBehaviorSubject.onNext(
+                        ConnectionUpdateError(
+                            deviceId,
+                            error?.message
+                                ?: "unknown error",
+                        ),
                     )
-                )
-            })
+                }),
         )
     }
 
@@ -155,13 +160,14 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
     override fun readCharacteristic(
         deviceId: String,
         characteristicId: UUID,
-        characteristicInstanceId: Int
+        characteristicInstanceId: Int,
     ): Single<CharOperationResult> =
         getConnection(deviceId).flatMapSingle { connectionResult ->
             when (connectionResult) {
                 is EstablishedConnection -> {
                     connectionResult.rxConnection.resolveCharacteristic(
-                            characteristicId, characteristicInstanceId
+                        characteristicId,
+                        characteristicInstanceId,
                     ).flatMap { c: BluetoothGattCharacteristic ->
                         connectionResult.rxConnection.readCharacteristic(c)
                                 /*
@@ -169,19 +175,19 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
                                 the error GAT_AUTH_FAIL(137) when reading char that will establish
                                 the bonding with the peripheral. By retrying the operation once we
                                 deviate between this flaky one time error and real auth failed cases
-                                */
-                                .retry(1) { Build.VERSION.SDK_INT < Build.VERSION_CODES.O }
-                                .map { value ->
-                                    CharOperationSuccessful(deviceId, value.asList())
-                                }
+                                 */
+                            .retry(1) { Build.VERSION.SDK_INT < Build.VERSION_CODES.O }
+                            .map { value ->
+                                CharOperationSuccessful(deviceId, value.asList())
+                            }
                     }
                 }
                 is EstablishConnectionFailure ->
                     Single.just(
                         CharOperationFailed(
                             deviceId,
-                            "failed to connect ${connectionResult.errorMessage}"
-                        )
+                            "failed to connect ${connectionResult.errorMessage}",
+                        ),
                     )
             }
         }.first(CharOperationFailed(deviceId, "read char failed"))
@@ -190,28 +196,28 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
         deviceId: String,
         characteristicId: UUID,
         characteristicInstanceId: Int,
-        value: ByteArray
+        value: ByteArray,
     ): Single<CharOperationResult> =
         executeWriteOperation(
             deviceId,
             characteristicId,
             characteristicInstanceId,
             value,
-            RxBleConnection::writeCharWithResponse
+            RxBleConnection::writeCharWithResponse,
         )
 
     override fun writeCharacteristicWithoutResponse(
         deviceId: String,
         characteristicId: UUID,
         characteristicInstanceId: Int,
-        value: ByteArray
+        value: ByteArray,
     ): Single<CharOperationResult> =
         executeWriteOperation(
             deviceId,
             characteristicId,
             characteristicInstanceId,
             value,
-            RxBleConnection::writeCharWithoutResponse
+            RxBleConnection::writeCharWithoutResponse,
         )
 
     override fun setupNotification(
@@ -224,7 +230,7 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
                 setupNotificationOrIndication(
                     deviceConnection,
                     characteristicId,
-                    characteristicInstanceId
+                    characteristicInstanceId,
                 )
             }
             // now we have setup the subscription and we want the actual value
@@ -243,8 +249,8 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
                     Single.just(
                         MtuNegotiateFailed(
                             deviceId,
-                            "failed to connect ${connectionResult.errorMessage}"
-                        )
+                            "failed to connect ${connectionResult.errorMessage}",
+                        ),
                     )
             }
         }.first(MtuNegotiateFailed(deviceId, "negotiate mtu timed out"))
@@ -259,7 +265,7 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
 
     private fun getConnection(
         deviceId: String,
-        timeout: Duration = Duration(0, TimeUnit.MILLISECONDS)
+        timeout: Duration = Duration(0, TimeUnit.MILLISECONDS),
     ): Observable<EstablishConnectionResult> {
         val device = rxBleClient.getBleDevice(deviceId)
         val connector =
@@ -273,24 +279,24 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
         characteristicId: UUID,
         characteristicInstanceId: Int,
         value: ByteArray,
-        bleOperation: RxBleConnection.(characteristic: BluetoothGattCharacteristic, value: ByteArray) -> Single<ByteArray>
+        bleOperation: RxBleConnection.(characteristic: BluetoothGattCharacteristic, value: ByteArray) -> Single<ByteArray>,
     ): Single<CharOperationResult> {
         return getConnection(deviceId)
             .flatMapSingle { connectionResult ->
                 when (connectionResult) {
                     is EstablishedConnection -> {
                         connectionResult.rxConnection.resolveCharacteristic(characteristicId, characteristicInstanceId)
-                                .flatMap { characteristic ->
-                                    connectionResult.rxConnection.bleOperation(characteristic, value)
-                                            .map { value -> CharOperationSuccessful(deviceId, value.asList()) }
-                                }
+                            .flatMap { characteristic ->
+                                connectionResult.rxConnection.bleOperation(characteristic, value)
+                                    .map { value -> CharOperationSuccessful(deviceId, value.asList()) }
+                            }
                     }
                     is EstablishConnectionFailure -> {
                         Single.just(
                             CharOperationFailed(
                                 deviceId,
-                                "failed to connect ${connectionResult.errorMessage}"
-                            )
+                                "failed to connect ${connectionResult.errorMessage}",
+                            ),
                         )
                     }
                 }
@@ -300,7 +306,7 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
     private fun setupNotificationOrIndication(
         deviceConnection: EstablishConnectionResult,
         characteristicId: UUID,
-        characteristicInstanceId: Int
+        characteristicInstanceId: Int,
     ): Observable<Observable<ByteArray>> =
         when (deviceConnection) {
             is EstablishedConnection -> {
@@ -308,7 +314,8 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
                     Observable.error(Exception("Bonding is in progress wait for bonding to be finished before executing more operations on the device"))
                 } else {
                     deviceConnection.rxConnection.resolveCharacteristic(
-                            characteristicId, characteristicInstanceId
+                        characteristicId,
+                        characteristicInstanceId,
                     ).flatMapObservable { characteristic ->
                         val mode = if (characteristic.descriptors.isEmpty()) {
                             NotificationSetupMode.COMPAT
@@ -319,7 +326,7 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
                         if ((characteristic.properties and BluetoothGattCharacteristic.PROPERTY_NOTIFY) > 0) {
                             deviceConnection.rxConnection.setupNotification(
                                 characteristic,
-                                mode
+                                mode,
                             )
                         } else {
                             deviceConnection.rxConnection.setupIndication(characteristic, mode)
@@ -334,7 +341,7 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
 
     override fun requestConnectionPriority(
         deviceId: String,
-        priority: ConnectionPriority
+        priority: ConnectionPriority,
     ): Single<RequestConnectionPriorityResult> =
         getConnection(deviceId).switchMapSingle { connectionResult ->
             when (connectionResult) {
@@ -342,7 +349,7 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
                     connectionResult.rxConnection.requestConnectionPriority(
                         priority.code,
                         2,
-                        TimeUnit.SECONDS
+                        TimeUnit.SECONDS,
                     )
                         .toSingle {
                             RequestConnectionPrioritySuccess(deviceId)
@@ -360,6 +367,6 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
                 .setMacAddressLogSetting(LogConstants.MAC_ADDRESS_FULL)
                 .setUuidsLogSetting(LogConstants.UUIDS_FULL)
                 .setShouldLogAttributeValues(true)
-                .build()
+                .build(),
         )
 }

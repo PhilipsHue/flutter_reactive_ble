@@ -59,17 +59,17 @@ enum class BleStatus(val code: Int) {
     UNAUTHORIZED(code = 2),
     POWERED_OFF(code = 3),
     LOCATION_SERVICES_DISABLED(code = 4),
-    READY(code = 5)
+    READY(code = 5),
 }
 
 enum class ConnectionPriority(val code: Int) {
     BALANCED(code = 0),
     HIGH_PERFORMACE(code = 1),
-    LOW_POWER(code = 2)
+    LOW_POWER(code = 2),
 }
 
 enum class Connectable(val code: Int) {
     UNKNOWN(code = 0),
     NOT_CONNECTABLE(code = 1),
-    CONNECTABLE(code = 2)
+    CONNECTABLE(code = 2),
 }

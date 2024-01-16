@@ -25,27 +25,26 @@ interface BleClient {
     fun readCharacteristic(
         deviceId: String,
         characteristicId: UUID,
-        characteristicInstanceId: Int
+        characteristicInstanceId: Int,
     ): Single<CharOperationResult>
     fun setupNotification(
         deviceId: String,
         characteristicId: UUID,
-        characteristicInstanceId: Int
+        characteristicInstanceId: Int,
     ): Observable<ByteArray>
     fun writeCharacteristicWithResponse(
         deviceId: String,
         characteristicId: UUID,
         characteristicInstanceId: Int,
-        value: ByteArray
+        value: ByteArray,
     ): Single<CharOperationResult>
     fun writeCharacteristicWithoutResponse(
         deviceId: String,
         characteristicId: UUID,
         characteristicInstanceId: Int,
-        value: ByteArray
+        value: ByteArray,
     ): Single<CharOperationResult>
     fun negotiateMtuSize(deviceId: String, size: Int): Single<MtuNegotiateResult>
     fun observeBleStatus(): Observable<BleStatus>
-    fun requestConnectionPriority(deviceId: String, priority: ConnectionPriority):
-            Single<RequestConnectionPriorityResult>
+    fun requestConnectionPriority(deviceId: String, priority: ConnectionPriority): Single<RequestConnectionPriorityResult>
 }

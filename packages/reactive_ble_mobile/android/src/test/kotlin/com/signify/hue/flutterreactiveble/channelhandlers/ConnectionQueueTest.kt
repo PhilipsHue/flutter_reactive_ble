@@ -1,8 +1,8 @@
 package com.signify.hue.flutterreactiveble.channelhandlers
 import com.google.common.truth.Truth.assertThat
 import io.reactivex.subjects.BehaviorSubject
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 
 class ConnectionQueueTest {
 

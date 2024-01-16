@@ -106,7 +106,6 @@ class ReactiveBleClientTest {
         subject.onComplete()
     }
 
-
     @DisplayName("Establishing a connection")
     @Nested
     inner class EstablishConnectionTest {
@@ -157,7 +156,7 @@ class ReactiveBleClientTest {
             every { rxConnection.readCharacteristic(any<BluetoothGattCharacteristic>()) }.returns(Single.just(byteArrayOf(byteMin, byteMax)))
             every { rxConnection.resolveCharacteristic(any(), any()) }.returns(Single.just(BluetoothGattCharacteristic(UUID.randomUUID(), 0, 0)))
             val observable = sut.readCharacteristic("test", UUID.randomUUID(), 11)
-                    .map { result -> result as CharOperationSuccessful }.test()
+                .map { result -> result as CharOperationSuccessful }.test()
 
             assertThat(observable.values().first().value).isEqualTo(listOf(byteMin, byteMax))
         }
@@ -216,7 +215,6 @@ class ReactiveBleClientTest {
             val bytes = byteArrayOf(byteMin, byteMax)
             subject.onNext(EstablishConnectionFailure("test", "error"))
 
-
             sut.writeCharacteristicWithoutResponse("test", UUID.randomUUID(), 11, bytes).test()
 
             verify(exactly = 0) { rxConnection.writeCharWithoutResponse(any(), any()) }
@@ -244,7 +242,7 @@ class ReactiveBleClientTest {
             every { rxConnection.writeCharWithResponse(any(), any()) }.returns(Single.just(byteArrayOf(byteMin, byteMax)))
             every { rxConnection.resolveCharacteristic(any(), any()) }.returns(Single.just(BluetoothGattCharacteristic(UUID.randomUUID(), 0, 0)))
             val observable = sut.writeCharacteristicWithResponse("test", UUID.randomUUID(), 11, bytes)
-                    .map { result -> result as CharOperationSuccessful }.test()
+                .map { result -> result as CharOperationSuccessful }.test()
 
             assertThat(observable.values().first().value).isEqualTo(bytes.toList())
         }
@@ -297,7 +295,6 @@ class ReactiveBleClientTest {
 
         @Test
         fun `starts with current state`() {
-
             val result = sut.observeBleStatus().test()
             assertThat(result.values().count()).isEqualTo(2)
             assertThat(result.values().first()).isEqualTo(BleStatus.POWERED_OFF)
@@ -332,7 +329,7 @@ class ReactiveBleClientTest {
         @BeforeEach
         fun setup() {
             every { bleDevice.bluetoothDevice }.returns(bluetoothDevice)
-            every {bluetoothDevice.bondState}.returns(BOND_BONDED)
+            every { bluetoothDevice.bondState }.returns(BOND_BONDED)
         }
 
         @Test

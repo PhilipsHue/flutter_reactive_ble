@@ -26,15 +26,15 @@ class BleStatusHandler(private val bleClient: BleClient) : EventChannel.StreamHa
     }
 
     private fun listenToBleStatus(eventSink: EventChannel.EventSink): Disposable =
-            Observable.timer(delayListenBleStatus, TimeUnit.MILLISECONDS)
-                    .switchMap { bleClient.observeBleStatus() }
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe({ bleStatus ->
-                        val message = pb.BleStatusInfo.newBuilder()
-                                .setStatus(bleStatus.code)
-                                .build()
-                        eventSink.success(message.toByteArray())
-                    }, { throwable ->
-                        eventSink.error("ObserveBleStatusFailure", throwable.message, null)
-                    })
+        Observable.timer(delayListenBleStatus, TimeUnit.MILLISECONDS)
+            .switchMap { bleClient.observeBleStatus() }
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({ bleStatus ->
+                val message = pb.BleStatusInfo.newBuilder()
+                    .setStatus(bleStatus.code)
+                    .build()
+                eventSink.success(message.toByteArray())
+            }, { throwable ->
+                eventSink.error("ObserveBleStatusFailure", throwable.message, null)
+            })
 }
