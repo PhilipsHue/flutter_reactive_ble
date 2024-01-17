@@ -41,6 +41,15 @@ class Uuid {
     }
   }
 
+  /// Expands a 16 bit uuid to a 128 bit one
+  Uuid get expanded {
+    if (data.length == 2) {
+      return Uuid.parse("0000$this-0000-1000-8000-00805f9b34fb");
+    } else {
+      return this;
+    }
+  }
+
   @override
   String toString() {
     String paddedHex(int num) {

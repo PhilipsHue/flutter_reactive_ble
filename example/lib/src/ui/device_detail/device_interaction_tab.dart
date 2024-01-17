@@ -8,28 +8,27 @@ import 'package:provider/provider.dart';
 import 'characteristic_interaction_dialog.dart';
 
 part 'device_interaction_tab.g.dart';
-//ignore_for_file: annotate_overrides
+
+// ignore_for_file: annotate_overrides
 
 class DeviceInteractionTab extends StatelessWidget {
-  final DiscoveredDevice device;
-
   const DeviceInteractionTab({
     required this.device,
     Key? key,
   }) : super(key: key);
 
+  final DiscoveredDevice device;
+
   @override
-  Widget build(BuildContext context) =>
-      Consumer3<BleDeviceConnector, ConnectionStateUpdate, BleDeviceInteractor>(
-        builder: (_, deviceConnector, connectionStateUpdate, serviceDiscoverer,
-                __) =>
-            _DeviceInteractionTab(
+  Widget build(BuildContext context) => Consumer3<BleDeviceConnector, ConnectionStateUpdate, BleDeviceInteractor>(
+        builder: (_, deviceConnector, connectionStateUpdate, serviceDiscoverer, __) => _DeviceInteractionTab(
           viewModel: DeviceInteractionViewModel(
-              deviceId: device.id,
-              connectionStatus: connectionStateUpdate.connectionState,
-              deviceConnector: deviceConnector,
-              discoverServices: () =>
-                  serviceDiscoverer.discoverServices(device.id)),
+            deviceId: device.id,
+            connectableStatus: device.connectable,
+            connectionStatus: connectionStateUpdate.connectionState,
+            deviceConnector: deviceConnector,
+            discoverServices: () => serviceDiscoverer.discoverServices(device.id),
+          ),
         ),
       );
 }
@@ -39,19 +38,21 @@ class DeviceInteractionTab extends StatelessWidget {
 class DeviceInteractionViewModel extends $DeviceInteractionViewModel {
   const DeviceInteractionViewModel({
     required this.deviceId,
+    required this.connectableStatus,
     required this.connectionStatus,
     required this.deviceConnector,
     required this.discoverServices,
   });
 
   final String deviceId;
+  final Connectable connectableStatus;
   final DeviceConnectionState connectionStatus;
   final BleDeviceConnector deviceConnector;
-  @CustomEquality(Ignore())
-  final Future<List<DiscoveredService>> Function() discoverServices;
 
-  bool get deviceConnected =>
-      connectionStatus == DeviceConnectionState.connected;
+  @CustomEquality(Ignore())
+  final Future<List<Service>> Function() discoverServices;
+
+  bool get deviceConnected => connectionStatus == DeviceConnectionState.connected;
 
   void connect() {
     deviceConnector.connect(deviceId);
@@ -75,7 +76,7 @@ class _DeviceInteractionTab extends StatefulWidget {
 }
 
 class _DeviceInteractionTabState extends State<_DeviceInteractionTab> {
-  late List<DiscoveredService> discoveredServices;
+  late List<Service> discoveredServices;
 
   @override
   void initState() {
@@ -97,8 +98,7 @@ class _DeviceInteractionTabState extends State<_DeviceInteractionTab> {
             delegate: SliverChildListDelegate.fixed(
               [
                 Padding(
-                  padding: const EdgeInsetsDirectional.only(
-                      top: 8.0, bottom: 16.0, start: 16.0),
+                  padding: const EdgeInsetsDirectional.only(top: 8.0, bottom: 16.0, start: 16.0),
                   child: Text(
                     "ID: ${widget.viewModel.deviceId}",
                     style: const TextStyle(fontWeight: FontWeight.bold),
@@ -107,7 +107,14 @@ class _DeviceInteractionTabState extends State<_DeviceInteractionTab> {
                 Padding(
                   padding: const EdgeInsetsDirectional.only(start: 16.0),
                   child: Text(
-                    "Status: ${widget.viewModel.connectionStatus}",
+                    "Connectable: ${widget.viewModel.connectableStatus}",
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsetsDirectional.only(start: 16.0),
+                  child: Text(
+                    "Connection: ${widget.viewModel.connectionStatus}",
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ),
@@ -117,21 +124,15 @@ class _DeviceInteractionTabState extends State<_DeviceInteractionTab> {
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: <Widget>[
                       ElevatedButton(
-                        onPressed: !widget.viewModel.deviceConnected
-                            ? widget.viewModel.connect
-                            : null,
+                        onPressed: !widget.viewModel.deviceConnected ? widget.viewModel.connect : null,
                         child: const Text("Connect"),
                       ),
                       ElevatedButton(
-                        onPressed: widget.viewModel.deviceConnected
-                            ? widget.viewModel.disconnect
-                            : null,
+                        onPressed: widget.viewModel.deviceConnected ? widget.viewModel.disconnect : null,
                         child: const Text("Disconnect"),
                       ),
                       ElevatedButton(
-                        onPressed: widget.viewModel.deviceConnected
-                            ? discoverServices
-                            : null,
+                        onPressed: widget.viewModel.deviceConnected ? discoverServices : null,
                         child: const Text("Discover Services"),
                       ),
                     ],
@@ -157,7 +158,7 @@ class _ServiceDiscoveryList extends StatefulWidget {
   }) : super(key: key);
 
   final String deviceId;
-  final List<DiscoveredService> discoveredServices;
+  final List<Service> discoveredServices;
 
   @override
   _ServiceDiscoveryListState createState() => _ServiceDiscoveryListState();
@@ -172,7 +173,7 @@ class _ServiceDiscoveryListState extends State<_ServiceDiscoveryList> {
     super.initState();
   }
 
-  String _charactisticsSummary(DiscoveredCharacteristic c) {
+  String _characteristicSummary(Characteristic c) {
     final props = <String>[];
     if (c.isReadable) {
       props.add("read");
@@ -193,19 +194,13 @@ class _ServiceDiscoveryListState extends State<_ServiceDiscoveryList> {
     return props.join("\n");
   }
 
-  Widget _characteristicTile(
-          DiscoveredCharacteristic characteristic, String deviceId) =>
-      ListTile(
+  Widget _characteristicTile(Characteristic characteristic) => ListTile(
         onTap: () => showDialog<void>(
-            context: context,
-            builder: (context) => CharacteristicInteractionDialog(
-                  characteristic: QualifiedCharacteristic(
-                      characteristicId: characteristic.characteristicId,
-                      serviceId: characteristic.serviceId,
-                      deviceId: deviceId),
-                )),
+          context: context,
+          builder: (context) => CharacteristicInteractionDialog(characteristic: characteristic),
+        ),
         title: Text(
-          '${characteristic.characteristicId}\n(${_charactisticsSummary(characteristic)})',
+          '${characteristic.id}\n(${_characteristicSummary(characteristic)})',
           style: const TextStyle(
             fontSize: 14,
           ),
@@ -231,19 +226,15 @@ class _ServiceDiscoveryListState extends State<_ServiceDiscoveryList> {
                       ),
                     ),
                   ),
-                  ListView.builder(
-                    shrinkWrap: true,
-                    itemBuilder: (context, index) => _characteristicTile(
-                      service.characteristics[index],
-                      widget.deviceId,
-                    ),
-                    itemCount: service.characteristicIds.length,
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: service.characteristics.map(_characteristicTile).toList(),
                   ),
                 ],
               ),
               headerBuilder: (context, isExpanded) => ListTile(
                 title: Text(
-                  '${service.serviceId}',
+                  '${service.id}',
                   style: const TextStyle(fontSize: 14),
                 ),
               ),
@@ -258,15 +249,16 @@ class _ServiceDiscoveryListState extends State<_ServiceDiscoveryList> {
   @override
   Widget build(BuildContext context) => widget.discoveredServices.isEmpty
       ? const SizedBox()
-      : Padding(
-          padding: const EdgeInsetsDirectional.only(
-            top: 20.0,
-            start: 20.0,
-            end: 20.0,
-          ),
-          child: ExpansionPanelList(
-            expansionCallback: (int index, bool isExpanded) {
-              setState(() {
+      : SafeArea(
+          top: false,
+          child: Padding(
+            padding: const EdgeInsetsDirectional.only(
+              top: 20.0,
+              start: 20.0,
+              end: 20.0,
+            ),
+            child: ExpansionPanelList(
+              expansionCallback: (int index, bool isExpanded) {
                 setState(() {
                   if (isExpanded) {
                     _expandedItems.remove(index);
@@ -274,11 +266,9 @@ class _ServiceDiscoveryListState extends State<_ServiceDiscoveryList> {
                     _expandedItems.add(index);
                   }
                 });
-              });
-            },
-            children: [
-              ...buildPanels(),
-            ],
+              },
+              children: buildPanels(),
+            ),
           ),
         );
 }

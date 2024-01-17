@@ -30,16 +30,16 @@ class _DeviceDetail extends StatelessWidget {
   final DiscoveredDevice device;
   final void Function(String deviceId) disconnect;
   @override
-  Widget build(BuildContext context) => WillPopScope(
-        onWillPop: () async {
+  Widget build(BuildContext context) => PopScope(
+        canPop: true,
+        onPopInvoked: (_) async {
           disconnect(device.id);
-          return true;
         },
         child: DefaultTabController(
           length: 2,
           child: Scaffold(
             appBar: AppBar(
-              title: Text(device.name),
+              title: Text(device.name.isNotEmpty ? device.name : "Unnamed"),
               bottom: const TabBar(
                 tabs: [
                   Tab(

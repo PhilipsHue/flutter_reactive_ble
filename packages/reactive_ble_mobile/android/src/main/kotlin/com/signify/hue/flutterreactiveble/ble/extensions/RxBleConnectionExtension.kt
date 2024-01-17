@@ -5,16 +5,21 @@ import com.polidea.rxandroidble2.RxBleConnection
 import io.reactivex.Single
 import java.util.UUID
 
-fun RxBleConnection.writeCharWithResponse(uuid: UUID, value: ByteArray): Single<ByteArray> =
-        executeWrite(uuid, value, BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT)
-
-fun RxBleConnection.writeCharWithoutResponse(uuid: UUID, value: ByteArray): Single<ByteArray> =
-        executeWrite(uuid, value, BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE)
-
-private fun RxBleConnection.executeWrite(uuid: UUID, value: ByteArray, writeType: Int) =
-        this.discoverServices().flatMap { services ->
-            services.getCharacteristic(uuid).flatMap { char ->
-                char.writeType = writeType
-                this.writeCharacteristic(char, value)
-            }
+fun RxBleConnection.resolveCharacteristic(uuid: UUID, instanceId: Int): Single<BluetoothGattCharacteristic> =
+        discoverServices().flatMap { services ->
+            Single.just(services.bluetoothGattServices.flatMap { service ->
+                service.characteristics.filter {
+                    it.uuid == uuid && it.instanceId == instanceId
+                }
+            }.single())
         }
+
+fun RxBleConnection.writeCharWithResponse(characteristic: BluetoothGattCharacteristic, value: ByteArray): Single<ByteArray> {
+    characteristic.writeType = BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
+    return writeCharacteristic(characteristic, value)
+}
+
+fun RxBleConnection.writeCharWithoutResponse(characteristic: BluetoothGattCharacteristic, value: ByteArray): Single<ByteArray> {
+    characteristic.writeType = BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE
+    return writeCharacteristic(characteristic, value)
+}
