@@ -2,7 +2,7 @@ include: package:flutter_lints/flutter.yaml
 
 analyzer:
   language:
-    # strict-casts: true -- DISABLED: Enabled in Dart 2.17
+    # strict-casts: true -- DISABLED: was introduced in Dart 2.16
     strict-inference: true
     strict-raw-types: true
   exclude:
