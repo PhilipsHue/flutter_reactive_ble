@@ -1,4 +1,4 @@
-/// States the level of debuglogging within this library
+/// States the level of debug logging within this library
 enum LogLevel {
   /// No debugLogging at all. This is the default level within the library.
   none,

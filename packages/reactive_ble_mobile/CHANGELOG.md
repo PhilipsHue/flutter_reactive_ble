@@ -1,3 +1,22 @@
+## 5.2.0
+
+* Bump the minimum requirement to Dart 2.17 and upgrade melos to 3.1.0 in #762
+* swiftlint config and inital formatting pass in #765
+* Cancel subscription when a disconnect event has been thrown in #769
+* Fix typos in #778
+* Update CI config to use Xcode 14 in #786
+* Support multiple services or characteristics with the same id in #776
+* Breaking change: If a device has multiple characteristics with the same ID, `readCharacteristic`, `writeCharacteristic` and `subscribeToCharacteristic` used to select the first of those characteristics. Now they will fail in this case. Use `resolve` or `getDiscoveredServices` instead.
+
+## 5.1.1
+
+* Make Connectable backwards compatible #757, #750
+
+## 5.1.0
+
+* Add IsConnectable to discovery data. #750
+* Upgraded build_runner. #750
+
 ## 5.0.3
 
 * Enable extended advertising on android. Fix #571

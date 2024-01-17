@@ -2,7 +2,7 @@ import 'package:meta/meta.dart';
 
 ///Result of a ble operation.
 ///
-/// In case the result is succesfull [Failure] is null.
+/// In case the result is successful [Failure] is null.
 @immutable
 class Result<Value, Failure> {
   const Result.success(this._value)

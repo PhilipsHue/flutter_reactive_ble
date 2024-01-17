@@ -13,8 +13,10 @@ import com.polidea.rxandroidble2.RxBleClient
 import com.polidea.rxandroidble2.RxBleConnection
 import com.polidea.rxandroidble2.RxBleDevice
 import com.polidea.rxandroidble2.RxBleDeviceServices
+import com.polidea.rxandroidble2.scan.IsConnectable
 import com.polidea.rxandroidble2.scan.ScanFilter
 import com.polidea.rxandroidble2.scan.ScanSettings
+import com.signify.hue.flutterreactiveble.ble.extensions.resolveCharacteristic
 import com.signify.hue.flutterreactiveble.ble.extensions.writeCharWithResponse
 import com.signify.hue.flutterreactiveble.ble.extensions.writeCharWithoutResponse
 import com.signify.hue.flutterreactiveble.converters.extractManufacturerData
@@ -38,7 +40,7 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
     private val allConnections = CompositeDisposable()
 
     companion object {
-        // this needs to be in companion update since backgroundisolates respawn the eventchannels
+        // this needs to be in companion update since background isolates respawn the event channels
         // Fix for https://github.com/PhilipsHue/flutter_reactive_ble/issues/277
         private val connectionUpdateBehaviorSubject: BehaviorSubject<ConnectionUpdate> =
             BehaviorSubject.create()
@@ -65,7 +67,6 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
         scanMode: ScanMode,
         requireLocationServicesEnabled: Boolean
     ): Observable<ScanInfo> {
-
         val filters = services.map { service ->
             ScanFilter.Builder()
                 .setServiceUuid(service)
@@ -85,6 +86,12 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
                 ScanInfo(result.bleDevice.macAddress, result.scanRecord.deviceName
                     ?: result.bleDevice.name ?: "",
                     result.rssi,
+                    when (result.isConnectable) {
+                        null -> Connectable.UNKNOWN
+                        IsConnectable.LEGACY_UNKNOWN -> Connectable.UNKNOWN
+                        IsConnectable.NOT_CONNECTABLE -> Connectable.NOT_CONNECTABLE
+                        IsConnectable.CONNECTABLE -> Connectable.CONNECTABLE
+                    },
                     result.scanRecord.serviceData?.mapKeys { it.key.uuid } ?: emptyMap(),
                     result.scanRecord.serviceUuids?.map { it.uuid } ?: emptyList(),
                     extractManufacturerData(result.scanRecord.manufacturerSpecificData))
@@ -132,7 +139,6 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
             ?: Completable.error(IllegalStateException("Device is not connected"))
 
     override fun discoverServices(deviceId: String): Single<RxBleDeviceServices> {
-
         return getConnection(deviceId).flatMapSingle { connectionResult ->
             when (connectionResult) {
                 is EstablishedConnection ->
@@ -148,22 +154,28 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
 
     override fun readCharacteristic(
         deviceId: String,
-        characteristic: UUID
+        characteristicId: UUID,
+        characteristicInstanceId: Int
     ): Single<CharOperationResult> =
-        getConnection(deviceId).flatMapSingle<CharOperationResult> { connectionResult ->
+        getConnection(deviceId).flatMapSingle { connectionResult ->
             when (connectionResult) {
-                is EstablishedConnection ->
-                    connectionResult.rxConnection.readCharacteristic(characteristic)
-                        /*
-                        On Android7 the ble stack frequently gives incorrectly
-                        the error GAT_AUTH_FAIL(137) when reading char that will establish
-                        the bonding with the peripheral. By retrying the operation once we
-                        deviate between this flaky one time error and real auth failed cases
-                        */
-                        .retry(1) { Build.VERSION.SDK_INT < Build.VERSION_CODES.O }
-                        .map { value ->
-                            CharOperationSuccessful(deviceId, value.asList())
-                        }
+                is EstablishedConnection -> {
+                    connectionResult.rxConnection.resolveCharacteristic(
+                            characteristicId, characteristicInstanceId
+                    ).flatMap { c: BluetoothGattCharacteristic ->
+                        connectionResult.rxConnection.readCharacteristic(c)
+                                /*
+                                On Android7 the ble stack frequently gives incorrectly
+                                the error GAT_AUTH_FAIL(137) when reading char that will establish
+                                the bonding with the peripheral. By retrying the operation once we
+                                deviate between this flaky one time error and real auth failed cases
+                                */
+                                .retry(1) { Build.VERSION.SDK_INT < Build.VERSION_CODES.O }
+                                .map { value ->
+                                    CharOperationSuccessful(deviceId, value.asList())
+                                }
+                    }
+                }
                 is EstablishConnectionFailure ->
                     Single.just(
                         CharOperationFailed(
@@ -176,35 +188,43 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
 
     override fun writeCharacteristicWithResponse(
         deviceId: String,
-        characteristic: UUID,
+        characteristicId: UUID,
+        characteristicInstanceId: Int,
         value: ByteArray
     ): Single<CharOperationResult> =
         executeWriteOperation(
             deviceId,
-            characteristic,
+            characteristicId,
+            characteristicInstanceId,
             value,
             RxBleConnection::writeCharWithResponse
         )
 
     override fun writeCharacteristicWithoutResponse(
         deviceId: String,
-        characteristic: UUID,
+        characteristicId: UUID,
+        characteristicInstanceId: Int,
         value: ByteArray
     ): Single<CharOperationResult> =
-
         executeWriteOperation(
             deviceId,
-            characteristic,
+            characteristicId,
+            characteristicInstanceId,
             value,
             RxBleConnection::writeCharWithoutResponse
         )
 
-    override fun setupNotification(deviceId: String, characteristic: UUID): Observable<ByteArray> {
+    override fun setupNotification(
+        deviceId: String,
+        characteristicId: UUID,
+        characteristicInstanceId: Int,
+    ): Observable<ByteArray> {
         return getConnection(deviceId)
             .flatMap { deviceConnection ->
                 setupNotificationOrIndication(
                     deviceConnection,
-                    characteristic
+                    characteristicId,
+                    characteristicInstanceId
                 )
             }
             // now we have setup the subscription and we want the actual value
@@ -250,16 +270,20 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
 
     private fun executeWriteOperation(
         deviceId: String,
-        characteristic: UUID,
+        characteristicId: UUID,
+        characteristicInstanceId: Int,
         value: ByteArray,
-        bleOperation: RxBleConnection.(characteristic: UUID, value: ByteArray) -> Single<ByteArray>
+        bleOperation: RxBleConnection.(characteristic: BluetoothGattCharacteristic, value: ByteArray) -> Single<ByteArray>
     ): Single<CharOperationResult> {
         return getConnection(deviceId)
-            .flatMapSingle<CharOperationResult> { connectionResult ->
+            .flatMapSingle { connectionResult ->
                 when (connectionResult) {
                     is EstablishedConnection -> {
-                        connectionResult.rxConnection.bleOperation(characteristic, value)
-                            .map { value -> CharOperationSuccessful(deviceId, value.asList()) }
+                        connectionResult.rxConnection.resolveCharacteristic(characteristicId, characteristicInstanceId)
+                                .flatMap { characteristic ->
+                                    connectionResult.rxConnection.bleOperation(characteristic, value)
+                                            .map { value -> CharOperationSuccessful(deviceId, value.asList()) }
+                                }
                     }
                     is EstablishConnectionFailure -> {
                         Single.just(
@@ -275,33 +299,32 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
 
     private fun setupNotificationOrIndication(
         deviceConnection: EstablishConnectionResult,
-        characteristic: UUID
+        characteristicId: UUID,
+        characteristicInstanceId: Int
     ): Observable<Observable<ByteArray>> =
-
         when (deviceConnection) {
             is EstablishedConnection -> {
-
                 if (rxBleClient.getBleDevice(deviceConnection.deviceId).bluetoothDevice.bondState == BOND_BONDING) {
                     Observable.error(Exception("Bonding is in progress wait for bonding to be finished before executing more operations on the device"))
                 } else {
-                    deviceConnection.rxConnection.discoverServices()
-                        .flatMap { deviceServices -> deviceServices.getCharacteristic(characteristic) }
-                        .flatMapObservable { char ->
-                            val mode = if (char.descriptors.isEmpty()) {
-                                NotificationSetupMode.COMPAT
-                            } else {
-                                NotificationSetupMode.DEFAULT
-                            }
-
-                            if ((char.properties and BluetoothGattCharacteristic.PROPERTY_NOTIFY) > 0) {
-                                deviceConnection.rxConnection.setupNotification(
-                                    characteristic,
-                                    mode
-                                )
-                            } else {
-                                deviceConnection.rxConnection.setupIndication(characteristic, mode)
-                            }
+                    deviceConnection.rxConnection.resolveCharacteristic(
+                            characteristicId, characteristicInstanceId
+                    ).flatMapObservable { characteristic ->
+                        val mode = if (characteristic.descriptors.isEmpty()) {
+                            NotificationSetupMode.COMPAT
+                        } else {
+                            NotificationSetupMode.DEFAULT
                         }
+
+                        if ((characteristic.properties and BluetoothGattCharacteristic.PROPERTY_NOTIFY) > 0) {
+                            deviceConnection.rxConnection.setupNotification(
+                                characteristic,
+                                mode
+                            )
+                        } else {
+                            deviceConnection.rxConnection.setupIndication(characteristic, mode)
+                        }
+                    }
                 }
             }
             is EstablishConnectionFailure -> {
@@ -313,7 +336,7 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
         deviceId: String,
         priority: ConnectionPriority
     ): Single<RequestConnectionPriorityResult> =
-        getConnection(deviceId).switchMapSingle<RequestConnectionPriorityResult> { connectionResult ->
+        getConnection(deviceId).switchMapSingle { connectionResult ->
             when (connectionResult) {
                 is EstablishedConnection ->
                     connectionResult.rxConnection.requestConnectionPriority(

@@ -12,6 +12,7 @@ void main() {
     group("decoding ${pb.DeviceScanInfo}", () {
       const id = 'id';
       const name = 'name';
+      const connectable = Connectable.available;
 
       late pb.ServiceDataEntry serviceDataEntry1;
       late pb.ServiceDataEntry serviceDataEntry2;
@@ -35,6 +36,7 @@ void main() {
         message = pb.DeviceScanInfo()
           ..id = id
           ..name = name
+          ..isConnectable = (pb.IsConnectable()..code = 2)
           ..serviceData.add(serviceDataEntry1)
           ..serviceData.add(serviceDataEntry2)
           ..serviceUuids.add(serviceUuid1)
@@ -56,6 +58,16 @@ void main() {
             scanresult.result
                 .iif(success: (d) => d.name, failure: (_) => throw Exception()),
             name);
+      });
+
+      test('converts connectable', () {
+        expect(
+          scanresult.result.iif(
+            success: (d) => d.connectable,
+            failure: (_) => throw Exception(),
+          ),
+          connectable,
+        );
       });
 
       test('converts service data', () {
@@ -492,19 +504,27 @@ void main() {
 
           final discoveredInternalServices = pb.DiscoveredService()
             ..serviceUuid = internalServiceUuid
-            ..characteristics.add(pb.DiscoveredCharacteristic(
-                characteristicId: internalCharUuid,
-                serviceId: internalServiceUuid,
-                isReadable: true))
+            ..serviceInstanceId = '11'
+            ..characteristics.add(
+              pb.DiscoveredCharacteristic()
+                ..characteristicId = internalCharUuid
+                ..characteristicInstanceId = '102'
+                ..serviceId = internalServiceUuid
+                ..isReadable = true,
+            )
             ..characteristicUuids.add(internalCharUuid);
 
           final discoveredService = pb.DiscoveredService()
             ..serviceUuid = serviceUuid
+            ..serviceInstanceId = '10'
             ..characteristicUuids.add(charUuid)
-            ..characteristics.add(pb.DiscoveredCharacteristic(
-                characteristicId: charUuid,
-                serviceId: serviceUuid,
-                isWritableWithResponse: true))
+            ..characteristics.add(
+              pb.DiscoveredCharacteristic()
+                ..characteristicId = charUuid
+                ..characteristicInstanceId = '101'
+                ..serviceId = serviceUuid
+                ..isWritableWithResponse = true,
+            )
             ..includedServices.add(discoveredInternalServices);
 
           message = pb.DiscoverServicesInfo()
@@ -520,12 +540,14 @@ void main() {
             [
               DiscoveredService(
                 serviceId: Uuid([0]),
+                serviceInstanceId: '10',
                 characteristicIds: [
                   Uuid([0, 1, 1])
                 ],
                 characteristics: [
                   DiscoveredCharacteristic(
                     characteristicId: Uuid([0, 1, 1]),
+                    characteristicInstanceId: '101',
                     serviceId: Uuid([0]),
                     isReadable: false,
                     isWritableWithResponse: true,
@@ -536,12 +558,14 @@ void main() {
                 ],
                 includedServices: [
                   DiscoveredService(
+                    serviceInstanceId: '11',
                     serviceId: Uuid([1]),
                     characteristicIds: [
                       Uuid([1, 1])
                     ],
                     characteristics: [
                       DiscoveredCharacteristic(
+                        characteristicInstanceId: '102',
                         characteristicId: Uuid([1, 1]),
                         serviceId: Uuid([1]),
                         isReadable: true,

@@ -1,5 +1,4 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-  package="com.signify.hue.flutterreactiveble">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!-- required for API 18 - 30 -->
     <uses-permission

@@ -11,6 +11,7 @@ import 'package:reactive_ble_mobile/src/reactive_ble_mobile_platform.dart';
 import 'package:reactive_ble_platform_interface/reactive_ble_platform_interface.dart';
 
 import 'reactive_ble_platform_test.mocks.dart';
+
 // ignore_for_file: avoid_implementing_value_types
 
 @GenerateMocks([
@@ -140,9 +141,11 @@ void main() {
 
       setUp(() {
         valueUpdate = CharacteristicValue(
-          characteristic: QualifiedCharacteristic(
+          characteristic: CharacteristicInstance(
             characteristicId: Uuid.parse('FEFF'),
+            characteristicInstanceId: "11",
             serviceId: Uuid.parse('FEFF'),
+            serviceInstanceId: "101",
             deviceId: '123',
           ),
           result: const Result.success([1]),
@@ -166,14 +169,16 @@ void main() {
     });
 
     group('Read characteristic', () {
-      late QualifiedCharacteristic characteristic;
+      late CharacteristicInstance characteristic;
       late pb.ReadCharacteristicRequest request;
 
       setUp(() {
         request = pb.ReadCharacteristicRequest();
-        characteristic = QualifiedCharacteristic(
+        characteristic = CharacteristicInstance(
           characteristicId: Uuid.parse('FEFF'),
+          characteristicInstanceId: "11",
           serviceId: Uuid.parse('FEFF'),
+          serviceInstanceId: "101",
           deviceId: '123',
         );
         when(_argsConverter.createReadCharacteristicRequest(characteristic))
@@ -197,7 +202,7 @@ void main() {
     });
 
     group('Write characteristic with response', () {
-      QualifiedCharacteristic characteristic;
+      CharacteristicInstance characteristic;
       const value = [0, 1];
       late pb.WriteCharacteristicRequest request;
       late WriteCharacteristicInfo expectedResult;
@@ -206,9 +211,11 @@ void main() {
       setUp(() async {
         request = pb.WriteCharacteristicRequest();
 
-        characteristic = QualifiedCharacteristic(
+        characteristic = CharacteristicInstance(
           characteristicId: Uuid.parse('FEFF'),
+          characteristicInstanceId: "11",
           serviceId: Uuid.parse('FEFF'),
+          serviceInstanceId: "11",
           deviceId: '123',
         );
 
@@ -248,7 +255,7 @@ void main() {
     });
 
     group('Write characteristic without response', () {
-      QualifiedCharacteristic characteristic;
+      CharacteristicInstance characteristic;
       const value = [0, 1];
       late pb.WriteCharacteristicRequest request;
       late WriteCharacteristicInfo expectedResult;
@@ -256,17 +263,18 @@ void main() {
 
       setUp(() async {
         request = pb.WriteCharacteristicRequest();
-        characteristic = QualifiedCharacteristic(
+        characteristic = CharacteristicInstance(
           characteristicId: Uuid.parse('FEFF'),
+          characteristicInstanceId: "11",
           serviceId: Uuid.parse('FEFF'),
+          serviceInstanceId: "101",
           deviceId: '123',
         );
 
         expectedResult = WriteCharacteristicInfo(
-            // ignore: void_checks
             characteristic: characteristic,
-            // ignore: void_checks
-            result: const Result.success(Unit()));
+            result: const Result.success(Unit()),
+        );
 
         when(_methodChannel.invokeMethod<List<int>?>(any, any)).thenAnswer(
           (_) async => value,
@@ -300,14 +308,16 @@ void main() {
     });
 
     group('Subscribe to notifications', () {
-      late QualifiedCharacteristic characteristic;
+      late CharacteristicInstance characteristic;
       late pb.NotifyCharacteristicRequest request;
 
       setUp(() {
         request = pb.NotifyCharacteristicRequest();
-        characteristic = QualifiedCharacteristic(
+        characteristic = CharacteristicInstance(
           characteristicId: Uuid.parse('FEFF'),
+          characteristicInstanceId: "11",
           serviceId: Uuid.parse('FEFF'),
+          serviceInstanceId: "101",
           deviceId: '123',
         );
 
@@ -337,14 +347,16 @@ void main() {
     });
 
     group('Stop subscribe to notifications', () {
-      QualifiedCharacteristic characteristic;
+      CharacteristicInstance characteristic;
       late pb.NotifyNoMoreCharacteristicRequest request;
 
       setUp(() async {
         request = pb.NotifyNoMoreCharacteristicRequest();
-        characteristic = QualifiedCharacteristic(
+        characteristic = CharacteristicInstance(
           characteristicId: Uuid.parse('FEFF'),
+          characteristicInstanceId: "11",
           serviceId: Uuid.parse('FEFF'),
+          serviceInstanceId: "101",
           deviceId: '123',
         );
 
@@ -486,6 +498,7 @@ void main() {
         id: '123',
         name: 'Testdevice',
         rssi: -40,
+        connectable: Connectable.unknown,
         serviceData: const {},
         serviceUuids: const [],
         manufacturerData: Uint8List.fromList([1]),
@@ -599,6 +612,7 @@ void main() {
       final services = [
         DiscoveredService(
           serviceId: Uuid([0x01, 0x02]),
+          serviceInstanceId: "101",
           characteristicIds: const [],
           characteristics: const [],
           includedServices: const [],

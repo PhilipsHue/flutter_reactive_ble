@@ -10,51 +10,27 @@ class CharacteristicInteractionDialog extends StatelessWidget {
     required this.characteristic,
     Key? key,
   }) : super(key: key);
-  final QualifiedCharacteristic characteristic;
+  final Characteristic characteristic;
 
   @override
   Widget build(BuildContext context) => Consumer<BleDeviceInteractor>(
-      builder: (context, interactor, _) => _CharacteristicInteractionDialog(
-            characteristic: characteristic,
-            readCharacteristic: interactor.readCharacteristic,
-            writeWithResponse: interactor.writeCharacterisiticWithResponse,
-            writeWithoutResponse:
-                interactor.writeCharacterisiticWithoutResponse,
-            subscribeToCharacteristic: interactor.subScribeToCharacteristic,
-          ));
+        builder: (context, interactor, _) => _CharacteristicInteractionDialog(characteristic: characteristic),
+      );
 }
 
 class _CharacteristicInteractionDialog extends StatefulWidget {
   const _CharacteristicInteractionDialog({
     required this.characteristic,
-    required this.readCharacteristic,
-    required this.writeWithResponse,
-    required this.writeWithoutResponse,
-    required this.subscribeToCharacteristic,
     Key? key,
   }) : super(key: key);
 
-  final QualifiedCharacteristic characteristic;
-  final Future<List<int>> Function(QualifiedCharacteristic characteristic)
-      readCharacteristic;
-  final Future<void> Function(
-          QualifiedCharacteristic characteristic, List<int> value)
-      writeWithResponse;
-
-  final Stream<List<int>> Function(QualifiedCharacteristic characteristic)
-      subscribeToCharacteristic;
-
-  final Future<void> Function(
-          QualifiedCharacteristic characteristic, List<int> value)
-      writeWithoutResponse;
+  final Characteristic characteristic;
 
   @override
-  _CharacteristicInteractionDialogState createState() =>
-      _CharacteristicInteractionDialogState();
+  _CharacteristicInteractionDialogState createState() => _CharacteristicInteractionDialogState();
 }
 
-class _CharacteristicInteractionDialogState
-    extends State<_CharacteristicInteractionDialog> {
+class _CharacteristicInteractionDialogState extends State<_CharacteristicInteractionDialog> {
   late String readOutput;
   late String writeOutput;
   late String subscribeOutput;
@@ -72,13 +48,13 @@ class _CharacteristicInteractionDialogState
 
   @override
   void dispose() {
+    textEditingController.dispose();
     subscribeStream?.cancel();
     super.dispose();
   }
 
   Future<void> subscribeCharacteristic() async {
-    subscribeStream =
-        widget.subscribeToCharacteristic(widget.characteristic).listen((event) {
+    subscribeStream = widget.characteristic.subscribe().listen((event) {
       setState(() {
         subscribeOutput = event.toString();
       });
@@ -89,28 +65,23 @@ class _CharacteristicInteractionDialogState
   }
 
   Future<void> readCharacteristic() async {
-    final result = await widget.readCharacteristic(widget.characteristic);
+    final result = await widget.characteristic.read();
     setState(() {
       readOutput = result.toString();
     });
   }
 
-  List<int> _parseInput() => textEditingController.text
-      .split(',')
-      .map(
-        int.parse,
-      )
-      .toList();
+  List<int> _parseInput() => textEditingController.text.split(',').map(int.parse).toList();
 
   Future<void> writeCharacteristicWithResponse() async {
-    await widget.writeWithResponse(widget.characteristic, _parseInput());
+    await widget.characteristic.write(_parseInput());
     setState(() {
       writeOutput = 'Ok';
     });
   }
 
   Future<void> writeCharacteristicWithoutResponse() async {
-    await widget.writeWithoutResponse(widget.characteristic, _parseInput());
+    await widget.characteristic.write(_parseInput(), withResponse: false);
     setState(() {
       writeOutput = 'Done';
     });
@@ -203,7 +174,7 @@ class _CharacteristicInteractionDialogState
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 8.0),
                 child: Text(
-                  widget.characteristic.characteristicId.toString(),
+                  widget.characteristic.id.toString(),
                 ),
               ),
               divider,
@@ -218,8 +189,9 @@ class _CharacteristicInteractionDialogState
                 child: Padding(
                   padding: const EdgeInsets.only(top: 20.0),
                   child: ElevatedButton(
-                      onPressed: () => Navigator.of(context).pop(),
-                      child: const Text('close')),
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: const Text('close'),
+                  ),
                 ),
               )
             ],

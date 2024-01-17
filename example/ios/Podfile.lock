@@ -23,11 +23,11 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/reactive_ble_mobile/ios"
 
 SPEC CHECKSUMS:
-  Flutter: 50d75fe2f02b26cc09d224853bb45737f8b3214a
+  Flutter: f04841e97a9d0b0a8025694d0796dd46242b2854
   Protobuf: 1a37ebea1338949e9ac35a3f06e80b3f536eec8d
   reactive_ble_mobile: 9ce6723d37ccf701dbffd202d487f23f5de03b4c
   SwiftProtobuf: 9c85136c6ba74b0a1b84279dbf0f6db8efb714e0
 
-PODFILE CHECKSUM: aafe91acc616949ddb318b77800a7f51bffa2a4c
+PODFILE CHECKSUM: ef19549a9bc3046e7bb7d2fab4d021637c0c58a3
 
-COCOAPODS: 1.11.2
+COCOAPODS: 1.10.1

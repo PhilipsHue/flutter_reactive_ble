@@ -16,6 +16,7 @@ message DeviceScanInfo {
     bytes manufacturerData = 6;
     repeated Uuid serviceUuids = 7;
     int32 rssi = 5;
+    IsConnectable isConnectable = 8;
 }
 
 message ConnectToDeviceRequest {
@@ -99,6 +100,8 @@ message CharacteristicAddress {
     string deviceId = 1;
     Uuid serviceUuid = 2;
     Uuid characteristicUuid = 3;
+    string serviceInstanceId = 4;
+    string characteristicInstanceId = 5;
 }
 
 message ServiceDataEntry {
@@ -129,6 +132,7 @@ message DiscoveredService {
     repeated Uuid characteristicUuids = 2;
     repeated DiscoveredService includedServices = 3;
     repeated DiscoveredCharacteristic characteristics = 4;
+    string serviceInstanceId = 5;
 }
 
 message DiscoveredCharacteristic {
@@ -139,6 +143,7 @@ message DiscoveredCharacteristic {
     bool isWritableWithoutResponse = 5;
     bool isNotifiable = 6;
     bool isIndicatable = 7;
+    string characteristicInstanceId = 8;
 }
 
 message Uuid {
@@ -148,4 +153,8 @@ message Uuid {
 message GenericFailure {
     int32 code = 1;
     string message = 2;
+}
+
+message IsConnectable {
+    int32 code = 1;
 }
