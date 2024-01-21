@@ -11,9 +11,10 @@ Bluetooth Low Energy (BLE) Flutter plug-in
   s.source           = { :path => '.' }
   s.source_files = 'Classes/**/*'
   s.public_header_files = 'Classes/**/*.h'
-  s.dependency 'Flutter'
   s.dependency 'Protobuf', '~> 3.5'
   s.dependency 'SwiftProtobuf', '~> 1.0'
+  s.ios.dependency 'Flutter'
+  s.osx.dependency 'FlutterMacOS'
   s.ios.deployment_target = '11.0'
   s.osx.deployment_target = '10.13'
   s.pod_target_xcconfig = { 'GCC_PREPROCESSOR_DEFINITIONS' => '$(inherited) GPB_USE_PROTOBUF_FRAMEWORK_IMPORTS=1' }

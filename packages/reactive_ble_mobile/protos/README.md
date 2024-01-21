@@ -24,7 +24,7 @@ brew install dart
 
 ```sh
 protoc --dart_out=../lib/src/generated ./bledata.proto
-protoc --swift_out=../ios/Classes/BleData ./bledata.proto
+protoc --swift_out=../darwin/Classes/BleData ./bledata.proto
 ```
 
-NOTE: If directory `../lib/generated` or `./ios/Classes/BleData` does not exist please create it.
+NOTE: If directory `../lib/generated` or `./darwin/Classes/BleData` does not exist please create it.

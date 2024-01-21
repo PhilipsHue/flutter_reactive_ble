@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:collection';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_reactive_ble/src/connected_device_operation.dart';
 import 'package:flutter_reactive_ble/src/debug_logger.dart';
 import 'package:flutter_reactive_ble/src/device_connector.dart';
@@ -104,7 +105,7 @@ class FlutterReactiveBle {
         print,
       );
 
-      if (Platform.isAndroid || Platform.isIOS) {
+      if (!kIsWeb && (Platform.isAndroid || Platform.isIOS || Platform.isMacOS)) {
         ReactiveBlePlatform.instance =
             const ReactiveBleMobilePlatformFactory().create(
           logger: _debugLogger,
@@ -120,7 +121,7 @@ class FlutterReactiveBle {
       );
       _deviceScanner = DeviceScannerImpl(
         blePlatform: _blePlatform,
-        platformIsAndroid: () => Platform.isAndroid,
+        platformIsAndroid: () => !kIsWeb && Platform.isAndroid,
         delayAfterScanCompletion: Future<void>.delayed(
           const Duration(milliseconds: 300),
         ),
