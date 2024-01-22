@@ -1,0 +1,17 @@
+name: ktlint
+on: [pull_request]
+jobs:
+  ktlint:
+    name: Check Code Quality
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clone repo
+        uses: actions/checkout@master
+        with:
+          fetch-depth: 1
+      - name: ktlint
+        uses: ScaCap/action-ktlint@master
+        with:
+          github_token: ${{ secrets.github_token }}
+          reporter: github-pr-review # Change reporter

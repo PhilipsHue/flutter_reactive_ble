@@ -1,7 +1,6 @@
 package com.signify.hue.flutterreactiveble.debugutils
 
 object PerformanceAnalyzer {
-
     var timer = Pair<Long, Long>(0, 0)
 
     fun start(startTime: Long) {
