@@ -41,10 +41,10 @@ class _SerialAlreadyDisposed extends Error {
 }
 
 /// A [SerialDisposable] that contains an underlying stream subscription.
-class StreamSubscriptionSerialDisposable
-    extends SerialDisposable<StreamSubscription> {
+class StreamSubscriptionSerialDisposable<T>
+    extends SerialDisposable<StreamSubscription<T>> {
   StreamSubscriptionSerialDisposable()
-      : super((StreamSubscription subscription) async {
+      : super((StreamSubscription<T> subscription) async {
           await subscription.cancel();
           return const Unit();
         });

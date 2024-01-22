@@ -207,7 +207,7 @@ packages:
     source: sdk
     version: "0.0.0"
   flutter_lints:
-    dependency: "direct main"
+    dependency: "direct dev"
     description:
       name: flutter_lints
       sha256: b543301ad291598523947dc534aaddc5aaad597b709d2426d3a0e0d44c5cb493
@@ -591,4 +591,4 @@ packages:
     version: "3.1.1"
 sdks:
   dart: ">=3.2.0-194.0.dev <4.0.0"
-  flutter: ">=1.16.0"
+  flutter: ">=2.0.0"

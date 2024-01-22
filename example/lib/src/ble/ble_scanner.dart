@@ -7,7 +7,7 @@ import 'package:meta/meta.dart';
 class BleScanner implements ReactiveState<BleScannerState> {
   BleScanner({
     required FlutterReactiveBle ble,
-    required Function(String message) logMessage,
+    required void Function(String message) logMessage,
   })  : _ble = ble,
         _logMessage = logMessage;
 
@@ -59,7 +59,7 @@ class BleScanner implements ReactiveState<BleScannerState> {
     await _stateStreamController.close();
   }
 
-  StreamSubscription? _subscription;
+  StreamSubscription<DiscoveredDevice>? _subscription;
 }
 
 @immutable
