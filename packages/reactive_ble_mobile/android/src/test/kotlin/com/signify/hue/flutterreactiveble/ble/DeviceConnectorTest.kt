@@ -21,7 +21,6 @@ import java.util.concurrent.TimeUnit
 
 @DisplayName("DeviceConnector unit tests")
 class DeviceConnectorTest {
-
     @MockK
     private lateinit var connection: RxBleConnection
 
@@ -63,7 +62,6 @@ class DeviceConnectorTest {
     @Nested
     @DisplayName("Successfull connection")
     inner class SuccesfullConnectionTest {
-
         @BeforeEach
         fun setup() {
             every { device.establishConnection(any()) }.returns(Observable.just(connection))

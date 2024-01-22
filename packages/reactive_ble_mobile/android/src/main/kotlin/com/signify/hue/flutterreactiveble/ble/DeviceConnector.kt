@@ -21,7 +21,6 @@ internal class DeviceConnector(
     private val updateListeners: (update: ConnectionUpdate) -> Unit,
     private val connectionQueue: ConnectionQueue,
 ) {
-
     companion object {
         private const val minTimeMsBeforeDisconnectingIsAllowed = 200L
         private const val delayMsAfterClearingCache = 300L
@@ -34,10 +33,11 @@ internal class DeviceConnector(
     @VisibleForTesting
     internal var connectionDisposable: Disposable? = null
 
-    private val lazyConnection = lazy {
-        connectionDisposable = establishConnection(device)
-        connectDeviceSubject
-    }
+    private val lazyConnection =
+        lazy {
+            connectionDisposable = establishConnection(device)
+            connectDeviceSubject
+        }
 
     private val currentConnection: EstablishConnectionResult?
         get() = if (lazyConnection.isInitialized()) connection.value else null
@@ -142,7 +142,10 @@ internal class DeviceConnector(
             )
     }
 
-    private fun connectDevice(rxBleDevice: RxBleDevice, shouldNotTimeout: Boolean): Observable<RxBleConnection> =
+    private fun connectDevice(
+        rxBleDevice: RxBleDevice,
+        shouldNotTimeout: Boolean,
+    ): Observable<RxBleConnection> =
         rxBleDevice.establishConnection(shouldNotTimeout)
             .compose {
                 if (shouldNotTimeout) {
@@ -157,12 +160,13 @@ internal class DeviceConnector(
                 }
             }
 
-    internal fun clearGattCache(): Completable = currentConnection?.let { connection ->
-        when (connection) {
-            is EstablishedConnection -> clearGattCache(connection.rxConnection)
-            is EstablishConnectionFailure -> Completable.error(Throwable(connection.errorMessage))
-        }
-    } ?: Completable.error(IllegalStateException("Connection is not established"))
+    internal fun clearGattCache(): Completable =
+        currentConnection?.let { connection ->
+            when (connection) {
+                is EstablishedConnection -> clearGattCache(connection.rxConnection)
+                is EstablishConnectionFailure -> Completable.error(Throwable(connection.errorMessage))
+            }
+        } ?: Completable.error(IllegalStateException("Connection is not established"))
 
     /**
      * Clear GATT attribute cache using an undocumented method `BluetoothGatt.refresh()`.
@@ -176,21 +180,22 @@ internal class DeviceConnector(
      * Known to work up to Android Q beta 2.
      */
     private fun clearGattCache(connection: RxBleConnection): Completable {
-        val operation = RxBleCustomOperation<Unit> { bluetoothGatt, _, _ ->
-            try {
-                val refreshMethod = bluetoothGatt.javaClass.getMethod("refresh")
-                val success = refreshMethod.invoke(bluetoothGatt) as Boolean
-                if (success) {
-                    Observable.empty<Unit>()
-                        .delay(DeviceConnector.Companion.delayMsAfterClearingCache, TimeUnit.MILLISECONDS)
-                } else {
-                    val reason = "BluetoothGatt.refresh() returned false"
-                    Observable.error(RuntimeException(reason))
+        val operation =
+            RxBleCustomOperation<Unit> { bluetoothGatt, _, _ ->
+                try {
+                    val refreshMethod = bluetoothGatt.javaClass.getMethod("refresh")
+                    val success = refreshMethod.invoke(bluetoothGatt) as Boolean
+                    if (success) {
+                        Observable.empty<Unit>()
+                            .delay(DeviceConnector.Companion.delayMsAfterClearingCache, TimeUnit.MILLISECONDS)
+                    } else {
+                        val reason = "BluetoothGatt.refresh() returned false"
+                        Observable.error(RuntimeException(reason))
+                    }
+                } catch (e: ReflectiveOperationException) {
+                    Observable.error<Unit>(e)
                 }
-            } catch (e: ReflectiveOperationException) {
-                Observable.error<Unit>(e)
             }
-        }
         return connection.queue(operation).ignoreElements()
     }
 

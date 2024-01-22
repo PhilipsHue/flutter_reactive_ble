@@ -37,7 +37,10 @@ class ReactiveBlePlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
         }
     }
 
-    override fun onMethodCall(call: MethodCall, result: Result) {
+    override fun onMethodCall(
+        call: MethodCall,
+        result: Result,
+    ) {
         pluginController.execute(call, result)
     }
 }

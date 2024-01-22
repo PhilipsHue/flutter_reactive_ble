@@ -13,7 +13,6 @@ import java.util.UUID
 import com.signify.hue.flutterreactiveble.ProtobufModel as pb
 
 class ServicesWithCharacteristicsConverterTest {
-
     private val serviceUuid = UUID.randomUUID()
     private val characteristicUuid = UUID.randomUUID()
     private val internalCharacteristicUuid = UUID.randomUUID()
@@ -59,10 +58,11 @@ class ServicesWithCharacteristicsConverterTest {
         every { internalServiceLevel2.includedServices }.returns(listOf())
         every { internalServiceLevel2.characteristics }.returns(listOf(internalCharacteristicLevel2))
 
-        conversionResult = sut.convertDiscoverServicesInfo(
-            "test",
-            RxBleDeviceServices(listOf(service)),
-        )
+        conversionResult =
+            sut.convertDiscoverServicesInfo(
+                "test",
+                RxBleDeviceServices(listOf(service)),
+            )
     }
 
     @Test

@@ -11,7 +11,6 @@ import io.reactivex.disposables.Disposable
 import com.signify.hue.flutterreactiveble.ProtobufModel as pb
 
 class ScanDevicesHandler(private val bleClient: com.signify.hue.flutterreactiveble.ble.BleClient) : EventChannel.StreamHandler {
-
     private var scanDevicesSink: EventChannel.EventSink? = null
     private lateinit var scanForDevicesDisposable: Disposable
     private val converter = ProtobufMessageConverter()
@@ -20,7 +19,10 @@ class ScanDevicesHandler(private val bleClient: com.signify.hue.flutterreactiveb
         private var scanParameters: ScanParameters? = null
     }
 
-    override fun onListen(objectSink: Any?, eventSink: EventChannel.EventSink?) {
+    override fun onListen(
+        objectSink: Any?,
+        eventSink: EventChannel.EventSink?,
+    ) {
         eventSink?.let {
             scanDevicesSink = eventSink
             startDeviceScan()
@@ -34,16 +36,17 @@ class ScanDevicesHandler(private val bleClient: com.signify.hue.flutterreactiveb
 
     private fun startDeviceScan() {
         scanParameters?.let { params ->
-            scanForDevicesDisposable = bleClient.scanForDevices(params.filter, params.mode, params.locationServiceIsMandatory)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                    { scanResult ->
-                        handleDeviceScanResult(converter.convertScanInfo(scanResult))
-                    },
-                    { throwable ->
-                        handleDeviceScanResult(converter.convertScanErrorInfo(throwable.message))
-                    },
-                )
+            scanForDevicesDisposable =
+                bleClient.scanForDevices(params.filter, params.mode, params.locationServiceIsMandatory)
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(
+                        { scanResult ->
+                            handleDeviceScanResult(converter.convertScanInfo(scanResult))
+                        },
+                        { throwable ->
+                            handleDeviceScanResult(converter.convertScanErrorInfo(throwable.message))
+                        },
+                    )
         }
             ?: handleDeviceScanResult(converter.convertScanErrorInfo("Scanning parameters are not set"))
     }
@@ -61,8 +64,9 @@ class ScanDevicesHandler(private val bleClient: com.signify.hue.flutterreactiveb
 
     fun prepareScan(scanMessage: pb.ScanForDevicesRequest) {
         stopDeviceScan()
-        val filter = scanMessage.serviceUuidsList
-            .map { ParcelUuid(UuidConverter().uuidFromByteArray(it.data.toByteArray())) }
+        val filter =
+            scanMessage.serviceUuidsList
+                .map { ParcelUuid(UuidConverter().uuidFromByteArray(it.data.toByteArray())) }
         val scanMode = createScanMode(scanMessage.scanMode)
         scanParameters = ScanParameters(filter, scanMode, scanMessage.requireLocationServicesEnabled)
     }

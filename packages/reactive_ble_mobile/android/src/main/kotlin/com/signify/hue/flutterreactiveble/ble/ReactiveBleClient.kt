@@ -67,11 +67,12 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
         scanMode: ScanMode,
         requireLocationServicesEnabled: Boolean,
     ): Observable<ScanInfo> {
-        val filters = services.map { service ->
-            ScanFilter.Builder()
-                .setServiceUuid(service)
-                .build()
-        }.toTypedArray()
+        val filters =
+            services.map { service ->
+                ScanFilter.Builder()
+                    .setServiceUuid(service)
+                    .build()
+            }.toTypedArray()
 
         return rxBleClient.scanBleDevices(
             ScanSettings.Builder()
@@ -101,7 +102,10 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
             }
     }
 
-    override fun connectToDevice(deviceId: String, timeout: Duration) {
+    override fun connectToDevice(
+        deviceId: String,
+        timeout: Duration,
+    ) {
         allConnections.add(
             getConnection(deviceId, timeout)
                 .subscribe({ result ->
@@ -148,7 +152,11 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
             when (connectionResult) {
                 is EstablishedConnection ->
                     if (rxBleClient.getBleDevice(connectionResult.deviceId).bluetoothDevice.bondState == BOND_BONDING) {
-                        Single.error(Exception("Bonding is in progress wait for bonding to be finished before executing more operations on the device"))
+                        Single.error(
+                            Exception(
+                                "Bonding is in progress wait for bonding to be finished before executing more operations on the device",
+                            ),
+                        )
                     } else {
                         connectionResult.rxConnection.discoverServices()
                     }
@@ -239,11 +247,15 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
             }
     }
 
-    override fun negotiateMtuSize(deviceId: String, size: Int): Single<MtuNegotiateResult> =
+    override fun negotiateMtuSize(
+        deviceId: String,
+        size: Int,
+    ): Single<MtuNegotiateResult> =
         getConnection(deviceId).flatMapSingle { connectionResult ->
             when (connectionResult) {
-                is EstablishedConnection -> connectionResult.rxConnection.requestMtu(size)
-                    .map { value -> MtuNegotiateSuccesful(deviceId, value) }
+                is EstablishedConnection ->
+                    connectionResult.rxConnection.requestMtu(size)
+                        .map { value -> MtuNegotiateSuccesful(deviceId, value) }
 
                 is EstablishConnectionFailure ->
                     Single.just(
@@ -255,13 +267,16 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
             }
         }.first(MtuNegotiateFailed(deviceId, "negotiate mtu timed out"))
 
-    override fun observeBleStatus(): Observable<BleStatus> = rxBleClient.observeStateChanges()
-        .startWith(rxBleClient.state)
-        .map { it.toBleState() }
+    override fun observeBleStatus(): Observable<BleStatus> =
+        rxBleClient.observeStateChanges()
+            .startWith(rxBleClient.state)
+            .map { it.toBleState() }
 
     @VisibleForTesting
-    internal open fun createDeviceConnector(device: RxBleDevice, timeout: Duration) =
-        DeviceConnector(device, timeout, connectionUpdateBehaviorSubject::onNext, connectionQueue)
+    internal open fun createDeviceConnector(
+        device: RxBleDevice,
+        timeout: Duration,
+    ) = DeviceConnector(device, timeout, connectionUpdateBehaviorSubject::onNext, connectionQueue)
 
     private fun getConnection(
         deviceId: String,
@@ -311,17 +326,20 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
         when (deviceConnection) {
             is EstablishedConnection -> {
                 if (rxBleClient.getBleDevice(deviceConnection.deviceId).bluetoothDevice.bondState == BOND_BONDING) {
-                    Observable.error(Exception("Bonding is in progress wait for bonding to be finished before executing more operations on the device"))
+                    Observable.error(
+                        Exception("Bonding is in progress wait for bonding to be finished before executing more operations on the device"),
+                    )
                 } else {
                     deviceConnection.rxConnection.resolveCharacteristic(
                         characteristicId,
                         characteristicInstanceId,
                     ).flatMapObservable { characteristic ->
-                        val mode = if (characteristic.descriptors.isEmpty()) {
-                            NotificationSetupMode.COMPAT
-                        } else {
-                            NotificationSetupMode.DEFAULT
-                        }
+                        val mode =
+                            if (characteristic.descriptors.isEmpty()) {
+                                NotificationSetupMode.COMPAT
+                            } else {
+                                NotificationSetupMode.DEFAULT
+                            }
 
                         if ((characteristic.properties and BluetoothGattCharacteristic.PROPERTY_NOTIFY) > 0) {
                             deviceConnection.rxConnection.setupNotification(
@@ -354,19 +372,21 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
                         .toSingle {
                             RequestConnectionPrioritySuccess(deviceId)
                         }
-                is EstablishConnectionFailure -> Single.fromCallable {
-                    RequestConnectionPriorityFailed(deviceId, connectionResult.errorMessage)
-                }
+                is EstablishConnectionFailure ->
+                    Single.fromCallable {
+                        RequestConnectionPriorityFailed(deviceId, connectionResult.errorMessage)
+                    }
             }
         }.first(RequestConnectionPriorityFailed(deviceId, "Unknown failure"))
 
     // enable this for extra debug output on the android stack
-    private fun enableDebugLogging() = RxBleClient
-        .updateLogOptions(
-            LogOptions.Builder().setLogLevel(LogConstants.VERBOSE)
-                .setMacAddressLogSetting(LogConstants.MAC_ADDRESS_FULL)
-                .setUuidsLogSetting(LogConstants.UUIDS_FULL)
-                .setShouldLogAttributeValues(true)
-                .build(),
-        )
+    private fun enableDebugLogging() =
+        RxBleClient
+            .updateLogOptions(
+                LogOptions.Builder().setLogLevel(LogConstants.VERBOSE)
+                    .setMacAddressLogSetting(LogConstants.MAC_ADDRESS_FULL)
+                    .setUuidsLogSetting(LogConstants.UUIDS_FULL)
+                    .setShouldLogAttributeValues(true)
+                    .build(),
+            )
 }

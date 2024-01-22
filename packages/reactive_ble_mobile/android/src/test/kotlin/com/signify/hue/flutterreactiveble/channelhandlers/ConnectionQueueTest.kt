@@ -5,7 +5,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 class ConnectionQueueTest {
-
     private lateinit var sut: com.signify.hue.flutterreactiveble.ble.ConnectionQueue
 
     @BeforeEach

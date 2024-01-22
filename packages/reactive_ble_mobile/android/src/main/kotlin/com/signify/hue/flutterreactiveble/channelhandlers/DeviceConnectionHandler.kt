@@ -14,7 +14,10 @@ class DeviceConnectionHandler(private val bleClient: com.signify.hue.flutterreac
 
     private lateinit var connectionUpdatesDisposable: Disposable
 
-    override fun onListen(objectSink: Any?, eventSink: EventChannel.EventSink?) {
+    override fun onListen(
+        objectSink: Any?,
+        eventSink: EventChannel.EventSink?,
+    ) {
         eventSink?.let {
             connectDeviceSink = eventSink
             connectionUpdatesDisposable = listenToConnectionChanges()
@@ -42,20 +45,21 @@ class DeviceConnectionHandler(private val bleClient: com.signify.hue.flutterreac
         bleClient.disconnectAllDevices()
     }
 
-    private fun listenToConnectionChanges() = bleClient.connectionUpdateSubject
-        .observeOn(AndroidSchedulers.mainThread())
-        .subscribe { update ->
-            when (update) {
-                is com.signify.hue.flutterreactiveble.ble.ConnectionUpdateSuccess -> {
-                    handleDeviceConnectionUpdateResult(converter.convertToDeviceInfo(update))
-                }
-                is com.signify.hue.flutterreactiveble.ble.ConnectionUpdateError -> {
-                    handleDeviceConnectionUpdateResult(
-                        converter.convertConnectionErrorToDeviceInfo(update.deviceId, update.errorMessage),
-                    )
+    private fun listenToConnectionChanges() =
+        bleClient.connectionUpdateSubject
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe { update ->
+                when (update) {
+                    is com.signify.hue.flutterreactiveble.ble.ConnectionUpdateSuccess -> {
+                        handleDeviceConnectionUpdateResult(converter.convertToDeviceInfo(update))
+                    }
+                    is com.signify.hue.flutterreactiveble.ble.ConnectionUpdateError -> {
+                        handleDeviceConnectionUpdateResult(
+                            converter.convertConnectionErrorToDeviceInfo(update.deviceId, update.errorMessage),
+                        )
+                    }
                 }
             }
-        }
 
     private fun handleDeviceConnectionUpdateResult(connectionUpdateMessage: pb.DeviceInfo) {
         connectDeviceSink?.success(connectionUpdateMessage.toByteArray())

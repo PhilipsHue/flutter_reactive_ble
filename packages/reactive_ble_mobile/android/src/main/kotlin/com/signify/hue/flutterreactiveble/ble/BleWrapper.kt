@@ -34,23 +34,33 @@ data class ScanInfo(val deviceId: String, val name: String, val rssi: Int, val c
 }
 
 sealed class ConnectionUpdate
+
 data class ConnectionUpdateSuccess(val deviceId: String, val connectionState: Int) : ConnectionUpdate()
+
 data class ConnectionUpdateError(val deviceId: String, val errorMessage: String) : ConnectionUpdate()
 
 sealed class EstablishConnectionResult
+
 data class EstablishedConnection(val deviceId: String, val rxConnection: RxBleConnection) : EstablishConnectionResult()
+
 data class EstablishConnectionFailure(val deviceId: String, val errorMessage: String) : EstablishConnectionResult()
 
 sealed class MtuNegotiateResult
+
 data class MtuNegotiateSuccesful(val deviceId: String, val size: Int) : MtuNegotiateResult()
+
 data class MtuNegotiateFailed(val deviceId: String, val errorMessage: String) : MtuNegotiateResult()
 
 sealed class CharOperationResult
+
 data class CharOperationSuccessful(val deviceId: String, val value: List<Byte>) : CharOperationResult()
+
 data class CharOperationFailed(val deviceId: String, val errorMessage: String) : CharOperationResult()
 
 sealed class RequestConnectionPriorityResult
+
 data class RequestConnectionPrioritySuccess(val deviceId: String) : RequestConnectionPriorityResult()
+
 data class RequestConnectionPriorityFailed(val deviceId: String, val errorMessage: String) : RequestConnectionPriorityResult()
 
 enum class BleStatus(val code: Int) {

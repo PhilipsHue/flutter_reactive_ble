@@ -22,23 +22,24 @@ import com.signify.hue.flutterreactiveble.ProtobufModel as pb
 
 @Suppress("TooManyFunctions")
 class PluginController {
-    private val pluginMethods = mapOf<String, (call: MethodCall, result: Result) -> Unit>(
-        "initialize" to this::initializeClient,
-        "deinitialize" to this::deinitializeClient,
-        "scanForDevices" to this::scanForDevices,
-        "connectToDevice" to this::connectToDevice,
-        "clearGattCache" to this::clearGattCache,
-        "disconnectFromDevice" to this::disconnectFromDevice,
-        "readCharacteristic" to this::readCharacteristic,
-        "writeCharacteristicWithResponse" to this::writeCharacteristicWithResponse,
-        "writeCharacteristicWithoutResponse" to this::writeCharacteristicWithoutResponse,
-        "readNotifications" to this::readNotifications,
-        "stopNotifications" to this::stopNotifications,
-        "negotiateMtuSize" to this::negotiateMtuSize,
-        "requestConnectionPriority" to this::requestConnectionPriority,
-        "discoverServices" to this::discoverServices,
-        "getDiscoveredServices" to this::discoverServices,
-    )
+    private val pluginMethods =
+        mapOf<String, (call: MethodCall, result: Result) -> Unit>(
+            "initialize" to this::initializeClient,
+            "deinitialize" to this::deinitializeClient,
+            "scanForDevices" to this::scanForDevices,
+            "connectToDevice" to this::connectToDevice,
+            "clearGattCache" to this::clearGattCache,
+            "disconnectFromDevice" to this::disconnectFromDevice,
+            "readCharacteristic" to this::readCharacteristic,
+            "writeCharacteristicWithResponse" to this::writeCharacteristicWithResponse,
+            "writeCharacteristicWithoutResponse" to this::writeCharacteristicWithoutResponse,
+            "readNotifications" to this::readNotifications,
+            "stopNotifications" to this::stopNotifications,
+            "negotiateMtuSize" to this::negotiateMtuSize,
+            "requestConnectionPriority" to this::requestConnectionPriority,
+            "discoverServices" to this::discoverServices,
+            "getDiscoveredServices" to this::discoverServices,
+        )
 
     private lateinit var bleClient: com.signify.hue.flutterreactiveble.ble.BleClient
 
@@ -53,7 +54,10 @@ class PluginController {
     private val uuidConverter = UuidConverter()
     private val protoConverter = ProtobufMessageConverter()
 
-    internal fun initialize(messenger: BinaryMessenger, context: Context) {
+    internal fun initialize(
+        messenger: BinaryMessenger,
+        context: Context,
+    ) {
         bleClient = com.signify.hue.flutterreactiveble.ble.ReactiveBleClient(context)
 
         scanchannel = EventChannel(messenger, "flutter_reactive_ble_scan")
@@ -77,32 +81,50 @@ class PluginController {
         deviceConnectionHandler.disconnectAll()
     }
 
-    internal fun execute(call: MethodCall, result: Result) {
+    internal fun execute(
+        call: MethodCall,
+        result: Result,
+    ) {
         pluginMethods[call.method]?.invoke(call, result) ?: result.notImplemented()
     }
 
-    private fun initializeClient(call: MethodCall, result: Result) {
+    private fun initializeClient(
+        call: MethodCall,
+        result: Result,
+    ) {
         bleClient.initializeClient()
         result.success(null)
     }
 
-    private fun deinitializeClient(call: MethodCall, result: Result) {
+    private fun deinitializeClient(
+        call: MethodCall,
+        result: Result,
+    ) {
         deinitialize()
         result.success(null)
     }
 
-    private fun scanForDevices(call: MethodCall, result: Result) {
+    private fun scanForDevices(
+        call: MethodCall,
+        result: Result,
+    ) {
         scanDevicesHandler.prepareScan(pb.ScanForDevicesRequest.parseFrom(call.arguments as ByteArray))
         result.success(null)
     }
 
-    private fun connectToDevice(call: MethodCall, result: Result) {
+    private fun connectToDevice(
+        call: MethodCall,
+        result: Result,
+    ) {
         result.success(null)
         val connectDeviceMessage = pb.ConnectToDeviceRequest.parseFrom(call.arguments as ByteArray)
         deviceConnectionHandler.connectToDevice(connectDeviceMessage)
     }
 
-    private fun clearGattCache(call: MethodCall, result: Result) {
+    private fun clearGattCache(
+        call: MethodCall,
+        result: Result,
+    ) {
         val args = pb.ClearGattCacheRequest.parseFrom(call.arguments as ByteArray)
         bleClient.clearGattCache(args.deviceId)
             .observeOn(AndroidSchedulers.mainThread())
@@ -112,23 +134,30 @@ class PluginController {
                     result.success(info.toByteArray())
                 },
                 {
-                    val info = protoConverter.convertClearGattCacheError(
-                        ClearGattCacheErrorType.UNKNOWN,
-                        it.message,
-                    )
+                    val info =
+                        protoConverter.convertClearGattCacheError(
+                            ClearGattCacheErrorType.UNKNOWN,
+                            it.message,
+                        )
                     result.success(info.toByteArray())
                 },
             )
             .discard()
     }
 
-    private fun disconnectFromDevice(call: MethodCall, result: Result) {
+    private fun disconnectFromDevice(
+        call: MethodCall,
+        result: Result,
+    ) {
         result.success(null)
         val connectDeviceMessage = pb.DisconnectFromDeviceRequest.parseFrom(call.arguments as ByteArray)
         deviceConnectionHandler.disconnectDevice(connectDeviceMessage.deviceId)
     }
 
-    private fun readCharacteristic(call: MethodCall, result: Result) {
+    private fun readCharacteristic(
+        call: MethodCall,
+        result: Result,
+    ) {
         result.success(null)
 
         val readCharMessage = pb.ReadCharacteristicRequest.parseFrom(call.arguments as ByteArray)
@@ -146,10 +175,11 @@ class PluginController {
                 { charResult ->
                     when (charResult) {
                         is com.signify.hue.flutterreactiveble.ble.CharOperationSuccessful -> {
-                            val charInfo = protoConverter.convertCharacteristicInfo(
-                                readCharMessage.characteristic,
-                                charResult.value.toByteArray(),
-                            )
+                            val charInfo =
+                                protoConverter.convertCharacteristicInfo(
+                                    readCharMessage.characteristic,
+                                    charResult.value.toByteArray(),
+                                )
                             charNotificationHandler.addSingleReadToStream(charInfo)
                         }
                         is com.signify.hue.flutterreactiveble.ble.CharOperationFailed -> {
@@ -178,12 +208,26 @@ class PluginController {
             .discard()
     }
 
-    private fun writeCharacteristicWithResponse(call: MethodCall, result: Result) {
-        executeWriteAndPropagateResultToChannel(call, result, com.signify.hue.flutterreactiveble.ble.BleClient::writeCharacteristicWithResponse)
+    private fun writeCharacteristicWithResponse(
+        call: MethodCall,
+        result: Result,
+    ) {
+        executeWriteAndPropagateResultToChannel(
+            call,
+            result,
+            com.signify.hue.flutterreactiveble.ble.BleClient::writeCharacteristicWithResponse,
+        )
     }
 
-    private fun writeCharacteristicWithoutResponse(call: MethodCall, result: Result) {
-        executeWriteAndPropagateResultToChannel(call, result, com.signify.hue.flutterreactiveble.ble.BleClient::writeCharacteristicWithoutResponse)
+    private fun writeCharacteristicWithoutResponse(
+        call: MethodCall,
+        result: Result,
+    ) {
+        executeWriteAndPropagateResultToChannel(
+            call,
+            result,
+            com.signify.hue.flutterreactiveble.ble.BleClient::writeCharacteristicWithoutResponse,
+        )
     }
 
     private fun executeWriteAndPropagateResultToChannel(
@@ -237,19 +281,28 @@ class PluginController {
             .discard()
     }
 
-    private fun readNotifications(call: MethodCall, result: Result) {
+    private fun readNotifications(
+        call: MethodCall,
+        result: Result,
+    ) {
         val request = pb.NotifyCharacteristicRequest.parseFrom(call.arguments as ByteArray)
         charNotificationHandler.subscribeToNotifications(request)
         result.success(null)
     }
 
-    private fun stopNotifications(call: MethodCall, result: Result) {
+    private fun stopNotifications(
+        call: MethodCall,
+        result: Result,
+    ) {
         val request = pb.NotifyNoMoreCharacteristicRequest.parseFrom(call.arguments as ByteArray)
         charNotificationHandler.unsubscribeFromNotifications(request)
         result.success(null)
     }
 
-    private fun negotiateMtuSize(call: MethodCall, result: Result) {
+    private fun negotiateMtuSize(
+        call: MethodCall,
+        result: Result,
+    ) {
         val request = pb.NegotiateMtuRequest.parseFrom(call.arguments as ByteArray)
         bleClient.negotiateMtuSize(request.deviceId, request.mtuSize)
             .observeOn(AndroidSchedulers.mainThread())
@@ -271,7 +324,10 @@ class PluginController {
             .discard()
     }
 
-    private fun requestConnectionPriority(call: MethodCall, result: Result) {
+    private fun requestConnectionPriority(
+        call: MethodCall,
+        result: Result,
+    ) {
         val request = pb.ChangeConnectionPriorityRequest.parseFrom(call.arguments as ByteArray)
 
         bleClient.requestConnectionPriority(request.deviceId, request.priority.toConnectionPriority())
@@ -298,7 +354,10 @@ class PluginController {
             .discard()
     }
 
-    private fun discoverServices(call: MethodCall, result: Result) {
+    private fun discoverServices(
+        call: MethodCall,
+        result: Result,
+    ) {
         val request = pb.DiscoverServicesRequest.parseFrom(call.arguments as ByteArray)
 
         bleClient.discoverServices(request.deviceId)

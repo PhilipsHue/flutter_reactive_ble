@@ -10,14 +10,16 @@ import java.util.concurrent.TimeUnit
 import com.signify.hue.flutterreactiveble.ProtobufModel as pb
 
 class BleStatusHandler(private val bleClient: BleClient) : EventChannel.StreamHandler {
-
     companion object {
         private const val delayListenBleStatus = 500L
     }
 
     private val subscriptionDisposable = SerialDisposable()
 
-    override fun onListen(arg: Any?, eventSink: EventChannel.EventSink?) {
+    override fun onListen(
+        arg: Any?,
+        eventSink: EventChannel.EventSink?,
+    ) {
         subscriptionDisposable.set(eventSink?.let(::listenToBleStatus))
     }
 
@@ -30,9 +32,10 @@ class BleStatusHandler(private val bleClient: BleClient) : EventChannel.StreamHa
             .switchMap { bleClient.observeBleStatus() }
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({ bleStatus ->
-                val message = pb.BleStatusInfo.newBuilder()
-                    .setStatus(bleStatus.code)
-                    .build()
+                val message =
+                    pb.BleStatusInfo.newBuilder()
+                        .setStatus(bleStatus.code)
+                        .build()
                 eventSink.success(message.toByteArray())
             }, { throwable ->
                 eventSink.error("ObserveBleStatusFailure", throwable.message, null)

@@ -23,7 +23,6 @@ import com.signify.hue.flutterreactiveble.ProtobufModel as pb
 
 @Suppress("TooManyFunctions")
 class ProtobufMessageConverter {
-
     companion object {
         private const val positionMostSignificantBit = 2
         private const val positionLeastSignificantBit = 3
@@ -78,7 +77,10 @@ class ProtobufMessageConverter {
             .build()
     }
 
-    fun convertClearGattCacheError(code: ClearGattCacheErrorType, message: String?): pb.ClearGattCacheInfo {
+    fun convertClearGattCacheError(
+        code: ClearGattCacheErrorType,
+        message: String?,
+    ): pb.ClearGattCacheInfo {
         val failure = pb.GenericFailure.newBuilder().setCode(code.code)
         message?.let(failure::setMessage)
         return pb.ClearGattCacheInfo.newBuilder().setFailure(failure).build()
@@ -101,9 +103,10 @@ class ProtobufMessageConverter {
         error: String?,
     ): pb.CharacteristicValueInfo {
         val characteristicAddress = createCharacteristicAddress(request)
-        val failure = pb.GenericFailure.newBuilder()
-            .setCode(CharacteristicErrorType.UNKNOWN.code)
-            .setMessage(error ?: "Unknown error")
+        val failure =
+            pb.GenericFailure.newBuilder()
+                .setCode(CharacteristicErrorType.UNKNOWN.code)
+                .setMessage(error ?: "Unknown error")
 
         return pb.CharacteristicValueInfo.newBuilder()
             .setCharacteristic(characteristicAddress)
@@ -115,13 +118,15 @@ class ProtobufMessageConverter {
         request: pb.WriteCharacteristicRequest,
         error: String?,
     ): pb.WriteCharacteristicInfo {
-        val builder = pb.WriteCharacteristicInfo.newBuilder()
-            .setCharacteristic(request.characteristic)
+        val builder =
+            pb.WriteCharacteristicInfo.newBuilder()
+                .setCharacteristic(request.characteristic)
 
         error?.let {
-            val failure = pb.GenericFailure.newBuilder()
-                .setCode(CharacteristicErrorType.UNKNOWN.code)
-                .setMessage(error)
+            val failure =
+                pb.GenericFailure.newBuilder()
+                    .setCode(CharacteristicErrorType.UNKNOWN.code)
+                    .setMessage(error)
 
             builder.setFailure(failure)
         }
@@ -131,15 +136,17 @@ class ProtobufMessageConverter {
 
     fun convertNegotiateMtuInfo(result: MtuNegotiateResult): pb.NegotiateMtuInfo =
         when (result) {
-            is MtuNegotiateSuccesful -> pb.NegotiateMtuInfo.newBuilder()
-                .setDeviceId(result.deviceId)
-                .setMtuSize(result.size)
-                .build()
-            is MtuNegotiateFailed -> {
-                val failure = pb.GenericFailure.newBuilder()
-                    .setCode(NegotiateMtuErrorType.UNKNOWN.code)
-                    .setMessage(result.errorMessage)
+            is MtuNegotiateSuccesful ->
+                pb.NegotiateMtuInfo.newBuilder()
+                    .setDeviceId(result.deviceId)
+                    .setMtuSize(result.size)
                     .build()
+            is MtuNegotiateFailed -> {
+                val failure =
+                    pb.GenericFailure.newBuilder()
+                        .setCode(NegotiateMtuErrorType.UNKNOWN.code)
+                        .setMessage(result.errorMessage)
+                        .build()
 
                 pb.NegotiateMtuInfo.newBuilder()
                     .setDeviceId(result.deviceId)
@@ -148,18 +155,18 @@ class ProtobufMessageConverter {
             }
         }
 
-    fun convertRequestConnectionPriorityInfo(
-        result: RequestConnectionPriorityResult,
-    ): pb.ChangeConnectionPriorityInfo {
+    fun convertRequestConnectionPriorityInfo(result: RequestConnectionPriorityResult): pb.ChangeConnectionPriorityInfo {
         return when (result) {
-            is RequestConnectionPrioritySuccess -> pb.ChangeConnectionPriorityInfo.newBuilder()
-                .setDeviceId(result.deviceId)
-                .build()
-            is RequestConnectionPriorityFailed -> {
-                val failure = pb.GenericFailure.newBuilder()
-                    .setCode(0)
-                    .setMessage(result.errorMessage)
+            is RequestConnectionPrioritySuccess ->
+                pb.ChangeConnectionPriorityInfo.newBuilder()
+                    .setDeviceId(result.deviceId)
                     .build()
+            is RequestConnectionPriorityFailed -> {
+                val failure =
+                    pb.GenericFailure.newBuilder()
+                        .setCode(0)
+                        .setMessage(result.errorMessage)
+                        .build()
 
                 pb.ChangeConnectionPriorityInfo.newBuilder()
                     .setDeviceId(result.deviceId)
@@ -210,13 +217,15 @@ class ProtobufMessageConverter {
     }
 
     private fun convertInternalService(gattService: BluetoothGattService): pb.DiscoveredService {
-        val root = pb.DiscoveredService.newBuilder()
-            .setServiceUuid(createUuidFromParcelUuid(gattService.uuid))
-            .addAllCharacteristicUuids(gattService.characteristics.map { createUuidFromParcelUuid(it.uuid) })
+        val root =
+            pb.DiscoveredService.newBuilder()
+                .setServiceUuid(createUuidFromParcelUuid(gattService.uuid))
+                .addAllCharacteristicUuids(gattService.characteristics.map { createUuidFromParcelUuid(it.uuid) })
 
-        val children = gattService.includedServices.map {
-            convertInternalService(it)
-        }
+        val children =
+            gattService.includedServices.map {
+                convertInternalService(it)
+            }
         return root.addAllIncludedServices(children).build()
     }
 
