@@ -42,7 +42,7 @@ data class EstablishedConnection(val deviceId: String, val rxConnection: RxBleCo
 data class EstablishConnectionFailure(val deviceId: String, val errorMessage: String) : EstablishConnectionResult()
 
 sealed class MtuNegotiateResult
-data class MtuNegotiateSuccesful(val deviceId: String, val size: Int) : MtuNegotiateResult()
+data class MtuNegotiateSuccessful(val deviceId: String, val size: Int) : MtuNegotiateResult()
 data class MtuNegotiateFailed(val deviceId: String, val errorMessage: String) : MtuNegotiateResult()
 
 sealed class CharOperationResult

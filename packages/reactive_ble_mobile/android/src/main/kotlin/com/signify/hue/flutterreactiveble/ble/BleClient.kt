@@ -48,4 +48,5 @@ interface BleClient {
     fun observeBleStatus(): Observable<BleStatus>
     fun requestConnectionPriority(deviceId: String, priority: ConnectionPriority):
             Single<RequestConnectionPriorityResult>
+    fun readRssi(deviceId: String): Single<Int>
 }

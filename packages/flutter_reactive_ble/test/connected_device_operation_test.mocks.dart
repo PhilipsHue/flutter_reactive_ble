@@ -143,6 +143,14 @@ class MockReactiveBlePlatform extends _i1.Mock
               _i2.Result<_i2.Unit,
                   _i2.GenericFailure<_i2.ClearGattCacheError>?>>);
   @override
+  _i4.Future<int> readRssi(String? deviceId) => (super.noSuchMethod(
+        Invocation.method(
+          #readRssi,
+          [deviceId],
+        ),
+        returnValue: _i4.Future<int>.value(0),
+      ) as _i4.Future<int>);
+  @override
   _i4.Stream<void> connectToDevice(
     String? id,
     Map<_i2.Uuid, List<_i2.Uuid>>? servicesWithCharacteristicsToDiscover,

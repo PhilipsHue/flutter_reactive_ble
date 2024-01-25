@@ -149,8 +149,9 @@ class _FakeDiscoverServicesRequest_10 extends _i1.SmartFake
         );
 }
 
-class _FakeScanResult_11 extends _i1.SmartFake implements _i3.ScanResult {
-  _FakeScanResult_11(
+class _FakeReadRssiRequest_11 extends _i1.SmartFake
+    implements _i2.ReadRssiRequest {
+  _FakeReadRssiRequest_11(
     Object parent,
     Invocation parentInvocation,
   ) : super(
@@ -159,9 +160,19 @@ class _FakeScanResult_11 extends _i1.SmartFake implements _i3.ScanResult {
         );
 }
 
-class _FakeConnectionStateUpdate_12 extends _i1.SmartFake
+class _FakeScanResult_12 extends _i1.SmartFake implements _i3.ScanResult {
+  _FakeScanResult_12(
+    Object parent,
+    Invocation parentInvocation,
+  ) : super(
+          parent,
+          parentInvocation,
+        );
+}
+
+class _FakeConnectionStateUpdate_13 extends _i1.SmartFake
     implements _i3.ConnectionStateUpdate {
-  _FakeConnectionStateUpdate_12(
+  _FakeConnectionStateUpdate_13(
     Object parent,
     Invocation parentInvocation,
   ) : super(
@@ -170,9 +181,9 @@ class _FakeConnectionStateUpdate_12 extends _i1.SmartFake
         );
 }
 
-class _FakeResult_13<Value, Failure> extends _i1.SmartFake
+class _FakeResult_14<Value, Failure> extends _i1.SmartFake
     implements _i3.Result<Value, Failure> {
-  _FakeResult_13(
+  _FakeResult_14(
     Object parent,
     Invocation parentInvocation,
   ) : super(
@@ -181,9 +192,9 @@ class _FakeResult_13<Value, Failure> extends _i1.SmartFake
         );
 }
 
-class _FakeCharacteristicValue_14 extends _i1.SmartFake
+class _FakeCharacteristicValue_15 extends _i1.SmartFake
     implements _i3.CharacteristicValue {
-  _FakeCharacteristicValue_14(
+  _FakeCharacteristicValue_15(
     Object parent,
     Invocation parentInvocation,
   ) : super(
@@ -192,9 +203,9 @@ class _FakeCharacteristicValue_14 extends _i1.SmartFake
         );
 }
 
-class _FakeWriteCharacteristicInfo_15 extends _i1.SmartFake
+class _FakeWriteCharacteristicInfo_16 extends _i1.SmartFake
     implements _i3.WriteCharacteristicInfo {
-  _FakeWriteCharacteristicInfo_15(
+  _FakeWriteCharacteristicInfo_16(
     Object parent,
     Invocation parentInvocation,
   ) : super(
@@ -203,9 +214,9 @@ class _FakeWriteCharacteristicInfo_15 extends _i1.SmartFake
         );
 }
 
-class _FakeConnectionPriorityInfo_16 extends _i1.SmartFake
+class _FakeConnectionPriorityInfo_17 extends _i1.SmartFake
     implements _i3.ConnectionPriorityInfo {
-  _FakeConnectionPriorityInfo_16(
+  _FakeConnectionPriorityInfo_17(
     Object parent,
     Invocation parentInvocation,
   ) : super(
@@ -214,8 +225,8 @@ class _FakeConnectionPriorityInfo_16 extends _i1.SmartFake
         );
 }
 
-class _FakeMethodCodec_17 extends _i1.SmartFake implements _i4.MethodCodec {
-  _FakeMethodCodec_17(
+class _FakeMethodCodec_18 extends _i1.SmartFake implements _i4.MethodCodec {
+  _FakeMethodCodec_18(
     Object parent,
     Invocation parentInvocation,
   ) : super(
@@ -224,9 +235,9 @@ class _FakeMethodCodec_17 extends _i1.SmartFake implements _i4.MethodCodec {
         );
 }
 
-class _FakeBinaryMessenger_18 extends _i1.SmartFake
+class _FakeBinaryMessenger_19 extends _i1.SmartFake
     implements _i5.BinaryMessenger {
-  _FakeBinaryMessenger_18(
+  _FakeBinaryMessenger_19(
     Object parent,
     Invocation parentInvocation,
   ) : super(
@@ -466,6 +477,21 @@ class MockArgsToProtobufConverter extends _i1.Mock
           ),
         ),
       ) as _i2.DiscoverServicesRequest);
+  @override
+  _i2.ReadRssiRequest createReadRssiRequest(String? deviceId) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #createReadRssiRequest,
+          [deviceId],
+        ),
+        returnValue: _FakeReadRssiRequest_11(
+          this,
+          Invocation.method(
+            #createReadRssiRequest,
+            [deviceId],
+          ),
+        ),
+      ) as _i2.ReadRssiRequest);
 }
 
 /// A class which mocks [ProtobufConverter].
@@ -490,7 +516,7 @@ class MockProtobufConverter extends _i1.Mock implements _i7.ProtobufConverter {
           #scanResultFrom,
           [data],
         ),
-        returnValue: _FakeScanResult_11(
+        returnValue: _FakeScanResult_12(
           this,
           Invocation.method(
             #scanResultFrom,
@@ -505,7 +531,7 @@ class MockProtobufConverter extends _i1.Mock implements _i7.ProtobufConverter {
           #connectionStateUpdateFrom,
           [data],
         ),
-        returnValue: _FakeConnectionStateUpdate_12(
+        returnValue: _FakeConnectionStateUpdate_13(
           this,
           Invocation.method(
             #connectionStateUpdateFrom,
@@ -520,7 +546,7 @@ class MockProtobufConverter extends _i1.Mock implements _i7.ProtobufConverter {
               #clearGattCacheResultFrom,
               [data],
             ),
-            returnValue: _FakeResult_13<_i3.Unit,
+            returnValue: _FakeResult_14<_i3.Unit,
                 _i3.GenericFailure<_i3.ClearGattCacheError>?>(
               this,
               Invocation.method(
@@ -537,7 +563,7 @@ class MockProtobufConverter extends _i1.Mock implements _i7.ProtobufConverter {
           #characteristicValueFrom,
           [data],
         ),
-        returnValue: _FakeCharacteristicValue_14(
+        returnValue: _FakeCharacteristicValue_15(
           this,
           Invocation.method(
             #characteristicValueFrom,
@@ -552,7 +578,7 @@ class MockProtobufConverter extends _i1.Mock implements _i7.ProtobufConverter {
           #writeCharacteristicInfoFrom,
           [data],
         ),
-        returnValue: _FakeWriteCharacteristicInfo_15(
+        returnValue: _FakeWriteCharacteristicInfo_16(
           this,
           Invocation.method(
             #writeCharacteristicInfoFrom,
@@ -567,7 +593,7 @@ class MockProtobufConverter extends _i1.Mock implements _i7.ProtobufConverter {
           #connectionPriorityInfoFrom,
           [data],
         ),
-        returnValue: _FakeConnectionPriorityInfo_16(
+        returnValue: _FakeConnectionPriorityInfo_17(
           this,
           Invocation.method(
             #connectionPriorityInfoFrom,
@@ -592,6 +618,14 @@ class MockProtobufConverter extends _i1.Mock implements _i7.ProtobufConverter {
         ),
         returnValue: <_i3.DiscoveredService>[],
       ) as List<_i3.DiscoveredService>);
+  @override
+  int readRssiResultFrom(List<int>? data) => (super.noSuchMethod(
+        Invocation.method(
+          #readRssiResultFrom,
+          [data],
+        ),
+        returnValue: 0,
+      ) as int);
 }
 
 /// A class which mocks [MethodChannel].
@@ -610,7 +644,7 @@ class MockMethodChannel extends _i1.Mock implements _i8.MethodChannel {
   @override
   _i4.MethodCodec get codec => (super.noSuchMethod(
         Invocation.getter(#codec),
-        returnValue: _FakeMethodCodec_17(
+        returnValue: _FakeMethodCodec_18(
           this,
           Invocation.getter(#codec),
         ),
@@ -618,7 +652,7 @@ class MockMethodChannel extends _i1.Mock implements _i8.MethodChannel {
   @override
   _i5.BinaryMessenger get binaryMessenger => (super.noSuchMethod(
         Invocation.getter(#binaryMessenger),
-        returnValue: _FakeBinaryMessenger_18(
+        returnValue: _FakeBinaryMessenger_19(
           this,
           Invocation.getter(#binaryMessenger),
         ),
