@@ -146,6 +146,14 @@ message DiscoveredCharacteristic {
     string characteristicInstanceId = 8;
 }
 
+message ReadRssiRequest {
+    string deviceId = 1;
+}
+
+message ReadRssiResult {
+    int32 rssi = 1;
+}
+
 message Uuid {
     bytes data = 1;
 }

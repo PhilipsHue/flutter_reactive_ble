@@ -184,4 +184,14 @@ internal class DeviceConnector(
                         queue.firstOrNull() == deviceId || !queue.contains(deviceId)
                     }
                     .takeUntil { it.isEmpty() || it.first() == deviceId }
+
+    /**
+     * Reads the current RSSI value of the device
+     */
+    internal fun readRssi(): Single<Int> = currentConnection?.let { connection ->
+        when (connection) {
+            is EstablishedConnection -> connection.rxConnection.readRssi()
+            is EstablishConnectionFailure -> Single.error(Throwable(connection.errorMessage))
+        }
+    } ?: Single.error(IllegalStateException("Connection is not established"))
 }

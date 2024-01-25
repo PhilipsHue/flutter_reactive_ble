@@ -140,6 +140,9 @@ public class SwiftReactiveBlePlugin: NSObject, FlutterPlugin {
         }),
         AnyPlatformMethod(UnaryPlatformMethod(name: "negotiateMtuSize") { (name, context, args: NegotiateMtuRequest, completion) in
             context.reportMaximumWriteValueLength(name: name, args: args, completion: completion)
+        }),
+        AnyPlatformMethod(UnaryPlatformMethod(name: "readRssi") { (name, context, args: ReadRssiRequest, completion) in
+            context.readRssi(name: name, args: args, completion: completion)
         })
     ])
 

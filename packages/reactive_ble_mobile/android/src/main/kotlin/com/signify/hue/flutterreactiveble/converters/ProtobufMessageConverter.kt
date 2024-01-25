@@ -7,7 +7,7 @@ import com.polidea.rxandroidble2.RxBleDeviceServices
 import com.signify.hue.flutterreactiveble.ble.ConnectionUpdateSuccess
 import com.signify.hue.flutterreactiveble.ble.MtuNegotiateFailed
 import com.signify.hue.flutterreactiveble.ble.MtuNegotiateResult
-import com.signify.hue.flutterreactiveble.ble.MtuNegotiateSuccesful
+import com.signify.hue.flutterreactiveble.ble.MtuNegotiateSuccessful
 import com.signify.hue.flutterreactiveble.ble.RequestConnectionPriorityFailed
 import com.signify.hue.flutterreactiveble.ble.RequestConnectionPriorityResult
 import com.signify.hue.flutterreactiveble.ble.RequestConnectionPrioritySuccess
@@ -127,7 +127,7 @@ class ProtobufMessageConverter {
 
     fun convertNegotiateMtuInfo(result: MtuNegotiateResult): pb.NegotiateMtuInfo =
             when (result) {
-                is MtuNegotiateSuccesful -> pb.NegotiateMtuInfo.newBuilder()
+                is MtuNegotiateSuccessful -> pb.NegotiateMtuInfo.newBuilder()
                         .setDeviceId(result.deviceId)
                         .setMtuSize(result.size)
                         .build()
@@ -173,6 +173,12 @@ class ProtobufMessageConverter {
         return pb.DiscoverServicesInfo.newBuilder()
                 .setDeviceId(deviceId)
                 .addAllServices(services.bluetoothGattServices.map { fromBluetoothGattService(it) })
+                .build()
+    }
+
+    fun convertReadRssiResult(rssi: Int): pb.ReadRssiResult {
+        return pb.ReadRssiResult.newBuilder()
+                .setRssi(rssi)
                 .build()
     }
 

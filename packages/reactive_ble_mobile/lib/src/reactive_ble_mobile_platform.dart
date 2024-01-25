@@ -302,6 +302,16 @@ class ReactiveBleMobilePlatform extends ReactiveBlePlatform {
         )
         .then((data) => _protobufConverter.discoveredServicesFrom(data!));
   }
+
+  @override
+  Future<int> readRssi(String deviceId) async => _bleMethodChannel
+      .invokeMethod<List<int>>(
+        "readRssi",
+        _argsToProtobufConverter
+            .createReadRssiRequest(deviceId)
+            .writeToBuffer(),
+      )
+      .then((data) => _protobufConverter.readRssiResultFrom(data!));
 }
 
 class ReactiveBleMobilePlatformFactory {
