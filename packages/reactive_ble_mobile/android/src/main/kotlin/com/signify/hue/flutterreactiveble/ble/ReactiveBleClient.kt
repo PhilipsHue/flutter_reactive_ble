@@ -99,7 +99,7 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
     }
 
     override fun connectToDevice(deviceId: String, timeout: Duration) {
-        allConnections.add(getConnection(deviceId, timeout)
+        allConnections.add(getConnection(deviceId, timeout, forceConnecting = true)
             .subscribe({ result ->
                 when (result) {
                     is EstablishedConnection -> {
@@ -259,13 +259,17 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
 
     private fun getConnection(
         deviceId: String,
-        timeout: Duration = Duration(0, TimeUnit.MILLISECONDS)
+        timeout: Duration = Duration(0, TimeUnit.MILLISECONDS),
+        forceConnecting: Boolean = false
     ): Observable<EstablishConnectionResult> {
-        val device = rxBleClient.getBleDevice(deviceId)
-        val connector =
-            activeConnections.getOrPut(deviceId) { createDeviceConnector(device, timeout) }
-
-        return connector.connection
+        return if (forceConnecting) {
+            val device = rxBleClient.getBleDevice(deviceId)
+            val connector =
+                activeConnections.getOrPut(deviceId) { createDeviceConnector(device, timeout) }
+            connector.connection
+        } else {
+            activeConnections[deviceId]?.connection ?: Observable.just(EstablishConnectionFailure(deviceId, "Device is not connected"))
+        }
     }
 
     private fun executeWriteOperation(
