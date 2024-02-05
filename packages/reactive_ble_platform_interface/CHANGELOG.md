@@ -1,3 +1,7 @@
+## 5.3.1
+
+*  Use proper platform_interface dependency version #837
+
 ## 5.3.0
 
 * Readd accidentally removed version constraint #789
