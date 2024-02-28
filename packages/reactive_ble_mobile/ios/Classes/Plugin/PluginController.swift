@@ -38,7 +38,7 @@ final class PluginController {
             },
             onDiscovery: papply(weak: self) { context, _, peripheral, advertisementData, rssi in
                 guard let sink = context.scan?.sink
-                else { assert(false); return }
+                else { return }
 
                 let serviceData = advertisementData[CBAdvertisementDataServiceDataKey] as? ServiceData ?? [:]
                 let serviceUuids = advertisementData[CBAdvertisementDataServiceUUIDsKey] as? [CBUUID] ?? []
