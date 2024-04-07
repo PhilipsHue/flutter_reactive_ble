@@ -166,7 +166,7 @@ struct EstablishBondingInfo {
 
 extension EstablishBondingInfo.BondState: CaseIterable {
   // The compiler won't synthesize support with the UNRECOGNIZED case.
-  static var allCases: [EstablishBondingInfo.BondState] = [
+  static let allCases: [EstablishBondingInfo.BondState] = [
     .none,
     .bonding,
     .bonded,
