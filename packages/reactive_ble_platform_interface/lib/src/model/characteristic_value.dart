@@ -1,10 +1,10 @@
+import 'characteristic_instance.dart';
 import 'generic_failure.dart';
-import 'qualified_characteristic.dart';
 import 'result.dart';
 
-/// Value update for specific [QualifiedCharacteristic].
+/// Value update for specific [CharacteristicInstance].
 class CharacteristicValue {
-  final QualifiedCharacteristic characteristic;
+  final CharacteristicInstance characteristic;
   final Result<List<int>, GenericFailure<CharacteristicValueUpdateError>?>
       result;
 

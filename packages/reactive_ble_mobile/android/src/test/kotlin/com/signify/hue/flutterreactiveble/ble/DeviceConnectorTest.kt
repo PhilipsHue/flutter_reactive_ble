@@ -20,10 +20,7 @@ import java.lang.Exception
 import java.util.concurrent.TimeUnit
 
 @DisplayName("DeviceConnector unit tests")
-
-
 class DeviceConnectorTest {
-
     @MockK
     private lateinit var connection: RxBleConnection
 
@@ -34,7 +31,7 @@ class DeviceConnectorTest {
     private lateinit var connectionQueue: ConnectionQueue
 
     @MockK
-    private  lateinit var updateListener: (update: ConnectionUpdate) -> Unit
+    private lateinit var updateListener: (update: ConnectionUpdate) -> Unit
 
     private lateinit var sut: DeviceConnector
     private lateinit var subject: BehaviorSubject<List<String>>
@@ -45,28 +42,26 @@ class DeviceConnectorTest {
         MockKAnnotations.init(this)
         subject = BehaviorSubject.create()
         every { device.connectionState }.returns(RxBleConnection.RxBleConnectionState.DISCONNECTED)
-        every { device.observeConnectionStateChanges()}.returns(Observable.just(RxBleConnection.RxBleConnectionState.CONNECTED))
+        every { device.observeConnectionStateChanges() }.returns(Observable.just(RxBleConnection.RxBleConnectionState.CONNECTED))
         every { device.macAddress }.returns(deviceId)
         every { updateListener.invoke(allAny()) }.returns(Unit)
 
-        every {connectionQueue.addToQueue(any())}.returns(Unit)
-        every {connectionQueue.observeQueue()}.returns(subject)
-        every {connectionQueue.removeFromQueue(any())}.returns(Unit)
+        every { connectionQueue.addToQueue(any()) }.returns(Unit)
+        every { connectionQueue.observeQueue() }.returns(subject)
+        every { connectionQueue.removeFromQueue(any()) }.returns(Unit)
 
         subject.onNext(listOf(device.macAddress))
         sut = DeviceConnector(device, Duration(0L, TimeUnit.MILLISECONDS), updateListener, connectionQueue)
-
     }
 
     @AfterEach
-    fun teardown(){
+    fun teardown() {
         sut.disconnectDevice(deviceId)
     }
 
     @Nested
-    @DisplayName ("Successfull connection")
+    @DisplayName("Successfull connection")
     inner class SuccesfullConnectionTest {
-
         @BeforeEach
         fun setup() {
             every { device.establishConnection(any()) }.returns(Observable.just(connection))
@@ -74,11 +69,10 @@ class DeviceConnectorTest {
 
         @Test
         @DisplayName("Add device to queue")
-        fun addDeviceToQueue(){
+        fun addDeviceToQueue() {
             sut.connection.test()
             verify(exactly = 1) { connectionQueue.addToQueue(deviceId) }
         }
-
 
         @Test
         @DisplayName("Connects to device only once")
@@ -103,7 +97,6 @@ class DeviceConnectorTest {
             sut.connection.test()
 
             verify(exactly = 1) { updateListener.invoke(ConnectionUpdateSuccess(deviceId, ConnectionState.CONNECTED.code)) }
-
         }
 
         @Test
@@ -119,15 +112,14 @@ class DeviceConnectorTest {
 
         @Test
         @DisplayName("Remove device from queue")
-        fun removeDeviceFromQueue(){
+        fun removeDeviceFromQueue() {
             sut.connection.test()
             verify(exactly = 1) { connectionQueue.removeFromQueue(deviceId) }
         }
     }
 
-
     @Nested
-    @DisplayName ("Failed connection")
+    @DisplayName("Failed connection")
     inner class NotSuccesfullConnectionTest {
         private val errorMessage = "aaa"
 
@@ -154,7 +146,7 @@ class DeviceConnectorTest {
 
         @Test
         @DisplayName("Remove device from queue")
-        fun removeDeviceFromQueue(){
+        fun removeDeviceFromQueue() {
             sut.connection.test()
             verify(exactly = 1) { connectionQueue.removeFromQueue(deviceId) }
         }
@@ -174,4 +166,3 @@ class DeviceConnectorTest {
         verify(exactly = 1) { updateListener.invoke(ConnectionUpdateSuccess(deviceId, ConnectionState.DISCONNECTED.code)) }
     }
 }
-

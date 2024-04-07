@@ -4,7 +4,9 @@ typealias RSSI = Int
 
 typealias PeripheralID = UUID
 typealias ServiceID = CBUUID
+typealias ServiceInstanceID = String
 typealias CharacteristicID = CBUUID
+typealias CharacteristicInstanceID = String
 
 typealias ServiceData = [ServiceID: Data]
 typealias AdvertisementData = [String: Any]
@@ -16,8 +18,8 @@ final class Central {
     typealias ConnectionChangeHandler = (Central, CBPeripheral, ConnectionChange) -> Void
     typealias ServicesWithCharacteristicsDiscoveryHandler = (Central, CBPeripheral, [Error]) -> Void
     typealias CharacteristicNotifyCompletionHandler = (Central, Error?) -> Void
-    typealias CharacteristicValueUpdateHandler = (Central, QualifiedCharacteristic, Data?, Error?) -> Void
-    typealias CharacteristicWriteCompletionHandler = (Central, QualifiedCharacteristic, Error?) -> Void
+    typealias CharacteristicValueUpdateHandler = (Central, CharacteristicInstance, Data?, Error?) -> Void
+    typealias CharacteristicWriteCompletionHandler = (Central, CharacteristicInstance, Error?) -> Void
 
     private let onServicesWithCharacteristicsInitialDiscovery: ServicesWithCharacteristicsDiscoveryHandler
 
@@ -31,6 +33,7 @@ final class Central {
     private let servicesWithCharacteristicsDiscoveryRegistry = PeripheralTaskRegistry<ServicesWithCharacteristicsDiscoveryTaskController>()
     private let characteristicNotifyRegistry = PeripheralTaskRegistry<CharacteristicNotifyTaskController>()
     private let characteristicWriteRegistry = PeripheralTaskRegistry<CharacteristicWriteTaskController>()
+    private let readRssiRegistry = PeripheralTaskRegistry<ReadRssiTaskController>()
 
     init(
         onStateChange: @escaping StateChangeHandler,
@@ -82,18 +85,39 @@ final class Central {
                 )
             },
             onCharacteristicNotificationStateUpdate: papply(weak: self) { central, characteristic, error in
+                guard let q = try? CharacteristicInstance(characteristic)
+                else {
+                    return
+                }
+
                 central.characteristicNotifyRegistry.updateTask(
-                    key: QualifiedCharacteristic(characteristic),
+                    key: q,
                     action: { $0.complete(error: error) }
                 )
             },
             onCharacteristicValueUpdate: papply(weak: self) { central, characteristic, error in
-                onCharacteristicValueUpdate(central, QualifiedCharacteristic(characteristic), characteristic.value, error)
+                guard let q = try? CharacteristicInstance(characteristic)
+                else {
+                    return
+                }
+
+                onCharacteristicValueUpdate(central, q, characteristic.value, error)
             },
             onCharacteristicValueWrite: papply(weak: self) { central, characteristic, error in
+                guard let q = try? CharacteristicInstance(characteristic)
+                else {
+                    return
+                }
+
                 central.characteristicWriteRegistry.updateTask(
-                    key: QualifiedCharacteristic(characteristic),
+                    key: q,
                     action: { $0.handleWrite(error: error) }
+                )
+            },
+            onReadRssi: papply(weak: self) { central, peripheral, rssi, error in
+                central.readRssiRegistry.updateTask(
+                    key: peripheral.identifier,
+                    action: { $0.handleReadRssi(rssi: rssi, error: error) }
                 )
             }
         )
@@ -188,6 +212,10 @@ final class Central {
         )
     }
 
+    func peripheral(for peripheralID: PeripheralID) throws -> CBPeripheral {
+        return try resolve(connected: peripheralID)
+    }
+
     private func discoverServicesWithCharacteristics(
         for peripheral: CBPeripheral,
         discover servicesWithCharacteristicsToDiscover: ServicesWithCharacteristicsToDiscover,
@@ -206,15 +234,15 @@ final class Central {
         )
     }
 
-    func turnNotifications(_ state: OnOff, for qualifiedCharacteristic: QualifiedCharacteristic, completion: @escaping CharacteristicNotifyCompletionHandler) throws {
-        let characteristic = try resolve(characteristic: qualifiedCharacteristic)
+    func turnNotifications(_ state: OnOff, for characteristicInstance: CharacteristicInstance, completion: @escaping CharacteristicNotifyCompletionHandler) throws {
+        let characteristic = try resolve(characteristic: characteristicInstance)
 
         guard [CBCharacteristicProperties.notify, .notifyEncryptionRequired, .indicate, .indicateEncryptionRequired]
                 .contains(where: characteristic.properties.contains)
-        else { throw Failure.notificationsNotSupported(qualifiedCharacteristic) }
+        else { throw Failure.notificationsNotSupported(characteristicInstance) }
 
         characteristicNotifyRegistry.registerTask(
-            key: qualifiedCharacteristic,
+            key: characteristicInstance,
             params: .init(state: state),
             completion: papply(weak: self) { central, result in
                 completion(central, result)
@@ -222,62 +250,63 @@ final class Central {
         )
 
         characteristicNotifyRegistry.updateTask(
-            key: qualifiedCharacteristic,
+            key: characteristicInstance,
             action: { $0.start(characteristic: characteristic) }
         )
     }
 
-    func read(characteristic qualifiedCharacteristic: QualifiedCharacteristic) throws {
-        let characteristic = try resolve(characteristic: qualifiedCharacteristic)
+    func read(characteristic characteristicInstance: CharacteristicInstance) throws {
+        let characteristic = try resolve(characteristic: characteristicInstance)
 
         guard characteristic.properties.contains(.read)
-        else { throw Failure.notReadable(qualifiedCharacteristic) }
+        else { throw Failure.notReadable(characteristicInstance) }
 
         guard let peripheral = characteristic.service?.peripheral
-        else { throw Failure.peripheralIsUnknown(qualifiedCharacteristic.peripheralID) }
+        else { throw Failure.peripheralIsUnknown(characteristicInstance.peripheralID) }
 
         peripheral.readValue(for: characteristic)
-
     }
 
     func writeWithResponse(
         value: Data,
-        characteristic qualifiedCharacteristic: QualifiedCharacteristic,
+        characteristic characteristicInstance: CharacteristicInstance,
         completion: @escaping CharacteristicWriteCompletionHandler
     ) throws {
-        let characteristic = try resolve(characteristic: qualifiedCharacteristic)
+        let characteristic = try resolve(characteristic: characteristicInstance)
 
         guard characteristic.properties.contains(.write)
-        else { throw Failure.notWritable(qualifiedCharacteristic) }
+        else { throw Failure.notWritable(characteristicInstance) }
+
+        let qualifiedChar = try CharacteristicInstance(characteristic)
 
         characteristicWriteRegistry.registerTask(
-            key: qualifiedCharacteristic,
+            key: qualifiedChar,
             params: .init(value: value),
             completion: papply(weak: self) { central, error in
-                completion(central, qualifiedCharacteristic, error)
+                completion(central, qualifiedChar, error)
             }
         )
 
         guard let peripheral = characteristic.service?.peripheral
-        else { throw Failure.peripheralIsUnknown(qualifiedCharacteristic.peripheralID) }
+        else { throw Failure.peripheralIsUnknown(qualifiedChar.peripheralID) }
 
         characteristicWriteRegistry.updateTask(
-            key: qualifiedCharacteristic,
+            key: qualifiedChar,
             action: { $0.start(peripheral: peripheral) }
         )
     }
 
     func writeWithoutResponse(
         value: Data,
-        characteristic qualifiedCharacteristic: QualifiedCharacteristic
+        characteristic characteristicInstance: CharacteristicInstance
     ) throws {
-        let characteristic = try resolve(characteristic: qualifiedCharacteristic)
+        let characteristic = try resolve(characteristic: characteristicInstance)
 
         guard characteristic.properties.contains(.writeWithoutResponse)
-        else { throw Failure.notWritable(qualifiedCharacteristic) }
+        else { throw Failure.notWritable(characteristicInstance) }
 
         guard let response = characteristic.service?.peripheral?.writeValue(value, for: characteristic, type: .withoutResponse)
-        else { throw Failure.characteristicNotFound(qualifiedCharacteristic) }
+        else { throw Failure.characteristicNotFound(characteristicInstance) }
 
         return response
     }
@@ -285,6 +314,24 @@ final class Central {
     func maximumWriteValueLength(for peripheral: PeripheralID, type: CBCharacteristicWriteType) throws -> Int {
         let peripheral = try resolve(connected: peripheral)
         return peripheral.maximumWriteValueLength(for: type)
+    }
+
+    
+    func readRssi(for peripheralId: PeripheralID, completion: @escaping (Failable<Int>) -> Void) throws {
+        let peripheral = try resolve(connected: peripheralId)
+
+        readRssiRegistry.registerTask(
+            key: peripheralId,
+            params: .init(),
+            completion: completion
+        )
+
+        readRssiRegistry.updateTask(
+            key: peripheralId,
+            action: {
+                $0.start(peripheral: peripheral)
+            }
+        )
     }
 
     private func eject(_ peripheral: CBPeripheral, error: Error) {
@@ -322,14 +369,14 @@ final class Central {
         return peripheral
     }
 
-    private func resolve(characteristic qualifiedCharacteristic: QualifiedCharacteristic) throws -> CBCharacteristic {
-        let peripheral = try resolve(connected: qualifiedCharacteristic.peripheralID)
+    private func resolve(characteristic characteristicInstance: CharacteristicInstance) throws -> CBCharacteristic {
+        let peripheral = try resolve(connected: characteristicInstance.peripheralID)
 
-        guard let service = peripheral.services?.first(where: { $0.uuid == qualifiedCharacteristic.serviceID })
-        else { throw Failure.serviceNotFound(qualifiedCharacteristic.serviceID, qualifiedCharacteristic.peripheralID) }
+        guard let service = peripheral.services?.filter({ $0.uuid == characteristicInstance.serviceID })[Int(characteristicInstance.serviceInstanceID) ?? 0]
+        else { throw Failure.serviceNotFound(characteristicInstance.serviceID, characteristicInstance.peripheralID) }
 
-        guard let characteristic = service.characteristics?.first(where: { $0.uuid == qualifiedCharacteristic.id })
-        else { throw Failure.characteristicNotFound(qualifiedCharacteristic) }
+        guard let characteristic = service.characteristics?.filter({ $0.uuid == characteristicInstance.id })[Int(characteristicInstance.instanceID) ?? 0]
+        else { throw Failure.characteristicNotFound(characteristicInstance) }
 
         return characteristic
     }
@@ -340,10 +387,10 @@ final class Central {
         case peripheralIsUnknown(PeripheralID)
         case peripheralIsNotConnected(PeripheralID)
         case serviceNotFound(ServiceID, PeripheralID)
-        case characteristicNotFound(QualifiedCharacteristic)
-        case notificationsNotSupported(QualifiedCharacteristic)
-        case notReadable(QualifiedCharacteristic)
-        case notWritable(QualifiedCharacteristic)
+        case characteristicNotFound(CharacteristicInstance)
+        case notificationsNotSupported(CharacteristicInstance)
+        case notReadable(CharacteristicInstance)
+        case notWritable(CharacteristicInstance)
 
         var description: String {
             switch self {
@@ -355,14 +402,14 @@ final class Central {
                 return "The peripheral \(peripheralID.uuidString) is not connected"
             case .serviceNotFound(let serviceID, let peripheralID):
                 return "A service \(serviceID) is not found in the peripheral \(peripheralID) (make sure it has been discovered)"
-            case .characteristicNotFound(let qualifiedCharacteristic):
-                return "A characteristic \(qualifiedCharacteristic.id) is not found in the service \(qualifiedCharacteristic.serviceID) of the peripheral \(qualifiedCharacteristic.peripheralID) (make sure it has been discovered)"
-            case .notificationsNotSupported(let qualifiedCharacteristic):
-                return "The characteristic \(qualifiedCharacteristic.id) of the service \(qualifiedCharacteristic.serviceID) of the peripheral \(qualifiedCharacteristic.peripheralID) does not support either notifications or indications"
-            case .notReadable(let qualifiedCharacteristic):
-                return "The characteristic \(qualifiedCharacteristic.id) of the service \(qualifiedCharacteristic.serviceID) of the peripheral \(qualifiedCharacteristic.peripheralID) is not readable"
-            case .notWritable(let qualifiedCharacteristic):
-                return "The characteristic \(qualifiedCharacteristic.id) of the service \(qualifiedCharacteristic.serviceID) of the peripheral \(qualifiedCharacteristic.peripheralID) is not writable"
+            case .characteristicNotFound(let characteristicInstance):
+                return "A characteristic \(characteristicInstance.id) is not found in the service \(characteristicInstance.serviceID) of the peripheral \(characteristicInstance.peripheralID) (make sure it has been discovered)"
+            case .notificationsNotSupported(let characteristicInstance):
+                return "The characteristic \(characteristicInstance.id) of the service \(characteristicInstance.serviceID) of the peripheral \(characteristicInstance.peripheralID) does not support either notifications or indications"
+            case .notReadable(let characteristicInstance):
+                return "The characteristic \(characteristicInstance.id) of the service \(characteristicInstance.serviceID) of the peripheral \(characteristicInstance.peripheralID) is not readable"
+            case .notWritable(let characteristicInstance):
+                return "The characteristic \(characteristicInstance.id) of the service \(characteristicInstance.serviceID) of the peripheral \(characteristicInstance.peripheralID) is not writable"
             }
         }
     }

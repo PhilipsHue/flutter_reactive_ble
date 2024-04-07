@@ -19,9 +19,9 @@ class BondingFailedException : RuntimeException()
 
 class BondingManager(private val context: Context) {
     /**
+     * TODO: try to understand why the popup is being displayed in the notification center (sometimes) ???!!!
      * @throws BondingFailedException
      */
-    // TODO: try to understand why the popup is being displayed in the notification center (sometimes) ???!!!
     @SuppressLint("MissingPermission")
     fun bondWithDevice(rxBleDevice: RxBleDevice): Single<Int> {
         return Single.create { completion ->
@@ -30,43 +30,50 @@ class BondingManager(private val context: Context) {
                 return@create
             }
 
-            val receiver = object : BroadcastReceiver() {
-                override fun onReceive(context: Context, intent: Intent) {
-                    val deviceBeingPaired: BluetoothDevice? =
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                            intent.getParcelableExtra(
-                                BluetoothDevice.EXTRA_DEVICE,
-                                BluetoothDevice::class.java
-                            )
-                        } else {
-                            @Suppress("DEPRECATION")
-                            intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE)
-                        }
+            val receiver =
+                object : BroadcastReceiver() {
+                    override fun onReceive(
+                        context: Context,
+                        intent: Intent,
+                    ) {
+                        val deviceBeingPaired: BluetoothDevice? =
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                                intent.getParcelableExtra(
+                                    BluetoothDevice.EXTRA_DEVICE,
+                                    BluetoothDevice::class.java,
+                                )
+                            } else {
+                                @Suppress("DEPRECATION")
+                                intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE)
+                            }
 
-                    if (deviceBeingPaired?.address == rxBleDevice.bluetoothDevice.address) {
-                        val state = intent.getIntExtra(
-                            BluetoothDevice.EXTRA_BOND_STATE,
-                            BluetoothDevice.BOND_NONE
-                        )
+                        if (deviceBeingPaired?.address == rxBleDevice.bluetoothDevice.address) {
+                            val state =
+                                intent.getIntExtra(
+                                    BluetoothDevice.EXTRA_BOND_STATE,
+                                    BluetoothDevice.BOND_NONE,
+                                )
 
-                        when (state) {
-                            BluetoothDevice.BOND_BONDED -> completion.onSuccess(state)
-                            BluetoothDevice.BOND_NONE -> completion.onSuccess(state)
-                            // BOND_BONDING is a intermediate state - do not send this back.
+                            when (state) {
+                                BluetoothDevice.BOND_BONDED -> completion.onSuccess(state)
+                                BluetoothDevice.BOND_NONE -> completion.onSuccess(state)
+                                // BOND_BONDING is a intermediate state - do not send this back.
+                            }
                         }
                     }
                 }
-            }
 
-            completion.setDisposable(Disposables.fromAction {
-                context.unregisterReceiver(
-                    receiver
-                )
-            })
+            completion.setDisposable(
+                Disposables.fromAction {
+                    context.unregisterReceiver(
+                        receiver,
+                    )
+                },
+            )
 
             context.registerReceiver(
                 receiver,
-                IntentFilter(BluetoothDevice.ACTION_BOND_STATE_CHANGED)
+                IntentFilter(BluetoothDevice.ACTION_BOND_STATE_CHANGED),
             )
 
             val createBondResult = rxBleDevice.bluetoothDevice.createBond()

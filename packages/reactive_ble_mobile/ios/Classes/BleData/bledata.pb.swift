@@ -559,6 +559,10 @@ struct CharacteristicAddress {
   /// Clears the value of `characteristicUuid`. Subsequent reads from it will return its default value.
   mutating func clearCharacteristicUuid() {self._characteristicUuid = nil}
 
+  var serviceInstanceID: String = String()
+
+  var characteristicInstanceID: String = String()
+
   var unknownFields = SwiftProtobuf.UnknownStorage()
 
   init() {}
@@ -671,6 +675,8 @@ struct DiscoveredService {
 
   var characteristics: [DiscoveredCharacteristic] = []
 
+  var serviceInstanceID: String = String()
+
   var unknownFields = SwiftProtobuf.UnknownStorage()
 
   init() {}
@@ -711,12 +717,38 @@ struct DiscoveredCharacteristic {
 
   var isIndicatable: Bool = false
 
+  var characteristicInstanceID: String = String()
+
   var unknownFields = SwiftProtobuf.UnknownStorage()
 
   init() {}
 
   fileprivate var _characteristicID: Uuid? = nil
   fileprivate var _serviceID: Uuid? = nil
+}
+
+struct ReadRssiRequest {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  var deviceID: String = String()
+
+  var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  init() {}
+}
+
+struct ReadRssiResult {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  var rssi: Int32 = 0
+
+  var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  init() {}
 }
 
 struct Uuid {
@@ -791,6 +823,8 @@ extension DiscoverServicesRequest: @unchecked Sendable {}
 extension DiscoverServicesInfo: @unchecked Sendable {}
 extension DiscoveredService: @unchecked Sendable {}
 extension DiscoveredCharacteristic: @unchecked Sendable {}
+extension ReadRssiRequest: @unchecked Sendable {}
+extension ReadRssiResult: @unchecked Sendable {}
 extension Uuid: @unchecked Sendable {}
 extension GenericFailure: @unchecked Sendable {}
 extension IsConnectable: @unchecked Sendable {}
@@ -1778,6 +1812,8 @@ extension CharacteristicAddress: SwiftProtobuf.Message, SwiftProtobuf._MessageIm
     1: .same(proto: "deviceId"),
     2: .same(proto: "serviceUuid"),
     3: .same(proto: "characteristicUuid"),
+    4: .same(proto: "serviceInstanceId"),
+    5: .same(proto: "characteristicInstanceId"),
   ]
 
   mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -1789,6 +1825,8 @@ extension CharacteristicAddress: SwiftProtobuf.Message, SwiftProtobuf._MessageIm
       case 1: try { try decoder.decodeSingularStringField(value: &self.deviceID) }()
       case 2: try { try decoder.decodeSingularMessageField(value: &self._serviceUuid) }()
       case 3: try { try decoder.decodeSingularMessageField(value: &self._characteristicUuid) }()
+      case 4: try { try decoder.decodeSingularStringField(value: &self.serviceInstanceID) }()
+      case 5: try { try decoder.decodeSingularStringField(value: &self.characteristicInstanceID) }()
       default: break
       }
     }
@@ -1808,6 +1846,12 @@ extension CharacteristicAddress: SwiftProtobuf.Message, SwiftProtobuf._MessageIm
     try { if let v = self._characteristicUuid {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 3)
     } }()
+    if !self.serviceInstanceID.isEmpty {
+      try visitor.visitSingularStringField(value: self.serviceInstanceID, fieldNumber: 4)
+    }
+    if !self.characteristicInstanceID.isEmpty {
+      try visitor.visitSingularStringField(value: self.characteristicInstanceID, fieldNumber: 5)
+    }
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -1815,6 +1859,8 @@ extension CharacteristicAddress: SwiftProtobuf.Message, SwiftProtobuf._MessageIm
     if lhs.deviceID != rhs.deviceID {return false}
     if lhs._serviceUuid != rhs._serviceUuid {return false}
     if lhs._characteristicUuid != rhs._characteristicUuid {return false}
+    if lhs.serviceInstanceID != rhs.serviceInstanceID {return false}
+    if lhs.characteristicInstanceID != rhs.characteristicInstanceID {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
@@ -2013,6 +2059,7 @@ extension DiscoveredService: SwiftProtobuf.Message, SwiftProtobuf._MessageImplem
     2: .same(proto: "characteristicUuids"),
     3: .same(proto: "includedServices"),
     4: .same(proto: "characteristics"),
+    5: .same(proto: "serviceInstanceId"),
   ]
 
   mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -2025,6 +2072,7 @@ extension DiscoveredService: SwiftProtobuf.Message, SwiftProtobuf._MessageImplem
       case 2: try { try decoder.decodeRepeatedMessageField(value: &self.characteristicUuids) }()
       case 3: try { try decoder.decodeRepeatedMessageField(value: &self.includedServices) }()
       case 4: try { try decoder.decodeRepeatedMessageField(value: &self.characteristics) }()
+      case 5: try { try decoder.decodeSingularStringField(value: &self.serviceInstanceID) }()
       default: break
       }
     }
@@ -2047,6 +2095,9 @@ extension DiscoveredService: SwiftProtobuf.Message, SwiftProtobuf._MessageImplem
     if !self.characteristics.isEmpty {
       try visitor.visitRepeatedMessageField(value: self.characteristics, fieldNumber: 4)
     }
+    if !self.serviceInstanceID.isEmpty {
+      try visitor.visitSingularStringField(value: self.serviceInstanceID, fieldNumber: 5)
+    }
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -2055,6 +2106,7 @@ extension DiscoveredService: SwiftProtobuf.Message, SwiftProtobuf._MessageImplem
     if lhs.characteristicUuids != rhs.characteristicUuids {return false}
     if lhs.includedServices != rhs.includedServices {return false}
     if lhs.characteristics != rhs.characteristics {return false}
+    if lhs.serviceInstanceID != rhs.serviceInstanceID {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
@@ -2070,6 +2122,7 @@ extension DiscoveredCharacteristic: SwiftProtobuf.Message, SwiftProtobuf._Messag
     5: .same(proto: "isWritableWithoutResponse"),
     6: .same(proto: "isNotifiable"),
     7: .same(proto: "isIndicatable"),
+    8: .same(proto: "characteristicInstanceId"),
   ]
 
   mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -2085,6 +2138,7 @@ extension DiscoveredCharacteristic: SwiftProtobuf.Message, SwiftProtobuf._Messag
       case 5: try { try decoder.decodeSingularBoolField(value: &self.isWritableWithoutResponse) }()
       case 6: try { try decoder.decodeSingularBoolField(value: &self.isNotifiable) }()
       case 7: try { try decoder.decodeSingularBoolField(value: &self.isIndicatable) }()
+      case 8: try { try decoder.decodeSingularStringField(value: &self.characteristicInstanceID) }()
       default: break
       }
     }
@@ -2116,6 +2170,9 @@ extension DiscoveredCharacteristic: SwiftProtobuf.Message, SwiftProtobuf._Messag
     if self.isIndicatable != false {
       try visitor.visitSingularBoolField(value: self.isIndicatable, fieldNumber: 7)
     }
+    if !self.characteristicInstanceID.isEmpty {
+      try visitor.visitSingularStringField(value: self.characteristicInstanceID, fieldNumber: 8)
+    }
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -2127,6 +2184,71 @@ extension DiscoveredCharacteristic: SwiftProtobuf.Message, SwiftProtobuf._Messag
     if lhs.isWritableWithoutResponse != rhs.isWritableWithoutResponse {return false}
     if lhs.isNotifiable != rhs.isNotifiable {return false}
     if lhs.isIndicatable != rhs.isIndicatable {return false}
+    if lhs.characteristicInstanceID != rhs.characteristicInstanceID {return false}
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+extension ReadRssiRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  static let protoMessageName: String = "ReadRssiRequest"
+  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "deviceId"),
+  ]
+
+  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeSingularStringField(value: &self.deviceID) }()
+      default: break
+      }
+    }
+  }
+
+  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    if !self.deviceID.isEmpty {
+      try visitor.visitSingularStringField(value: self.deviceID, fieldNumber: 1)
+    }
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  static func ==(lhs: ReadRssiRequest, rhs: ReadRssiRequest) -> Bool {
+    if lhs.deviceID != rhs.deviceID {return false}
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+extension ReadRssiResult: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  static let protoMessageName: String = "ReadRssiResult"
+  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "rssi"),
+  ]
+
+  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeSingularInt32Field(value: &self.rssi) }()
+      default: break
+      }
+    }
+  }
+
+  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    if self.rssi != 0 {
+      try visitor.visitSingularInt32Field(value: self.rssi, fieldNumber: 1)
+    }
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  static func ==(lhs: ReadRssiResult, rhs: ReadRssiResult) -> Bool {
+    if lhs.rssi != rhs.rssi {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }

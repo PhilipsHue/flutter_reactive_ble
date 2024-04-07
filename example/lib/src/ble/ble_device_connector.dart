@@ -6,7 +6,7 @@ import 'package:flutter_reactive_ble_example/src/ble/reactive_state.dart';
 class BleDeviceConnector extends ReactiveState<ConnectionStateUpdate> {
   BleDeviceConnector({
     required FlutterReactiveBle ble,
-    required Function(String message) logMessage,
+    required void Function(String message) logMessage,
   })  : _ble = ble,
         _logMessage = logMessage;
 

@@ -42,7 +42,6 @@ class BondingManagerTest {
     @Nested
     @DisplayName("Bonding => to success")
     inner class BondingSuccessTest {
-
         private var receiver: CapturingSlot<BroadcastReceiver> = CapturingSlot()
 
         @BeforeEach
@@ -63,18 +62,18 @@ class BondingManagerTest {
         @ValueSource(
             ints = [
                 BluetoothDevice.BOND_BONDED,
-                BluetoothDevice.BOND_NONE
-            ]
+                BluetoothDevice.BOND_NONE,
+            ],
         )
         fun createBond(bondState: Int) {
             val result = sut.bondWithDevice(device).test()
 
             every { deviceIntent.action }.returns(BluetoothDevice.ACTION_BOND_STATE_CHANGED)
             every { deviceIntent.getIntExtra(BluetoothDevice.EXTRA_BOND_STATE, any()) }.returns(
-                bondState
+                bondState,
             )
             every { deviceIntent.getParcelableExtra<BluetoothDevice>(BluetoothDevice.EXTRA_DEVICE) }.returns(
-                bluetoothDevice
+                bluetoothDevice,
             )
 
             receiver.captured.onReceive(context, deviceIntent)
@@ -87,7 +86,6 @@ class BondingManagerTest {
     @Nested
     @DisplayName("Already bonded")
     inner class AlreadyBonded {
-
         @BeforeEach
         fun setup() {
             every { bluetoothDevice.bondState }.returns(BluetoothDevice.BOND_BONDED)
@@ -105,7 +103,6 @@ class BondingManagerTest {
     @Nested
     @DisplayName("Bonding Failed")
     inner class FailedBondingTest {
-
         @BeforeEach
         fun setup() {
             every { bluetoothDevice.bondState }.returns(BluetoothDevice.BOND_NONE)

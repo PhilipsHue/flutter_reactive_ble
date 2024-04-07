@@ -16,11 +16,11 @@ Setup melos to point to the dependencies in your local folder: `melos bootstrap`
 
 ### Android
 
-Library requires kotlin version `1.5.31`.
+Library requires kotlin version `1.8.21`.
 
 ### Update kotlin version
 
-To update the kotlin version open Android studio and go to `Tools > Kotlin > Configure Kotlin plugin updates` and update `Update channel` to `1.5.x`.
+To update the kotlin version open Android studio and go to `Tools > Kotlin > Configure Kotlin plugin updates` and update `Update channel` to `1.8.x`.
 
 ## Features
 

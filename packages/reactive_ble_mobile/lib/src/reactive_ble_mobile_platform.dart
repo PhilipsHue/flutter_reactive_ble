@@ -206,7 +206,7 @@ class ReactiveBleMobilePlatform extends ReactiveBlePlatform {
   }
 
   @override
-  Stream<void> readCharacteristic(QualifiedCharacteristic characteristic) {
+  Stream<void> readCharacteristic(CharacteristicInstance characteristic) {
     _logger?.log(
       'Read characteristic: $characteristic',
     );
@@ -222,7 +222,7 @@ class ReactiveBleMobilePlatform extends ReactiveBlePlatform {
 
   @override
   Future<WriteCharacteristicInfo> writeCharacteristicWithResponse(
-    QualifiedCharacteristic characteristic,
+    CharacteristicInstance characteristic,
     List<int> value,
   ) async {
     _logger?.log('Write with response to $characteristic, value: $value');
@@ -237,7 +237,7 @@ class ReactiveBleMobilePlatform extends ReactiveBlePlatform {
 
   @override
   Future<WriteCharacteristicInfo> writeCharacteristicWithoutResponse(
-    QualifiedCharacteristic characteristic,
+    CharacteristicInstance characteristic,
     List<int> value,
   ) async {
     _logger?.log(
@@ -255,7 +255,7 @@ class ReactiveBleMobilePlatform extends ReactiveBlePlatform {
 
   @override
   Stream<void> subscribeToNotifications(
-    QualifiedCharacteristic characteristic,
+    CharacteristicInstance characteristic,
   ) {
     _logger?.log('Start subscribing to notifications for $characteristic');
     return _bleMethodChannel
@@ -270,7 +270,7 @@ class ReactiveBleMobilePlatform extends ReactiveBlePlatform {
 
   @override
   Future<void> stopSubscribingToNotifications(
-    QualifiedCharacteristic characteristic,
+    CharacteristicInstance characteristic,
   ) {
     _logger?.log('Stop subscribing to notifications for $characteristic');
     return _bleMethodChannel
@@ -340,6 +340,29 @@ class ReactiveBleMobilePlatform extends ReactiveBlePlatform {
         )
         .then((data) => _protobufConverter.discoveredServicesFrom(data!));
   }
+
+  @override
+  Future<List<DiscoveredService>> getDiscoverServices(String deviceId) async {
+    _logger?.log('Get discovered services for device: $deviceId');
+    return _bleMethodChannel
+        .invokeMethod<List<int>>(
+          'getDiscoveredServices',
+          _argsToProtobufConverter
+              .createDiscoverServicesRequest(deviceId)
+              .writeToBuffer(),
+        )
+        .then((data) => _protobufConverter.discoveredServicesFrom(data!));
+  }
+
+  @override
+  Future<int> readRssi(String deviceId) async => _bleMethodChannel
+      .invokeMethod<List<int>>(
+        "readRssi",
+        _argsToProtobufConverter
+            .createReadRssiRequest(deviceId)
+            .writeToBuffer(),
+      )
+      .then((data) => _protobufConverter.readRssiResultFrom(data!));
 }
 
 class ReactiveBleMobilePlatformFactory {

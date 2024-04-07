@@ -31,6 +31,8 @@ abstract class ProtobufConverter {
       pb.NegotiateMtuInfo.fromBuffer(data).mtuSize;
 
   List<DiscoveredService> discoveredServicesFrom(List<int> data);
+
+  int readRssiResultFrom(List<int> data);
 }
 
 class ProtobufConverterImpl implements ProtobufConverter {
@@ -201,10 +203,12 @@ class ProtobufConverterImpl implements ProtobufConverter {
   int mtuSizeFrom(List<int> data) =>
       pb.NegotiateMtuInfo.fromBuffer(data).mtuSize;
 
-  QualifiedCharacteristic qualifiedCharacteristicFrom(
+  CharacteristicInstance qualifiedCharacteristicFrom(
           pb.CharacteristicAddress message) =>
-      QualifiedCharacteristic(
+      CharacteristicInstance(
+        characteristicInstanceId: message.characteristicInstanceId,
         characteristicId: Uuid(message.characteristicUuid.data),
+        serviceInstanceId: message.serviceInstanceId,
         serviceId: Uuid(message.serviceUuid.data),
         deviceId: message.deviceId,
       );
@@ -234,9 +238,14 @@ class ProtobufConverterImpl implements ProtobufConverter {
     return message.services.map(_convertService).toList(growable: false);
   }
 
+  @override
+  int readRssiResultFrom(List<int> data) =>
+      pb.ReadRssiResult.fromBuffer(data).rssi;
+
   DiscoveredService _convertService(pb.DiscoveredService service) =>
       DiscoveredService(
         serviceId: Uuid(service.serviceUuid.data),
+        serviceInstanceId: service.serviceInstanceId,
         characteristicIds: service.characteristicUuids
             .map((c) => Uuid(c.data))
             .toList(growable: false),
@@ -244,6 +253,7 @@ class ProtobufConverterImpl implements ProtobufConverter {
             .map((c) => DiscoveredCharacteristic(
                 characteristicId: Uuid(c.characteristicId.data),
                 serviceId: Uuid(c.serviceId.data),
+                characteristicInstanceId: c.characteristicInstanceId,
                 isReadable: c.isReadable,
                 isWritableWithResponse: c.isWritableWithResponse,
                 isWritableWithoutResponse: c.isWritableWithoutResponse,

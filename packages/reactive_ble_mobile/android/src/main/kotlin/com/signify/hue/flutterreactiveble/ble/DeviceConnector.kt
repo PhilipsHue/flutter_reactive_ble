@@ -21,7 +21,6 @@ internal class DeviceConnector(
     private val updateListeners: (update: ConnectionUpdate) -> Unit,
     private val connectionQueue: ConnectionQueue,
 ) {
-
     companion object {
         private const val minTimeMsBeforeDisconnectingIsAllowed = 200L
         private const val delayMsAfterClearingCache = 300L
@@ -34,10 +33,11 @@ internal class DeviceConnector(
     @VisibleForTesting
     internal var connectionDisposable: Disposable? = null
 
-    private val lazyConnection = lazy {
-        connectionDisposable = establishConnection(device)
-        connectDeviceSubject
-    }
+    private val lazyConnection =
+        lazy {
+            connectionDisposable = establishConnection(device)
+            connectDeviceSubject
+        }
 
     private val currentConnection: EstablishConnectionResult?
         get() = if (lazyConnection.isInitialized()) connection.value else null
@@ -47,16 +47,12 @@ internal class DeviceConnector(
     private val connectionStatusUpdates by lazy {
         device.observeConnectionStateChanges()
             .startWith(device.connectionState)
-            .map<ConnectionUpdate> {
-                ConnectionUpdateSuccess(
-                    device.macAddress,
-                    it.toConnectionState().code
-                )
-            }
+            .map<ConnectionUpdate> { ConnectionUpdateSuccess(device.macAddress, it.toConnectionState().code) }
             .onErrorReturn {
                 ConnectionUpdateError(
-                    device.macAddress, it.message
-                        ?: "Unknown error"
+                    device.macAddress,
+                    it.message
+                        ?: "Unknown error",
                 )
             }
             .subscribe {
@@ -72,10 +68,7 @@ internal class DeviceConnector(
         disconnect to quickly after establishing connection. https://issuetracker.google.com/issues/37121223
          */
         if (diff < DeviceConnector.Companion.minTimeMsBeforeDisconnectingIsAllowed) {
-            Single.timer(
-                DeviceConnector.Companion.minTimeMsBeforeDisconnectingIsAllowed - diff,
-                TimeUnit.MILLISECONDS
-            )
+            Single.timer(DeviceConnector.Companion.minTimeMsBeforeDisconnectingIsAllowed - diff, TimeUnit.MILLISECONDS)
                 .doFinally {
                     sendDisconnectedUpdate(deviceId)
                     disposeSubscriptions()
@@ -109,23 +102,18 @@ internal class DeviceConnector(
                     Observable.just(
                         EstablishConnectionFailure(
                             deviceId,
-                            "Device is not in queue"
-                        )
+                            "Device is not in queue",
+                        ),
                     )
                 } else {
                     connectDevice(rxBleDevice, shouldNotTimeout)
-                        .map<EstablishConnectionResult> {
-                            EstablishedConnection(
-                                rxBleDevice.macAddress,
-                                it
-                            )
-                        }
+                        .map<EstablishConnectionResult> { EstablishedConnection(rxBleDevice.macAddress, it) }
                 }
             }
             .onErrorReturn { error ->
                 EstablishConnectionFailure(
                     rxBleDevice.macAddress,
-                    error.message ?: "Unknown error"
+                    error.message ?: "Unknown error",
                 )
             }
             .doOnNext {
@@ -142,13 +130,16 @@ internal class DeviceConnector(
                 connectionQueue.removeFromQueue(deviceId)
                 updateListeners.invoke(
                     ConnectionUpdateError(
-                        deviceId, it.message
-                            ?: "Unknown error"
-                    )
+                        deviceId,
+                        it.message
+                            ?: "Unknown error",
+                    ),
                 )
             }
-            .subscribe({ connectDeviceSubject.onNext(it) },
-                { throwable -> connectDeviceSubject.onError(throwable) })
+            .subscribe(
+                { connectDeviceSubject.onNext(it) },
+                { throwable -> connectDeviceSubject.onError(throwable) },
+            )
     }
 
     private fun connectDevice(
@@ -156,7 +147,6 @@ internal class DeviceConnector(
         shouldNotTimeout: Boolean,
     ): Observable<RxBleConnection> =
         rxBleDevice.establishConnection(shouldNotTimeout)
-
             .compose {
                 if (shouldNotTimeout) {
                     it
@@ -165,17 +155,18 @@ internal class DeviceConnector(
                         Observable.timer(connectionTimeout.value, connectionTimeout.unit),
                         Function<RxBleConnection, Observable<Unit>> {
                             Observable.never<Unit>()
-                        }
+                        },
                     )
                 }
             }
 
-    internal fun clearGattCache(): Completable = currentConnection?.let { connection ->
-        when (connection) {
-            is EstablishedConnection -> clearGattCache(connection.rxConnection)
-            is EstablishConnectionFailure -> Completable.error(Throwable(connection.errorMessage))
-        }
-    } ?: Completable.error(IllegalStateException("Connection is not established"))
+    internal fun clearGattCache(): Completable =
+        currentConnection?.let { connection ->
+            when (connection) {
+                is EstablishedConnection -> clearGattCache(connection.rxConnection)
+                is EstablishConnectionFailure -> Completable.error(Throwable(connection.errorMessage))
+            }
+        } ?: Completable.error(IllegalStateException("Connection is not established"))
 
     /**
      * Clear GATT attribute cache using an undocumented method `BluetoothGatt.refresh()`.
@@ -189,24 +180,22 @@ internal class DeviceConnector(
      * Known to work up to Android Q beta 2.
      */
     private fun clearGattCache(connection: RxBleConnection): Completable {
-        val operation = RxBleCustomOperation<Unit> { bluetoothGatt, _, _ ->
-            try {
-                val refreshMethod = bluetoothGatt.javaClass.getMethod("refresh")
-                val success = refreshMethod.invoke(bluetoothGatt) as Boolean
-                if (success) {
-                    Observable.empty<Unit>()
-                        .delay(
-                            DeviceConnector.Companion.delayMsAfterClearingCache,
-                            TimeUnit.MILLISECONDS
-                        )
-                } else {
-                    val reason = "BluetoothGatt.refresh() returned false"
-                    Observable.error(RuntimeException(reason))
+        val operation =
+            RxBleCustomOperation<Unit> { bluetoothGatt, _, _ ->
+                try {
+                    val refreshMethod = bluetoothGatt.javaClass.getMethod("refresh")
+                    val success = refreshMethod.invoke(bluetoothGatt) as Boolean
+                    if (success) {
+                        Observable.empty<Unit>()
+                            .delay(DeviceConnector.Companion.delayMsAfterClearingCache, TimeUnit.MILLISECONDS)
+                    } else {
+                        val reason = "BluetoothGatt.refresh() returned false"
+                        Observable.error(RuntimeException(reason))
+                    }
+                } catch (e: ReflectiveOperationException) {
+                    Observable.error<Unit>(e)
                 }
-            } catch (e: ReflectiveOperationException) {
-                Observable.error<Unit>(e)
             }
-        }
         return connection.queue(operation).ignoreElements()
     }
 
@@ -216,4 +205,15 @@ internal class DeviceConnector(
                 queue.firstOrNull() == deviceId || !queue.contains(deviceId)
             }
             .takeUntil { it.isEmpty() || it.first() == deviceId }
+
+    /**
+     * Reads the current RSSI value of the device
+     */
+    internal fun readRssi(): Single<Int> =
+        currentConnection?.let { connection ->
+            when (connection) {
+                is EstablishedConnection -> connection.rxConnection.readRssi()
+                is EstablishConnectionFailure -> Single.error(Throwable(connection.errorMessage))
+            }
+        } ?: Single.error(IllegalStateException("Connection is not established"))
 }

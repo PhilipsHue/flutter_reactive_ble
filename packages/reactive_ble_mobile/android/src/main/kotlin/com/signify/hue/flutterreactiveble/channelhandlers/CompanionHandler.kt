@@ -31,25 +31,28 @@ class CompanionHandler {
     @RequiresApi(Build.VERSION_CODES.O)
     fun launchCompanionFlow(
         parseFrom: ProtobufModel.LaunchCompanionRequest,
-        result: MethodChannel.Result
+        result: MethodChannel.Result,
     ) {
-        val deviceFilter: BluetoothLeDeviceFilter = BluetoothLeDeviceFilter.Builder()
-            .setNamePattern(Pattern.compile(parseFrom.deviceNamePattern))
-            .build()
+        val deviceFilter: BluetoothLeDeviceFilter =
+            BluetoothLeDeviceFilter.Builder()
+                .setNamePattern(Pattern.compile(parseFrom.deviceNamePattern))
+                .build()
 
-        val pairingRequestBuilder = AssociationRequest.Builder()
-            .addDeviceFilter(deviceFilter)
-            .setSingleDevice(parseFrom.singleDeviceScan)
+        val pairingRequestBuilder =
+            AssociationRequest.Builder()
+                .addDeviceFilter(deviceFilter)
+                .setSingleDevice(parseFrom.singleDeviceScan)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             pairingRequestBuilder.setForceConfirmation(parseFrom.forceConfirmation)
         }
 
-        val activity = activity.get() ?: return result.error(
-            "CompanionHandler",
-            "Activity is null",
-            null
-        )
+        val activity =
+            activity.get() ?: return result.error(
+                "CompanionHandler",
+                "Activity is null",
+                null,
+            )
 
         val deviceManager =
             activity.getSystemService(Context.COMPANION_DEVICE_SERVICE) as CompanionDeviceManager
@@ -57,7 +60,8 @@ class CompanionHandler {
         val executor = Executor { it.run() }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            deviceManager.associate(pairingRequestBuilder.build(),
+            deviceManager.associate(
+                pairingRequestBuilder.build(),
                 executor,
                 object : CompanionDeviceManager.Callback() {
                     override fun onAssociationPending(intentSender: IntentSender) {
@@ -67,7 +71,7 @@ class CompanionHandler {
                             null,
                             0,
                             0,
-                            0
+                            0,
                         )
                     }
 
@@ -75,10 +79,10 @@ class CompanionHandler {
                         result.success(
                             ProtobufModel.DeviceAssociationInfo.newBuilder()
                                 .setMacAddress(
-                                    associationInfo.deviceMacAddress!!.toString().uppercase()
+                                    associationInfo.deviceMacAddress!!.toString().uppercase(),
                                 )
                                 .build()
-                                .toByteArray()
+                                .toByteArray(),
                         )
                     }
 
@@ -86,7 +90,8 @@ class CompanionHandler {
                         Log.e(TAG, "onFailure: $errorMessage")
                         result.error("CompanionHandler", errorMessage.toString(), null)
                     }
-                })
+                },
+            )
         } else {
             deviceManager.associate(
                 pairingRequestBuilder.build(),
@@ -96,7 +101,11 @@ class CompanionHandler {
                         tmpResult = result
                         activity.startIntentSenderForResult(
                             chooserLauncher,
-                            SELECT_DEVICE_REQUEST_CODE, null, 0, 0, 0
+                            SELECT_DEVICE_REQUEST_CODE,
+                            null,
+                            0,
+                            0,
+                            0,
                         )
                     }
 
@@ -104,22 +113,24 @@ class CompanionHandler {
                         Log.e(TAG, "onFailure: $error")
                         result.error("CompanionHandler", error.toString(), null)
                     }
-                }, null
+                },
+                null,
             )
         }
     }
 
     fun setActivity(activity: Activity?) {
-        this.activity = WeakReference(activity);
+        this.activity = WeakReference(activity)
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun onActivityResult(data: Intent?): ScanResult? {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            val associationInfo = data?.getParcelableExtra(
-                CompanionDeviceManager.EXTRA_ASSOCIATION,
-                AssociationInfo::class.java
-            )
+            val associationInfo =
+                data?.getParcelableExtra(
+                    CompanionDeviceManager.EXTRA_ASSOCIATION,
+                    AssociationInfo::class.java,
+                )
 
             Log.d(TAG, "onActivityResult: ${associationInfo?.id}")
             Log.d(TAG, "onActivityResult: ${associationInfo?.displayName}")
@@ -132,13 +143,12 @@ class CompanionHandler {
             val scanResult: ScanResult? =
                 data?.getParcelableExtra(CompanionDeviceManager.EXTRA_DEVICE)
 
-
             if (scanResult != null) {
                 tmpResult?.success(
                     ProtobufModel.DeviceAssociationInfo.newBuilder()
                         .setMacAddress(scanResult.device.address.uppercase())
                         .build()
-                        .toByteArray()
+                        .toByteArray(),
                 )
 
                 tmpResult = null

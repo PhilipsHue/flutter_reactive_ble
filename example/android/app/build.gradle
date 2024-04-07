@@ -32,9 +32,6 @@ android {
         main.java.srcDirs += 'src/main/kotlin'
     }
 
-    lintOptions {
-        disable 'InvalidPackage'
-    }
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -48,7 +45,7 @@ android {
     defaultConfig {
         applicationId "com.signify.hue.reactivebleexample"
         minSdkVersion 21
-        targetSdkVersion 31
+        targetSdkVersion 33
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
     }
@@ -58,6 +55,11 @@ android {
             // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig signingConfigs.debug
         }
+    }
+    namespace 'com.signify.hue.reactivebleexample'
+
+    lint {
+        disable 'InvalidPackage'
     }
 }
 
