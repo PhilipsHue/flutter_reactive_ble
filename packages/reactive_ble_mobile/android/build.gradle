@@ -2,7 +2,7 @@ group 'com.signify.hue.flutterreactiveblelib'
 version '1.0-SNAPSHOT'
 
 buildscript {
-    ext.detekt_version = '1.17.1'
+    ext.detekt_version = '1.23.0'
     ext.kotlin_version = '1.8.21'
     repositories {
         google()
@@ -105,5 +105,5 @@ dependencies {
     testImplementation "org.junit.jupiter:junit-jupiter-api:5.7.0"
     testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:5.7.0"
     testImplementation "io.mockk:mockk:1.11.0"
-    testImplementation "com.google.truth:truth:1.0"
+    testImplementation "com.google.truth:truth:1.1.4"
 }
