@@ -23,7 +23,7 @@ class ReactiveBlePlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
         private fun initializePlugin(
             messenger: BinaryMessenger,
             context: Context,
-            plugin: ReactiveBlePlugin
+            plugin: ReactiveBlePlugin,
         ) {
             val channel = MethodChannel(messenger, "flutter_reactive_ble_method")
             channel.setMethodCallHandler(plugin)
@@ -37,7 +37,10 @@ class ReactiveBlePlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
         }
     }
 
-    override fun onMethodCall(call: MethodCall, result: Result) {
+    override fun onMethodCall(
+        call: MethodCall,
+        result: Result,
+    ) {
         pluginController.execute(call, result)
     }
 }
