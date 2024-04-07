@@ -44,7 +44,7 @@ jobs:
         run: |
           ./bin/quality_checks.sh
 
-      - name: Build android app & run native tests
+      - name: Build Android app & run native tests
         run: |
           #!/bin/bash -ex
           cd example

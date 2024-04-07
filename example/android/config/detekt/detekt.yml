@@ -61,13 +61,22 @@ complexity:
     active: false
     threshold: 10
     includeStaticDeclarations: false
-  ComplexMethod:
+  CyclomaticComplexMethod:
     active: true
     threshold: 15
     ignoreSingleWhenExpression: false
     ignoreSimpleWhenEntries: false
     ignoreNestingFunctions: false
-    nestingFunctions: run,let,apply,with,also,use,forEach,isNotNull,ifNull
+    nestingFunctions:
+      - run
+      - let
+      - apply
+      - with
+      - also
+      - use
+      - forEach
+      - isNotNull
+      - ifNull
   LabeledExpression:
     active: false
     ignoredLabels: []
@@ -79,7 +88,8 @@ complexity:
     threshold: 60
   LongParameterList:
     active: true
-    threshold: 6
+    functionThreshold: 6
+    constructorThreshold: 6
     ignoreDefaultParameters: false
   MethodOverloading:
     active: false
@@ -135,7 +145,7 @@ empty-blocks:
     active: true
   EmptyFunctionBlock:
     active: true
-    ignoreOverriddenFunctions: false
+    ignoreOverridden: false
   EmptyIfBlock:
     active: true
   EmptyInitBlock:
@@ -246,7 +256,6 @@ formatting:
     active: false
     autoCorrect: true
     indentSize: 4
-    continuationIndentSize: 4
   MaximumLineLength:
     active: false
     maxLineLength: 230
@@ -294,7 +303,7 @@ formatting:
   ParameterListWrapping:
     active: true
     autoCorrect: false
-    indentSize: 0
+    indentSize: 4
   SpacingAroundColon:
     active: true
     autoCorrect: true
@@ -345,7 +354,6 @@ naming:
     parameterPattern: '[a-z][A-Za-z0-9]*'
     privateParameterPattern: '[a-z][A-Za-z0-9]*'
     excludeClassPattern: '$^'
-    ignoreOverridden: true
   EnumNaming:
     active: true
     excludes: 
@@ -392,7 +400,6 @@ naming:
       - "**/*.Spek.kt"
     functionPattern: '^([a-z$][a-zA-Z$0-9]*)|(`.*`)$'
     excludeClassPattern: '$^'
-    ignoreOverridden: true
   FunctionParameterNaming:
     active: true
     excludes: 
@@ -403,7 +410,6 @@ naming:
       - "**/*.Spek.kt"
     parameterPattern: '[a-z][A-Za-z0-9]*'
     excludeClassPattern: '$^'
-    ignoreOverriddenFunctions: true
   InvalidPackageDeclaration:
     active: false
     rootPackage: ''
@@ -411,7 +417,7 @@ naming:
     active: true
   MemberNameEqualsClassName:
     active: true
-    ignoreOverriddenFunction: true
+    ignoreOverridden: true
   ObjectPropertyNaming:
     active: true
     excludes: 
@@ -472,7 +478,6 @@ naming:
     variablePattern: '[a-z][A-Za-z0-9]*'
     privateVariablePattern: '(_)?[a-z][A-Za-z0-9]*'
     excludeClassPattern: '$^'
-    ignoreOverridden: true
 
 performance:
   active: true
@@ -501,8 +506,6 @@ potential-bugs:
   active: true
   Deprecation:
     active: false
-  DuplicateCaseInWhenExpression:
-    active: true
   EqualsAlwaysReturnsTrueOrFalse:
     active: true
   EqualsWithHashCodeExist:
@@ -527,12 +530,8 @@ potential-bugs:
       - "**/*.Test.kt"
       - "**/*.Spec.kt"
       - "**/*.Spek.kt"
-    excludeAnnotatedProperties: ""
+    ignoreAnnotated: []
     ignoreOnClassesPattern: ""
-  MissingWhenCase:
-    active: true
-  RedundantElseInWhen:
-    active: true
   UnconditionalJumpStatementInLoop:
     active: false
   UnreachableCode:
@@ -548,6 +547,10 @@ potential-bugs:
 
 style:
   active: true
+  BracesOnIfStatements:
+    active: true
+    singleLine: 'never'
+    multiLine: 'always'
   CollapsibleIfStatements:
     active: false
   DataClassContainsFunctions:
@@ -567,7 +570,7 @@ style:
     includeLineWrapping: false
   ForbiddenComment:
     active: true
-    values: 
+    comments: 
       - 'TODO:'
       - 'FIXME:'
       - 'STOPSHIP:'
@@ -585,9 +588,8 @@ style:
     ignoreOverridableFunction: true
     excludedFunctions:
       - 'describeContents'
-    excludeAnnotatedFunction: "dagger.Provides"
-  LibraryCodeMustSpecifyReturnType:
-    active: true
+    ignoreAnnotated: 
+      - "dagger.Provides"
   LoopWithTooManyJumpStatements:
     active: true
     maxJumpCount: 1
@@ -609,8 +611,6 @@ style:
     ignoreNamedArgument: true
     ignoreEnums: false
     ignoreRanges: false
-  MandatoryBracesIfStatements:
-    active: false
   MaxLineLength:
     autoCorrect: false
     active: false
@@ -662,10 +662,11 @@ style:
     active: false
   UnderscoresInNumericLiterals:
     active: false
-    acceptableDecimalLength: 5
+    acceptableLength: 5
   UnnecessaryAbstractClass:
     active: true
-    excludeAnnotatedClasses: "dagger.Module"
+    ignoreAnnotated: 
+      - "dagger.Module"
   UnnecessaryApply:
     active: false
   UnnecessaryInheritance:
@@ -689,7 +690,7 @@ style:
     active: false
   UseDataClass:
     active: false
-    excludeAnnotatedClasses: ""
+    ignoreAnnotated: []
     allowVars: false
   UseIfInsteadOfWhen:
     active: false
@@ -712,3 +713,7 @@ style:
     excludeImports: 
       - 'java.util.*'
       - 'kotlinx.android.synthetic.*'
+
+libraries:
+  LibraryCodeMustSpecifyReturnType:
+    active: true

@@ -3,7 +3,15 @@ package com.signify.hue.flutterreactiveble.ble
 import com.polidea.rxandroidble2.RxBleConnection
 import java.util.UUID
 
-data class ScanInfo(val deviceId: String, val name: String, val rssi: Int, val connectable: Connectable, val serviceData: Map<UUID, ByteArray>, val serviceUuids: List<UUID>, val manufacturerData: ByteArray) {
+data class ScanInfo(
+    val deviceId: String,
+    val name: String,
+    val rssi: Int,
+    val connectable: Connectable,
+    val serviceData: Map<UUID, ByteArray>,
+    val serviceUuids: List<UUID>,
+    val manufacturerData: ByteArray,
+) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
