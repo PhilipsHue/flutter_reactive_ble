@@ -20,7 +20,6 @@ class ProtobufMessageConverterTest {
     @Nested
     @DisplayName("Convert to scaninfo")
     inner class ScanInfoTest {
-
         @Test
         fun `converts scan result to DeviceDiscoveryMessage`() {
             val scanInfo = createScanInfo()
@@ -107,7 +106,6 @@ class ProtobufMessageConverterTest {
     @Nested
     @DisplayName("Convert to deviceinfo")
     inner class DeviceInfoTest {
-
         @Test
         fun `converts device id as parameter in device connection message`() {
             val deviceId = "2"
@@ -126,13 +124,12 @@ class ProtobufMessageConverterTest {
     @Nested
     @DisplayName("Convert to charinfo")
     inner class ConvertCharInfoTest {
-
         @Test
         fun `converts to a characteristicvalueInfo object `() {
             val request = createCharacteristicRequest("a", UUID.randomUUID())
 
             assertThat(protobufConverter.convertCharacteristicInfo(request.characteristic, byteArrayOf(1)))
-                    .isInstanceOf(pb.CharacteristicValueInfo::class.java)
+                .isInstanceOf(pb.CharacteristicValueInfo::class.java)
         }
 
         @Test
@@ -148,7 +145,6 @@ class ProtobufMessageConverterTest {
     @Nested
     @DisplayName("Convert to negotiatemtuinfo")
     inner class NegotiateMtuInfoTest {
-
         @Test
         fun `converts to negotiatemtuinfo object`() {
             val result = MtuNegotiateSuccessful("", 3)
@@ -179,14 +175,14 @@ class ProtobufMessageConverterTest {
             val errorMessage = "whoops"
             val result = MtuNegotiateFailed("id", errorMessage)
             assertThat(protobufConverter.convertNegotiateMtuInfo(result).failure.message)
-                    .isEqualTo(errorMessage)
+                .isEqualTo(errorMessage)
         }
 
         @Test
         fun `converts error code`() {
             val result = MtuNegotiateFailed("id", "")
             assertThat(protobufConverter.convertNegotiateMtuInfo(result).failure.code)
-                    .isEqualTo(NegotiateMtuErrorType.UNKNOWN.code)
+                .isEqualTo(NegotiateMtuErrorType.UNKNOWN.code)
         }
     }
 
@@ -204,29 +200,33 @@ class ProtobufMessageConverterTest {
         val manufacturerData = "123".toByteArray()
 
         return ScanInfo(
-                deviceId = macAddress,
-                name = deviceName,
-                rssi = rssi,
-                connectable = Connectable.UNKNOWN,
-                serviceData = serviceData,
-                manufacturerData = manufacturerData,
-                serviceUuids = listOf(serviceUuid),
+            deviceId = macAddress,
+            name = deviceName,
+            rssi = rssi,
+            connectable = Connectable.UNKNOWN,
+            serviceData = serviceData,
+            manufacturerData = manufacturerData,
+            serviceUuids = listOf(serviceUuid),
         )
     }
 
-    private fun createCharacteristicRequest(deviceId: String, serviceUuid: UUID): pb.ReadCharacteristicRequest {
+    private fun createCharacteristicRequest(
+        deviceId: String,
+        serviceUuid: UUID,
+    ): pb.ReadCharacteristicRequest {
         val uuidConverter = UuidConverter()
-        val uuid = pb.Uuid.newBuilder()
+        val uuid =
+            pb.Uuid.newBuilder()
                 .setData(ByteString.copyFrom(uuidConverter.byteArrayFromUuid(serviceUuid)))
 
-        val characteristicAddress = pb.CharacteristicAddress.newBuilder()
+        val characteristicAddress =
+            pb.CharacteristicAddress.newBuilder()
                 .setDeviceId(deviceId)
                 .setServiceUuid(uuid)
                 .setCharacteristicUuid(uuid)
 
         return pb.ReadCharacteristicRequest.newBuilder()
-                .setCharacteristic(characteristicAddress)
-                .build()
+            .setCharacteristic(characteristicAddress)
+            .build()
     }
 }
-

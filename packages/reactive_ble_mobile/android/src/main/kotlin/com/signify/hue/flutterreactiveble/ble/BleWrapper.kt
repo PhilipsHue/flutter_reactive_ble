@@ -34,23 +34,33 @@ data class ScanInfo(val deviceId: String, val name: String, val rssi: Int, val c
 }
 
 sealed class ConnectionUpdate
+
 data class ConnectionUpdateSuccess(val deviceId: String, val connectionState: Int) : ConnectionUpdate()
+
 data class ConnectionUpdateError(val deviceId: String, val errorMessage: String) : ConnectionUpdate()
 
 sealed class EstablishConnectionResult
+
 data class EstablishedConnection(val deviceId: String, val rxConnection: RxBleConnection) : EstablishConnectionResult()
+
 data class EstablishConnectionFailure(val deviceId: String, val errorMessage: String) : EstablishConnectionResult()
 
 sealed class MtuNegotiateResult
+
 data class MtuNegotiateSuccessful(val deviceId: String, val size: Int) : MtuNegotiateResult()
+
 data class MtuNegotiateFailed(val deviceId: String, val errorMessage: String) : MtuNegotiateResult()
 
 sealed class CharOperationResult
+
 data class CharOperationSuccessful(val deviceId: String, val value: List<Byte>) : CharOperationResult()
+
 data class CharOperationFailed(val deviceId: String, val errorMessage: String) : CharOperationResult()
 
 sealed class RequestConnectionPriorityResult
+
 data class RequestConnectionPrioritySuccess(val deviceId: String) : RequestConnectionPriorityResult()
+
 data class RequestConnectionPriorityFailed(val deviceId: String, val errorMessage: String) : RequestConnectionPriorityResult()
 
 enum class BleStatus(val code: Int) {
@@ -59,17 +69,17 @@ enum class BleStatus(val code: Int) {
     UNAUTHORIZED(code = 2),
     POWERED_OFF(code = 3),
     LOCATION_SERVICES_DISABLED(code = 4),
-    READY(code = 5)
+    READY(code = 5),
 }
 
 enum class ConnectionPriority(val code: Int) {
     BALANCED(code = 0),
     HIGH_PERFORMACE(code = 1),
-    LOW_POWER(code = 2)
+    LOW_POWER(code = 2),
 }
 
 enum class Connectable(val code: Int) {
     UNKNOWN(code = 0),
     NOT_CONNECTABLE(code = 1),
-    CONNECTABLE(code = 2)
+    CONNECTABLE(code = 2),
 }
