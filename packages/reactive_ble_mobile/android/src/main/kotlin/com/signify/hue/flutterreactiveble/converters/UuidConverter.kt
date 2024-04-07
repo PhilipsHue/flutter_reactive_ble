@@ -23,8 +23,22 @@ class UuidConverter {
         // UUID construction is retrieved from BLE corespec v5.0 page 1917
         val uuidConstruct =
             byteArrayOf(
-                0x00, 0x00, bytes[0], bytes[1], 0x00, 0x00, 0x10, 0x00,
-                0x80.toByte(), 0x00, 0x00, 0x80.toByte(), 0x5F, 0x9B.toByte(), 0x34, 0xFB.toByte(),
+                0x00,
+                0x00,
+                bytes[0],
+                bytes[1],
+                0x00,
+                0x00,
+                0x10,
+                0x00,
+                0x80.toByte(),
+                0x00,
+                0x00,
+                0x80.toByte(),
+                0x5F,
+                0x9B.toByte(),
+                0x34,
+                0xFB.toByte(),
             )
 
         return convert128BitNotationToUuid(uuidConstruct)
@@ -34,8 +48,22 @@ class UuidConverter {
     private fun convert32BitToUuid(bytes: ByteArray): UUID {
         val uuidConstruct =
             byteArrayOf(
-                bytes[0], bytes[1], bytes[2], bytes[3], 0x00, 0x00, 0x10, 0x00,
-                0x80.toByte(), 0x00, 0x00, 0x80.toByte(), 0x5F, 0x9B.toByte(), 0x34, 0xFB.toByte(),
+                bytes[0],
+                bytes[1],
+                bytes[2],
+                bytes[3],
+                0x00,
+                0x00,
+                0x10,
+                0x00,
+                0x80.toByte(),
+                0x00,
+                0x00,
+                0x80.toByte(),
+                0x5F,
+                0x9B.toByte(),
+                0x34,
+                0xFB.toByte(),
             )
 
         return convert128BitNotationToUuid(uuidConstruct)

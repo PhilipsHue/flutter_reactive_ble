@@ -2,7 +2,7 @@ package com.signify.hue.flutterreactiveble.converters
 
 import com.google.common.truth.Truth.assertThat
 import org.junit.jupiter.api.Test
-import java.util.*
+import java.util.UUID
 
 class UuidConverterTest {
     val converter = UuidConverter()

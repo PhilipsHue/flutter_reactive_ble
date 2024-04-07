@@ -55,7 +55,7 @@ class DeviceConnectorTest {
     }
 
     @AfterEach
-    fun teardown()  {
+    fun teardown() {
         sut.disconnectDevice(deviceId)
     }
 
@@ -69,7 +69,7 @@ class DeviceConnectorTest {
 
         @Test
         @DisplayName("Add device to queue")
-        fun addDeviceToQueue()  {
+        fun addDeviceToQueue() {
             sut.connection.test()
             verify(exactly = 1) { connectionQueue.addToQueue(deviceId) }
         }
@@ -112,7 +112,7 @@ class DeviceConnectorTest {
 
         @Test
         @DisplayName("Remove device from queue")
-        fun removeDeviceFromQueue()  {
+        fun removeDeviceFromQueue() {
             sut.connection.test()
             verify(exactly = 1) { connectionQueue.removeFromQueue(deviceId) }
         }
@@ -146,7 +146,7 @@ class DeviceConnectorTest {
 
         @Test
         @DisplayName("Remove device from queue")
-        fun removeDeviceFromQueue()  {
+        fun removeDeviceFromQueue() {
             sut.connection.test()
             verify(exactly = 1) { connectionQueue.removeFromQueue(deviceId) }
         }
