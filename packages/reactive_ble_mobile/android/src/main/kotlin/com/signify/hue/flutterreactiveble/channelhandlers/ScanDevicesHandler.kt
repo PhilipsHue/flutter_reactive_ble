@@ -10,7 +10,9 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import com.signify.hue.flutterreactiveble.ProtobufModel as pb
 
-class ScanDevicesHandler(private val bleClient: com.signify.hue.flutterreactiveble.ble.BleClient) : EventChannel.StreamHandler {
+class ScanDevicesHandler(
+    private val bleClient: com.signify.hue.flutterreactiveble.ble.BleClient,
+) : EventChannel.StreamHandler {
     private var scanDevicesSink: EventChannel.EventSink? = null
     private lateinit var scanForDevicesDisposable: Disposable
     private val converter = ProtobufMessageConverter()
@@ -76,4 +78,8 @@ class ScanDevicesHandler(private val bleClient: com.signify.hue.flutterreactiveb
     }
 }
 
-private data class ScanParameters(val filter: List<ParcelUuid>, val mode: ScanMode, val locationServiceIsMandatory: Boolean)
+private data class ScanParameters(
+    val filter: List<ParcelUuid>,
+    val mode: ScanMode,
+    val locationServiceIsMandatory: Boolean,
+)

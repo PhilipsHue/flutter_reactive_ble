@@ -34,9 +34,13 @@ import org.junit.jupiter.api.Test
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 
-private class BleClientForTesting(val bleClient: RxBleClient, appContext: Context, val deviceConnector: DeviceConnector) : ReactiveBleClient(
-    appContext,
-) {
+private class BleClientForTesting(
+    val bleClient: RxBleClient,
+    appContext: Context,
+    val deviceConnector: DeviceConnector,
+) : ReactiveBleClient(
+        appContext,
+    ) {
     override fun initializeClient() {
         rxBleClient = bleClient
         activeConnections = mutableMapOf()
