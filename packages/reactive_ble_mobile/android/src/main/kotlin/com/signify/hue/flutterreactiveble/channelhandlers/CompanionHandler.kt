@@ -110,7 +110,6 @@ class CompanionHandler {
                     }
 
                     override fun onFailure(error: CharSequence?) {
-                        Log.e(TAG, "onFailure: $error")
                         result.error("CompanionHandler", error.toString(), null)
                     }
                 },

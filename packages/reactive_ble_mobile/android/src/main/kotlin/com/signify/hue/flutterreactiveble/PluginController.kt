@@ -19,13 +19,14 @@ import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.EventChannel
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel.Result
+import io.flutter.plugin.common.PluginRegistry.ActivityResultListener
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import java.util.UUID
 import com.signify.hue.flutterreactiveble.ProtobufModel as pb
 
 @Suppress("TooManyFunctions")
-class PluginController {
+class PluginController : ActivityResultListener {
     private val pluginMethods =
         mapOf<String, (call: MethodCall, result: Result) -> Unit>(
             "initialize" to this::initializeClient,
