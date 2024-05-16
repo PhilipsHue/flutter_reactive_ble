@@ -26,6 +26,7 @@ final class Central {
     private var peripheralDelegate: PeripheralDelegate!
     private var centralManagerDelegate: CentralManagerDelegate!
     private var centralManager: CBCentralManager!
+    private var centralManagerRestoreID: String = "ReactiveBleRestoreId"
 
     private(set) var isScanning = false
     private(set) var activePeripherals = [PeripheralID: CBPeripheral]()
@@ -44,6 +45,8 @@ final class Central {
     ) {
         self.onServicesWithCharacteristicsInitialDiscovery = onServicesWithCharacteristicsInitialDiscovery
         self.centralManagerDelegate = CentralManagerDelegate(
+            centralManager: centralManager,
+            peripheralDelegate : peripheralDelegate,
             onStateChange: papply(weak: self) { central, state in
                 if state != .poweredOn {
                     central.activePeripherals.forEach { _, peripheral in
@@ -123,7 +126,11 @@ final class Central {
         )
         self.centralManager = CBCentralManager(
             delegate: centralManagerDelegate,
-            queue: nil
+            queue: nil,
+            options:  [
+                CBCentralManagerOptionRestoreIdentifierKey: centralManagerRestoreID,
+                CBCentralManagerOptionShowPowerAlertKey: true
+            ]
         )
     }
 
