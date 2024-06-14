@@ -93,15 +93,6 @@ void main() {
       const deviceId = '123';
       final uuidDeviceToScan = Uuid.parse('FEFF');
       final uuidCurrentScan = Uuid.parse('FEFE');
-      final discoveredDevice = DiscoveredDevice(
-        id: 'deviceId',
-        manufacturerData: Uint8List.fromList([0]),
-        serviceUuids: const [],
-        name: 'test',
-        rssi: -39,
-        connectable: Connectable.unknown,
-        serviceData: const {},
-      );
 
       setUp(() {
         _connectionStateUpdateStream = Stream.fromIterable([
@@ -235,15 +226,23 @@ void main() {
         });
 
         group('And device is not discovered in a previous scan', () {
-          setUp(() {
-            when(_scanner.scanForDevices(
-              withServices: anyNamed('withServices'),
-              scanMode: anyNamed('scanMode'),
-            )).thenAnswer((_) => Stream.fromIterable([discoveredDevice]));
-          });
-
           group('And device is not found after scanning', () {
             setUp(() {
+              when(_scanner.scanForDevices(
+                withServices: anyNamed('withServices'),
+                scanMode: anyNamed('scanMode'),
+              )).thenAnswer((_) => Stream.fromIterable([
+                    DiscoveredDevice(
+                      id: 'deviceId',
+                      manufacturerData: Uint8List.fromList([0]),
+                      serviceUuids: const [],
+                      name: 'test',
+                      rssi: -39,
+                      connectable: Connectable.unknown,
+                      serviceData: const {},
+                    )
+                  ]));
+
               when(_registry.deviceIsDiscoveredRecently(
                       deviceId: deviceId,
                       cacheValidity: anyNamed('cacheValidity')))
@@ -272,6 +271,21 @@ void main() {
           });
           group('And device found after scanning', () {
             setUp(() {
+              when(_scanner.scanForDevices(
+                withServices: anyNamed('withServices'),
+                scanMode: anyNamed('scanMode'),
+              )).thenAnswer((_) => Stream.fromIterable([
+                    DiscoveredDevice(
+                      id: deviceId,
+                      manufacturerData: Uint8List.fromList([0]),
+                      serviceUuids: const [],
+                      name: 'test',
+                      rssi: -39,
+                      connectable: Connectable.unknown,
+                      serviceData: const {},
+                    )
+                  ]));
+
               final responses = [false, true, true, true];
               when(_registry.deviceIsDiscoveredRecently(
                       deviceId: deviceId,
