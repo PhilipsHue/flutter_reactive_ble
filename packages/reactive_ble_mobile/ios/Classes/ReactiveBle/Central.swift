@@ -192,6 +192,12 @@ final class Central {
             .forEach(centralManager.cancelPeripheralConnection)
     }
 
+    func retrievePeripheralName(
+        for peripheralID: PeripheralID
+    ) throws -> String? {
+        return try resolve(known: peripheralID).name
+    }
+
     func discoverServicesWithCharacteristics(
         for peripheralID: PeripheralID,
         discover servicesWithCharacteristicsToDiscover: ServicesWithCharacteristicsToDiscover,

@@ -3,11 +3,15 @@ import 'package:reactive_ble_platform_interface/reactive_ble_platform_interface.
 import '../generated/bledata.pb.dart' as pb;
 
 abstract class ArgsToProtobufConverter {
+  pb.EstablishBondingRequest createEstablishBondingArgs(String id);
+
   pb.ConnectToDeviceRequest createConnectToDeviceArgs(
     String id,
     Map<Uuid, List<Uuid>>? servicesWithCharacteristicsToDiscover,
     Duration? connectionTimeout,
   );
+
+  pb.GetDeviceNameRequest createGetDeviceNameArgs(String id);
 
   pb.DisconnectFromDeviceRequest createDisconnectDeviceArgs(String deviceId);
 
@@ -38,6 +42,12 @@ abstract class ArgsToProtobufConverter {
     ConnectionPriority priority,
   );
 
+  pb.LaunchCompanionRequest createLaunchCompanionWorkflowRequest({
+    required String deviceNamePattern,
+    required bool singleDeviceScan,
+    required bool forceConfirmation,
+  });
+
   pb.ScanForDevicesRequest createScanForDevicesRequest({
     required List<Uuid>? withServices,
     required ScanMode scanMode,
@@ -53,6 +63,10 @@ abstract class ArgsToProtobufConverter {
 
 class ArgsToProtobufConverterImpl implements ArgsToProtobufConverter {
   const ArgsToProtobufConverterImpl();
+
+  @override
+  pb.EstablishBondingRequest createEstablishBondingArgs(String id) =>
+      pb.EstablishBondingRequest()..deviceId = id;
 
   @override
   pb.ConnectToDeviceRequest createConnectToDeviceArgs(
@@ -81,8 +95,13 @@ class ArgsToProtobufConverterImpl implements ArgsToProtobufConverter {
       args.servicesWithCharacteristicsToDiscover =
           pb.ServicesWithCharacteristics()..items.addAll(items);
     }
+
     return args;
   }
+
+  @override
+  pb.GetDeviceNameRequest createGetDeviceNameArgs(String deviceId) =>
+      pb.GetDeviceNameRequest()..deviceId = deviceId;
 
   @override
   pb.DisconnectFromDeviceRequest createDisconnectDeviceArgs(String deviceId) =>
@@ -177,6 +196,17 @@ class ArgsToProtobufConverterImpl implements ArgsToProtobufConverter {
 
     return args;
   }
+
+  @override
+  pb.LaunchCompanionRequest createLaunchCompanionWorkflowRequest({
+    required String deviceNamePattern,
+    required bool singleDeviceScan,
+    required bool forceConfirmation,
+  }) =>
+      pb.LaunchCompanionRequest()
+        ..deviceNamePattern = deviceNamePattern
+        ..singleDeviceScan = singleDeviceScan
+        ..forceConfirmation = forceConfirmation;
 
   @override
   pb.ScanForDevicesRequest createScanForDevicesRequest({

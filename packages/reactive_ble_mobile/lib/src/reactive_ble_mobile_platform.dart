@@ -96,6 +96,30 @@ class ReactiveBleMobilePlatform extends ReactiveBlePlatform {
   }
 
   @override
+  Future<DeviceAssociationInfo?> launchCompanionWorkflow({
+    required String pattern,
+    required bool singleDeviceScan,
+    required bool forceConfirmation,
+  }) async {
+    final bytes = await _bleMethodChannel.invokeMethod<List<int>>(
+      'launchCompanionWorkflow',
+      _argsToProtobufConverter
+          .createLaunchCompanionWorkflowRequest(
+            deviceNamePattern: pattern,
+            singleDeviceScan: singleDeviceScan,
+            forceConfirmation: forceConfirmation,
+          )
+          .writeToBuffer(),
+    );
+
+    if (bytes == null) {
+      return null;
+    }
+
+    return _protobufConverter.associationInfoFrom(bytes);
+  }
+
+  @override
   Stream<void> scanForDevices({
     required List<Uuid> withServices,
     required ScanMode scanMode,
@@ -119,6 +143,20 @@ class ReactiveBleMobilePlatform extends ReactiveBlePlatform {
   }
 
   @override
+  Future<BondingStatus> establishBonding(String deviceId) {
+    _logger?.log('Establish bond with device: $deviceId');
+
+    return _bleMethodChannel
+        .invokeMethod<List<int>>(
+          "establishBonding",
+          _argsToProtobufConverter
+              .createEstablishBondingArgs(deviceId)
+              .writeToBuffer(),
+        )
+        .then((data) => _protobufConverter.bondingStatusFrom(data!));
+  }
+
+  @override
   Stream<void> connectToDevice(
     String id,
     Map<Uuid, List<Uuid>>? servicesWithCharacteristicsToDiscover,
@@ -139,6 +177,19 @@ class ReactiveBleMobilePlatform extends ReactiveBlePlatform {
               .writeToBuffer(),
         )
         .asStream();
+  }
+
+  @override
+  Future<String?> retrieveDeviceName(String id) {
+    _logger?.log(
+      'Retrieve device name: $id',
+    );
+    return _bleMethodChannel
+        .invokeMethod<List<int>>(
+          'retrieveDeviceName',
+          _argsToProtobufConverter.createGetDeviceNameArgs(id).writeToBuffer(),
+        )
+        .then((data) => _protobufConverter.deviceNameFrom(data!));
   }
 
   @override

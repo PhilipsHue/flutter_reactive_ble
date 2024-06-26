@@ -222,6 +222,20 @@ class FlutterReactiveBle {
     return _connectedDeviceOperator.requestConnectionPriority(deviceId, priority);
   }
 
+  Future<DeviceAssociationInfo?> launchCompanionWorkflow({
+    required String pattern,
+    bool singleDeviceScan = true,
+    bool forceConfirmation = false,
+  }) async {
+    await initialize();
+
+    return _deviceScanner.launchCompanionWorkflow(
+      pattern: pattern,
+      singleDeviceScan: singleDeviceScan,
+      forceConfirmation: forceConfirmation,
+    );
+  }
+
   /// Scan for BLE peripherals advertising the services specified in [withServices]
   /// or for all BLE peripherals, if no services is specified. It is recommended to always specify some services.
   ///
@@ -243,6 +257,12 @@ class FlutterReactiveBle {
       scanMode: scanMode,
       requireLocationServicesEnabled: requireLocationServicesEnabled,
     );
+  }
+
+  Future<BondingStatus> establishBonding({required String deviceId}) async {
+    await initialize();
+
+    return _deviceConnector.establishBonding(deviceId: deviceId);
   }
 
   /// Establishes a connection to a BLE device.
@@ -271,6 +291,19 @@ class FlutterReactiveBle {
               connectionTimeout: connectionTimeout,
             ),
           );
+
+  /// iOS only. Retrieves the name of the device with the given id.
+  ///
+  /// This operation can only succeed when the host is `connected` with the peripheral.
+  ///
+  /// It is using the the CBPeripheral `name` property to retrieve the name.
+  /// See the [documentation](https://developer.apple.com/documentation/corebluetooth/cbperipheral/1519029-name) for details.
+  /// Under the hood, this uses the GAP profile to retrieve the name.
+  ///
+  /// This operation is only supported on Apple platforms.
+  /// It will throw an [UnimplementedError] on other platforms.
+  Future<String?> retrieveDeviceName(String id) =>
+      _deviceConnector.retrieveDeviceName(id);
 
   /// Scans for a specific device and connects to it in case a device containing the specified [id]
   /// is found and that is advertising the services specified in [withServices].

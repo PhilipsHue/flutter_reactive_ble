@@ -2,12 +2,14 @@ package com.signify.hue.flutterreactiveble
 
 import android.content.Context
 import io.flutter.embedding.engine.plugins.FlutterPlugin
+import io.flutter.embedding.engine.plugins.activity.ActivityAware
+import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.Result
 
-class ReactiveBlePlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
+class ReactiveBlePlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAware {
     override fun onAttachedToEngine(binding: FlutterPlugin.FlutterPluginBinding) {
         initializePlugin(binding.binaryMessenger, binding.applicationContext, this)
     }
@@ -42,5 +44,23 @@ class ReactiveBlePlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
         result: Result,
     ) {
         pluginController.execute(call, result)
+    }
+
+    override fun onAttachedToActivity(binding: ActivityPluginBinding) {
+        binding.addActivityResultListener(pluginController)
+        pluginController.setActivity(binding.activity)
+    }
+
+    override fun onDetachedFromActivityForConfigChanges() {
+        pluginController.setActivity(null)
+    }
+
+    override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {
+        binding.addActivityResultListener(pluginController)
+        pluginController.setActivity(binding.activity)
+    }
+
+    override fun onDetachedFromActivity() {
+        pluginController.setActivity(null)
     }
 }

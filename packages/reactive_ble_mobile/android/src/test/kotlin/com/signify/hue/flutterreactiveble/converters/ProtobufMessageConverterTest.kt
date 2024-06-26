@@ -1,7 +1,9 @@
 package com.signify.hue.flutterreactiveble.converters
 
+import android.bluetooth.BluetoothDevice
 import com.google.common.truth.Truth.assertThat
 import com.google.protobuf.ByteString
+import com.signify.hue.flutterreactiveble.ProtobufModel.EstablishBondingInfo.BondState
 import com.signify.hue.flutterreactiveble.ble.Connectable
 import com.signify.hue.flutterreactiveble.ble.ConnectionUpdateSuccess
 import com.signify.hue.flutterreactiveble.ble.MtuNegotiateFailed
@@ -11,7 +13,10 @@ import com.signify.hue.flutterreactiveble.model.NegotiateMtuErrorType
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
 import java.util.UUID
+import java.util.stream.Stream
 import com.signify.hue.flutterreactiveble.ProtobufModel as pb
 
 class ProtobufMessageConverterTest {
@@ -117,7 +122,9 @@ class ProtobufMessageConverterTest {
         fun `converts result as parameter in device connection message`() {
             val result = 0
             val connection = ConnectionUpdateSuccess("", result)
-            assertThat(protobufConverter.convertToDeviceInfo(connection).connectionState).isEqualTo(result)
+            assertThat(protobufConverter.convertToDeviceInfo(connection).connectionState).isEqualTo(
+                result,
+            )
         }
     }
 
@@ -136,7 +143,8 @@ class ProtobufMessageConverterTest {
         fun `converts a char value and request into a characteristic info value `() {
             val request = createCharacteristicRequest("b", UUID.randomUUID())
             val expectedValue = byteArrayOf(1)
-            val valueInfo = protobufConverter.convertCharacteristicInfo(request.characteristic, expectedValue)
+            val valueInfo =
+                protobufConverter.convertCharacteristicInfo(request.characteristic, expectedValue)
 
             assertThat(valueInfo.value).isEqualTo(ByteString.copyFrom(expectedValue))
         }
@@ -183,6 +191,33 @@ class ProtobufMessageConverterTest {
             val result = MtuNegotiateFailed("id", "")
             assertThat(protobufConverter.convertNegotiateMtuInfo(result).failure.code)
                 .isEqualTo(NegotiateMtuErrorType.UNKNOWN.code)
+        }
+    }
+
+    @DisplayName("Convert to bondinfo")
+    inner class BondInfoTest {
+        @Test
+        @MethodSource("provideParameters")
+        fun `converts bonded`(
+            bondState: BondState,
+            androidConstant: Int,
+        ) {
+            assertThat(protobufConverter.convertBondingInfo(androidConstant)).isEqualTo(bondState)
+        }
+
+        private fun provideParameters(): Stream<Arguments?>? {
+            return Stream.of(
+                Arguments.of(BondState.BONDED, BluetoothDevice.BOND_BONDED),
+                Arguments.of(BondState.BONDING, BluetoothDevice.BOND_BONDING),
+                Arguments.of(BondState.NONE, BluetoothDevice.BOND_NONE),
+            )
+        }
+
+        @Test
+        fun `converts unknown to none`() {
+            val result = BluetoothDevice.BOND_BONDED
+
+            assertThat(protobufConverter.convertBondingInfo(result)).isEqualTo(pb.EstablishBondingInfo.BondState.BONDED)
         }
     }
 

@@ -1,9 +1,13 @@
 package com.signify.hue.flutterreactiveble
 
+import android.app.Activity
 import android.content.Context
+import android.content.Intent
+import android.os.Build
 import com.signify.hue.flutterreactiveble.ble.RequestConnectionPriorityFailed
 import com.signify.hue.flutterreactiveble.channelhandlers.BleStatusHandler
 import com.signify.hue.flutterreactiveble.channelhandlers.CharNotificationHandler
+import com.signify.hue.flutterreactiveble.channelhandlers.CompanionHandler
 import com.signify.hue.flutterreactiveble.channelhandlers.DeviceConnectionHandler
 import com.signify.hue.flutterreactiveble.channelhandlers.ScanDevicesHandler
 import com.signify.hue.flutterreactiveble.converters.ProtobufMessageConverter
@@ -15,18 +19,21 @@ import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.EventChannel
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel.Result
+import io.flutter.plugin.common.PluginRegistry.ActivityResultListener
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import java.util.UUID
 import com.signify.hue.flutterreactiveble.ProtobufModel as pb
 
 @Suppress("TooManyFunctions")
-class PluginController {
+class PluginController : ActivityResultListener {
     private val pluginMethods =
         mapOf<String, (call: MethodCall, result: Result) -> Unit>(
             "initialize" to this::initializeClient,
             "deinitialize" to this::deinitializeClient,
+            "launchCompanionWorkflow" to this::launchCompanionFlow,
             "scanForDevices" to this::scanForDevices,
+            "establishBonding" to this::establishBonding,
             "connectToDevice" to this::connectToDevice,
             "clearGattCache" to this::clearGattCache,
             "disconnectFromDevice" to this::disconnectFromDevice,
@@ -48,6 +55,7 @@ class PluginController {
     private lateinit var deviceConnectionChannel: EventChannel
     private lateinit var charNotificationChannel: EventChannel
 
+    private lateinit var companionHandler: CompanionHandler
     private lateinit var scanDevicesHandler: ScanDevicesHandler
     private lateinit var deviceConnectionHandler: DeviceConnectionHandler
     private lateinit var charNotificationHandler: CharNotificationHandler
@@ -66,6 +74,7 @@ class PluginController {
         charNotificationChannel = EventChannel(messenger, "flutter_reactive_ble_char_update")
         val bleStatusChannel = EventChannel(messenger, "flutter_reactive_ble_status")
 
+        companionHandler = CompanionHandler()
         scanDevicesHandler = ScanDevicesHandler(bleClient)
         deviceConnectionHandler = DeviceConnectionHandler(bleClient)
         charNotificationHandler = CharNotificationHandler(bleClient)
@@ -105,6 +114,36 @@ class PluginController {
         result.success(null)
     }
 
+    private fun launchCompanionFlow(
+        call: MethodCall,
+        result: Result,
+    ) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            companionHandler.launchCompanionFlow(
+                pb.LaunchCompanionRequest.parseFrom(call.arguments as ByteArray),
+                result,
+            )
+        } else {
+            result.error(
+                "NOT_SUPPORTED",
+                "Companion flow is only supported on Android Oreo and above",
+                null,
+            )
+        }
+    }
+
+    private fun establishBonding(
+        call: MethodCall,
+        result: Result,
+    ) {
+        val establishBondingMessage = pb.EstablishBondingRequest.parseFrom(call.arguments as ByteArray)
+        deviceConnectionHandler.establishBonding(establishBondingMessage).subscribe({
+            result.success(protoConverter.convertBondingInfo(it).toByteArray())
+        }, {
+            result.error("establish_bonding_error", it.message, null)
+        }).discard()
+    }
+
     private fun scanForDevices(
         call: MethodCall,
         result: Result,
@@ -119,6 +158,7 @@ class PluginController {
     ) {
         result.success(null)
         val connectDeviceMessage = pb.ConnectToDeviceRequest.parseFrom(call.arguments as ByteArray)
+
         deviceConnectionHandler.connectToDevice(connectDeviceMessage)
     }
 
@@ -151,7 +191,8 @@ class PluginController {
         result: Result,
     ) {
         result.success(null)
-        val connectDeviceMessage = pb.DisconnectFromDeviceRequest.parseFrom(call.arguments as ByteArray)
+        val connectDeviceMessage =
+            pb.DisconnectFromDeviceRequest.parseFrom(call.arguments as ByteArray)
         deviceConnectionHandler.disconnectDevice(connectDeviceMessage.deviceId)
     }
 
@@ -183,6 +224,7 @@ class PluginController {
                                 )
                             charNotificationHandler.addSingleReadToStream(charInfo)
                         }
+
                         is com.signify.hue.flutterreactiveble.ble.CharOperationFailed -> {
                             protoConverter.convertCharacteristicError(
                                 readCharMessage.characteristic,
@@ -370,6 +412,29 @@ class PluginController {
                 result.error("service_discovery_failure", throwable.toString(), throwable.stackTrace.toList().toString())
             })
             .discard()
+    }
+
+    fun setActivity(activity: Activity?) {
+        companionHandler.setActivity(activity)
+    }
+
+    override fun onActivityResult(
+        requestCode: Int,
+        resultCode: Int,
+        data: Intent?,
+    ): Boolean {
+        if (requestCode == CompanionHandler.SELECT_DEVICE_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+                return false
+            }
+
+            // When
+            companionHandler.onActivityResult(data) ?: return false
+
+            return true
+        }
+
+        return false
     }
 
     private fun readRssi(

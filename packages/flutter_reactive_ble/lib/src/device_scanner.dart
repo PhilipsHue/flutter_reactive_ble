@@ -5,6 +5,12 @@ import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
 abstract class DeviceScanner {
   ScanSession? get currentScan;
 
+  Future<DeviceAssociationInfo?> launchCompanionWorkflow({
+    required String pattern,
+    required bool singleDeviceScan,
+    required bool forceConfirmation,
+  });
+
   Stream<DiscoveredDevice> scanForDevices({
     required List<Uuid> withServices,
     ScanMode scanMode = ScanMode.balanced,
@@ -37,6 +43,18 @@ class DeviceScannerImpl implements DeviceScanner {
 
   @override
   ScanSession? get currentScan => _currentScanSession;
+
+  @override
+  Future<DeviceAssociationInfo?> launchCompanionWorkflow({
+    required String pattern,
+    required bool singleDeviceScan,
+    required bool forceConfirmation,
+  }) async =>
+      _blePlatform.launchCompanionWorkflow(
+        pattern: pattern,
+        singleDeviceScan: singleDeviceScan,
+        forceConfirmation: forceConfirmation,
+      );
 
   @override
   Stream<DiscoveredDevice> scanForDevices({
