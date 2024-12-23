@@ -19,7 +19,7 @@ class BleDeviceConnector extends ReactiveState<ConnectionStateUpdate> {
   final _deviceConnectionController = StreamController<ConnectionStateUpdate>();
 
   // ignore: cancel_subscriptions
-  late StreamSubscription<ConnectionStateUpdate> _connection;
+  StreamSubscription<ConnectionStateUpdate>? _connection;
 
   Future<void> connect(String deviceId) async {
     _logMessage('Start connecting to $deviceId');
@@ -37,7 +37,7 @@ class BleDeviceConnector extends ReactiveState<ConnectionStateUpdate> {
   Future<void> disconnect(String deviceId) async {
     try {
       _logMessage('disconnecting to device: $deviceId');
-      await _connection.cancel();
+      await _connection?.cancel();
     } on Exception catch (e, _) {
       _logMessage("Error disconnecting from a device: $e");
     } finally {
