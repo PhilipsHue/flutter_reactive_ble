@@ -285,7 +285,7 @@ class _ServiceDiscoveryListState extends State<_ServiceDiscoveryList> {
             child: ExpansionPanelList(
               expansionCallback: (int index, bool isExpanded) {
                 setState(() {
-                  if (isExpanded) {
+                  if (!isExpanded) {
                     _expandedItems.remove(index);
                   } else {
                     _expandedItems.add(index);
