@@ -155,9 +155,7 @@ class _DeviceInteractionTabState extends State<_DeviceInteractionTab> {
                         child: const Text("Discover Services"),
                       ),
                       ElevatedButton(
-                        onPressed: widget.viewModel.deviceConnected
-                            ? readRssi
-                            : null,
+                        onPressed: widget.viewModel.deviceConnected ? readRssi : null,
                         child: const Text("Get RSSI"),
                       ),
                     ],
@@ -285,7 +283,7 @@ class _ServiceDiscoveryListState extends State<_ServiceDiscoveryList> {
             child: ExpansionPanelList(
               expansionCallback: (int index, bool isExpanded) {
                 setState(() {
-                  if (isExpanded) {
+                  if (!isExpanded) {
                     _expandedItems.remove(index);
                   } else {
                     _expandedItems.add(index);
