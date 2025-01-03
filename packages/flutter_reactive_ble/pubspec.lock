@@ -433,14 +433,14 @@ packages:
       path: "../reactive_ble_mobile"
       relative: true
     source: path
-    version: "5.3.1"
+    version: "5.4.0"
   reactive_ble_platform_interface:
     dependency: "direct main"
     description:
       path: "../reactive_ble_platform_interface"
       relative: true
     source: path
-    version: "5.3.1"
+    version: "5.4.0"
   shelf:
     dependency: transitive
     description:
