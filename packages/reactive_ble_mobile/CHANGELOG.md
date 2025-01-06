@@ -1,3 +1,24 @@
+## 5.4.0
+
+* Support for MacOS #889
+* Fixes subscription to _deviceConnector.deviceConnectionStateUpdateStream leaking #876
+* Workspace upgrade (dependencies) & gitignore sync #857
+* Run ktlint -F #766
+
+## 5.3.1
+
+*  Use proper platform_interface dependency version #837
+
+## 5.3.0
+
+* Readd accidentally removed version constraint #789
+* Add a placeholder implementation for non-mobile platforms #688
+* Add Github actions and Migrate to latest Android SDK, AGP and protobuf plugin  #830
+* Include packages lock-files #797
+* Update Kotlin version in README #831
+* Migrate away from deprecated strong mode analysis options #832
+* Read RSSI #796
+
 ## 5.2.0
 
 * Bump the minimum requirement to Dart 2.17 and upgrade melos to 3.1.0 in #762

@@ -29,6 +29,7 @@ void main() {
       return _ble.getDiscoveredServices(deviceId);
     },
     logMessage: _bleLogger.addToLog,
+    readRssi: _ble.readRssi,
   );
   runApp(
     MultiProvider(

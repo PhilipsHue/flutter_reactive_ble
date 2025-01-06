@@ -60,11 +60,10 @@ class FlutterReactiveBle {
   BleStatus get status => _status;
 
   /// A stream providing connection updates for all the connected BLE devices.
-  Stream<ConnectionStateUpdate> get connectedDeviceStream => Repeater(onListenEmitFrom: () async* {
+  Stream<ConnectionStateUpdate> get connectedDeviceStream => Repeater.broadcast(onListenEmitFrom: () async* {
         await initialize();
         yield* _deviceConnector.deviceConnectionStateUpdateStream;
-      }).stream.asBroadcastStream()
-        ..listen((_) {});
+      }).stream;
 
   /// A stream providing value updates for all the connected BLE devices.
   ///
@@ -104,9 +103,8 @@ class FlutterReactiveBle {
         print,
       );
 
-      if (Platform.isAndroid || Platform.isIOS) {
-        ReactiveBlePlatform.instance =
-            const ReactiveBleMobilePlatformFactory().create(
+      if (Platform.isAndroid || Platform.isIOS || Platform.isMacOS) {
+        ReactiveBlePlatform.instance = const ReactiveBleMobilePlatformFactory().create(
           logger: _debugLogger,
         );
       }
@@ -397,6 +395,11 @@ class FlutterReactiveBle {
   /// The connection may need to be reestablished after successful GATT attribute cache clearing.
   Future<void> clearGattCache(String deviceId) =>
       _blePlatform.clearGattCache(deviceId).then((info) => info.dematerialize());
+
+  /// Reads the RSSI of the of the peripheral with the given device ID.
+  /// The peripheral must be connected, otherwise a [PlatformException] will be
+  /// thrown
+  Future<int> readRssi(String deviceId) async => _blePlatform.readRssi(deviceId);
 
   /// Subscribes to updates from the characteristic specified.
   ///

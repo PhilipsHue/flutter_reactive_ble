@@ -28,6 +28,7 @@ class DeviceInteractionTab extends StatelessWidget {
             connectionStatus: connectionStateUpdate.connectionState,
             deviceConnector: deviceConnector,
             discoverServices: () => serviceDiscoverer.discoverServices(device.id),
+            readRssi: () => serviceDiscoverer.readRssi(device.id),
           ),
         ),
       );
@@ -42,12 +43,14 @@ class DeviceInteractionViewModel extends $DeviceInteractionViewModel {
     required this.connectionStatus,
     required this.deviceConnector,
     required this.discoverServices,
+    required this.readRssi,
   });
 
   final String deviceId;
   final Connectable connectableStatus;
   final DeviceConnectionState connectionStatus;
   final BleDeviceConnector deviceConnector;
+  final Future<int> Function() readRssi;
 
   @CustomEquality(Ignore())
   final Future<List<Service>> Function() discoverServices;
@@ -78,6 +81,8 @@ class _DeviceInteractionTab extends StatefulWidget {
 class _DeviceInteractionTabState extends State<_DeviceInteractionTab> {
   late List<Service> discoveredServices;
 
+  int _rssi = 0;
+
   @override
   void initState() {
     discoveredServices = [];
@@ -88,6 +93,13 @@ class _DeviceInteractionTabState extends State<_DeviceInteractionTab> {
     final result = await widget.viewModel.discoverServices();
     setState(() {
       discoveredServices = result;
+    });
+  }
+
+  Future<void> readRssi() async {
+    final rssi = await widget.viewModel.readRssi();
+    setState(() {
+      _rssi = rssi;
     });
   }
 
@@ -119,9 +131,16 @@ class _DeviceInteractionTabState extends State<_DeviceInteractionTab> {
                   ),
                 ),
                 Padding(
+                  padding: const EdgeInsetsDirectional.only(start: 16.0),
+                  child: Text(
+                    "Rssi: $_rssi dB",
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
+                Padding(
                   padding: const EdgeInsets.only(top: 16.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  child: Wrap(
+                    alignment: WrapAlignment.spaceEvenly,
                     children: <Widget>[
                       ElevatedButton(
                         onPressed: !widget.viewModel.deviceConnected ? widget.viewModel.connect : null,
@@ -134,6 +153,10 @@ class _DeviceInteractionTabState extends State<_DeviceInteractionTab> {
                       ElevatedButton(
                         onPressed: widget.viewModel.deviceConnected ? discoverServices : null,
                         child: const Text("Discover Services"),
+                      ),
+                      ElevatedButton(
+                        onPressed: widget.viewModel.deviceConnected ? readRssi : null,
+                        child: const Text("Get RSSI"),
                       ),
                     ],
                   ),
@@ -260,7 +283,7 @@ class _ServiceDiscoveryListState extends State<_ServiceDiscoveryList> {
             child: ExpansionPanelList(
               expansionCallback: (int index, bool isExpanded) {
                 setState(() {
-                  if (isExpanded) {
+                  if (!isExpanded) {
                     _expandedItems.remove(index);
                   } else {
                     _expandedItems.add(index);

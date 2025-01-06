@@ -1,6 +1,6 @@
 name: flutter_reactive_ble
 description: Reactive Bluetooth Low Energy (BLE) plugin that can communicate with multiple devices
-version: 5.2.0
+version: 5.4.0
 homepage: https://github.com/PhilipsHue/flutter_reactive_ble
 
 environment:
@@ -21,8 +21,8 @@ dependencies:
     sdk: flutter
   functional_data: ^1.0.0
   meta: ^1.3.0
-  reactive_ble_mobile: ^5.2.0
-  reactive_ble_platform_interface: ^5.2.0
+  reactive_ble_mobile: ^5.4.0
+  reactive_ble_platform_interface: ^5.4.0
 
 dependency_overrides:
   reactive_ble_mobile:

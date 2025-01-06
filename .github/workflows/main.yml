@@ -44,14 +44,15 @@ jobs:
         run: |
           ./bin/quality_checks.sh
 
-      - name: Android native tests
+      - name: Build Android app & run native tests
         run: |
           #!/bin/bash -ex
-          cd example/android && ls && ./gradlew detekt && ./gradlew testDebugUnitTest
+          cd example
+          flutter build apk --debug
 
-      - name: Build android app
-        run: |
-          cd example && flutter build apk --debug
+          cd android
+          ./gradlew detekt
+          ./gradlew testDebugUnitTest
 
       - name: Build iOS app
         run: |
