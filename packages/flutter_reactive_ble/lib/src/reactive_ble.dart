@@ -103,7 +103,7 @@ class FlutterReactiveBle {
         print,
       );
 
-      if (Platform.isAndroid || Platform.isIOS) {
+      if (Platform.isAndroid || Platform.isIOS || Platform.isMacOS) {
         ReactiveBlePlatform.instance = const ReactiveBleMobilePlatformFactory().create(
           logger: _debugLogger,
         );

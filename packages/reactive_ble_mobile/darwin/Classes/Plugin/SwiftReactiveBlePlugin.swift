@@ -1,4 +1,3 @@
-import Flutter
 import enum SwiftProtobuf.BinaryEncodingError
 import CoreBluetooth
 
@@ -6,15 +5,21 @@ public class SwiftReactiveBlePlugin: NSObject, FlutterPlugin {
 
     public static func register(with registrar: FlutterPluginRegistrar) {
         let plugin = SwiftReactiveBlePlugin()
-        let methodChannel = FlutterMethodChannel(name: "flutter_reactive_ble_method", binaryMessenger: registrar.messenger())
+        var messenger: FlutterBinaryMessenger
+        #if os(iOS)
+            messenger = registrar.messenger()
+        #elseif os(macOS)
+            messenger = registrar.messenger
+        #endif
+        let methodChannel = FlutterMethodChannel(name: "flutter_reactive_ble_method", binaryMessenger: messenger)
         registrar.addMethodCallDelegate(plugin, channel: methodChannel)
-        FlutterEventChannel(name: "flutter_reactive_ble_status", binaryMessenger: registrar.messenger())
+        FlutterEventChannel(name: "flutter_reactive_ble_status", binaryMessenger: messenger)
             .setStreamHandler(plugin.statusStreamHandler)
-        FlutterEventChannel(name: "flutter_reactive_ble_scan", binaryMessenger: registrar.messenger())
+        FlutterEventChannel(name: "flutter_reactive_ble_scan", binaryMessenger: messenger)
             .setStreamHandler(plugin.scanStreamHandler)
-        FlutterEventChannel(name: "flutter_reactive_ble_connected_device", binaryMessenger: registrar.messenger())
+        FlutterEventChannel(name: "flutter_reactive_ble_connected_device", binaryMessenger: messenger)
             .setStreamHandler(plugin.connectedDeviceStreamHandler)
-        FlutterEventChannel(name: "flutter_reactive_ble_char_update", binaryMessenger: registrar.messenger())
+        FlutterEventChannel(name: "flutter_reactive_ble_char_update", binaryMessenger: messenger)
             .setStreamHandler(plugin.characteristicValueUpdateStreamHandler)
     }
 
