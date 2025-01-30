@@ -1,3 +1,14 @@
+## 5.4.0
+
+* Support for MacOS #889
+* Fixes subscription to _deviceConnector.deviceConnectionStateUpdateStream leaking #876
+* Workspace upgrade (dependencies) & gitignore sync #857
+* Run ktlint -F #766
+
+## 5.3.1
+
+*  Use proper platform_interface dependency version #837
+
 ## 5.3.0
 
 * Readd accidentally removed version constraint #789

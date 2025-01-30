@@ -12,9 +12,7 @@ import org.junit.Test
 import java.util.UUID
 import com.signify.hue.flutterreactiveble.ProtobufModel as pb
 
-
 class ServicesWithCharacteristicsConverterTest {
-
     private val serviceUuid = UUID.randomUUID()
     private val characteristicUuid = UUID.randomUUID()
     private val internalCharacteristicUuid = UUID.randomUUID()
@@ -42,7 +40,6 @@ class ServicesWithCharacteristicsConverterTest {
     @MockK
     lateinit var internalCharacteristicLevel2: BluetoothGattCharacteristic
 
-
     @Before
     fun setUp() {
         MockKAnnotations.init(this)
@@ -61,8 +58,11 @@ class ServicesWithCharacteristicsConverterTest {
         every { internalServiceLevel2.includedServices }.returns(listOf())
         every { internalServiceLevel2.characteristics }.returns(listOf(internalCharacteristicLevel2))
 
-        conversionResult = sut.convertDiscoverServicesInfo("test",
-                RxBleDeviceServices(listOf(service)))
+        conversionResult =
+            sut.convertDiscoverServicesInfo(
+                "test",
+                RxBleDeviceServices(listOf(service)),
+            )
     }
 
     @Test
@@ -75,11 +75,11 @@ class ServicesWithCharacteristicsConverterTest {
         assertThat(conversionResult.getServices(0).characteristicUuidsCount).isEqualTo(1)
     }
 
-
     @Test
     fun `It converts nested internal services correctly`() {
-        assertThat(conversionResult.getServices(0).getIncludedServices(0)
-                .includedServicesCount).isEqualTo(2)
+        assertThat(
+            conversionResult.getServices(0).getIncludedServices(0)
+                .includedServicesCount,
+        ).isEqualTo(2)
     }
 }
-
