@@ -43,16 +43,19 @@ class ConnectedDeviceOperationImpl implements ConnectedDeviceOperation {
       _blePlatform.charValueUpdateStream;
 
   @override
-  Future<List<int>> readCharacteristic(CharacteristicInstance characteristic) {
+  Future<List<int>> readCharacteristic(
+    CharacteristicInstance characteristic,
+  ) async {
     final specificCharacteristicValueStream = characteristicValueStream
         .where((update) => update.characteristic == characteristic)
-        .map((update) => update.result.dematerialize());
+        .map((update) => update.result);
 
-    return _blePlatform
+    final result = await _blePlatform
         .readCharacteristic(characteristic)
         .asyncExpand((_) => specificCharacteristicValueStream)
         .firstWhere((_) => true,
             orElse: () => throw NoBleCharacteristicDataReceived());
+    return result.dematerialize();
   }
 
   @override
