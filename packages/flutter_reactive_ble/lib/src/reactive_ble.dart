@@ -25,9 +25,9 @@ class FlutterReactiveBle {
     required DeviceScanner deviceScanner,
     required DeviceConnector deviceConnector,
     required ConnectedDeviceOperation connectedDeviceOperation,
-    required Logger debugLogger,
     required Future<void> initialization,
     required ReactiveBlePlatform reactiveBlePlatform,
+    Logger? debugLogger,
   }) {
     _deviceScanner = deviceScanner;
     _deviceConnector = deviceConnector;
@@ -89,7 +89,7 @@ class FlutterReactiveBle {
   late DeviceConnector _deviceConnector;
   late ConnectedDeviceOperation _connectedDeviceOperator;
   late DeviceScanner _deviceScanner;
-  late Logger _debugLogger;
+  Logger? _debugLogger;
 
   /// Initializes this [FlutterReactiveBle] instance and its platform-specific
   /// counterparts.
@@ -430,9 +430,19 @@ class FlutterReactiveBle {
   ///
   /// Use [LogLevel.verbose] for full debug output. Make sure to  run this only for debugging purposes.
   /// Use [LogLevel.none] to disable logging. This is also the default.
-  set logLevel(LogLevel logLevel) => _debugLogger.logLevel = logLevel;
+  set logLevel(LogLevel logLevel) => _debugLogger?.logLevel = logLevel;
 
-  LogLevel get logLevel => _debugLogger.logLevel;
+  LogLevel get logLevel => _debugLogger?.logLevel ?? LogLevel.none;
+
+  /// Sets the logger.
+  ///
+  /// Set to null to disable logging.
+  set logger(Logger? logger) {
+    _debugLogger = logger;
+    _blePlatform.logger = logger;
+  }
+
+  Logger? get logger => _debugLogger;
 }
 
 /// An instance of this object should not be used after its device has lost its connection.
