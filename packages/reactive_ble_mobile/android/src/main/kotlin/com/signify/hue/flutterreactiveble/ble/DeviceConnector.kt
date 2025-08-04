@@ -68,11 +68,11 @@ internal class DeviceConnector(
             Single.timer(DeviceConnector.Companion.minTimeMsBeforeDisconnectingIsAllowed - diff, TimeUnit.MILLISECONDS)
                     .doFinally {
                         sendDisconnectedUpdate(deviceId)
-                        disposeSubscriptions()
+                        disposeSubscriptionsAndRemoveFromQueue()
                     }.subscribe()
         } else {
             sendDisconnectedUpdate(deviceId)
-            disposeSubscriptions()
+            disposeSubscriptionsAndRemoveFromQueue()
         }
     }
 
@@ -80,10 +80,11 @@ internal class DeviceConnector(
         updateListeners(ConnectionUpdateSuccess(deviceId, ConnectionState.DISCONNECTED.code))
     }
 
-    private fun disposeSubscriptions() {
+    private fun disposeSubscriptionsAndRemoveFromQueue() {
         connectionDisposable?.dispose()
         connectDeviceSubject.onComplete()
         connectionStatusUpdates.dispose()
+        connectionQueue.removeFromQueue(deviceId)
     }
 
     private fun establishConnection(rxBleDevice: RxBleDevice): Disposable {
@@ -183,7 +184,7 @@ internal class DeviceConnector(
                     .filter { queue ->
                         queue.firstOrNull() == deviceId || !queue.contains(deviceId)
                     }
-                    .takeUntil { it.isEmpty() || it.first() == deviceId }
+                    .take(1)
 
     /**
      * Reads the current RSSI value of the device
