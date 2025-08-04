@@ -6,7 +6,7 @@ enum class ScanMode(val code: Int) {
     OPPORTUNISTIC(-1),
     LOW_POWER(0),
     BALANCED(1),
-    LOW_LATENCY(2)
+    LOW_LATENCY(2),
 }
 
 internal fun ScanMode.toScanSettings(): Int =
@@ -18,10 +18,10 @@ internal fun ScanMode.toScanSettings(): Int =
     }
 
 internal fun createScanMode(mode: Int): ScanMode =
-        when (mode) {
-            -1 -> ScanMode.OPPORTUNISTIC
-            0 -> ScanMode.LOW_POWER
-            1 -> ScanMode.BALANCED
-            2 -> ScanMode.LOW_LATENCY
-            else -> ScanMode.LOW_POWER
-        }
+    when (mode) {
+        -1 -> ScanMode.OPPORTUNISTIC
+        0 -> ScanMode.LOW_POWER
+        1 -> ScanMode.BALANCED
+        2 -> ScanMode.LOW_LATENCY
+        else -> ScanMode.LOW_POWER
+    }

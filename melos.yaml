@@ -9,6 +9,8 @@ scripts:
 
   get: melos exec -- flutter pub get
 
+  upgrade: melos exec -- flutter packages upgrade
+
   unittest: 
     run: melos exec -- flutter test
 

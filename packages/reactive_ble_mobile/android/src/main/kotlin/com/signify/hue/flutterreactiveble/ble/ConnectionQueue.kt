@@ -4,7 +4,6 @@ import androidx.annotation.VisibleForTesting
 import io.reactivex.subjects.BehaviorSubject
 
 internal class ConnectionQueue {
-
     private val queueSubject = BehaviorSubject.createDefault(listOf<String>())
 
     fun observeQueue() = queueSubject

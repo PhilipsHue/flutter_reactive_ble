@@ -35,7 +35,7 @@ class _CharacteristicInteractionDialogState extends State<_CharacteristicInterac
   late String writeOutput;
   late String subscribeOutput;
   late TextEditingController textEditingController;
-  late StreamSubscription<List<int>>? subscribeStream;
+  StreamSubscription<List<int>>? subscribeStream;
 
   @override
   void initState() {
