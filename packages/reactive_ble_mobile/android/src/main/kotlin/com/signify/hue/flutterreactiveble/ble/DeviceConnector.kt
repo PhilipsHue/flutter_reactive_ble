@@ -66,10 +66,10 @@ internal class DeviceConnector(
          */
         if (diff < DeviceConnector.Companion.minTimeMsBeforeDisconnectingIsAllowed) {
             Single.timer(DeviceConnector.Companion.minTimeMsBeforeDisconnectingIsAllowed - diff, TimeUnit.MILLISECONDS)
-                    .doFinally {
-                        sendDisconnectedUpdate(deviceId)
-                        disposeSubscriptionsAndRemoveFromQueue()
-                    }.subscribe()
+                .doFinally {
+                    sendDisconnectedUpdate(deviceId)
+                    disposeSubscriptionsAndRemoveFromQueue()
+                }.subscribe()
         } else {
             sendDisconnectedUpdate(deviceId)
             disposeSubscriptionsAndRemoveFromQueue()
@@ -180,11 +180,11 @@ internal class DeviceConnector(
     }
 
     private fun waitUntilFirstOfQueue(deviceId: String) =
-            connectionQueue.observeQueue()
-                    .filter { queue ->
-                        queue.firstOrNull() == deviceId || !queue.contains(deviceId)
-                    }
-                    .take(1)
+        connectionQueue.observeQueue()
+                .filter { queue ->
+                    queue.firstOrNull() == deviceId || !queue.contains(deviceId)
+                }
+                .take(1)
 
     /**
      * Reads the current RSSI value of the device
