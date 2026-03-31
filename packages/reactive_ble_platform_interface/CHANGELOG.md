@@ -1,3 +1,9 @@
+## 5.4.1
+
+* Prevent index out of range crash when filtering services and characteristics #919
+* Improve stack trace of exceptions from read(Characteristic) #896
+* Upgraded protobuf to v3 and upgraded the android example to fix the deprecated imperative apply of gradle plugins #871
+
 ## 5.4.0
 
 * Support for MacOS #889
