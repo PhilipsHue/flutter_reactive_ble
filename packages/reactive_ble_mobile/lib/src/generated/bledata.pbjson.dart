@@ -1,13 +1,15 @@
+// This is a generated file - do not edit.
 //
-//  Generated code. Do not modify.
-//  source: bledata.proto
-//
-// @dart = 2.12
+// Generated from bledata.proto.
+
+// @dart = 3.3
 
 // ignore_for_file: annotate_overrides, camel_case_types, comment_references
-// ignore_for_file: constant_identifier_names, library_prefixes
-// ignore_for_file: non_constant_identifier_names, prefer_final_fields
-// ignore_for_file: unnecessary_import, unnecessary_this, unused_import
+// ignore_for_file: constant_identifier_names
+// ignore_for_file: curly_braces_in_flow_control_structures
+// ignore_for_file: deprecated_member_use_from_same_package, library_prefixes
+// ignore_for_file: non_constant_identifier_names, prefer_relative_imports
+// ignore_for_file: unused_import
 
 import 'dart:convert' as $convert;
 import 'dart:core' as $core;
@@ -17,9 +19,22 @@ import 'dart:typed_data' as $typed_data;
 const ScanForDevicesRequest$json = {
   '1': 'ScanForDevicesRequest',
   '2': [
-    {'1': 'serviceUuids', '3': 1, '4': 3, '5': 11, '6': '.Uuid', '10': 'serviceUuids'},
+    {
+      '1': 'serviceUuids',
+      '3': 1,
+      '4': 3,
+      '5': 11,
+      '6': '.Uuid',
+      '10': 'serviceUuids'
+    },
     {'1': 'scanMode', '3': 2, '4': 1, '5': 5, '10': 'scanMode'},
-    {'1': 'requireLocationServicesEnabled', '3': 3, '4': 1, '5': 8, '10': 'requireLocationServicesEnabled'},
+    {
+      '1': 'requireLocationServicesEnabled',
+      '3': 3,
+      '4': 1,
+      '5': 8,
+      '10': 'requireLocationServicesEnabled'
+    },
   ],
 };
 
@@ -36,12 +51,46 @@ const DeviceScanInfo$json = {
   '2': [
     {'1': 'id', '3': 1, '4': 1, '5': 9, '10': 'id'},
     {'1': 'name', '3': 2, '4': 1, '5': 9, '10': 'name'},
-    {'1': 'failure', '3': 3, '4': 1, '5': 11, '6': '.GenericFailure', '10': 'failure'},
-    {'1': 'serviceData', '3': 4, '4': 3, '5': 11, '6': '.ServiceDataEntry', '10': 'serviceData'},
-    {'1': 'manufacturerData', '3': 6, '4': 1, '5': 12, '10': 'manufacturerData'},
-    {'1': 'serviceUuids', '3': 7, '4': 3, '5': 11, '6': '.Uuid', '10': 'serviceUuids'},
+    {
+      '1': 'failure',
+      '3': 3,
+      '4': 1,
+      '5': 11,
+      '6': '.GenericFailure',
+      '10': 'failure'
+    },
+    {
+      '1': 'serviceData',
+      '3': 4,
+      '4': 3,
+      '5': 11,
+      '6': '.ServiceDataEntry',
+      '10': 'serviceData'
+    },
+    {
+      '1': 'manufacturerData',
+      '3': 6,
+      '4': 1,
+      '5': 12,
+      '10': 'manufacturerData'
+    },
+    {
+      '1': 'serviceUuids',
+      '3': 7,
+      '4': 3,
+      '5': 11,
+      '6': '.Uuid',
+      '10': 'serviceUuids'
+    },
     {'1': 'rssi', '3': 5, '4': 1, '5': 5, '10': 'rssi'},
-    {'1': 'isConnectable', '3': 8, '4': 1, '5': 11, '6': '.IsConnectable', '10': 'isConnectable'},
+    {
+      '1': 'isConnectable',
+      '3': 8,
+      '4': 1,
+      '5': 11,
+      '6': '.IsConnectable',
+      '10': 'isConnectable'
+    },
   ],
 };
 
@@ -59,7 +108,14 @@ const ConnectToDeviceRequest$json = {
   '1': 'ConnectToDeviceRequest',
   '2': [
     {'1': 'deviceId', '3': 1, '4': 1, '5': 9, '10': 'deviceId'},
-    {'1': 'servicesWithCharacteristicsToDiscover', '3': 2, '4': 1, '5': 11, '6': '.ServicesWithCharacteristics', '10': 'servicesWithCharacteristicsToDiscover'},
+    {
+      '1': 'servicesWithCharacteristicsToDiscover',
+      '3': 2,
+      '4': 1,
+      '5': 11,
+      '6': '.ServicesWithCharacteristics',
+      '10': 'servicesWithCharacteristicsToDiscover'
+    },
     {'1': 'timeoutInMs', '3': 3, '4': 1, '5': 5, '10': 'timeoutInMs'},
   ],
 };
@@ -77,7 +133,14 @@ const DeviceInfo$json = {
   '2': [
     {'1': 'id', '3': 1, '4': 1, '5': 9, '10': 'id'},
     {'1': 'connectionState', '3': 2, '4': 1, '5': 5, '10': 'connectionState'},
-    {'1': 'failure', '3': 3, '4': 1, '5': 11, '6': '.GenericFailure', '10': 'failure'},
+    {
+      '1': 'failure',
+      '3': 3,
+      '4': 1,
+      '5': 11,
+      '6': '.GenericFailure',
+      '10': 'failure'
+    },
   ],
 };
 
@@ -96,9 +159,10 @@ const DisconnectFromDeviceRequest$json = {
 };
 
 /// Descriptor for `DisconnectFromDeviceRequest`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List disconnectFromDeviceRequestDescriptor = $convert.base64Decode(
-    'ChtEaXNjb25uZWN0RnJvbURldmljZVJlcXVlc3QSGgoIZGV2aWNlSWQYASABKAlSCGRldmljZU'
-    'lk');
+final $typed_data.Uint8List disconnectFromDeviceRequestDescriptor =
+    $convert.base64Decode(
+        'ChtEaXNjb25uZWN0RnJvbURldmljZVJlcXVlc3QSGgoIZGV2aWNlSWQYASABKAlSCGRldmljZU'
+        'lk');
 
 @$core.Deprecated('Use clearGattCacheRequestDescriptor instead')
 const ClearGattCacheRequest$json = {
@@ -109,14 +173,22 @@ const ClearGattCacheRequest$json = {
 };
 
 /// Descriptor for `ClearGattCacheRequest`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List clearGattCacheRequestDescriptor = $convert.base64Decode(
-    'ChVDbGVhckdhdHRDYWNoZVJlcXVlc3QSGgoIZGV2aWNlSWQYASABKAlSCGRldmljZUlk');
+final $typed_data.Uint8List clearGattCacheRequestDescriptor =
+    $convert.base64Decode(
+        'ChVDbGVhckdhdHRDYWNoZVJlcXVlc3QSGgoIZGV2aWNlSWQYASABKAlSCGRldmljZUlk');
 
 @$core.Deprecated('Use clearGattCacheInfoDescriptor instead')
 const ClearGattCacheInfo$json = {
   '1': 'ClearGattCacheInfo',
   '2': [
-    {'1': 'failure', '3': 1, '4': 1, '5': 11, '6': '.GenericFailure', '10': 'failure'},
+    {
+      '1': 'failure',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.GenericFailure',
+      '10': 'failure'
+    },
   ],
 };
 
@@ -129,48 +201,86 @@ final $typed_data.Uint8List clearGattCacheInfoDescriptor = $convert.base64Decode
 const NotifyCharacteristicRequest$json = {
   '1': 'NotifyCharacteristicRequest',
   '2': [
-    {'1': 'characteristic', '3': 1, '4': 1, '5': 11, '6': '.CharacteristicAddress', '10': 'characteristic'},
+    {
+      '1': 'characteristic',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.CharacteristicAddress',
+      '10': 'characteristic'
+    },
   ],
 };
 
 /// Descriptor for `NotifyCharacteristicRequest`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List notifyCharacteristicRequestDescriptor = $convert.base64Decode(
-    'ChtOb3RpZnlDaGFyYWN0ZXJpc3RpY1JlcXVlc3QSPgoOY2hhcmFjdGVyaXN0aWMYASABKAsyFi'
-    '5DaGFyYWN0ZXJpc3RpY0FkZHJlc3NSDmNoYXJhY3RlcmlzdGlj');
+final $typed_data.Uint8List notifyCharacteristicRequestDescriptor =
+    $convert.base64Decode(
+        'ChtOb3RpZnlDaGFyYWN0ZXJpc3RpY1JlcXVlc3QSPgoOY2hhcmFjdGVyaXN0aWMYASABKAsyFi'
+        '5DaGFyYWN0ZXJpc3RpY0FkZHJlc3NSDmNoYXJhY3RlcmlzdGlj');
 
 @$core.Deprecated('Use notifyNoMoreCharacteristicRequestDescriptor instead')
 const NotifyNoMoreCharacteristicRequest$json = {
   '1': 'NotifyNoMoreCharacteristicRequest',
   '2': [
-    {'1': 'characteristic', '3': 1, '4': 1, '5': 11, '6': '.CharacteristicAddress', '10': 'characteristic'},
+    {
+      '1': 'characteristic',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.CharacteristicAddress',
+      '10': 'characteristic'
+    },
   ],
 };
 
 /// Descriptor for `NotifyNoMoreCharacteristicRequest`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List notifyNoMoreCharacteristicRequestDescriptor = $convert.base64Decode(
-    'CiFOb3RpZnlOb01vcmVDaGFyYWN0ZXJpc3RpY1JlcXVlc3QSPgoOY2hhcmFjdGVyaXN0aWMYAS'
-    'ABKAsyFi5DaGFyYWN0ZXJpc3RpY0FkZHJlc3NSDmNoYXJhY3RlcmlzdGlj');
+final $typed_data.Uint8List notifyNoMoreCharacteristicRequestDescriptor =
+    $convert.base64Decode(
+        'CiFOb3RpZnlOb01vcmVDaGFyYWN0ZXJpc3RpY1JlcXVlc3QSPgoOY2hhcmFjdGVyaXN0aWMYAS'
+        'ABKAsyFi5DaGFyYWN0ZXJpc3RpY0FkZHJlc3NSDmNoYXJhY3RlcmlzdGlj');
 
 @$core.Deprecated('Use readCharacteristicRequestDescriptor instead')
 const ReadCharacteristicRequest$json = {
   '1': 'ReadCharacteristicRequest',
   '2': [
-    {'1': 'characteristic', '3': 1, '4': 1, '5': 11, '6': '.CharacteristicAddress', '10': 'characteristic'},
+    {
+      '1': 'characteristic',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.CharacteristicAddress',
+      '10': 'characteristic'
+    },
   ],
 };
 
 /// Descriptor for `ReadCharacteristicRequest`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List readCharacteristicRequestDescriptor = $convert.base64Decode(
-    'ChlSZWFkQ2hhcmFjdGVyaXN0aWNSZXF1ZXN0Ej4KDmNoYXJhY3RlcmlzdGljGAEgASgLMhYuQ2'
-    'hhcmFjdGVyaXN0aWNBZGRyZXNzUg5jaGFyYWN0ZXJpc3RpYw==');
+final $typed_data.Uint8List readCharacteristicRequestDescriptor =
+    $convert.base64Decode(
+        'ChlSZWFkQ2hhcmFjdGVyaXN0aWNSZXF1ZXN0Ej4KDmNoYXJhY3RlcmlzdGljGAEgASgLMhYuQ2'
+        'hhcmFjdGVyaXN0aWNBZGRyZXNzUg5jaGFyYWN0ZXJpc3RpYw==');
 
 @$core.Deprecated('Use characteristicValueInfoDescriptor instead')
 const CharacteristicValueInfo$json = {
   '1': 'CharacteristicValueInfo',
   '2': [
-    {'1': 'characteristic', '3': 1, '4': 1, '5': 11, '6': '.CharacteristicAddress', '10': 'characteristic'},
+    {
+      '1': 'characteristic',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.CharacteristicAddress',
+      '10': 'characteristic'
+    },
     {'1': 'value', '3': 2, '4': 1, '5': 12, '10': 'value'},
-    {'1': 'failure', '3': 3, '4': 1, '5': 11, '6': '.GenericFailure', '10': 'failure'},
+    {
+      '1': 'failure',
+      '3': 3,
+      '4': 1,
+      '5': 11,
+      '6': '.GenericFailure',
+      '10': 'failure'
+    },
   ],
 };
 
@@ -184,23 +294,45 @@ final $typed_data.Uint8List characteristicValueInfoDescriptor = $convert.base64D
 const WriteCharacteristicRequest$json = {
   '1': 'WriteCharacteristicRequest',
   '2': [
-    {'1': 'characteristic', '3': 1, '4': 1, '5': 11, '6': '.CharacteristicAddress', '10': 'characteristic'},
+    {
+      '1': 'characteristic',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.CharacteristicAddress',
+      '10': 'characteristic'
+    },
     {'1': 'value', '3': 2, '4': 1, '5': 12, '10': 'value'},
   ],
 };
 
 /// Descriptor for `WriteCharacteristicRequest`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List writeCharacteristicRequestDescriptor = $convert.base64Decode(
-    'ChpXcml0ZUNoYXJhY3RlcmlzdGljUmVxdWVzdBI+Cg5jaGFyYWN0ZXJpc3RpYxgBIAEoCzIWLk'
-    'NoYXJhY3RlcmlzdGljQWRkcmVzc1IOY2hhcmFjdGVyaXN0aWMSFAoFdmFsdWUYAiABKAxSBXZh'
-    'bHVl');
+final $typed_data.Uint8List writeCharacteristicRequestDescriptor =
+    $convert.base64Decode(
+        'ChpXcml0ZUNoYXJhY3RlcmlzdGljUmVxdWVzdBI+Cg5jaGFyYWN0ZXJpc3RpYxgBIAEoCzIWLk'
+        'NoYXJhY3RlcmlzdGljQWRkcmVzc1IOY2hhcmFjdGVyaXN0aWMSFAoFdmFsdWUYAiABKAxSBXZh'
+        'bHVl');
 
 @$core.Deprecated('Use writeCharacteristicInfoDescriptor instead')
 const WriteCharacteristicInfo$json = {
   '1': 'WriteCharacteristicInfo',
   '2': [
-    {'1': 'characteristic', '3': 1, '4': 1, '5': 11, '6': '.CharacteristicAddress', '10': 'characteristic'},
-    {'1': 'failure', '3': 3, '4': 1, '5': 11, '6': '.GenericFailure', '10': 'failure'},
+    {
+      '1': 'characteristic',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.CharacteristicAddress',
+      '10': 'characteristic'
+    },
+    {
+      '1': 'failure',
+      '3': 3,
+      '4': 1,
+      '5': 11,
+      '6': '.GenericFailure',
+      '10': 'failure'
+    },
   ],
 };
 
@@ -230,7 +362,14 @@ const NegotiateMtuInfo$json = {
   '2': [
     {'1': 'deviceId', '3': 1, '4': 1, '5': 9, '10': 'deviceId'},
     {'1': 'mtuSize', '3': 2, '4': 1, '5': 5, '10': 'mtuSize'},
-    {'1': 'failure', '3': 3, '4': 1, '5': 11, '6': '.GenericFailure', '10': 'failure'},
+    {
+      '1': 'failure',
+      '3': 3,
+      '4': 1,
+      '5': 11,
+      '6': '.GenericFailure',
+      '10': 'failure'
+    },
   ],
 };
 
@@ -249,8 +388,8 @@ const BleStatusInfo$json = {
 };
 
 /// Descriptor for `BleStatusInfo`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List bleStatusInfoDescriptor = $convert.base64Decode(
-    'Cg1CbGVTdGF0dXNJbmZvEhYKBnN0YXR1cxgBIAEoBVIGc3RhdHVz');
+final $typed_data.Uint8List bleStatusInfoDescriptor = $convert
+    .base64Decode('Cg1CbGVTdGF0dXNJbmZvEhYKBnN0YXR1cxgBIAEoBVIGc3RhdHVz');
 
 @$core.Deprecated('Use changeConnectionPriorityRequestDescriptor instead')
 const ChangeConnectionPriorityRequest$json = {
@@ -262,33 +401,68 @@ const ChangeConnectionPriorityRequest$json = {
 };
 
 /// Descriptor for `ChangeConnectionPriorityRequest`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List changeConnectionPriorityRequestDescriptor = $convert.base64Decode(
-    'Ch9DaGFuZ2VDb25uZWN0aW9uUHJpb3JpdHlSZXF1ZXN0EhoKCGRldmljZUlkGAEgASgJUghkZX'
-    'ZpY2VJZBIaCghwcmlvcml0eRgCIAEoBVIIcHJpb3JpdHk=');
+final $typed_data.Uint8List changeConnectionPriorityRequestDescriptor =
+    $convert.base64Decode(
+        'Ch9DaGFuZ2VDb25uZWN0aW9uUHJpb3JpdHlSZXF1ZXN0EhoKCGRldmljZUlkGAEgASgJUghkZX'
+        'ZpY2VJZBIaCghwcmlvcml0eRgCIAEoBVIIcHJpb3JpdHk=');
 
 @$core.Deprecated('Use changeConnectionPriorityInfoDescriptor instead')
 const ChangeConnectionPriorityInfo$json = {
   '1': 'ChangeConnectionPriorityInfo',
   '2': [
     {'1': 'deviceId', '3': 1, '4': 1, '5': 9, '10': 'deviceId'},
-    {'1': 'failure', '3': 2, '4': 1, '5': 11, '6': '.GenericFailure', '10': 'failure'},
+    {
+      '1': 'failure',
+      '3': 2,
+      '4': 1,
+      '5': 11,
+      '6': '.GenericFailure',
+      '10': 'failure'
+    },
   ],
 };
 
 /// Descriptor for `ChangeConnectionPriorityInfo`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List changeConnectionPriorityInfoDescriptor = $convert.base64Decode(
-    'ChxDaGFuZ2VDb25uZWN0aW9uUHJpb3JpdHlJbmZvEhoKCGRldmljZUlkGAEgASgJUghkZXZpY2'
-    'VJZBIpCgdmYWlsdXJlGAIgASgLMg8uR2VuZXJpY0ZhaWx1cmVSB2ZhaWx1cmU=');
+final $typed_data.Uint8List changeConnectionPriorityInfoDescriptor =
+    $convert.base64Decode(
+        'ChxDaGFuZ2VDb25uZWN0aW9uUHJpb3JpdHlJbmZvEhoKCGRldmljZUlkGAEgASgJUghkZXZpY2'
+        'VJZBIpCgdmYWlsdXJlGAIgASgLMg8uR2VuZXJpY0ZhaWx1cmVSB2ZhaWx1cmU=');
 
 @$core.Deprecated('Use characteristicAddressDescriptor instead')
 const CharacteristicAddress$json = {
   '1': 'CharacteristicAddress',
   '2': [
     {'1': 'deviceId', '3': 1, '4': 1, '5': 9, '10': 'deviceId'},
-    {'1': 'serviceUuid', '3': 2, '4': 1, '5': 11, '6': '.Uuid', '10': 'serviceUuid'},
-    {'1': 'characteristicUuid', '3': 3, '4': 1, '5': 11, '6': '.Uuid', '10': 'characteristicUuid'},
-    {'1': 'serviceInstanceId', '3': 4, '4': 1, '5': 9, '10': 'serviceInstanceId'},
-    {'1': 'characteristicInstanceId', '3': 5, '4': 1, '5': 9, '10': 'characteristicInstanceId'},
+    {
+      '1': 'serviceUuid',
+      '3': 2,
+      '4': 1,
+      '5': 11,
+      '6': '.Uuid',
+      '10': 'serviceUuid'
+    },
+    {
+      '1': 'characteristicUuid',
+      '3': 3,
+      '4': 1,
+      '5': 11,
+      '6': '.Uuid',
+      '10': 'characteristicUuid'
+    },
+    {
+      '1': 'serviceInstanceId',
+      '3': 4,
+      '4': 1,
+      '5': 9,
+      '10': 'serviceInstanceId'
+    },
+    {
+      '1': 'characteristicInstanceId',
+      '3': 5,
+      '4': 1,
+      '5': 9,
+      '10': 'characteristicInstanceId'
+    },
   ],
 };
 
@@ -304,7 +478,14 @@ final $typed_data.Uint8List characteristicAddressDescriptor = $convert.base64Dec
 const ServiceDataEntry$json = {
   '1': 'ServiceDataEntry',
   '2': [
-    {'1': 'serviceUuid', '3': 1, '4': 1, '5': 11, '6': '.Uuid', '10': 'serviceUuid'},
+    {
+      '1': 'serviceUuid',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.Uuid',
+      '10': 'serviceUuid'
+    },
     {'1': 'data', '3': 2, '4': 1, '5': 12, '10': 'data'},
   ],
 };
@@ -318,29 +499,52 @@ final $typed_data.Uint8List serviceDataEntryDescriptor = $convert.base64Decode(
 const ServicesWithCharacteristics$json = {
   '1': 'ServicesWithCharacteristics',
   '2': [
-    {'1': 'items', '3': 1, '4': 3, '5': 11, '6': '.ServiceWithCharacteristics', '10': 'items'},
+    {
+      '1': 'items',
+      '3': 1,
+      '4': 3,
+      '5': 11,
+      '6': '.ServiceWithCharacteristics',
+      '10': 'items'
+    },
   ],
 };
 
 /// Descriptor for `ServicesWithCharacteristics`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List servicesWithCharacteristicsDescriptor = $convert.base64Decode(
-    'ChtTZXJ2aWNlc1dpdGhDaGFyYWN0ZXJpc3RpY3MSMQoFaXRlbXMYASADKAsyGy5TZXJ2aWNlV2'
-    'l0aENoYXJhY3RlcmlzdGljc1IFaXRlbXM=');
+final $typed_data.Uint8List servicesWithCharacteristicsDescriptor =
+    $convert.base64Decode(
+        'ChtTZXJ2aWNlc1dpdGhDaGFyYWN0ZXJpc3RpY3MSMQoFaXRlbXMYASADKAsyGy5TZXJ2aWNlV2'
+        'l0aENoYXJhY3RlcmlzdGljc1IFaXRlbXM=');
 
 @$core.Deprecated('Use serviceWithCharacteristicsDescriptor instead')
 const ServiceWithCharacteristics$json = {
   '1': 'ServiceWithCharacteristics',
   '2': [
-    {'1': 'serviceId', '3': 1, '4': 1, '5': 11, '6': '.Uuid', '10': 'serviceId'},
-    {'1': 'characteristics', '3': 2, '4': 3, '5': 11, '6': '.Uuid', '10': 'characteristics'},
+    {
+      '1': 'serviceId',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.Uuid',
+      '10': 'serviceId'
+    },
+    {
+      '1': 'characteristics',
+      '3': 2,
+      '4': 3,
+      '5': 11,
+      '6': '.Uuid',
+      '10': 'characteristics'
+    },
   ],
 };
 
 /// Descriptor for `ServiceWithCharacteristics`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List serviceWithCharacteristicsDescriptor = $convert.base64Decode(
-    'ChpTZXJ2aWNlV2l0aENoYXJhY3RlcmlzdGljcxIjCglzZXJ2aWNlSWQYASABKAsyBS5VdWlkUg'
-    'lzZXJ2aWNlSWQSLwoPY2hhcmFjdGVyaXN0aWNzGAIgAygLMgUuVXVpZFIPY2hhcmFjdGVyaXN0'
-    'aWNz');
+final $typed_data.Uint8List serviceWithCharacteristicsDescriptor =
+    $convert.base64Decode(
+        'ChpTZXJ2aWNlV2l0aENoYXJhY3RlcmlzdGljcxIjCglzZXJ2aWNlSWQYASABKAsyBS5VdWlkUg'
+        'lzZXJ2aWNlSWQSLwoPY2hhcmFjdGVyaXN0aWNzGAIgAygLMgUuVXVpZFIPY2hhcmFjdGVyaXN0'
+        'aWNz');
 
 @$core.Deprecated('Use discoverServicesRequestDescriptor instead')
 const DiscoverServicesRequest$json = {
@@ -351,15 +555,23 @@ const DiscoverServicesRequest$json = {
 };
 
 /// Descriptor for `DiscoverServicesRequest`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List discoverServicesRequestDescriptor = $convert.base64Decode(
-    'ChdEaXNjb3ZlclNlcnZpY2VzUmVxdWVzdBIaCghkZXZpY2VJZBgBIAEoCVIIZGV2aWNlSWQ=');
+final $typed_data.Uint8List discoverServicesRequestDescriptor =
+    $convert.base64Decode(
+        'ChdEaXNjb3ZlclNlcnZpY2VzUmVxdWVzdBIaCghkZXZpY2VJZBgBIAEoCVIIZGV2aWNlSWQ=');
 
 @$core.Deprecated('Use discoverServicesInfoDescriptor instead')
 const DiscoverServicesInfo$json = {
   '1': 'DiscoverServicesInfo',
   '2': [
     {'1': 'deviceId', '3': 1, '4': 1, '5': 9, '10': 'deviceId'},
-    {'1': 'services', '3': 2, '4': 3, '5': 11, '6': '.DiscoveredService', '10': 'services'},
+    {
+      '1': 'services',
+      '3': 2,
+      '4': 3,
+      '5': 11,
+      '6': '.DiscoveredService',
+      '10': 'services'
+    },
   ],
 };
 
@@ -372,11 +584,45 @@ final $typed_data.Uint8List discoverServicesInfoDescriptor = $convert.base64Deco
 const DiscoveredService$json = {
   '1': 'DiscoveredService',
   '2': [
-    {'1': 'serviceUuid', '3': 1, '4': 1, '5': 11, '6': '.Uuid', '10': 'serviceUuid'},
-    {'1': 'characteristicUuids', '3': 2, '4': 3, '5': 11, '6': '.Uuid', '10': 'characteristicUuids'},
-    {'1': 'includedServices', '3': 3, '4': 3, '5': 11, '6': '.DiscoveredService', '10': 'includedServices'},
-    {'1': 'characteristics', '3': 4, '4': 3, '5': 11, '6': '.DiscoveredCharacteristic', '10': 'characteristics'},
-    {'1': 'serviceInstanceId', '3': 5, '4': 1, '5': 9, '10': 'serviceInstanceId'},
+    {
+      '1': 'serviceUuid',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.Uuid',
+      '10': 'serviceUuid'
+    },
+    {
+      '1': 'characteristicUuids',
+      '3': 2,
+      '4': 3,
+      '5': 11,
+      '6': '.Uuid',
+      '10': 'characteristicUuids'
+    },
+    {
+      '1': 'includedServices',
+      '3': 3,
+      '4': 3,
+      '5': 11,
+      '6': '.DiscoveredService',
+      '10': 'includedServices'
+    },
+    {
+      '1': 'characteristics',
+      '3': 4,
+      '4': 3,
+      '5': 11,
+      '6': '.DiscoveredCharacteristic',
+      '10': 'characteristics'
+    },
+    {
+      '1': 'serviceInstanceId',
+      '3': 5,
+      '4': 1,
+      '5': 9,
+      '10': 'serviceInstanceId'
+    },
   ],
 };
 
@@ -393,14 +639,46 @@ final $typed_data.Uint8List discoveredServiceDescriptor = $convert.base64Decode(
 const DiscoveredCharacteristic$json = {
   '1': 'DiscoveredCharacteristic',
   '2': [
-    {'1': 'characteristicId', '3': 1, '4': 1, '5': 11, '6': '.Uuid', '10': 'characteristicId'},
-    {'1': 'serviceId', '3': 2, '4': 1, '5': 11, '6': '.Uuid', '10': 'serviceId'},
+    {
+      '1': 'characteristicId',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.Uuid',
+      '10': 'characteristicId'
+    },
+    {
+      '1': 'serviceId',
+      '3': 2,
+      '4': 1,
+      '5': 11,
+      '6': '.Uuid',
+      '10': 'serviceId'
+    },
     {'1': 'isReadable', '3': 3, '4': 1, '5': 8, '10': 'isReadable'},
-    {'1': 'isWritableWithResponse', '3': 4, '4': 1, '5': 8, '10': 'isWritableWithResponse'},
-    {'1': 'isWritableWithoutResponse', '3': 5, '4': 1, '5': 8, '10': 'isWritableWithoutResponse'},
+    {
+      '1': 'isWritableWithResponse',
+      '3': 4,
+      '4': 1,
+      '5': 8,
+      '10': 'isWritableWithResponse'
+    },
+    {
+      '1': 'isWritableWithoutResponse',
+      '3': 5,
+      '4': 1,
+      '5': 8,
+      '10': 'isWritableWithoutResponse'
+    },
     {'1': 'isNotifiable', '3': 6, '4': 1, '5': 8, '10': 'isNotifiable'},
     {'1': 'isIndicatable', '3': 7, '4': 1, '5': 8, '10': 'isIndicatable'},
-    {'1': 'characteristicInstanceId', '3': 8, '4': 1, '5': 9, '10': 'characteristicInstanceId'},
+    {
+      '1': 'characteristicInstanceId',
+      '3': 8,
+      '4': 1,
+      '5': 9,
+      '10': 'characteristicInstanceId'
+    },
   ],
 };
 
@@ -436,8 +714,8 @@ const ReadRssiResult$json = {
 };
 
 /// Descriptor for `ReadRssiResult`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List readRssiResultDescriptor = $convert.base64Decode(
-    'Cg5SZWFkUnNzaVJlc3VsdBISCgRyc3NpGAEgASgFUgRyc3Np');
+final $typed_data.Uint8List readRssiResultDescriptor =
+    $convert.base64Decode('Cg5SZWFkUnNzaVJlc3VsdBISCgRyc3NpGAEgASgFUgRyc3Np');
 
 @$core.Deprecated('Use uuidDescriptor instead')
 const Uuid$json = {
@@ -448,8 +726,8 @@ const Uuid$json = {
 };
 
 /// Descriptor for `Uuid`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List uuidDescriptor = $convert.base64Decode(
-    'CgRVdWlkEhIKBGRhdGEYASABKAxSBGRhdGE=');
+final $typed_data.Uint8List uuidDescriptor =
+    $convert.base64Decode('CgRVdWlkEhIKBGRhdGEYASABKAxSBGRhdGE=');
 
 @$core.Deprecated('Use genericFailureDescriptor instead')
 const GenericFailure$json = {
@@ -474,6 +752,5 @@ const IsConnectable$json = {
 };
 
 /// Descriptor for `IsConnectable`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List isConnectableDescriptor = $convert.base64Decode(
-    'Cg1Jc0Nvbm5lY3RhYmxlEhIKBGNvZGUYASABKAVSBGNvZGU=');
-
+final $typed_data.Uint8List isConnectableDescriptor =
+    $convert.base64Decode('Cg1Jc0Nvbm5lY3RhYmxlEhIKBGNvZGUYASABKAVSBGNvZGU=');
