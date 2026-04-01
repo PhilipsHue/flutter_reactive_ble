@@ -1,3 +1,8 @@
+## 5.4.2
+
+* Update to Gradle distribution 8.4 #904
+* Bump protobuf to 6.0.0 #923 (and #916)
+
 ## 5.4.1
 
 * Prevent index out of range crash when filtering services and characteristics #919
