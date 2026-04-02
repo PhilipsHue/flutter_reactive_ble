@@ -366,13 +366,21 @@ final class Central {
     private func resolve(characteristic characteristicInstance: CharacteristicInstance) throws -> CBCharacteristic {
         let peripheral = try resolve(connected: characteristicInstance.peripheralID)
 
-        guard let service = peripheral.services?.filter({ $0.uuid == characteristicInstance.serviceID })[Int(characteristicInstance.serviceInstanceID) ?? 0]
+        let filteredServices = peripheral.services?.filter { $0.uuid == characteristicInstance.serviceID } ?? []
+        let serviceIndex = Int(characteristicInstance.serviceInstanceID) ?? 0
+
+        guard serviceIndex >= 0, serviceIndex < filteredServices.count
         else { throw Failure.serviceNotFound(characteristicInstance.serviceID, characteristicInstance.peripheralID) }
 
-        guard let characteristic = service.characteristics?.filter({ $0.uuid == characteristicInstance.id })[Int(characteristicInstance.instanceID) ?? 0]
+        let service = filteredServices[serviceIndex]
+
+        let filteredCharacteristics = service.characteristics?.filter {$0.uuid == characteristicInstance.id} ?? []
+        let characteristicsIndex = Int(characteristicInstance.instanceID) ?? 0
+
+        guard characteristicsIndex >= 0, characteristicsIndex < filteredCharacteristics.count
         else { throw Failure.characteristicNotFound(characteristicInstance) }
 
-        return characteristic
+        return filteredCharacteristics[characteristicsIndex]
     }
 
     private enum Failure: Error, CustomStringConvertible {

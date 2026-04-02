@@ -32,7 +32,7 @@ class _DeviceDetail extends StatelessWidget {
   @override
   Widget build(BuildContext context) => PopScope(
         canPop: true,
-        onPopInvoked: (_) async {
+        onPopInvokedWithResult: (_, __) async {
           disconnect(device.id);
         },
         child: DefaultTabController(
