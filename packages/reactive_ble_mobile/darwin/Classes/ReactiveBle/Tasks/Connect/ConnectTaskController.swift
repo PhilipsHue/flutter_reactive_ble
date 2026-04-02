@@ -11,22 +11,21 @@ struct ConnectTaskController: PeripheralTaskController {
     }
 
     func connect(centralManager: CBCentralManager, peripheral: CBPeripheral) -> SubjectTask {
-        guard case .pending = task.state
-        else {
-            assert(false)
-            return task
+        guard case .pending = task.state else {
+            return task.with(state: task.state.finished(.failedToConnect(
+                NSError(domain: "ConnectTaskController", code: -1, 
+                       userInfo: [NSLocalizedDescriptionKey: "Invalid state for connect operation"]))))
         }
 
         centralManager.connect(peripheral)
-
         return task.with(state: task.state.processing(.connecting))
     }
 
     func handleConnectionChange(_ connectionChange: ConnectionChange) -> SubjectTask {
-        guard case .processing(since: _, .connecting) = task.state
-        else {
-            assert(false)
-            return task
+        guard case .processing(since: _, .connecting) = task.state else {
+            return task.with(state: task.state.finished(.failedToConnect(
+                NSError(domain: "ConnectTaskController", code: -2,
+                       userInfo: [NSLocalizedDescriptionKey: "Invalid state for connection change"]))))
         }
 
         return task.with(state: task.state.finished(connectionChange))
@@ -40,8 +39,9 @@ struct ConnectTaskController: PeripheralTaskController {
             centralManager.cancelPeripheralConnection(peripheral)
             return task.with(state: task.state.finished(.failedToConnect(error)))
         case .finished:
-            assert(false)
-            return task
+            return task.with(state: task.state.finished(.failedToConnect(
+                NSError(domain: "ConnectTaskController", code: -3,
+                       userInfo: [NSLocalizedDescriptionKey: "Cannot cancel already finished task"]))))
         }
     }
 }

@@ -22,9 +22,6 @@ int convertPriorityToInt(ConnectionPriority priority) {
       return 1;
     case ConnectionPriority.lowPower:
       return 2;
-    default:
-      assert(false);
-      return -1000;
   }
 }
 
