@@ -1,3 +1,9 @@
+#if os(iOS)
+  import Flutter
+#elseif os(macOS)
+  import FlutterMacOS
+#endif
+
 import protocol SwiftProtobuf.Message
 
 enum PluginError: Error {

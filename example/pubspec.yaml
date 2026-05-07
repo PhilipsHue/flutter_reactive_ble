@@ -33,4 +33,6 @@ dependency_overrides:
     path: ../packages/reactive_ble_platform_interface
 
 flutter:
+  config:
+    enable-swift-package-manager: true
   uses-material-design: true
