@@ -1,4 +1,5 @@
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
+import 'package:reactive_ble_platform_interface/src/logger.dart';
 
 import 'models.dart';
 
@@ -12,6 +13,8 @@ import 'models.dart';
 abstract class ReactiveBlePlatform extends PlatformInterface {
   ReactiveBlePlatform() : super(token: _token);
   static final Object _token = Object();
+
+  Logger? logger;
 
   static ReactiveBlePlatform _instance = _PlaceholderImplementation();
 
