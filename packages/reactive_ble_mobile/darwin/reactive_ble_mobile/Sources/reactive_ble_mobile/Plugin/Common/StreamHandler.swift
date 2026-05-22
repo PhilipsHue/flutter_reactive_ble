@@ -1,3 +1,9 @@
+#if os(iOS)
+  import Flutter
+#elseif os(macOS)
+  import FlutterMacOS
+#endif
+
 final class StreamHandler<Context: AnyObject>: NSObject, FlutterStreamHandler {
 
     typealias OnListenHandler = (Context, EventSink) -> FlutterError?
