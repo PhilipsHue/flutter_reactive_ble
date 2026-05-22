@@ -85,7 +85,17 @@ class DeviceConnectorImpl implements DeviceConnector {
     Map<Uuid, List<Uuid>>? servicesWithCharacteristicsToDiscover,
     Duration? connectionTimeout,
   }) {
-    if (_deviceScanner.currentScan != null) {
+    if (_deviceIsDiscoveredRecently(
+      deviceId: id,
+      cacheValidity: _scanRegistryCacheValidityPeriod,
+    )) {
+      return connect(
+        id: id,
+        servicesWithCharacteristicsToDiscover:
+            servicesWithCharacteristicsToDiscover,
+        connectionTimeout: connectionTimeout,
+      );
+    } else if (_deviceScanner.currentScan != null) {
       return _awaitCurrentScanAndConnect(
         withServices,
         prescanDuration,
@@ -111,48 +121,38 @@ class DeviceConnectorImpl implements DeviceConnector {
     List<Uuid> withServices,
     Duration prescanDuration,
   ) {
-    if (_deviceIsDiscoveredRecently(
-        deviceId: id, cacheValidity: _scanRegistryCacheValidityPeriod)) {
-      return connect(
-        id: id,
-        servicesWithCharacteristicsToDiscover:
-            servicesWithCharacteristicsToDiscover,
-        connectionTimeout: connectionTimeout,
-      );
-    } else {
-      final scanSubscription = _deviceScanner
-          .scanForDevices(
-              withServices: withServices, scanMode: ScanMode.lowLatency)
-          .listen((DiscoveredDevice scanData) {}, onError: (Object _) {});
-      Future<void>.delayed(prescanDuration).then<void>((_) {
-        scanSubscription.cancel();
-      });
+    final scanSubscription = _deviceScanner
+        .scanForDevices(
+            withServices: withServices, scanMode: ScanMode.lowLatency)
+        .listen((DiscoveredDevice scanData) {}, onError: (Object _) {});
+    Future<void>.delayed(prescanDuration).then<void>((_) {
+      scanSubscription.cancel();
+    });
 
-      return _deviceScanner.currentScan!.future
-          .then((_) => true)
-          .catchError((Object _) => false)
-          .asStream()
-          .asyncExpand(
-        (succeeded) {
-          if (succeeded) {
-            return _connectIfRecentlyDiscovered(
-                id, servicesWithCharacteristicsToDiscover, connectionTimeout);
-          } else {
-            // When the scan fails 99% of the times it is due to violation of the scan threshold:
-            // https://blog.classycode.com/undocumented-android-7-ble-behavior-changes-d1a9bd87d983
-            //
-            // Previously we used "autoconnect" but that gives slow connection times (up to 2 min) on a lot of devices.
-            return Future<void>.delayed(_delayAfterScanFailure)
-                .asStream()
-                .asyncExpand((_) => _connectIfRecentlyDiscovered(
-                      id,
-                      servicesWithCharacteristicsToDiscover,
-                      connectionTimeout,
-                    ));
-          }
-        },
-      );
-    }
+    return _deviceScanner.currentScan!.future
+        .then((_) => true)
+        .catchError((Object _) => false)
+        .asStream()
+        .asyncExpand(
+      (succeeded) {
+        if (succeeded) {
+          return _connectIfRecentlyDiscovered(
+              id, servicesWithCharacteristicsToDiscover, connectionTimeout);
+        } else {
+          // When the scan fails 99% of the times it is due to violation of the scan threshold:
+          // https://blog.classycode.com/undocumented-android-7-ble-behavior-changes-d1a9bd87d983
+          //
+          // Previously we used "autoconnect" but that gives slow connection times (up to 2 min) on a lot of devices.
+          return Future<void>.delayed(_delayAfterScanFailure)
+              .asStream()
+              .asyncExpand((_) => _connectIfRecentlyDiscovered(
+                    id,
+                    servicesWithCharacteristicsToDiscover,
+                    connectionTimeout,
+                  ));
+        }
+      },
+    );
   }
 
   Stream<ConnectionStateUpdate> _awaitCurrentScanAndConnect(
