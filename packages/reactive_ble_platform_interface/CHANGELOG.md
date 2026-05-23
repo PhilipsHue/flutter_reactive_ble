@@ -1,3 +1,7 @@
+## 5.5.1
+
+* Update compileSdkVersion from 33 to 34 fixing compatibility issues with Androidx on modern flutter #911 #926
+
 ## 5.5.0
 
 * Added Swift Package Manager support #921
