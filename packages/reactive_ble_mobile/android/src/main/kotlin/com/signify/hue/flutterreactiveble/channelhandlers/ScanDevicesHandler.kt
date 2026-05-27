@@ -58,7 +58,14 @@ class ScanDevicesHandler(
             scanForDevicesDisposable.let {
                 if (!it.isDisposed) {
                     it.dispose()
-                    scanParameters = null
+
+                    // If we are doing a hot restart the stopDeviceScan callback will get called twice, with the second being
+                    // something we don't care about because it's just swapping eventchannel subscriptions...and then clobbering
+                    // the value provided to scanParameters...so we're just going to prevent that clobbering from happening
+                    // https://github.com/PhilipsHue/flutter_reactive_ble/issues/195
+                    // https://github.com/PhilipsHue/flutter_reactive_ble/issues/196
+                    // https://github.com/flutter/engine/blob/2962099077b36704071802ea5595f4a016a1c214/shell/platform/android/io/flutter/plugin/common/EventChannel.java#L212
+                    // scanParameters = null
                 }
             }
         }
