@@ -7,11 +7,13 @@ fun extractManufacturerData(manufacturerData: SparseArray<ByteArray>?): ByteArra
 
     if (manufacturerData != null && manufacturerData.size() > 0) {
         val companyId = manufacturerData.keyAt(0)
-        val payload = manufacturerData.get(companyId)
-
         rawData.add((companyId.toByte()))
         rawData.add(((companyId.shr(Byte.SIZE_BITS)).toByte()))
-        rawData.addAll(2, payload.asList())
+        rawData.addAll(manufacturerData.valueAt(0).asList())
+
+        for (i in 1 until manufacturerData.size()) {
+            rawData.addAll(manufacturerData.valueAt(i).asList())
+        }
     }
 
     return rawData.toByteArray()
