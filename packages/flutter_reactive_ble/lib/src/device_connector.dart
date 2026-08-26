@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:collection/collection.dart';
 import 'package:flutter_reactive_ble/src/device_scanner.dart';
 import 'package:flutter_reactive_ble/src/rx_ext/repeater.dart';
@@ -110,49 +112,77 @@ class DeviceConnectorImpl implements DeviceConnector {
     Duration? connectionTimeout,
     List<Uuid> withServices,
     Duration prescanDuration,
-  ) {
+  ) async* {
     if (_deviceIsDiscoveredRecently(
         deviceId: id, cacheValidity: _scanRegistryCacheValidityPeriod)) {
-      return connect(
+      yield* connect(
         id: id,
         servicesWithCharacteristicsToDiscover:
             servicesWithCharacteristicsToDiscover,
         connectionTimeout: connectionTimeout,
       );
-    } else {
-      final scanSubscription = _deviceScanner
-          .scanForDevices(
-              withServices: withServices, scanMode: ScanMode.lowLatency)
-          .listen((DiscoveredDevice scanData) {}, onError: (Object _) {});
+      return;
+    }
+
+    // get a sync function context so we can cancel the stream on a simple
+    // timer
+    Stream<DiscoveredDevice> scanWithTimeout() {
+      final controller = StreamController<DiscoveredDevice>();
+
+      final stream = _deviceScanner.scanForDevices(
+          withServices: withServices, scanMode: ScanMode.lowLatency);
+
+      final scanSubscription =
+          stream.listen(controller.add, onError: controller.addError);
       Future<void>.delayed(prescanDuration).then<void>((_) {
         scanSubscription.cancel();
+        controller.close();
       });
 
-      return _deviceScanner.currentScan!.future
-          .then((_) => true)
-          .catchError((Object _) => false)
-          .asStream()
-          .asyncExpand(
-        (succeeded) {
-          if (succeeded) {
-            return _connectIfRecentlyDiscovered(
-                id, servicesWithCharacteristicsToDiscover, connectionTimeout);
-          } else {
-            // When the scan fails 99% of the times it is due to violation of the scan threshold:
-            // https://blog.classycode.com/undocumented-android-7-ble-behavior-changes-d1a9bd87d983
-            //
-            // Previously we used "autoconnect" but that gives slow connection times (up to 2 min) on a lot of devices.
-            return Future<void>.delayed(_delayAfterScanFailure)
-                .asStream()
-                .asyncExpand((_) => _connectIfRecentlyDiscovered(
-                      id,
-                      servicesWithCharacteristicsToDiscover,
-                      connectionTimeout,
-                    ));
-          }
-        },
-      );
+      return controller.stream;
     }
+
+    var didScanDevice = false;
+    try {
+      await for (final device in scanWithTimeout()) {
+        if (device.id == id) {
+          didScanDevice = true;
+          break;
+        }
+      }
+      // ignore: avoid_catches_without_on_clauses
+    } catch (_) {
+      // When the scan fails 99% of the times it is due to violation of the scan threshold:
+      // https://blog.classycode.com/undocumented-android-7-ble-behavior-changes-d1a9bd87d983
+      //
+      // Previously we used "autoconnect" but that gives slow connection times (up to 2 min) on a lot of devices.
+      await Future<void>.delayed(_delayAfterScanFailure);
+
+      yield* _connectIfRecentlyDiscovered(
+        id,
+        servicesWithCharacteristicsToDiscover,
+        connectionTimeout,
+      );
+      return;
+    }
+
+    if (didScanDevice) {
+      yield* connect(
+        id: id,
+        servicesWithCharacteristicsToDiscover:
+            servicesWithCharacteristicsToDiscover,
+        connectionTimeout: connectionTimeout,
+      );
+      return;
+    }
+
+    yield ConnectionStateUpdate(
+      deviceId: id,
+      connectionState: DeviceConnectionState.disconnected,
+      failure: const GenericFailure(
+          code: ConnectionError.failedToConnect,
+          message: "Device is not advertising"),
+    );
   }
 
   Stream<ConnectionStateUpdate> _awaitCurrentScanAndConnect(
