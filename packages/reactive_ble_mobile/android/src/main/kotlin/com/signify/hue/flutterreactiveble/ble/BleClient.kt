@@ -16,6 +16,17 @@ interface BleClient {
 
     fun initializeClient()
 
+    /**
+     * Establishes a bond with the device.
+     *
+     * The single will emit the final bond state of the device.
+     * The value is one of the constants in [android.bluetooth.BluetoothDevice]:
+     * - [android.bluetooth.BluetoothDevice.BOND_NONE]
+     * - [android.bluetooth.BluetoothDevice.BOND_BONDING]
+     * - [android.bluetooth.BluetoothDevice.BOND_BONDED]
+     */
+    fun establishBond(deviceId: String): Single<Int>
+
     fun scanForDevices(
         services: List<ParcelUuid>,
         scanMode: ScanMode,

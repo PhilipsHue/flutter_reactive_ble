@@ -6,6 +6,19 @@ import 'package:reactive_ble_platform_interface/reactive_ble_platform_interface.
 abstract class DeviceConnector {
   Stream<ConnectionStateUpdate> get deviceConnectionStateUpdateStream;
 
+  /// Creates a bond (pairing) with the device identified by [deviceId].
+  ///
+  /// **Android only.** Completes with the resulting [BondingStatus].
+  Future<BondingStatus> establishBonding({
+    required String deviceId,
+  });
+
+  /// Retrieves the name of the device identified by [id].
+  ///
+  /// **iOS/macOS only.** Completes with the device name, or `null` when the
+  /// name is unknown.
+  Future<String?> retrieveDeviceName(String id);
+
   Stream<ConnectionStateUpdate> connect({
     required String id,
     Map<Uuid, List<Uuid>>? servicesWithCharacteristicsToDiscover,
@@ -47,6 +60,14 @@ class DeviceConnectorImpl implements DeviceConnector {
   @override
   Stream<ConnectionStateUpdate> get deviceConnectionStateUpdateStream =>
       _blePlatform.connectionUpdateStream;
+
+  @override
+  Future<BondingStatus> establishBonding({required String deviceId}) async =>
+      _blePlatform.establishBonding(deviceId);
+
+  @override
+  Future<String?> retrieveDeviceName(String id) =>
+      _blePlatform.retrieveDeviceName(id);
 
   @override
   Stream<ConnectionStateUpdate> connect({

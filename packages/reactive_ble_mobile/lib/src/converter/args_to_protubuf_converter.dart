@@ -9,6 +9,10 @@ abstract class ArgsToProtobufConverter {
     Duration? connectionTimeout,
   );
 
+  pb.EstablishBondingRequest createEstablishBondingArgs(String id);
+
+  pb.GetDeviceNameRequest createGetDeviceNameArgs(String id);
+
   pb.DisconnectFromDeviceRequest createDisconnectDeviceArgs(String deviceId);
 
   pb.ReadCharacteristicRequest createReadCharacteristicRequest(
@@ -37,6 +41,12 @@ abstract class ArgsToProtobufConverter {
     String deviceId,
     ConnectionPriority priority,
   );
+
+  pb.LaunchCompanionRequest createLaunchCompanionWorkflowRequest({
+    required String deviceNamePattern,
+    required bool singleDeviceScan,
+    required bool forceConfirmation,
+  });
 
   pb.ScanForDevicesRequest createScanForDevicesRequest({
     required List<Uuid>? withServices,
@@ -85,8 +95,16 @@ class ArgsToProtobufConverterImpl implements ArgsToProtobufConverter {
   }
 
   @override
+  pb.EstablishBondingRequest createEstablishBondingArgs(String id) =>
+      pb.EstablishBondingRequest()..deviceId = id;
+
+  @override
   pb.DisconnectFromDeviceRequest createDisconnectDeviceArgs(String deviceId) =>
       pb.DisconnectFromDeviceRequest()..deviceId = deviceId;
+
+  @override
+  pb.GetDeviceNameRequest createGetDeviceNameArgs(String deviceId) =>
+      pb.GetDeviceNameRequest()..deviceId = deviceId;
 
   @override
   pb.ReadCharacteristicRequest createReadCharacteristicRequest(
@@ -202,6 +220,17 @@ class ArgsToProtobufConverterImpl implements ArgsToProtobufConverter {
     final args = pb.ClearGattCacheRequest()..deviceId = deviceId;
     return args;
   }
+
+  @override
+  pb.LaunchCompanionRequest createLaunchCompanionWorkflowRequest({
+    required String deviceNamePattern,
+    required bool singleDeviceScan,
+    required bool forceConfirmation,
+  }) =>
+      pb.LaunchCompanionRequest()
+        ..deviceNamePattern = deviceNamePattern
+        ..singleDeviceScan = singleDeviceScan
+        ..forceConfirmation = forceConfirmation;
 
   @override
   pb.DiscoverServicesRequest createDiscoverServicesRequest(String deviceId) {

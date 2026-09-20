@@ -5,6 +5,21 @@ import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
 abstract class DeviceScanner {
   ScanSession? get currentScan;
 
+  /// Launches the Android companion device workflow to associate a BLE device
+  /// with the host.
+  ///
+  /// **Android only.** The advertised device name is matched against [pattern]
+  /// (a regular expression). See [ReactiveBlePlatform.launchCompanionWorkflow]
+  /// for the meaning of [singleDeviceScan] and [forceConfirmation].
+  ///
+  /// Completes with a [DeviceAssociationInfo] describing the associated device,
+  /// or `null` when no device was selected.
+  Future<DeviceAssociationInfo?> launchCompanionWorkflow({
+    required String pattern,
+    required bool singleDeviceScan,
+    required bool forceConfirmation,
+  });
+
   Stream<DiscoveredDevice> scanForDevices({
     required List<Uuid> withServices,
     ScanMode scanMode = ScanMode.balanced,
@@ -37,6 +52,18 @@ class DeviceScannerImpl implements DeviceScanner {
 
   @override
   ScanSession? get currentScan => _currentScanSession;
+
+  @override
+  Future<DeviceAssociationInfo?> launchCompanionWorkflow({
+    required String pattern,
+    required bool singleDeviceScan,
+    required bool forceConfirmation,
+  }) async =>
+      _blePlatform.launchCompanionWorkflow(
+        pattern: pattern,
+        singleDeviceScan: singleDeviceScan,
+        forceConfirmation: forceConfirmation,
+      );
 
   @override
   Stream<DiscoveredDevice> scanForDevices({
