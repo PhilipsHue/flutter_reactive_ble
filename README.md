@@ -74,6 +74,15 @@ For iOS/MacOS it is required you add the following entries to the `Info.plist` f
 
 For MacOS, make sure to enable Bluetooth from Capabilities
 
+#### Bluetooth power alert
+
+By default iOS shows a system alert asking the user to turn on Bluetooth when the plugin initializes while Bluetooth is off. If your app handles this state itself (for example by listening to `statusStream` for `BleStatus.poweredOff`), you can disable the alert by adding the following to your `Info.plist`:
+
+```xml
+<key>FlutterReactiveBleShowPowerAlert</key>
+<false/>
+```
+
 ## Usage
 ### Initialization
 
