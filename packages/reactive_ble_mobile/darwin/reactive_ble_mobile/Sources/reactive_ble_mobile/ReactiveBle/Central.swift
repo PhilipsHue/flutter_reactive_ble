@@ -123,8 +123,15 @@ final class Central {
         )
         self.centralManager = CBCentralManager(
             delegate: centralManagerDelegate,
-            queue: nil
+            queue: nil,
+            options: [CBCentralManagerOptionShowPowerAlertKey: Central.showPowerAlert]
         )
+    }
+
+    /// Read from the `FlutterReactiveBleShowPowerAlert` key in the app's Info.plist.
+    /// Defaults to `true`, matching CoreBluetooth's own default.
+    private static var showPowerAlert: Bool {
+        Bundle.main.object(forInfoDictionaryKey: "FlutterReactiveBleShowPowerAlert") as? Bool ?? true
     }
 
     var state: CBManagerState { return centralManager.state }
