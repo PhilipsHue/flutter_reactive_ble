@@ -1,5 +1,9 @@
 ## 5.6.0
 
+* Replace the with Gradle 8.10 deprecated compileSdkVersion with compileSdk and compileSdkMinor
+ 
+## 5.6.0
+
 * Support built-in Kotlin, AGP 9.0+ and Android SDK 37 #934
 * Set min Flutter version to 3.44.0
 
