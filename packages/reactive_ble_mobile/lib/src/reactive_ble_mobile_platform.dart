@@ -37,13 +37,18 @@ class ReactiveBleMobilePlatform extends ReactiveBlePlatform {
   Stream<ScanResult>? _scanResultStream;
   Stream<BleStatus>? _bleStatusStream;
 
+  /// Null when logging is disabled, so `_enabledLogger?.log(...)` skips
+  /// building the message (and its string interpolation) for [LogLevel.none].
+  Logger? get _enabledLogger =>
+      _logger?.logLevel == LogLevel.none ? null : _logger;
+
   @override
   Stream<ConnectionStateUpdate> get connectionUpdateStream =>
       _connectionUpdateStream ??= _connectedDeviceRawStream
           .map(_protobufConverter.connectionStateUpdateFrom)
           .map(
         (update) {
-          _logger?.log(
+          _enabledLogger?.log(
             'Received $ConnectionStateUpdate(deviceId: ${update.deviceId}, connectionState: ${update.connectionState}, failure: ${update.failure})',
           );
           return update;
@@ -56,7 +61,7 @@ class ReactiveBleMobilePlatform extends ReactiveBlePlatform {
           .map(_protobufConverter.characteristicValueFrom)
           .map(
         (update) {
-          _logger?.log(
+          _enabledLogger?.log(
             'Received $CharacteristicValue(characteristic: ${update.characteristic}, result: ${update.runtimeType})',
           );
           return update;
@@ -67,7 +72,7 @@ class ReactiveBleMobilePlatform extends ReactiveBlePlatform {
   Stream<ScanResult> get scanStream => _scanResultStream ??=
           _bleDeviceScanRawStream.map(_protobufConverter.scanResultFrom).map(
         (scanResult) {
-          _logger?.log(
+          _enabledLogger?.log(
             'Received $ScanResult(result: ${scanResult.result})',
           );
           return scanResult;
@@ -79,19 +84,19 @@ class ReactiveBleMobilePlatform extends ReactiveBlePlatform {
       _bleStatusStream ??= _bleStatusRawChannel
           .map(_protobufConverter.bleStatusFrom)
           .map((status) {
-        _logger?.log('Received $BleStatus update: $status');
+        _enabledLogger?.log('Received $BleStatus update: $status');
         return status;
       });
 
   @override
   Future<void> initialize() {
-    _logger?.log('Initialize BLE platform');
+    _enabledLogger?.log('Initialize BLE platform');
     return _bleMethodChannel.invokeMethod("initialize");
   }
 
   @override
   Future<void> deinitialize() {
-    _logger?.log('Deinitialize BLE platform');
+    _enabledLogger?.log('Deinitialize BLE platform');
     return _bleMethodChannel.invokeMethod<void>("deinitialize");
   }
 
@@ -101,7 +106,7 @@ class ReactiveBleMobilePlatform extends ReactiveBlePlatform {
     required ScanMode scanMode,
     required bool requireLocationServicesEnabled,
   }) {
-    _logger?.log(
+    _enabledLogger?.log(
       'Scan for devices with services:$withServices, scanMode: $scanMode, requireLocationServicesEnabled: $requireLocationServicesEnabled',
     );
     return _bleMethodChannel
@@ -124,7 +129,7 @@ class ReactiveBleMobilePlatform extends ReactiveBlePlatform {
     Map<Uuid, List<Uuid>>? servicesWithCharacteristicsToDiscover,
     Duration? connectionTimeout,
   ) {
-    _logger?.log(
+    _enabledLogger?.log(
       'Connect to device: $id, servicesWithCharacteristicsToDiscover: $servicesWithCharacteristicsToDiscover, timeout: $connectionTimeout',
     );
     return _bleMethodChannel
@@ -143,7 +148,7 @@ class ReactiveBleMobilePlatform extends ReactiveBlePlatform {
 
   @override
   Future<void> disconnectDevice(String deviceId) {
-    _logger?.log(
+    _enabledLogger?.log(
       'Disconnect device: $deviceId',
     );
     return _bleMethodChannel.invokeMethod<void>(
@@ -156,7 +161,7 @@ class ReactiveBleMobilePlatform extends ReactiveBlePlatform {
 
   @override
   Stream<void> readCharacteristic(CharacteristicInstance characteristic) {
-    _logger?.log(
+    _enabledLogger?.log(
       'Read characteristic: $characteristic',
     );
     return _bleMethodChannel
@@ -174,7 +179,7 @@ class ReactiveBleMobilePlatform extends ReactiveBlePlatform {
     CharacteristicInstance characteristic,
     List<int> value,
   ) async {
-    _logger?.log('Write with response to $characteristic, value: $value');
+    _enabledLogger?.log('Write with response to $characteristic, value: $value');
     return _bleMethodChannel
         .invokeMethod<List<int>>(
             "writeCharacteristicWithResponse",
@@ -189,7 +194,7 @@ class ReactiveBleMobilePlatform extends ReactiveBlePlatform {
     CharacteristicInstance characteristic,
     List<int> value,
   ) async {
-    _logger?.log(
+    _enabledLogger?.log(
       'Write without response to $characteristic, value: $value',
     );
     return _bleMethodChannel
@@ -206,7 +211,7 @@ class ReactiveBleMobilePlatform extends ReactiveBlePlatform {
   Stream<void> subscribeToNotifications(
     CharacteristicInstance characteristic,
   ) {
-    _logger?.log('Start subscribing to notifications for $characteristic');
+    _enabledLogger?.log('Start subscribing to notifications for $characteristic');
     return _bleMethodChannel
         .invokeMethod<void>(
           "readNotifications",
@@ -221,7 +226,7 @@ class ReactiveBleMobilePlatform extends ReactiveBlePlatform {
   Future<void> stopSubscribingToNotifications(
     CharacteristicInstance characteristic,
   ) {
-    _logger?.log('Stop subscribing to notifications for $characteristic');
+    _enabledLogger?.log('Stop subscribing to notifications for $characteristic');
     return _bleMethodChannel
         .invokeMethod<void>(
           "stopNotifications",
@@ -237,7 +242,7 @@ class ReactiveBleMobilePlatform extends ReactiveBlePlatform {
 
   @override
   Future<int> requestMtuSize(String deviceId, int? mtu) async {
-    _logger?.log('Request mtu size for device: $deviceId with mtuSize: $mtu');
+    _enabledLogger?.log('Request mtu size for device: $deviceId with mtuSize: $mtu');
     return _bleMethodChannel
         .invokeMethod<List<int>>(
           "negotiateMtuSize",
@@ -251,7 +256,7 @@ class ReactiveBleMobilePlatform extends ReactiveBlePlatform {
   @override
   Future<ConnectionPriorityInfo> requestConnectionPriority(
       String deviceId, ConnectionPriority priority) {
-    _logger?.log(
+    _enabledLogger?.log(
         'Request connection priority for device: $deviceId, priority: $priority');
     return _bleMethodChannel
         .invokeMethod<List<int>>(
@@ -266,7 +271,7 @@ class ReactiveBleMobilePlatform extends ReactiveBlePlatform {
   @override
   Future<Result<Unit, GenericFailure<ClearGattCacheError>?>> clearGattCache(
       String deviceId) {
-    _logger?.log('Clear gatt cache for device: $deviceId');
+    _enabledLogger?.log('Clear gatt cache for device: $deviceId');
     return _bleMethodChannel
         .invokeMethod<List<int>>(
           "clearGattCache",
@@ -279,7 +284,7 @@ class ReactiveBleMobilePlatform extends ReactiveBlePlatform {
 
   @override
   Future<List<DiscoveredService>> discoverServices(String deviceId) async {
-    _logger?.log('Discover services for device: $deviceId');
+    _enabledLogger?.log('Discover services for device: $deviceId');
     return _bleMethodChannel
         .invokeMethod<List<int>>(
           'discoverServices',
@@ -292,7 +297,7 @@ class ReactiveBleMobilePlatform extends ReactiveBlePlatform {
 
   @override
   Future<List<DiscoveredService>> getDiscoverServices(String deviceId) async {
-    _logger?.log('Get discovered services for device: $deviceId');
+    _enabledLogger?.log('Get discovered services for device: $deviceId');
     return _bleMethodChannel
         .invokeMethod<List<int>>(
           'getDiscoveredServices',

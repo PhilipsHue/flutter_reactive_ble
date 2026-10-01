@@ -647,5 +647,55 @@ void main() {
         ).called(1);
       });
     });
+
+    group('Logging', () {
+      late _FakeLogger logger;
+
+      setUp(() {
+        logger = _FakeLogger();
+        _sut = ReactiveBleMobilePlatform(
+          argsToProtobufConverter: _argsConverter,
+          bleMethodChannel: _methodChannel,
+          protobufConverter: _protobufConverter,
+          connectedDeviceChannel: _connectedDeviceStreamController.stream,
+          charUpdateChannel: _argsStreamController.stream,
+          bleDeviceScanChannel: _scanStreamController.stream,
+          bleStatusChannel: _statusStreamController.stream,
+          logger: logger,
+        );
+
+        when(_protobufConverter.bleStatusFrom([1])).thenReturn(BleStatus.ready);
+        _statusStreamController.add([1]);
+      });
+
+      test('It does not log when log level is none', () async {
+        logger.logLevel = LogLevel.none;
+        await _sut.initialize();
+        await _sut.bleStatusStream.first;
+
+        expect(logger.messages, isEmpty);
+      });
+
+      test('It logs when log level is verbose', () async {
+        logger.logLevel = LogLevel.verbose;
+        await _sut.initialize();
+        await _sut.bleStatusStream.first;
+
+        expect(logger.messages, [
+          'Initialize BLE platform',
+          'Received BleStatus update: BleStatus.ready',
+        ]);
+      });
+    });
   });
+}
+
+class _FakeLogger implements Logger {
+  final messages = <Object>[];
+
+  @override
+  LogLevel logLevel = LogLevel.none;
+
+  @override
+  void log(Object message) => messages.add(message);
 }
