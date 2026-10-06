@@ -532,26 +532,38 @@ final class PluginController {
             return
         }
 
-        let result: WriteCharacteristicInfo
         do {
+            // Completion fires only once the write is actually accepted by a
+            // ready peripheral (it may be deferred behind flow control), so the
+            // Flutter-side Future provides genuine backpressure.
             try central.writeWithoutResponse(
                 value: args.value,
-                characteristic: characteristic
+                characteristic: characteristic,
+                completion: { error in
+                    let result = WriteCharacteristicInfo.with {
+                        $0.characteristic = args.characteristic
+                        if let error = error {
+                            $0.failure = GenericFailure.with {
+                                $0.code = Int32(WriteCharacteristicFailure.unknown.rawValue)
+                                $0.message = "\(error)"
+                            }
+                        }
+                    }
+
+                    completion(.success(result))
+                }
             )
-            result = WriteCharacteristicInfo.with {
-                $0.characteristic = args.characteristic
-            }
         } catch {
-            result = WriteCharacteristicInfo.with {
+            let result = WriteCharacteristicInfo.with {
                 $0.characteristic = args.characteristic
                 $0.failure = GenericFailure.with {
                     $0.code = Int32(WriteCharacteristicFailure.unknown.rawValue)
                     $0.message = "\(error)"
                 }
             }
-        }
 
-        completion(.success(result))
+            completion(.success(result))
+        }
     }
 
     func reportMaximumWriteValueLength(name: String, args: NegotiateMtuRequest, completion: @escaping PlatformMethodCompletionHandler) {
