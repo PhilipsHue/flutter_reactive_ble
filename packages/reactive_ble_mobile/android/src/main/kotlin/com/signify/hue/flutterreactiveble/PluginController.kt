@@ -33,6 +33,7 @@ class PluginController {
             "readCharacteristic" to this::readCharacteristic,
             "writeCharacteristicWithResponse" to this::writeCharacteristicWithResponse,
             "writeCharacteristicWithoutResponse" to this::writeCharacteristicWithoutResponse,
+            "writeCharacteristicWithoutResponseBatch" to this::writeCharacteristicWithoutResponseBatch,
             "readNotifications" to this::readNotifications,
             "stopNotifications" to this::stopNotifications,
             "negotiateMtuSize" to this::negotiateMtuSize,
@@ -228,6 +229,17 @@ class PluginController {
             call,
             result,
             com.signify.hue.flutterreactiveble.ble.BleClient::writeCharacteristicWithoutResponse,
+        )
+    }
+
+    private fun writeCharacteristicWithoutResponseBatch(
+        call: MethodCall,
+        result: Result,
+    ) {
+        executeWriteAndPropagateResultToChannel(
+            call,
+            result,
+            com.signify.hue.flutterreactiveble.ble.BleClient::writeCharacteristicWithoutResponseBatch,
         )
     }
 

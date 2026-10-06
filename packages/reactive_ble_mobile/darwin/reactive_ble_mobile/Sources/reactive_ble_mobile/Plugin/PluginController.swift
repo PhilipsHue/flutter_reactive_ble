@@ -566,6 +566,66 @@ final class PluginController {
         }
     }
 
+    func writeCharacteristicWithoutResponseBatch(name: String, args: WriteCharacteristicRequest, completion: @escaping PlatformMethodCompletionHandler) {
+        guard let central = central
+        else {
+            completion(.failure(PluginError.notInitialized.asFlutterError))
+            return
+        }
+
+        guard let characteristic = CharacteristicInstanceIDFactory().make(from: args.characteristic)
+        else {
+            completion(.failure(PluginError.invalidMethodCall(method: name, details: "characteristic, service, and peripheral IDs are required").asFlutterError))
+            return
+        }
+
+        // Completes the Flutter call exactly once: on the first error, or when the last packet is accepted.
+        var isFinished = false
+        let finish: (Error?) -> Void = { error in
+            guard !isFinished else { return }
+            isFinished = true
+            let result = WriteCharacteristicInfo.with {
+                $0.characteristic = args.characteristic
+                if let error = error {
+                    $0.failure = GenericFailure.with {
+                        $0.code = Int32(WriteCharacteristicFailure.unknown.rawValue)
+                        $0.message = "\(error)"
+                    }
+                }
+            }
+
+            completion(.success(result))
+        }
+
+        do {
+            let value = args.value
+            let packetSize = try central.maximumWriteValueLength(for: characteristic.peripheralID, type: .withoutResponse)
+            let packetStarts = Array(stride(from: value.startIndex, to: value.endIndex, by: packetSize))
+            var remaining = packetStarts.count
+            if remaining == 0 {
+                finish(nil)
+                return
+            }
+
+            // Packets join the per-peripheral FIFO in order; writeWithoutResponse's flow control
+            // sends each one as soon as the peripheral can accept it.
+            for start in packetStarts {
+                try central.writeWithoutResponse(
+                    value: value[start..<min(start + packetSize, value.endIndex)],
+                    characteristic: characteristic,
+                    completion: { error in
+                        remaining -= 1
+                        if error != nil || remaining == 0 {
+                            finish(error)
+                        }
+                    }
+                )
+            }
+        } catch {
+            finish(error)
+        }
+    }
+
     func reportMaximumWriteValueLength(name: String, args: NegotiateMtuRequest, completion: @escaping PlatformMethodCompletionHandler) {
         guard let central = central
         else {

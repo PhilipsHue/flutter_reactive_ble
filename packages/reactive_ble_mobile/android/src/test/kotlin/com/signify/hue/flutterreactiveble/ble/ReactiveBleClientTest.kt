@@ -12,6 +12,7 @@ import com.polidea.rxandroidble2.RxBleDeviceServices
 import com.signify.hue.flutterreactiveble.ble.extensions.resolveCharacteristic
 import com.signify.hue.flutterreactiveble.ble.extensions.writeCharWithResponse
 import com.signify.hue.flutterreactiveble.ble.extensions.writeCharWithoutResponse
+import com.signify.hue.flutterreactiveble.ble.extensions.writeCharWithoutResponseBatch
 import com.signify.hue.flutterreactiveble.utils.Duration
 import io.mockk.MockKAnnotations
 import io.mockk.every
@@ -251,6 +252,22 @@ class ReactiveBleClientTest {
             val result = sut.writeCharacteristicWithoutResponse("test", UUID.randomUUID(), 11, bytes).test()
 
             assertThat(result.values().first()).isInstanceOf(CharOperationFailed::class.java)
+            verify(exactly = 0) { rxConnection.writeCharWithoutResponse(any(), any()) }
+        }
+
+        @Test
+        fun `should call writeCharWithoutResponseBatch once with the whole value`() {
+            val bytes = ByteArray(1000) { it.toByte() }
+
+            every {
+                rxConnection.resolveCharacteristic(
+                    any(),
+                    any(),
+                )
+            }.returns(Single.just(BluetoothGattCharacteristic(UUID.randomUUID(), 0, 0)))
+            sut.writeCharacteristicWithoutResponseBatch("test", UUID.randomUUID(), 11, bytes).test()
+
+            verify(exactly = 1) { rxConnection.writeCharWithoutResponseBatch(any(), bytes) }
             verify(exactly = 0) { rxConnection.writeCharWithoutResponse(any(), any()) }
         }
 

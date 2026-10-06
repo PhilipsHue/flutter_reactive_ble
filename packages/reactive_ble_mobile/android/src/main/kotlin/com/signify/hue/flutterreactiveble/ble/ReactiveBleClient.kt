@@ -19,6 +19,7 @@ import com.polidea.rxandroidble2.scan.ScanSettings
 import com.signify.hue.flutterreactiveble.ble.extensions.resolveCharacteristic
 import com.signify.hue.flutterreactiveble.ble.extensions.writeCharWithResponse
 import com.signify.hue.flutterreactiveble.ble.extensions.writeCharWithoutResponse
+import com.signify.hue.flutterreactiveble.ble.extensions.writeCharWithoutResponseBatch
 import com.signify.hue.flutterreactiveble.converters.extractManufacturerData
 import com.signify.hue.flutterreactiveble.model.ScanMode
 import com.signify.hue.flutterreactiveble.model.toScanSettings
@@ -226,6 +227,20 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
             characteristicInstanceId,
             value,
             RxBleConnection::writeCharWithoutResponse,
+        )
+
+    override fun writeCharacteristicWithoutResponseBatch(
+        deviceId: String,
+        characteristicId: UUID,
+        characteristicInstanceId: Int,
+        value: ByteArray,
+    ): Single<CharOperationResult> =
+        executeWriteOperation(
+            deviceId,
+            characteristicId,
+            characteristicInstanceId,
+            value,
+            RxBleConnection::writeCharWithoutResponseBatch,
         )
 
     override fun setupNotification(

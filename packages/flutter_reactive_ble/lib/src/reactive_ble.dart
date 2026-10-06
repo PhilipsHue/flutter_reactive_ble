@@ -200,6 +200,32 @@ class FlutterReactiveBle {
     await (await resolveSingle(characteristic)).write(value, withResponse: false);
   }
 
+  /// Writes [value] without response as back-to-back packets of (MTU - 3) bytes.
+  ///
+  /// The platform splits [value] and sends each packet as soon as the BLE stack
+  /// accepts the previous one, so there is no round trip to dart between packets.
+  /// Use it for bulk transfers such as firmware updates, where awaiting
+  /// [writeCharacteristicWithoutResponse] per packet limits throughput.
+  ///
+  /// Packets are sent in order. The returned future completes when the last
+  /// packet has been accepted by the platform BLE stack (not when the device has
+  /// processed it), or with an error on the first failure; in that case, packets
+  /// before the failure may already have been sent.
+  ///
+  /// Negotiate the MTU with [requestMtu] first. Keep [value] no larger than
+  /// what the device can buffer, and confirm reception between batches
+  /// (e.g. via a notification) as write-without-response has no acknowledgement.
+  Future<void> writeCharacteristicWithoutResponseBatch(
+    QualifiedCharacteristic characteristic, {
+    required List<int> value,
+  }) async {
+    if (value.isEmpty) return;
+    await initialize();
+    final resolved = await resolveSingle(characteristic);
+    resolved._assertValidity();
+    await _connectedDeviceOperator.writeCharacteristicWithoutResponseBatch(resolved._ids, value: value);
+  }
+
   /// Request a specific MTU for a connected device.
   ///
   /// Returns the actual MTU negotiated.

@@ -17,6 +17,11 @@ abstract class ConnectedDeviceOperation {
     required List<int> value,
   });
 
+  Future<void> writeCharacteristicWithoutResponseBatch(
+    CharacteristicInstance characteristic, {
+    required List<int> value,
+  });
+
   Stream<List<int>> subscribeToCharacteristic(
     CharacteristicInstance characteristic,
     Future<void> isDisconnected,
@@ -74,6 +79,15 @@ class ConnectedDeviceOperationImpl implements ConnectedDeviceOperation {
   }) async =>
       _blePlatform
           .writeCharacteristicWithoutResponse(characteristic, value)
+          .then((info) => info.result.dematerialize());
+
+  @override
+  Future<void> writeCharacteristicWithoutResponseBatch(
+    CharacteristicInstance characteristic, {
+    required List<int> value,
+  }) async =>
+      _blePlatform
+          .writeCharacteristicWithoutResponseBatch(characteristic, value)
           .then((info) => info.result.dematerialize());
 
   @override

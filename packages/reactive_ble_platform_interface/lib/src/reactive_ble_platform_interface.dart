@@ -157,6 +157,21 @@ abstract class ReactiveBlePlatform extends PlatformInterface {
         'writeCharacteristicWithoutResponse has not been implemented.');
   }
 
+  /// Writes [value] as a sequence of write-without-response packets of
+  /// (MTU - 3) bytes, sent back to back by the platform without returning to
+  /// the dart layer between packets.
+  ///
+  /// When implementing this operation make sure the packets are sent in order
+  /// and that the response is returned once the last packet is accepted by the
+  /// platform BLE stack, or on the first failure.
+  Future<WriteCharacteristicInfo> writeCharacteristicWithoutResponseBatch(
+    CharacteristicInstance characteristic,
+    List<int> value,
+  ) {
+    throw UnimplementedError(
+        'writeCharacteristicWithoutResponseBatch has not been implemented.');
+  }
+
   /// Starts subscribing to notifications for a specified characteristic.
   ///
   /// This stream only returns the result of the operation. Value updates should
