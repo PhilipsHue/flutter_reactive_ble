@@ -323,8 +323,9 @@ class MockArgsToProtobufConverter extends _i1.Mock
   @override
   _i2.WriteCharacteristicRequest createWriteCharacteristicRequest(
     _i3.CharacteristicInstance? characteristic,
-    List<int>? value,
-  ) =>
+    List<int>? value, {
+    int? packetSize,
+  }) =>
       (super.noSuchMethod(
         Invocation.method(
           #createWriteCharacteristicRequest,
@@ -332,6 +333,7 @@ class MockArgsToProtobufConverter extends _i1.Mock
             characteristic,
             value,
           ],
+          {#packetSize: packetSize},
         ),
         returnValue: _FakeWriteCharacteristicRequest_3(
           this,
@@ -341,6 +343,7 @@ class MockArgsToProtobufConverter extends _i1.Mock
               characteristic,
               value,
             ],
+            {#packetSize: packetSize},
           ),
         ),
       ) as _i2.WriteCharacteristicRequest);

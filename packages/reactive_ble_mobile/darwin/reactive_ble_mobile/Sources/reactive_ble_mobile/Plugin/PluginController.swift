@@ -599,7 +599,8 @@ final class PluginController {
 
         do {
             let value = args.value
-            let packetSize = try central.maximumWriteValueLength(for: characteristic.peripheralID, type: .withoutResponse)
+            let maxLen = try central.maximumWriteValueLength(for: characteristic.peripheralID, type: .withoutResponse)
+            let packetSize = args.packetSize > 0 ? min(Int(args.packetSize), maxLen) : maxLen
             let packetStarts = Array(stride(from: value.startIndex, to: value.endIndex, by: packetSize))
             var remaining = packetStarts.count
             if remaining == 0 {

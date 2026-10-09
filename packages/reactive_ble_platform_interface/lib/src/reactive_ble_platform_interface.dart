@@ -157,17 +157,27 @@ abstract class ReactiveBlePlatform extends PlatformInterface {
         'writeCharacteristicWithoutResponse has not been implemented.');
   }
 
-  /// Writes [value] as a sequence of write-without-response packets of
-  /// (MTU - 3) bytes, sent back to back by the platform without returning to
-  /// the dart layer between packets.
+  /// Writes [value] without response as a sequence of packets, sent back to
+  /// back by the platform without returning to the dart layer between packets.
+  ///
+  /// This reduces per-write overhead for bulk transfers: every packet is filled
+  /// up to the maximum size and the dart <-> platform round trip per write is
+  /// removed. The BLE stack may still send only one packet per connection event.
+  ///
+  /// By default packets are (MTU - 3) bytes. If [packetSize] is set it is used
+  /// instead, e.g. when the peripheral expects a fixed frame per ATT write. It
+  /// must not exceed (MTU - 3): iOS and macOS clamp it to
+  /// `maximumWriteValueLength`, Android does not check it. Protocols with a
+  /// frame below (MTU - 3) only gain the saved round trips.
   ///
   /// When implementing this operation make sure the packets are sent in order
   /// and that the response is returned once the last packet is accepted by the
   /// platform BLE stack, or on the first failure.
   Future<WriteCharacteristicInfo> writeCharacteristicWithoutResponseBatch(
     CharacteristicInstance characteristic,
-    List<int> value,
-  ) {
+    List<int> value, {
+    int? packetSize,
+  }) {
     throw UnimplementedError(
         'writeCharacteristicWithoutResponseBatch has not been implemented.');
   }

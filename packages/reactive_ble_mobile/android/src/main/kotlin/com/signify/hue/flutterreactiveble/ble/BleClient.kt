@@ -66,6 +66,7 @@ interface BleClient {
         characteristicId: UUID,
         characteristicInstanceId: Int,
         value: ByteArray,
+        packetSize: Int,
     ): Single<CharOperationResult>
 
     fun negotiateMtuSize(

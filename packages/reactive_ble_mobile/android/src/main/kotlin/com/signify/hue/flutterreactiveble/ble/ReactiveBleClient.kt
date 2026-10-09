@@ -234,14 +234,14 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
         characteristicId: UUID,
         characteristicInstanceId: Int,
         value: ByteArray,
+        packetSize: Int,
     ): Single<CharOperationResult> =
         executeWriteOperation(
             deviceId,
             characteristicId,
             characteristicInstanceId,
             value,
-            RxBleConnection::writeCharWithoutResponseBatch,
-        )
+        ) { characteristic, bytes -> writeCharWithoutResponseBatch(characteristic, bytes, packetSize) }
 
     override fun setupNotification(
         deviceId: String,

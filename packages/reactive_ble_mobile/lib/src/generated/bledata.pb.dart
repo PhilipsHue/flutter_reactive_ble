@@ -827,10 +827,12 @@ class WriteCharacteristicRequest extends $pb.GeneratedMessage {
   factory WriteCharacteristicRequest({
     CharacteristicAddress? characteristic,
     $core.List<$core.int>? value,
+    $core.int? packetSize,
   }) {
     final result = create();
     if (characteristic != null) result.characteristic = characteristic;
     if (value != null) result.value = value;
+    if (packetSize != null) result.packetSize = packetSize;
     return result;
   }
 
@@ -850,6 +852,7 @@ class WriteCharacteristicRequest extends $pb.GeneratedMessage {
         subBuilder: CharacteristicAddress.create)
     ..a<$core.List<$core.int>>(
         2, _omitFieldNames ? '' : 'value', $pb.PbFieldType.OY)
+    ..aI(3, _omitFieldNames ? '' : 'packetSize')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -892,6 +895,15 @@ class WriteCharacteristicRequest extends $pb.GeneratedMessage {
   $core.bool hasValue() => $_has(1);
   @$pb.TagNumber(2)
   void clearValue() => $_clearField(2);
+
+  @$pb.TagNumber(3)
+  $core.int get packetSize => $_getIZ(2);
+  @$pb.TagNumber(3)
+  set packetSize($core.int value) => $_setSignedInt32(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasPacketSize() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearPacketSize() => $_clearField(3);
 }
 
 class WriteCharacteristicInfo extends $pb.GeneratedMessage {

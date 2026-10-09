@@ -144,6 +144,26 @@ void main() {
       test('It converts value', () {
         expect(result.value, value);
       });
+
+      test('It leaves packet size unset by default', () {
+        expect(result.hasPacketSize(), isFalse);
+        expect(result.packetSize, 0);
+      });
+
+      test('It converts packet size', () {
+        final withPacketSize = _sut.createWriteCharacteristicRequest(
+          CharacteristicInstance(
+            characteristicId: charUuid,
+            characteristicInstanceId: "101",
+            serviceId: serviceUuid,
+            serviceInstanceId: "11",
+            deviceId: deviceId,
+          ),
+          value,
+          packetSize: 253,
+        );
+        expect(withPacketSize.packetSize, 253);
+      });
     });
 
     group('Create NotifyCharacteristic request', () {

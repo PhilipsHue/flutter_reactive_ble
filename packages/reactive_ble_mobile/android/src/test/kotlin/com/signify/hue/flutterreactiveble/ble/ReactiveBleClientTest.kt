@@ -265,10 +265,25 @@ class ReactiveBleClientTest {
                     any(),
                 )
             }.returns(Single.just(BluetoothGattCharacteristic(UUID.randomUUID(), 0, 0)))
-            sut.writeCharacteristicWithoutResponseBatch("test", UUID.randomUUID(), 11, bytes).test()
+            sut.writeCharacteristicWithoutResponseBatch("test", UUID.randomUUID(), 11, bytes, 0).test()
 
-            verify(exactly = 1) { rxConnection.writeCharWithoutResponseBatch(any(), bytes) }
+            verify(exactly = 1) { rxConnection.writeCharWithoutResponseBatch(any(), bytes, 0) }
             verify(exactly = 0) { rxConnection.writeCharWithoutResponse(any(), any()) }
+        }
+
+        @Test
+        fun `should call writeCharWithoutResponseBatch with the requested packetSize`() {
+            val bytes = ByteArray(1000) { it.toByte() }
+
+            every {
+                rxConnection.resolveCharacteristic(
+                    any(),
+                    any(),
+                )
+            }.returns(Single.just(BluetoothGattCharacteristic(UUID.randomUUID(), 0, 0)))
+            sut.writeCharacteristicWithoutResponseBatch("test", UUID.randomUUID(), 11, bytes, 253).test()
+
+            verify(exactly = 1) { rxConnection.writeCharWithoutResponseBatch(any(), bytes, 253) }
         }
 
         @Test

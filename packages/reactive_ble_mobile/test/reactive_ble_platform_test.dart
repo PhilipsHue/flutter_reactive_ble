@@ -336,6 +336,7 @@ void main() {
           _argsConverter.createWriteCharacteristicRequest(
             characteristic,
             value,
+            packetSize: anyNamed('packetSize'),
           ),
         ).thenReturn(request);
         when(_protobufConverter.writeCharacteristicInfoFrom(value))
@@ -355,6 +356,56 @@ void main() {
           _methodChannel.invokeMethod<void>(
             'writeCharacteristicWithoutResponseBatch',
             request.writeToBuffer(),
+          ),
+        ).called(1);
+      });
+    });
+
+    group('Write characteristic without response batch with packet size', () {
+      const value = [0, 1];
+      const packetSize = 253;
+      late CharacteristicInstance characteristic;
+      late pb.WriteCharacteristicRequest request;
+
+      setUp(() async {
+        request = pb.WriteCharacteristicRequest();
+        characteristic = CharacteristicInstance(
+          characteristicId: Uuid.parse('FEFF'),
+          characteristicInstanceId: "11",
+          serviceId: Uuid.parse('FEFF'),
+          serviceInstanceId: "101",
+          deviceId: '123',
+        );
+
+        when(_methodChannel.invokeMethod<List<int>?>(any, any)).thenAnswer(
+          (_) async => value,
+        );
+        when(
+          _argsConverter.createWriteCharacteristicRequest(
+            characteristic,
+            value,
+            packetSize: packetSize,
+          ),
+        ).thenReturn(request);
+        when(_protobufConverter.writeCharacteristicInfoFrom(value)).thenReturn(
+          WriteCharacteristicInfo(
+            characteristic: characteristic,
+            result: const Result.success(Unit()),
+          ),
+        );
+        await _sut.writeCharacteristicWithoutResponseBatch(
+          characteristic,
+          value,
+          packetSize: packetSize,
+        );
+      });
+
+      test('It forwards the packet size to the converter', () {
+        verify(
+          _argsConverter.createWriteCharacteristicRequest(
+            characteristic,
+            value,
+            packetSize: packetSize,
           ),
         ).called(1);
       });

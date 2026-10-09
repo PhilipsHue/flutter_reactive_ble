@@ -35,16 +35,20 @@ fun RxBleConnection.writeCharWithoutResponse(
     return writeCharacteristic(characteristic, value)
 }
 
-// Splits value into MTU-3 packets and writes them back to back as a single queued operation,
-// each packet sent as soon as the previous onCharacteristicWrite arrives (no Dart round trip).
+// Splits value into packets of packetSize bytes (MTU-3 when packetSize is 0) and writes them back to back
+// as a single queued operation, each packet sent as soon as the previous onCharacteristicWrite arrives
+// (no Dart round trip).
 fun RxBleConnection.writeCharWithoutResponseBatch(
     characteristic: BluetoothGattCharacteristic,
     value: ByteArray,
+    packetSize: Int,
 ): Single<ByteArray> {
     characteristic.writeType = BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE
-    return createNewLongWriteBuilder()
+    val builder = createNewLongWriteBuilder()
         .setCharacteristic(characteristic)
         .setBytes(value)
+    if (packetSize > 0) builder.setMaxBatchSize(packetSize)
+    return builder
         .build()
         .lastOrError()
 }

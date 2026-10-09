@@ -20,6 +20,7 @@ abstract class ConnectedDeviceOperation {
   Future<void> writeCharacteristicWithoutResponseBatch(
     CharacteristicInstance characteristic, {
     required List<int> value,
+    int? packetSize,
   });
 
   Stream<List<int>> subscribeToCharacteristic(
@@ -85,9 +86,14 @@ class ConnectedDeviceOperationImpl implements ConnectedDeviceOperation {
   Future<void> writeCharacteristicWithoutResponseBatch(
     CharacteristicInstance characteristic, {
     required List<int> value,
+    int? packetSize,
   }) async =>
       _blePlatform
-          .writeCharacteristicWithoutResponseBatch(characteristic, value)
+          .writeCharacteristicWithoutResponseBatch(
+            characteristic,
+            value,
+            packetSize: packetSize,
+          )
           .then((info) => info.result.dematerialize());
 
   @override
