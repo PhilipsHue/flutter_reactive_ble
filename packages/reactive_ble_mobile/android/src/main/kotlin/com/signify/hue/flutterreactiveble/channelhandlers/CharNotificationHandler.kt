@@ -32,10 +32,22 @@ class CharNotificationHandler(private val bleClient: com.signify.hue.flutterreac
         unsubscribeFromAllNotifications()
     }
 
-    fun subscribeToNotifications(request: pb.NotifyCharacteristicRequest) {
+    fun subscribeToNotifications(
+        request: pb.NotifyCharacteristicRequest,
+        onSubscriptionCompleted: () -> Unit = {},
+        onSubscriptionError: (Throwable) -> Unit = {},
+    ) {
         val charUuid =
             uuidConverter
                 .uuidFromByteArray(request.characteristic.characteristicUuid.data.toByteArray())
+        var isCompleted = false
+        fun completeSubscription() {
+            if (!isCompleted) {
+                isCompleted = true
+                onSubscriptionCompleted()
+            }
+        }
+        subscriptionMap.remove(request.characteristic)?.dispose()
         val subscription =
             bleClient.setupNotification(
                 request.characteristic.deviceId,
@@ -43,9 +55,20 @@ class CharNotificationHandler(private val bleClient: com.signify.hue.flutterreac
                 request.characteristic.characteristicInstanceId.toInt(),
             )
                 .observeOn(AndroidSchedulers.mainThread())
+                .doOnDispose(::completeSubscription)
+                .flatMap { notificationObservable ->
+                    notificationObservable
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .doOnSubscribe { completeSubscription() }
+                }
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({ value ->
                     handleNotificationValue(request.characteristic, value)
                 }, {
+                    if (!isCompleted) {
+                        isCompleted = true
+                        onSubscriptionError(it)
+                    }
                     when (it) {
                         is BleDisconnectedException -> {
                             subscriptionMap.remove(request.characteristic)?.dispose()

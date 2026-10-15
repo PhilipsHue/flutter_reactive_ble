@@ -589,6 +589,87 @@ void main() {
       });
     });
 
+    group('Subscribe to characteristic async', () {
+      const update = ConnectionStateUpdate(
+        deviceId: '123',
+        connectionState: DeviceConnectionState.disconnected,
+        failure: null,
+      );
+
+      late QualifiedCharacteristic char;
+      late Stream<List<int>> valueStream;
+      late Stream<List<int>?> resultStream;
+
+      setUp(() async {
+        char = _createChar();
+        when(_deviceConnector.deviceConnectionStateUpdateStream).thenAnswer((_) => Stream.fromIterable([update]));
+        when(_deviceOperation.getDiscoverServices(char.deviceId)).thenAnswer((_) async => [
+              DiscoveredService(
+                serviceId: char.serviceId,
+                serviceInstanceId: "11",
+                characteristicIds: [char.characteristicId],
+                includedServices: [],
+                characteristics: [
+                  DiscoveredCharacteristic(
+                    characteristicId: Uuid.parse("1234"),
+                    characteristicInstanceId: "101",
+                    serviceId: char.serviceId,
+                    isReadable: true,
+                    isWritableWithResponse: true,
+                    isWritableWithoutResponse: true,
+                    isNotifiable: true,
+                    isIndicatable: true,
+                  ),
+                  DiscoveredCharacteristic(
+                    characteristicId: char.characteristicId,
+                    characteristicInstanceId: "101",
+                    serviceId: char.serviceId,
+                    isReadable: true,
+                    isWritableWithResponse: true,
+                    isWritableWithoutResponse: true,
+                    isNotifiable: true,
+                    isIndicatable: true,
+                  ),
+                ],
+              )
+            ]);
+
+        valueStream = Stream.fromIterable([
+          [1],
+          [2]
+        ]);
+
+        when(_deviceOperation.subscribeToCharacteristicAsync(any, any)).thenAnswer((_) async => valueStream);
+
+        resultStream = await _sut.subscribeToCharacteristicAsync(char);
+      });
+
+      test("It subscribes to the correct characteristic", () {
+        verify(_deviceOperation.subscribeToCharacteristicAsync(
+          CharacteristicInstance(
+            characteristicId: char.characteristicId,
+            characteristicInstanceId: "101",
+            serviceId: char.serviceId,
+            serviceInstanceId: "11",
+            deviceId: char.deviceId,
+          ),
+          any,
+        )).called(1);
+      });
+
+      test('It emits correct value', () {
+        expect(
+          resultStream,
+          emitsInOrder(
+            <List<int>>[
+              [1],
+              [2]
+            ],
+          ),
+        );
+      });
+    });
+
     group('Discover Services', () {
       const deviceId = '123';
 
