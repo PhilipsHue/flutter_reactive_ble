@@ -287,8 +287,15 @@ class PluginController {
         result: Result,
     ) {
         val request = pb.NotifyCharacteristicRequest.parseFrom(call.arguments as ByteArray)
-        charNotificationHandler.subscribeToNotifications(request)
-        result.success(null)
+        charNotificationHandler.subscribeToNotifications(
+            request,
+            onSubscriptionCompleted = {
+                result.success(null)
+            },
+            onSubscriptionError = { error ->
+                result.error("char_notification_error", error.message, null)
+            },
+        )
     }
 
     private fun stopNotifications(

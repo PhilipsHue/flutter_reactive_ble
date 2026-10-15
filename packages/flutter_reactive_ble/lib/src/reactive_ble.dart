@@ -412,6 +412,19 @@ class FlutterReactiveBle {
     yield* (await resolveSingle(characteristic)).subscribe();
   }
 
+  /// Subscribes to updates from the characteristic specified, waiting for the
+  /// BLE subscription to be completed before returning.
+  ///
+  /// This stream terminates automatically when the device is disconnected.
+  ///
+  /// This method assumes there is a single characteristic with the ids specified in [characteristic]. If there are
+  /// multiple characteristics with the same id on a device, use [resolve] to find them all. Or use
+  /// [getDiscoveredServices] to select the [Service]s and [Characteristic]s you're interested in.
+  Future<Stream<List<int>>> subscribeToCharacteristicAsync(QualifiedCharacteristic characteristic) async {
+    await initialize();
+    return (await resolveSingle(characteristic)).subscribeAsync();
+  }
+
   Future<Iterable<Characteristic>> resolve(QualifiedCharacteristic characteristic) async {
     final services = await getDiscoveredServices(characteristic.deviceId);
     return services
@@ -557,6 +570,29 @@ class Characteristic {
             isDisconnected,
           ),
         );
+  }
+
+  /// Subscribes to updates from the characteristic specified, waiting for the
+  /// BLE subscription to be completed before returning.
+  ///
+  /// This stream terminates automatically when the device is disconnected.
+  Future<Stream<List<int>>> subscribeAsync() async {
+    _assertValidity();
+
+    final isDisconnected = _lib.connectedDeviceStream
+        .where((update) =>
+            update.deviceId == service.deviceId &&
+            (update.connectionState == DeviceConnectionState.disconnecting ||
+                update.connectionState == DeviceConnectionState.disconnected))
+        .cast<void>()
+        .firstWhere((_) => true, orElse: () {});
+
+    await _lib.initialize();
+
+    return _lib._connectedDeviceOperator.subscribeToCharacteristicAsync(
+      _ids,
+      isDisconnected,
+    );
   }
 
   // A Characteristic becomes invalid when its device gets disconnected. After reconnecting to the device,
