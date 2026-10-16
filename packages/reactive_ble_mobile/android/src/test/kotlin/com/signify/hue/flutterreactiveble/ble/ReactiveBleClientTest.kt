@@ -102,6 +102,7 @@ class ReactiveBleClientTest {
         sut.initializeClient()
 
         every { bleDevice.observeConnectionStateChanges() }.returns(Observable.just(RxBleConnection.RxBleConnectionState.CONNECTED))
+        every { bleDevice.connectionState }.returns(RxBleConnection.RxBleConnectionState.DISCONNECTED)
         every { rxBleClient.getBleDevice(any()) }.returns(bleDevice)
         every { deviceConnector.connection }.returns(subject)
 
@@ -406,6 +407,18 @@ class ReactiveBleClientTest {
             subject.onNext(EstablishConnectionFailure("test", "error"))
             val result = sut.discoverServices("test").test()
             result.assertError(Exception::class.java)
+        }
+
+        @Test
+        fun `It surfaces an actionable error when device is connected at OS level but untracked`() {
+            ReactiveBleClient.activeConnections.clear()
+            every { bleDevice.connectionState }.returns(RxBleConnection.RxBleConnectionState.CONNECTED)
+
+            val result = sut.discoverServices("untracked").test()
+
+            result.assertError { throwable ->
+                throwable.message?.contains("already connected at the OS level") == true
+            }
         }
     }
 }
