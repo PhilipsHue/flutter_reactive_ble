@@ -170,7 +170,10 @@ final class PluginController {
             return
         }
 
-        assert(!central.isScanning)
+        // Stop any ongoing scan (e.g. a prescan from connectToAdvertisingDevice) before preparing a new one, like on Android
+        if central.isScanning {
+            central.stopScan()
+        }
 
         scan = StreamingTask(parameters: .init(services: args.serviceUuids.map({ uuid in CBUUID(data: uuid.data) })))
 
