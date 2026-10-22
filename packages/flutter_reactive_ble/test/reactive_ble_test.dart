@@ -316,6 +316,93 @@ void main() {
       });
     });
 
+    group('Write characteristic without response batch', () {
+      const value = [2];
+      late QualifiedCharacteristic characteristic;
+
+      setUp(() async {
+        characteristic = _createChar();
+
+        when(_deviceOperation.writeCharacteristicWithoutResponseBatch(
+          any,
+          value: anyNamed('value'),
+          packetSize: anyNamed('packetSize'),
+        )).thenAnswer((_) async {});
+        when(_deviceOperation.getDiscoverServices(characteristic.deviceId)).thenAnswer((_) async => [
+              DiscoveredService(
+                serviceId: characteristic.serviceId,
+                serviceInstanceId: "11",
+                characteristicIds: [characteristic.characteristicId],
+                includedServices: [],
+                characteristics: [
+                  DiscoveredCharacteristic(
+                    characteristicId: characteristic.characteristicId,
+                    characteristicInstanceId: "101",
+                    serviceId: characteristic.serviceId,
+                    isReadable: true,
+                    isWritableWithResponse: true,
+                    isWritableWithoutResponse: true,
+                    isNotifiable: true,
+                    isIndicatable: true,
+                  ),
+                ],
+              )
+            ]);
+        when(_deviceConnector.deviceConnectionStateUpdateStream).thenAnswer((_) => const Stream.empty());
+      });
+
+      test('It forwards value and packet size to the correct characteristic', () async {
+        await _sut.writeCharacteristicWithoutResponseBatch(
+          characteristic,
+          value: value,
+          packetSize: 253,
+        );
+
+        verify(_deviceOperation.writeCharacteristicWithoutResponseBatch(
+          CharacteristicInstance(
+            characteristicId: characteristic.characteristicId,
+            characteristicInstanceId: "101",
+            serviceId: characteristic.serviceId,
+            serviceInstanceId: "11",
+            deviceId: characteristic.deviceId,
+          ),
+          value: [2],
+          packetSize: 253,
+        )).called(1);
+      });
+
+      test('It passes a null packet size when none is given', () async {
+        await _sut.writeCharacteristicWithoutResponseBatch(
+          characteristic,
+          value: value,
+        );
+
+        verify(_deviceOperation.writeCharacteristicWithoutResponseBatch(
+          any,
+          value: [2],
+          packetSize: null,
+        )).called(1);
+      });
+
+      for (final invalid in [0, -1]) {
+        test('It throws an ArgumentError for packet size $invalid', () async {
+          await expectLater(
+            _sut.writeCharacteristicWithoutResponseBatch(
+              characteristic,
+              value: value,
+              packetSize: invalid,
+            ),
+            throwsArgumentError,
+          );
+          verifyNever(_deviceOperation.writeCharacteristicWithoutResponseBatch(
+            any,
+            value: anyNamed('value'),
+            packetSize: anyNamed('packetSize'),
+          ));
+        });
+      }
+    });
+
     group('Request mtu', () {
       const deviceId = '123';
       const mtu = 120;

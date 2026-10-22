@@ -200,6 +200,53 @@ class FlutterReactiveBle {
     await (await resolveSingle(characteristic)).write(value, withResponse: false);
   }
 
+  /// Writes [value] without response as a sequence of packets, sent back to
+  /// back by the platform without returning to the dart layer between packets.
+  ///
+  /// This reduces per-write overhead for bulk transfers such as firmware
+  /// updates: every packet is filled up to the maximum size and the
+  /// dart <-> platform round trip per write is removed, which awaiting
+  /// [writeCharacteristicWithoutResponse] per packet would incur. The BLE stack
+  /// may still send only one packet per connection event.
+  ///
+  /// By default packets are (MTU - 3) bytes. Set [packetSize] when the
+  /// peripheral expects a fixed frame per ATT write; the value is split into
+  /// packets of that many bytes (the last one may be shorter). It must be
+  /// positive and must not exceed (MTU - 3): iOS and macOS clamp it to
+  /// `maximumWriteValueLength`, Android does not check it. Protocols with a
+  /// frame below (MTU - 3) only gain the saved round trips. A null [packetSize]
+  /// uses the platform default.
+  ///
+  /// Packets are sent in order. The returned future completes when the last
+  /// packet has been accepted by the platform BLE stack (not when the device has
+  /// processed it), or with an error on the first failure; in that case, packets
+  /// before the failure may already have been sent.
+  ///
+  /// Negotiate the MTU with [requestMtu] first. Keep [value] no larger than
+  /// what the device can buffer, and confirm reception between batches
+  /// (e.g. via a notification) as write-without-response has no acknowledgement.
+  ///
+  /// Throws an [ArgumentError] if [packetSize] is not positive.
+  Future<void> writeCharacteristicWithoutResponseBatch(
+    QualifiedCharacteristic characteristic, {
+    required List<int> value,
+    int? packetSize,
+  }) async {
+    if (packetSize != null && packetSize <= 0) {
+      throw ArgumentError.value(
+          packetSize, 'packetSize', 'must be greater than 0');
+    }
+    if (value.isEmpty) return;
+    await initialize();
+    final resolved = await resolveSingle(characteristic);
+    resolved._assertValidity();
+    await _connectedDeviceOperator.writeCharacteristicWithoutResponseBatch(
+      resolved._ids,
+      value: value,
+      packetSize: packetSize,
+    );
+  }
+
   /// Request a specific MTU for a connected device.
   ///
   /// Returns the actual MTU negotiated.

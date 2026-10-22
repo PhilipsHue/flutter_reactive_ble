@@ -12,6 +12,7 @@ import com.polidea.rxandroidble2.RxBleDeviceServices
 import com.signify.hue.flutterreactiveble.ble.extensions.resolveCharacteristic
 import com.signify.hue.flutterreactiveble.ble.extensions.writeCharWithResponse
 import com.signify.hue.flutterreactiveble.ble.extensions.writeCharWithoutResponse
+import com.signify.hue.flutterreactiveble.ble.extensions.writeCharWithoutResponseBatch
 import com.signify.hue.flutterreactiveble.utils.Duration
 import io.mockk.MockKAnnotations
 import io.mockk.every
@@ -252,6 +253,37 @@ class ReactiveBleClientTest {
 
             assertThat(result.values().first()).isInstanceOf(CharOperationFailed::class.java)
             verify(exactly = 0) { rxConnection.writeCharWithoutResponse(any(), any()) }
+        }
+
+        @Test
+        fun `should call writeCharWithoutResponseBatch once with the whole value`() {
+            val bytes = ByteArray(1000) { it.toByte() }
+
+            every {
+                rxConnection.resolveCharacteristic(
+                    any(),
+                    any(),
+                )
+            }.returns(Single.just(BluetoothGattCharacteristic(UUID.randomUUID(), 0, 0)))
+            sut.writeCharacteristicWithoutResponseBatch("test", UUID.randomUUID(), 11, bytes, 0).test()
+
+            verify(exactly = 1) { rxConnection.writeCharWithoutResponseBatch(any(), bytes, 0) }
+            verify(exactly = 0) { rxConnection.writeCharWithoutResponse(any(), any()) }
+        }
+
+        @Test
+        fun `should call writeCharWithoutResponseBatch with the requested packetSize`() {
+            val bytes = ByteArray(1000) { it.toByte() }
+
+            every {
+                rxConnection.resolveCharacteristic(
+                    any(),
+                    any(),
+                )
+            }.returns(Single.just(BluetoothGattCharacteristic(UUID.randomUUID(), 0, 0)))
+            sut.writeCharacteristicWithoutResponseBatch("test", UUID.randomUUID(), 11, bytes, 253).test()
+
+            verify(exactly = 1) { rxConnection.writeCharWithoutResponseBatch(any(), bytes, 253) }
         }
 
         @Test
