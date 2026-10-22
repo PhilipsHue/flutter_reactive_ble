@@ -54,7 +54,7 @@ class _CharacteristicInteractionDialogState extends State<_CharacteristicInterac
   }
 
   Future<void> subscribeCharacteristic() async {
-    subscribeStream = widget.characteristic.subscribe().listen((event) {
+    subscribeStream ??= widget.characteristic.subscribe().listen((event) {
       setState(() {
         subscribeOutput = event.toString();
       });
