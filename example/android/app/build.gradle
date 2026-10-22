@@ -22,7 +22,8 @@ if (flutterVersionName == null) {
 }
 
 android {
-    compileSdkVersion 37
+    compileSdk = 37
+    compileSdkMinor = 1
 
     buildFeatures {
         buildConfig = true
