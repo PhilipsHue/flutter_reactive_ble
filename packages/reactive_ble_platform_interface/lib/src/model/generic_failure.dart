@@ -2,7 +2,7 @@ import 'package:meta/meta.dart';
 
 /// Error result of a BLE operation.
 @immutable
-class GenericFailure<T> {
+class GenericFailure<T> implements Exception {
   /// Code that classifies the failure.
   final T code;
 
