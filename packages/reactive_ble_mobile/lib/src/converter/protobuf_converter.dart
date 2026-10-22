@@ -7,6 +7,16 @@ import '../select_from.dart';
 abstract class ProtobufConverter {
   BleStatus bleStatusFrom(List<int> data);
 
+  /// Parses the result of an `establishBonding` call into a [BondingStatus].
+  BondingStatus bondingStatusFrom(List<int> data);
+
+  /// Parses the result of a `launchCompanionWorkflow` call into a
+  /// [DeviceAssociationInfo].
+  DeviceAssociationInfo associationInfoFrom(List<int> data);
+
+  /// Parses the result of a `retrieveDeviceName` call into the device name.
+  String deviceNameFrom(List<int> data);
+
   ScanResult scanResultFrom(List<int> data);
 
   ConnectionStateUpdate connectionStateUpdateFrom(List<int> data);
@@ -40,6 +50,33 @@ class ProtobufConverterImpl implements ProtobufConverter {
       index: message.status,
       fallback: (_) => BleStatus.unknown,
     );
+  }
+
+  @override
+  BondingStatus bondingStatusFrom(List<int> data) {
+    final message = pb.EstablishBondingInfo.fromBuffer(data);
+    switch (message.status) {
+      case pb.EstablishBondingInfo_BondState.BONDING:
+        return BondingStatus.bonding;
+      case pb.EstablishBondingInfo_BondState.BONDED:
+        return BondingStatus.bonded;
+      case pb.EstablishBondingInfo_BondState.NONE:
+        return BondingStatus.none;
+    }
+
+    return BondingStatus.none;
+  }
+
+  @override
+  DeviceAssociationInfo associationInfoFrom(List<int> data) {
+    final message = pb.DeviceAssociationInfo.fromBuffer(data);
+    return DeviceAssociationInfo(macAddress: message.macAddress);
+  }
+
+  @override
+  String deviceNameFrom(List<int> data) {
+    final message = pb.DeviceNameInfo.fromBuffer(data);
+    return message.deviceName;
   }
 
   @override

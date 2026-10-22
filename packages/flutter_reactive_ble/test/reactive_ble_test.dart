@@ -346,6 +346,69 @@ void main() {
       });
     });
 
+    group('Companion workflow', () {
+      const pattern = 'device-pattern';
+      const associationInfo = DeviceAssociationInfo(macAddress: 'AB:CD:EF:12:34:56');
+
+      setUp(() {
+        when(_deviceScanner.launchCompanionWorkflow(
+          pattern: anyNamed('pattern'),
+          singleDeviceScan: anyNamed('singleDeviceScan'),
+          forceConfirmation: anyNamed('forceConfirmation'),
+        )).thenAnswer((_) async => associationInfo);
+      });
+
+      test('It returns the associated device', () async {
+        final result = await _sut.launchCompanionWorkflow(pattern: pattern);
+
+        expect(result, associationInfo);
+      });
+
+      test('It forwards singleDeviceScan and forceConfirmation', () async {
+        await _sut.launchCompanionWorkflow(
+          pattern: pattern,
+          singleDeviceScan: false,
+          forceConfirmation: true,
+        );
+
+        verify(_deviceScanner.launchCompanionWorkflow(
+          pattern: pattern,
+          singleDeviceScan: false,
+          forceConfirmation: true,
+        )).called(1);
+      });
+    });
+
+    group('Establish bonding', () {
+      const deviceId = '123';
+
+      setUp(() {
+        when(_deviceConnector.establishBonding(deviceId: anyNamed('deviceId')))
+            .thenAnswer((_) async => BondingStatus.bonded);
+      });
+
+      test('It returns the bonding status', () async {
+        final result = await _sut.establishBonding(deviceId: deviceId);
+
+        expect(result, BondingStatus.bonded);
+      });
+    });
+
+    group('Retrieve device name', () {
+      const deviceId = '123';
+      const deviceName = 'My device';
+
+      setUp(() {
+        when(_deviceConnector.retrieveDeviceName(any)).thenAnswer((_) async => deviceName);
+      });
+
+      test('It returns the device name', () async {
+        final result = await _sut.retrieveDeviceName(deviceId);
+
+        expect(result, deviceName);
+      });
+    });
+
     group('Scan devices', () {
       final withServices = [Uuid.parse('FEFF')];
       const mode = ScanMode.lowPower;

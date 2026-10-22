@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:reactive_ble_mobile/src/converter/protobuf_converter.dart';
 import 'package:reactive_ble_mobile/src/generated/bledata.pb.dart' as pb;
+import 'package:reactive_ble_mobile/src/generated/bledata.pbenum.dart';
 import 'package:reactive_ble_platform_interface/reactive_ble_platform_interface.dart';
 
 void main() {
@@ -472,6 +473,54 @@ void main() {
       test('falls back in case of invalid status', () {
         final message = pb.BleStatusInfo()..status = 6;
         expect(sut.bleStatusFrom(message.writeToBuffer()), BleStatus.unknown);
+      });
+    });
+
+    group('decoding ${pb.EstablishBondingInfo}', () {
+      test('converts bonded', () {
+        final message = pb.EstablishBondingInfo()
+          ..status = EstablishBondingInfo_BondState.BONDED;
+        expect(
+            sut.bondingStatusFrom(message.writeToBuffer()), BondingStatus.bonded);
+      });
+
+      test('converts bonding', () {
+        final message = pb.EstablishBondingInfo()
+          ..status = EstablishBondingInfo_BondState.BONDING;
+        expect(sut.bondingStatusFrom(message.writeToBuffer()),
+            BondingStatus.bonding);
+      });
+
+      test('converts none', () {
+        final message = pb.EstablishBondingInfo();
+        expect(
+            sut.bondingStatusFrom(message.writeToBuffer()), BondingStatus.none);
+      });
+    });
+
+    group('decoding ${pb.DeviceAssociationInfo}', () {
+      const macAddress = 'AB:CD:EF:12:34:56';
+
+      test('converts the mac address', () {
+        final message = pb.DeviceAssociationInfo()..macAddress = macAddress;
+
+        expect(
+          sut.associationInfoFrom(message.writeToBuffer()).macAddress,
+          macAddress,
+        );
+      });
+    });
+
+    group('decoding ${pb.DeviceNameInfo}', () {
+      const id = 'id';
+      const deviceName = 'My device';
+
+      test('converts the device name', () {
+        final message = pb.DeviceNameInfo()
+          ..id = id
+          ..deviceName = deviceName;
+
+        expect(sut.deviceNameFrom(message.writeToBuffer()), deviceName);
       });
     });
 

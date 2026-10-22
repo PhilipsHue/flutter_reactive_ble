@@ -107,6 +107,9 @@ public class ReactiveBlePlugin: NSObject, FlutterPlugin {
         AnyPlatformMethod(UnaryPlatformMethod(name: "connectToDevice") { (name, context, args: ConnectToDeviceRequest, completion) in
             context.connectToDevice(name: name, args: args, completion: completion)
         }),
+        AnyPlatformMethod(UnaryPlatformMethod(name: "retrieveDeviceName") { (name, context, args: GetDeviceNameRequest, completion) in
+            context.retrieveDeviceName(name: name, args: args, completion: completion)
+        }),
         AnyPlatformMethod(UnaryPlatformMethod(name: "disconnectFromDevice") { (name, context, args: ConnectToDeviceRequest, completion) in
             context.disconnectFromDevice(name: name, args: args, completion: completion)
         }),

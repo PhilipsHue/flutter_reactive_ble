@@ -14,7 +14,11 @@ import 'dart:core' as $core;
 
 import 'package:protobuf/protobuf.dart' as $pb;
 
+import 'bledata.pbenum.dart';
+
 export 'package:protobuf/protobuf.dart' show GeneratedMessageGenericExtensions;
+
+export 'bledata.pbenum.dart';
 
 class ScanForDevicesRequest extends $pb.GeneratedMessage {
   factory ScanForDevicesRequest({
@@ -2232,6 +2236,367 @@ class IsConnectable extends $pb.GeneratedMessage {
   $core.bool hasCode() => $_has(0);
   @$pb.TagNumber(1)
   void clearCode() => $_clearField(1);
+}
+
+class LaunchCompanionRequest extends $pb.GeneratedMessage {
+  factory LaunchCompanionRequest({
+    $core.String? deviceNamePattern,
+    $core.bool? singleDeviceScan,
+    $core.bool? forceConfirmation,
+  }) {
+    final result = create();
+    if (deviceNamePattern != null) result.deviceNamePattern = deviceNamePattern;
+    if (singleDeviceScan != null) result.singleDeviceScan = singleDeviceScan;
+    if (forceConfirmation != null) result.forceConfirmation = forceConfirmation;
+    return result;
+  }
+
+  LaunchCompanionRequest._();
+
+  factory LaunchCompanionRequest.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromBuffer(data, registry);
+  factory LaunchCompanionRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'LaunchCompanionRequest',
+      createEmptyInstance: create)
+    ..aOS(1, _omitFieldNames ? '' : 'deviceNamePattern',
+        protoName: 'deviceNamePattern')
+    ..aOB(2, _omitFieldNames ? '' : 'singleDeviceScan',
+        protoName: 'singleDeviceScan')
+    ..aOB(3, _omitFieldNames ? '' : 'forceConfirmation',
+        protoName: 'forceConfirmation')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  LaunchCompanionRequest clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  LaunchCompanionRequest copyWith(
+          void Function(LaunchCompanionRequest) updates) =>
+      super.copyWith((message) => updates(message as LaunchCompanionRequest))
+          as LaunchCompanionRequest;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static LaunchCompanionRequest create() => LaunchCompanionRequest._();
+  @$core.override
+  LaunchCompanionRequest createEmptyInstance() => create();
+  @$core.pragma('dart2js:noInline')
+  static LaunchCompanionRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<LaunchCompanionRequest>(create);
+  static LaunchCompanionRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get deviceNamePattern => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set deviceNamePattern($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasDeviceNamePattern() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearDeviceNamePattern() => $_clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.bool get singleDeviceScan => $_getBF(1);
+  @$pb.TagNumber(2)
+  set singleDeviceScan($core.bool value) => $_setBool(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasSingleDeviceScan() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearSingleDeviceScan() => $_clearField(2);
+
+  @$pb.TagNumber(3)
+  $core.bool get forceConfirmation => $_getBF(2);
+  @$pb.TagNumber(3)
+  set forceConfirmation($core.bool value) => $_setBool(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasForceConfirmation() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearForceConfirmation() => $_clearField(3);
+}
+
+class DeviceAssociationInfo extends $pb.GeneratedMessage {
+  factory DeviceAssociationInfo({
+    $core.String? macAddress,
+  }) {
+    final result = create();
+    if (macAddress != null) result.macAddress = macAddress;
+    return result;
+  }
+
+  DeviceAssociationInfo._();
+
+  factory DeviceAssociationInfo.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromBuffer(data, registry);
+  factory DeviceAssociationInfo.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'DeviceAssociationInfo',
+      createEmptyInstance: create)
+    ..aOS(1, _omitFieldNames ? '' : 'macAddress', protoName: 'macAddress')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  DeviceAssociationInfo clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  DeviceAssociationInfo copyWith(
+          void Function(DeviceAssociationInfo) updates) =>
+      super.copyWith((message) => updates(message as DeviceAssociationInfo))
+          as DeviceAssociationInfo;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static DeviceAssociationInfo create() => DeviceAssociationInfo._();
+  @$core.override
+  DeviceAssociationInfo createEmptyInstance() => create();
+  @$core.pragma('dart2js:noInline')
+  static DeviceAssociationInfo getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<DeviceAssociationInfo>(create);
+  static DeviceAssociationInfo? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get macAddress => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set macAddress($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasMacAddress() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearMacAddress() => $_clearField(1);
+}
+
+class EstablishBondingRequest extends $pb.GeneratedMessage {
+  factory EstablishBondingRequest({
+    $core.String? deviceId,
+  }) {
+    final result = create();
+    if (deviceId != null) result.deviceId = deviceId;
+    return result;
+  }
+
+  EstablishBondingRequest._();
+
+  factory EstablishBondingRequest.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromBuffer(data, registry);
+  factory EstablishBondingRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'EstablishBondingRequest',
+      createEmptyInstance: create)
+    ..aOS(1, _omitFieldNames ? '' : 'deviceId', protoName: 'deviceId')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  EstablishBondingRequest clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  EstablishBondingRequest copyWith(
+          void Function(EstablishBondingRequest) updates) =>
+      super.copyWith((message) => updates(message as EstablishBondingRequest))
+          as EstablishBondingRequest;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static EstablishBondingRequest create() => EstablishBondingRequest._();
+  @$core.override
+  EstablishBondingRequest createEmptyInstance() => create();
+  @$core.pragma('dart2js:noInline')
+  static EstablishBondingRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<EstablishBondingRequest>(create);
+  static EstablishBondingRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get deviceId => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set deviceId($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasDeviceId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearDeviceId() => $_clearField(1);
+}
+
+class EstablishBondingInfo extends $pb.GeneratedMessage {
+  factory EstablishBondingInfo({
+    EstablishBondingInfo_BondState? status,
+  }) {
+    final result = create();
+    if (status != null) result.status = status;
+    return result;
+  }
+
+  EstablishBondingInfo._();
+
+  factory EstablishBondingInfo.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromBuffer(data, registry);
+  factory EstablishBondingInfo.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'EstablishBondingInfo',
+      createEmptyInstance: create)
+    ..aE<EstablishBondingInfo_BondState>(1, _omitFieldNames ? '' : 'status',
+        enumValues: EstablishBondingInfo_BondState.values)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  EstablishBondingInfo clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  EstablishBondingInfo copyWith(void Function(EstablishBondingInfo) updates) =>
+      super.copyWith((message) => updates(message as EstablishBondingInfo))
+          as EstablishBondingInfo;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static EstablishBondingInfo create() => EstablishBondingInfo._();
+  @$core.override
+  EstablishBondingInfo createEmptyInstance() => create();
+  @$core.pragma('dart2js:noInline')
+  static EstablishBondingInfo getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<EstablishBondingInfo>(create);
+  static EstablishBondingInfo? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  EstablishBondingInfo_BondState get status => $_getN(0);
+  @$pb.TagNumber(1)
+  set status(EstablishBondingInfo_BondState value) => $_setField(1, value);
+  @$pb.TagNumber(1)
+  $core.bool hasStatus() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearStatus() => $_clearField(1);
+}
+
+class GetDeviceNameRequest extends $pb.GeneratedMessage {
+  factory GetDeviceNameRequest({
+    $core.String? deviceId,
+  }) {
+    final result = create();
+    if (deviceId != null) result.deviceId = deviceId;
+    return result;
+  }
+
+  GetDeviceNameRequest._();
+
+  factory GetDeviceNameRequest.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromBuffer(data, registry);
+  factory GetDeviceNameRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'GetDeviceNameRequest',
+      createEmptyInstance: create)
+    ..aOS(1, _omitFieldNames ? '' : 'deviceId', protoName: 'deviceId')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  GetDeviceNameRequest clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  GetDeviceNameRequest copyWith(void Function(GetDeviceNameRequest) updates) =>
+      super.copyWith((message) => updates(message as GetDeviceNameRequest))
+          as GetDeviceNameRequest;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static GetDeviceNameRequest create() => GetDeviceNameRequest._();
+  @$core.override
+  GetDeviceNameRequest createEmptyInstance() => create();
+  @$core.pragma('dart2js:noInline')
+  static GetDeviceNameRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<GetDeviceNameRequest>(create);
+  static GetDeviceNameRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get deviceId => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set deviceId($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasDeviceId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearDeviceId() => $_clearField(1);
+}
+
+class DeviceNameInfo extends $pb.GeneratedMessage {
+  factory DeviceNameInfo({
+    $core.String? id,
+    $core.String? deviceName,
+  }) {
+    final result = create();
+    if (id != null) result.id = id;
+    if (deviceName != null) result.deviceName = deviceName;
+    return result;
+  }
+
+  DeviceNameInfo._();
+
+  factory DeviceNameInfo.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromBuffer(data, registry);
+  factory DeviceNameInfo.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'DeviceNameInfo',
+      createEmptyInstance: create)
+    ..aOS(1, _omitFieldNames ? '' : 'id')
+    ..aOS(2, _omitFieldNames ? '' : 'deviceName', protoName: 'deviceName')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  DeviceNameInfo clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  DeviceNameInfo copyWith(void Function(DeviceNameInfo) updates) =>
+      super.copyWith((message) => updates(message as DeviceNameInfo))
+          as DeviceNameInfo;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static DeviceNameInfo create() => DeviceNameInfo._();
+  @$core.override
+  DeviceNameInfo createEmptyInstance() => create();
+  @$core.pragma('dart2js:noInline')
+  static DeviceNameInfo getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<DeviceNameInfo>(create);
+  static DeviceNameInfo? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get id => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set id($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearId() => $_clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.String get deviceName => $_getSZ(1);
+  @$pb.TagNumber(2)
+  set deviceName($core.String value) => $_setString(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasDeviceName() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearDeviceName() => $_clearField(2);
 }
 
 const $core.bool _omitFieldNames =

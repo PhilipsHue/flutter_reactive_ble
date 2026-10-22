@@ -68,6 +68,32 @@ abstract class ReactiveBlePlatform extends PlatformInterface {
     throw UnimplementedError('deInitialize() has not been implemented.');
   }
 
+  /// Launches the Android companion device workflow to associate a BLE device
+  /// with the host.
+  ///
+  /// This method is **Android only**. On other platforms the implementation
+  /// should throw an [UnsupportedError].
+  ///
+  /// Calling this method opens the native companion user interface. The user
+  /// selects a device from the list of BLE devices that are currently
+  /// advertising. With [singleDeviceScan] set to `true` the device list is
+  /// skipped and the user directly confirms the single matching device.
+  ///
+  /// The advertised device name is filtered using [pattern], which is a
+  /// regular expression. When [forceConfirmation] is `true` the user is asked
+  /// to explicitly confirm the association.
+  ///
+  /// Returns a [DeviceAssociationInfo] describing the associated device, or
+  /// `null` when no device was selected.
+  Future<DeviceAssociationInfo?> launchCompanionWorkflow({
+    required String pattern,
+    required bool singleDeviceScan,
+    required bool forceConfirmation,
+  }) {
+    throw UnimplementedError(
+        'launchCompanionWorkflow() has not been implemented.');
+  }
+
   /// Stream that handles triggers scanning for Ble devices.
   ///
   /// As long as the stream has been `listened` to the scanning continues. When
@@ -85,6 +111,15 @@ abstract class ReactiveBlePlatform extends PlatformInterface {
   Future<Result<Unit, GenericFailure<ClearGattCacheError>?>> clearGattCache(
       String deviceId) {
     throw UnimplementedError('clearGattCache() has not been implemented.');
+  }
+
+  /// Creates a bond with the peripheral and completes with the resulting
+  /// [BondingStatus].
+  ///
+  /// This method is **Android only**. On other platforms the implementation
+  /// should throw an [UnsupportedError].
+  Future<BondingStatus> establishBonding(String deviceId) {
+    throw UnimplementedError('establishBonding() has not been implemented.');
   }
 
   Future<int> readRssi(String deviceId) async {
@@ -107,6 +142,18 @@ abstract class ReactiveBlePlatform extends PlatformInterface {
   /// Operation that disconnects the host with the peripheral.
   Future<void> disconnectDevice(String deviceId) {
     throw UnimplementedError('disconnectDevice has not been implemented.');
+  }
+
+  /// Retrieves the name of the device with the given [id].
+  ///
+  /// This method is **iOS/macOS only**. On other platforms the implementation
+  /// should throw an [UnimplementedError].
+  ///
+  /// This operation can only succeed when the host is `connected` with the
+  /// peripheral. It uses the `CBPeripheral.name` GAP property to retrieve the
+  /// name.
+  Future<String?> retrieveDeviceName(String id) {
+    throw UnimplementedError('retrieveDeviceName has not been implemented.');
   }
 
   /// Performs service discovery on the peripheral and returns the discovered
