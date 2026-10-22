@@ -341,6 +341,130 @@ void main() {
                 ]));
           });
         });
+
+        group('Subscribe to characteristic async', () {
+          test('It waits for subscription to complete before returning stream',
+              () async {
+            final subscriptionCompleter = Completer<void>();
+            when(_blePlatform.subscribeToNotifications(charDevice))
+                .thenAnswer((_) => subscriptionCompleter.future.asStream());
+            when(_blePlatform.charValueUpdateStream)
+                .thenAnswer((_) => Stream.fromIterable([
+                      valueUpdate1,
+                      valueUpdateOtherDevice,
+                      valueUpdate2,
+                      valueUpdateSameDeviceOtherChar,
+                    ]));
+
+            var completed = false;
+            final streamFuture = _sut
+                .subscribeToCharacteristicAsync(
+                    charDevice, terminateCompleter.future)
+                .then((stream) {
+              completed = true;
+              return stream;
+            });
+
+            await Future<void>.delayed(Duration.zero);
+            expect(completed, isFalse);
+
+            subscriptionCompleter.complete();
+            final stream = await streamFuture;
+            expect(completed, isTrue);
+
+            expect(
+              stream,
+              emitsInOrder(<List<int>>[
+                [1],
+                [2],
+              ]),
+            );
+          });
+
+          test(
+              'It buffers notifications emitted before the returned stream is listened to',
+              () async {
+            final charValueController =
+                StreamController<CharacteristicValue>.broadcast();
+            addTearDown(charValueController.close);
+
+            when(_blePlatform.charValueUpdateStream)
+                .thenAnswer((_) => charValueController.stream);
+
+            final stream = await _sut.subscribeToCharacteristicAsync(
+                charDevice, terminateCompleter.future);
+
+            // Emit a notification before any listener is attached to `stream`
+            charValueController.add(valueUpdate1);
+            await Future<void>.delayed(Duration.zero);
+
+            final received = <List<int>>[];
+            final subscription = stream.listen(received.add);
+            addTearDown(subscription.cancel);
+
+            charValueController.add(valueUpdate2);
+            await Future<void>.delayed(Duration.zero);
+
+            expect(received, <List<int>>[
+              [1],
+              [2],
+            ]);
+          });
+
+          test(
+              'It stops subscribing to notifications when stream subscription is cancelled',
+              () async {
+            final charValueController =
+                StreamController<CharacteristicValue>.broadcast();
+            addTearDown(charValueController.close);
+
+            when(_blePlatform.charValueUpdateStream)
+                .thenAnswer((_) => charValueController.stream);
+
+            final stream = await _sut.subscribeToCharacteristicAsync(
+                charDevice, terminateCompleter.future);
+
+            final subscription = stream.listen((_) {});
+            await subscription.cancel();
+
+            verify(_blePlatform.stopSubscribingToNotifications(charDevice))
+                .called(1);
+          });
+
+          test('It closes stream when device disconnects', () async {
+            final charValueController =
+                StreamController<CharacteristicValue>.broadcast();
+            addTearDown(charValueController.close);
+
+            when(_blePlatform.charValueUpdateStream)
+                .thenAnswer((_) => charValueController.stream);
+
+            final stream = await _sut.subscribeToCharacteristicAsync(
+                charDevice, terminateCompleter.future);
+
+            terminateCompleter.complete(const ConnectionStateUpdate(
+              deviceId: '123',
+              connectionState: DeviceConnectionState.disconnected,
+              failure: null,
+            ));
+
+            await expectLater(stream, emitsDone);
+          });
+
+          test('It propagates error if subscribeToNotifications fails',
+              () async {
+            when(_blePlatform.subscribeToNotifications(charDevice))
+                .thenAnswer((_) => Stream<void>.error(Exception('BLE failure')));
+            when(_blePlatform.charValueUpdateStream)
+                .thenAnswer((_) => const Stream.empty());
+
+            await expectLater(
+              _sut.subscribeToCharacteristicAsync(
+                  charDevice, terminateCompleter.future),
+              throwsException,
+            );
+          });
+        });
       });
 
       group('Negotiate mtusize', () {
