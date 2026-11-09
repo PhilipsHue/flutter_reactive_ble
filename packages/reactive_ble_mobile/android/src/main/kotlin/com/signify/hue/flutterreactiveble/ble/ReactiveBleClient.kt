@@ -274,6 +274,17 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
         timeout: Duration,
     ) = DeviceConnector(device, timeout, connectionUpdateBehaviorSubject::onNext, connectionQueue)
 
+    /**
+     * Resolves the connection stream for [deviceId], in this order of precedence:
+     * 1. An already tracked [DeviceConnector] (its connection stream is reused).
+     * 2. A failure result when the OS reports the device as connected but the plugin no longer
+     *    tracks it, since RxAndroidBle cannot adopt an existing GATT connection.
+     * 3. A newly created [DeviceConnector], registered in [activeConnections].
+     *
+     * Early returns keep the guard clauses flat and readable, so detekt's `ReturnCount` rule
+     * is intentionally suppressed for this function.
+     */
+    @Suppress("ReturnCount")
     private fun getConnection(
         deviceId: String,
         timeout: Duration = Duration(0, TimeUnit.MILLISECONDS),

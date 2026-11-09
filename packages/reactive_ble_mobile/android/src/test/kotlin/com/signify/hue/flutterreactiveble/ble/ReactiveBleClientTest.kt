@@ -313,6 +313,54 @@ class ReactiveBleClientTest {
         }
     }
 
+    /**
+     * Covers the three branches of the private `getConnection`, exercised through
+     * [ReactiveBleClient.negotiateMtuSize].
+     */
+    @Nested
+    @DisplayName("Resolving a connection")
+    inner class GetConnectionTest {
+        private val mtuSize = 19
+
+        @BeforeEach
+        fun setup() {
+            ReactiveBleClient.activeConnections.clear()
+            every { rxConnection.requestMtu(any()) }.returns(Single.just(mtuSize))
+        }
+
+        @Test
+        fun `should create and track a connector for an untracked disconnected device`() {
+            val result = sut.negotiateMtuSize("test", mtuSize).test()
+
+            assertThat(result.values().first()).isInstanceOf(MtuNegotiateSuccessful::class.java)
+            assertThat(ReactiveBleClient.activeConnections).containsKey("test")
+            verify(exactly = 1) { deviceConnector.connection }
+        }
+
+        @Test
+        fun `should reuse the tracked connector even when the OS reports connected`() {
+            sut.negotiateMtuSize("test", mtuSize).test()
+            every { bleDevice.connectionState }.returns(RxBleConnection.RxBleConnectionState.CONNECTED)
+
+            val result = sut.negotiateMtuSize("test", mtuSize).test()
+
+            assertThat(result.values().first()).isInstanceOf(MtuNegotiateSuccessful::class.java)
+            assertThat(ReactiveBleClient.activeConnections).hasSize(1)
+        }
+
+        @Test
+        fun `should return an actionable failure when connected at OS level but untracked`() {
+            every { bleDevice.connectionState }.returns(RxBleConnection.RxBleConnectionState.CONNECTED)
+
+            val result = sut.negotiateMtuSize("untracked", mtuSize).test()
+
+            val failure = result.values().first() as MtuNegotiateFailed
+            assertThat(failure.errorMessage).contains("already connected at the OS level")
+            assertThat(ReactiveBleClient.activeConnections).isEmpty()
+            verify(exactly = 0) { deviceConnector.connection }
+        }
+    }
+
     @Nested
     @DisplayName("Read RSSI")
     inner class ReadRssiTest {
