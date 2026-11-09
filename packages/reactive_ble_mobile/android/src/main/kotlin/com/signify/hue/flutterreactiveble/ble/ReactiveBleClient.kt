@@ -232,7 +232,7 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
         deviceId: String,
         characteristicId: UUID,
         characteristicInstanceId: Int,
-    ): Observable<ByteArray> {
+    ): Observable<Observable<ByteArray>> {
         return getConnection(deviceId)
             .flatMap { deviceConnection ->
                 setupNotificationOrIndication(
@@ -240,10 +240,6 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
                     characteristicId,
                     characteristicInstanceId,
                 )
-            }
-            // now we have setup the subscription and we want the actual value
-            .flatMap { notificationObservable ->
-                notificationObservable
             }
     }
 

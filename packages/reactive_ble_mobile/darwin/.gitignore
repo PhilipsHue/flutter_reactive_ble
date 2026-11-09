@@ -11,6 +11,8 @@ DerivedData/
 build/
 GeneratedPluginRegistrant.h
 GeneratedPluginRegistrant.m
+.build/
+.swiftpm/
 
 .generated/
 

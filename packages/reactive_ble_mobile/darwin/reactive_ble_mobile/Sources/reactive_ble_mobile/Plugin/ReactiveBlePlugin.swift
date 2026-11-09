@@ -1,10 +1,16 @@
+#if os(iOS)
+  import Flutter
+#elseif os(macOS)
+  import FlutterMacOS
+#endif
+
 import enum SwiftProtobuf.BinaryEncodingError
 import CoreBluetooth
 
-public class SwiftReactiveBlePlugin: NSObject, FlutterPlugin {
+public class ReactiveBlePlugin: NSObject, FlutterPlugin {
 
     public static func register(with registrar: FlutterPluginRegistrar) {
-        let plugin = SwiftReactiveBlePlugin()
+        let plugin = ReactiveBlePlugin()
         var messenger: FlutterBinaryMessenger
         #if os(iOS)
             messenger = registrar.messenger()

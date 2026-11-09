@@ -20,14 +20,14 @@ class UuidConverterTest {
     fun `should be able to convert 16bit uuid`() {
         val array = byteArrayOf(0xFE.toByte(), 0x0F.toByte())
         val uuid = converter.uuidFromByteArray(array)
-        assertThat(uuid.toString().toUpperCase()).isEqualTo("0000FE0F-0000-1000-8000-00805F9B34FB")
+        assertThat(uuid.toString().uppercase()).isEqualTo("0000FE0F-0000-1000-8000-00805F9B34FB")
     }
 
     @Test
     fun `should be able to convert 32bit uuid`() {
         val array = byteArrayOf(0xFE.toByte(), 0x0F.toByte(), 0x0F.toByte(), 0xFE.toByte())
         val uuid = converter.uuidFromByteArray(array)
-        assertThat(uuid.toString().toUpperCase()).isEqualTo("FE0F0FFE-0000-1000-8000-00805F9B34FB")
+        assertThat(uuid.toString().uppercase()).isEqualTo("FE0F0FFE-0000-1000-8000-00805F9B34FB")
     }
 
     @Test

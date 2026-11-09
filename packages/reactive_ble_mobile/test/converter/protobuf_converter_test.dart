@@ -143,7 +143,7 @@ void main() {
 
         final error = sut.genericFailureFrom(
           hasFailure: true,
-          getFailure: () => pb.GenericFailure(),
+          getFailure: pb.GenericFailure.new,
           codes: <String>[fallbackCode],
           fallback: (_) => fallbackCode,
         )!;

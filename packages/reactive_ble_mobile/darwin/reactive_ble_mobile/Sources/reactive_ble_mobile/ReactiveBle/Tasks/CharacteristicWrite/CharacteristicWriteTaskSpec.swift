@@ -1,3 +1,9 @@
+#if os(iOS)
+  import Flutter
+#elseif os(macOS)
+  import FlutterMacOS
+#endif
+
 struct CharacteristicWriteTaskSpec: PeripheralTaskSpec {
 
     typealias Key = CharacteristicInstance

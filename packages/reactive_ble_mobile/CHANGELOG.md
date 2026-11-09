@@ -1,3 +1,12 @@
+## 5.6.0
+
+* Support built-in Kotlin, AGP 9.0+ and Android SDK 37 #934
+* Set min Flutter version to 3.44.0
+
+## 5.5.0
+
+* Added Swift Package Manager support #921
+
 ## 5.4.2
 
 * Update to Gradle distribution 8.4 #904

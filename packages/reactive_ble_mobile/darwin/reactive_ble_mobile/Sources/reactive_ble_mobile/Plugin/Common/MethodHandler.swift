@@ -1,3 +1,9 @@
+#if os(iOS)
+  import Flutter
+#elseif os(macOS)
+  import FlutterMacOS
+#endif
+
 final class MethodHandler<Context: AnyObject> {
 
     private let methods: [String: AnyPlatformMethod<Context>]
