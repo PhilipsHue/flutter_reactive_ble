@@ -274,14 +274,44 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
         timeout: Duration,
     ) = DeviceConnector(device, timeout, connectionUpdateBehaviorSubject::onNext, connectionQueue)
 
+    /**
+     * Resolves the connection stream for [deviceId], in this order of precedence:
+     * 1. An already tracked [DeviceConnector] (its connection stream is reused).
+     * 2. A failure result when the OS reports the device as connected but the plugin no longer
+     *    tracks it, since RxAndroidBle cannot adopt an existing GATT connection.
+     * 3. A newly created [DeviceConnector], registered in [activeConnections].
+     *
+     * Early returns keep the guard clauses flat and readable, so detekt's `ReturnCount` rule
+     * is intentionally suppressed for this function.
+     */
+    @Suppress("ReturnCount")
     private fun getConnection(
         deviceId: String,
         timeout: Duration = Duration(0, TimeUnit.MILLISECONDS),
     ): Observable<EstablishConnectionResult> {
         val device = rxBleClient.getBleDevice(deviceId)
-        val connector =
-            activeConnections.getOrPut(deviceId) { createDeviceConnector(device, timeout) }
 
+        activeConnections[deviceId]?.let { existing ->
+            return existing.connection
+        }
+
+        if (device.connectionState == RxBleConnection.RxBleConnectionState.CONNECTED) {
+            // RxAndroidBle already holds a connection for this device but the plugin no longer
+            // tracks a DeviceConnector for it (e.g. after a Flutter hot restart, or when a
+            // previous disconnect did not propagate down to the OS). RxAndroidBle does not
+            // expose a way to adopt the existing GATT, so calling establishConnection again
+            // would throw BleAlreadyConnectedException. Surface an actionable error instead.
+            return Observable.just(
+                EstablishConnectionFailure(
+                    deviceId,
+                    "Device $deviceId is already connected at the OS level but is no longer " +
+                        "tracked by the plugin. Call disconnectDevice (or restart Bluetooth) " +
+                        "before retrying.",
+                ),
+            )
+        }
+
+        val connector = activeConnections.getOrPut(deviceId) { createDeviceConnector(device, timeout) }
         return connector.connection
     }
 
