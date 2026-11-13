@@ -84,6 +84,59 @@ void main() {
       });
     });
 
+    group('Establish bonding args', () {
+      const deviceId = '123';
+      late pb.EstablishBondingRequest result;
+
+      setUp(() {
+        result = _sut.createEstablishBondingArgs(deviceId);
+      });
+
+      test('It converts deviceId', () {
+        expect(result.deviceId, deviceId);
+      });
+    });
+
+    group('Get device name', () {
+      const deviceId = '123';
+      late pb.GetDeviceNameRequest result;
+
+      setUp(() {
+        result = _sut.createGetDeviceNameArgs(deviceId);
+      });
+
+      test('It converts deviceId', () {
+        expect(result.deviceId, deviceId);
+      });
+    });
+
+    group('Launch companion workflow', () {
+      const deviceNamePattern = 'Hue.*';
+      const singleDeviceScan = true;
+      const forceConfirmation = false;
+      late pb.LaunchCompanionRequest result;
+
+      setUp(() {
+        result = _sut.createLaunchCompanionWorkflowRequest(
+          deviceNamePattern: deviceNamePattern,
+          singleDeviceScan: singleDeviceScan,
+          forceConfirmation: forceConfirmation,
+        );
+      });
+
+      test('It converts the device name pattern', () {
+        expect(result.deviceNamePattern, deviceNamePattern);
+      });
+
+      test('It converts the single device scan flag', () {
+        expect(result.singleDeviceScan, singleDeviceScan);
+      });
+
+      test('It converts the force confirmation flag', () {
+        expect(result.forceConfirmation, forceConfirmation);
+      });
+    });
+
     group('Create ReadCharacteristicRequest', () {
       late pb.ReadCharacteristicRequest result;
       const deviceId = '123';

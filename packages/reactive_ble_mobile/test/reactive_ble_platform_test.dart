@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart'
+    show TargetPlatform, debugDefaultTargetPlatformOverride;
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
@@ -60,6 +62,140 @@ void main() {
       _argsStreamController.close();
       _scanStreamController.close();
       _statusStreamController.close();
+    });
+
+    group('companion workflow', () {
+      const associationInfo =
+          DeviceAssociationInfo(macAddress: 'AB:CD:EF:12:34:56');
+      const pattern = 'Hue.*';
+      const singleDeviceScan = false;
+      const forceConfirmation = true;
+      const responseBytes = <int>[1, 2, 3];
+      late pb.LaunchCompanionRequest request;
+
+      setUp(() {
+        debugDefaultTargetPlatformOverride = TargetPlatform.android;
+        request = pb.LaunchCompanionRequest();
+        when(_argsConverter.createLaunchCompanionWorkflowRequest(
+          deviceNamePattern: pattern,
+          singleDeviceScan: singleDeviceScan,
+          forceConfirmation: forceConfirmation,
+        )).thenReturn(request);
+        when(_methodChannel.invokeMethod<List<int>>(any, any))
+            .thenAnswer((_) async => responseBytes);
+        when(_protobufConverter.associationInfoFrom(responseBytes))
+            .thenReturn(associationInfo);
+      });
+
+      tearDown(() => debugDefaultTargetPlatformOverride = null);
+
+      test('It invokes the method channel with the request', () async {
+        await _sut.launchCompanionWorkflow(
+          pattern: pattern,
+          singleDeviceScan: singleDeviceScan,
+          forceConfirmation: forceConfirmation,
+        );
+
+        verify(_methodChannel.invokeMethod<List<int>>(
+          'launchCompanionWorkflow',
+          request.writeToBuffer(),
+        )).called(1);
+      });
+
+      test('It converts the response into a DeviceAssociationInfo', () async {
+        final result = await _sut.launchCompanionWorkflow(
+          pattern: pattern,
+          singleDeviceScan: singleDeviceScan,
+          forceConfirmation: forceConfirmation,
+        );
+
+        expect(result, associationInfo);
+      });
+
+      test('It is not supported on iOS', () {
+        debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+
+        expect(
+          () => _sut.launchCompanionWorkflow(
+            pattern: pattern,
+            singleDeviceScan: singleDeviceScan,
+            forceConfirmation: forceConfirmation,
+          ),
+          throwsA(isA<UnsupportedError>()),
+        );
+      });
+    });
+
+    group('establish bonding', () {
+      const responseBytes = <int>[1, 2, 3];
+      late pb.EstablishBondingRequest request;
+
+      setUp(() {
+        debugDefaultTargetPlatformOverride = TargetPlatform.android;
+        request = pb.EstablishBondingRequest();
+        when(_argsConverter.createEstablishBondingArgs('id')).thenReturn(request);
+        when(_methodChannel.invokeMethod<List<int>>(any, any))
+            .thenAnswer((_) async => responseBytes);
+        when(_protobufConverter.bondingStatusFrom(responseBytes))
+            .thenReturn(BondingStatus.bonded);
+      });
+
+      tearDown(() => debugDefaultTargetPlatformOverride = null);
+
+      test('It returns the bonded status', () async {
+        final result = await _sut.establishBonding('id');
+
+        verify(_methodChannel.invokeMethod<List<int>>(
+          'establishBonding',
+          request.writeToBuffer(),
+        )).called(1);
+        expect(result, BondingStatus.bonded);
+      });
+
+      test('It is not supported on iOS', () {
+        debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+
+        expect(
+          () => _sut.establishBonding('id'),
+          throwsA(isA<UnsupportedError>()),
+        );
+      });
+    });
+
+    group('retrieve device name', () {
+      const responseBytes = <int>[1, 2, 3];
+      late pb.GetDeviceNameRequest request;
+
+      setUp(() {
+        debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+        request = pb.GetDeviceNameRequest();
+        when(_argsConverter.createGetDeviceNameArgs('id')).thenReturn(request);
+        when(_methodChannel.invokeMethod<List<int>>(any, any))
+            .thenAnswer((_) async => responseBytes);
+        when(_protobufConverter.deviceNameFrom(responseBytes))
+            .thenReturn('My device');
+      });
+
+      tearDown(() => debugDefaultTargetPlatformOverride = null);
+
+      test('It returns the device name', () async {
+        final result = await _sut.retrieveDeviceName('id');
+
+        verify(_methodChannel.invokeMethod<List<int>>(
+          'retrieveDeviceName',
+          request.writeToBuffer(),
+        )).called(1);
+        expect(result, 'My device');
+      });
+
+      test('It is not supported on Android', () {
+        debugDefaultTargetPlatformOverride = TargetPlatform.android;
+
+        expect(
+          () => _sut.retrieveDeviceName('id'),
+          throwsA(isA<UnimplementedError>()),
+        );
+      });
     });
 
     group('connect to device', () {

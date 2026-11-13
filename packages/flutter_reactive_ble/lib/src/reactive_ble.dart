@@ -222,6 +222,61 @@ class FlutterReactiveBle {
     return _connectedDeviceOperator.requestConnectionPriority(deviceId, priority);
   }
 
+  /// Launches the Android companion device workflow to associate a BLE device
+  /// with the host without requiring scan or location permissions.
+  ///
+  /// This method is **Android only**. On other platforms it throws an
+  /// [UnsupportedError].
+  ///
+  /// A native user interface is opened in which the user selects a BLE device.
+  /// The advertised device name is matched against [pattern], which is a
+  /// regular expression. When [singleDeviceScan] is `true` the device list is
+  /// skipped and the user confirms the single matching device directly. When
+  /// [forceConfirmation] is `true` the user is asked to explicitly confirm the
+  /// association.
+  ///
+  /// Returns a [DeviceAssociationInfo] describing the associated device, or
+  /// `null` when no device was selected. The [DeviceAssociationInfo.macAddress]
+  /// can be used to connect to the device with [connectToDevice].
+  Future<DeviceAssociationInfo?> launchCompanionWorkflow({
+    required String pattern,
+    bool singleDeviceScan = true,
+    bool forceConfirmation = false,
+  }) async {
+    await initialize();
+
+    return _deviceScanner.launchCompanionWorkflow(
+      pattern: pattern,
+      singleDeviceScan: singleDeviceScan,
+      forceConfirmation: forceConfirmation,
+    );
+  }
+
+  /// Creates a bond (pairing) with the device identified by [deviceId].
+  ///
+  /// This method is **Android only**. On other platforms (e.g. iOS) it throws
+  /// an [UnsupportedError].
+  ///
+  /// Completes with the resulting [BondingStatus]. A device typically has to be
+  /// bonded before it can be used on some platforms.
+  Future<BondingStatus> establishBonding({required String deviceId}) async {
+    await initialize();
+
+    return _deviceConnector.establishBonding(deviceId: deviceId);
+  }
+
+  /// Retrieves the name of the device identified by [id].
+  ///
+  /// This method is **iOS/macOS only**. On other platforms it throws an
+  /// [UnimplementedError].
+  ///
+  /// This operation can only succeed when the host is `connected` with the
+  /// peripheral. It uses the `CBPeripheral.name` property to retrieve the name.
+  /// See the [documentation](https://developer.apple.com/documentation/corebluetooth/cbperipheral/1519029-name)
+  /// for details. Under the hood this uses the GAP profile to retrieve the name.
+  Future<String?> retrieveDeviceName(String id) =>
+      _deviceConnector.retrieveDeviceName(id);
+
   /// Scan for BLE peripherals advertising the services specified in [withServices]
   /// or for all BLE peripherals, if no services is specified. It is recommended to always specify some services.
   ///

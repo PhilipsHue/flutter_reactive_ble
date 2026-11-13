@@ -166,3 +166,36 @@ message GenericFailure {
 message IsConnectable {
     int32 code = 1;
 }
+
+message LaunchCompanionRequest {
+    string deviceNamePattern = 1;
+    bool singleDeviceScan = 2;
+    bool forceConfirmation = 3;
+}
+
+message DeviceAssociationInfo {
+    string macAddress = 1;
+}
+
+message EstablishBondingRequest {
+    string deviceId = 1;
+}
+
+message EstablishBondingInfo {
+    enum BondState {
+        NONE = 0;
+        BONDING = 1;
+        BONDED = 2;
+    }
+
+    BondState status = 1;
+}
+
+message GetDeviceNameRequest {
+    string deviceId = 1;
+}
+
+message DeviceNameInfo {
+    string id = 1;
+    string deviceName = 2;
+}

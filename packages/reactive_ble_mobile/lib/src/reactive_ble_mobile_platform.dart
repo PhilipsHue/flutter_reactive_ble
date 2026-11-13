@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:reactive_ble_platform_interface/reactive_ble_platform_interface.dart';
 
@@ -96,6 +97,36 @@ class ReactiveBleMobilePlatform extends ReactiveBlePlatform {
   }
 
   @override
+  Future<DeviceAssociationInfo?> launchCompanionWorkflow({
+    required String pattern,
+    required bool singleDeviceScan,
+    required bool forceConfirmation,
+  }) async {
+    if (defaultTargetPlatform != TargetPlatform.android) {
+      throw UnsupportedError(
+        'launchCompanionWorkflow() is only supported on Android.',
+      );
+    }
+
+    final data = await _bleMethodChannel.invokeMethod<List<int>>(
+      'launchCompanionWorkflow',
+      _argsToProtobufConverter
+          .createLaunchCompanionWorkflowRequest(
+            deviceNamePattern: pattern,
+            singleDeviceScan: singleDeviceScan,
+            forceConfirmation: forceConfirmation,
+          )
+          .writeToBuffer(),
+    );
+
+    if (data == null) {
+      return null;
+    }
+
+    return _protobufConverter.associationInfoFrom(data);
+  }
+
+  @override
   Stream<void> scanForDevices({
     required List<Uuid> withServices,
     required ScanMode scanMode,
@@ -152,6 +183,45 @@ class ReactiveBleMobilePlatform extends ReactiveBlePlatform {
           .createDisconnectDeviceArgs(deviceId)
           .writeToBuffer(),
     );
+  }
+
+  @override
+  Future<BondingStatus> establishBonding(String deviceId) async {
+    if (defaultTargetPlatform != TargetPlatform.android) {
+      throw UnsupportedError(
+        'establishBonding() is only supported on Android.',
+      );
+    }
+
+    _logger?.log('Establish bond with device: $deviceId');
+
+    final data = await _bleMethodChannel.invokeMethod<List<int>>(
+      "establishBonding",
+      _argsToProtobufConverter
+          .createEstablishBondingArgs(deviceId)
+          .writeToBuffer(),
+    );
+
+    return _protobufConverter.bondingStatusFrom(data!);
+  }
+
+  @override
+  Future<String?> retrieveDeviceName(String id) async {
+    if (defaultTargetPlatform != TargetPlatform.iOS &&
+        defaultTargetPlatform != TargetPlatform.macOS) {
+      throw UnimplementedError(
+        'retrieveDeviceName() is only supported on Apple platforms.',
+      );
+    }
+
+    _logger?.log('Retrieve device name: $id');
+
+    final data = await _bleMethodChannel.invokeMethod<List<int>>(
+      'retrieveDeviceName',
+      _argsToProtobufConverter.createGetDeviceNameArgs(id).writeToBuffer(),
+    );
+
+    return _protobufConverter.deviceNameFrom(data!);
   }
 
   @override

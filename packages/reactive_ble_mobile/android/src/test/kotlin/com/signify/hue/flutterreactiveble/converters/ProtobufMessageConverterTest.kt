@@ -1,7 +1,9 @@
 package com.signify.hue.flutterreactiveble.converters
 
+import android.bluetooth.BluetoothDevice
 import com.google.common.truth.Truth.assertThat
 import com.google.protobuf.ByteString
+import com.signify.hue.flutterreactiveble.ProtobufModel.EstablishBondingInfo.BondState
 import com.signify.hue.flutterreactiveble.ble.Connectable
 import com.signify.hue.flutterreactiveble.ble.ConnectionUpdateSuccess
 import com.signify.hue.flutterreactiveble.ble.MtuNegotiateFailed
@@ -183,6 +185,34 @@ class ProtobufMessageConverterTest {
             val result = MtuNegotiateFailed("id", "")
             assertThat(protobufConverter.convertNegotiateMtuInfo(result).failure.code)
                 .isEqualTo(NegotiateMtuErrorType.UNKNOWN.code)
+        }
+    }
+
+    @Nested
+    @DisplayName("Convert to bonding info")
+    inner class BondInfoTest {
+        @Test
+        fun `converts bonded`() {
+            assertThat(protobufConverter.convertBondingInfo(BluetoothDevice.BOND_BONDED).status)
+                .isEqualTo(BondState.BONDED)
+        }
+
+        @Test
+        fun `converts bonding`() {
+            assertThat(protobufConverter.convertBondingInfo(BluetoothDevice.BOND_BONDING).status)
+                .isEqualTo(BondState.BONDING)
+        }
+
+        @Test
+        fun `converts none`() {
+            assertThat(protobufConverter.convertBondingInfo(BluetoothDevice.BOND_NONE).status)
+                .isEqualTo(BondState.NONE)
+        }
+
+        @Test
+        fun `converts unknown to none`() {
+            assertThat(protobufConverter.convertBondingInfo(Int.MAX_VALUE).status)
+                .isEqualTo(BondState.NONE)
         }
     }
 
