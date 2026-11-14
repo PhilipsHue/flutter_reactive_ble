@@ -307,6 +307,110 @@ void main() {
       });
     });
 
+    group('Write characteristic without response batch', () {
+      CharacteristicInstance characteristic;
+      const value = [0, 1];
+      late pb.WriteCharacteristicRequest request;
+      late WriteCharacteristicInfo expectedResult;
+      late WriteCharacteristicInfo result;
+
+      setUp(() async {
+        request = pb.WriteCharacteristicRequest();
+        characteristic = CharacteristicInstance(
+          characteristicId: Uuid.parse('FEFF'),
+          characteristicInstanceId: "11",
+          serviceId: Uuid.parse('FEFF'),
+          serviceInstanceId: "101",
+          deviceId: '123',
+        );
+
+        expectedResult = WriteCharacteristicInfo(
+            characteristic: characteristic,
+            result: const Result.success(Unit()),
+        );
+
+        when(_methodChannel.invokeMethod<List<int>?>(any, any)).thenAnswer(
+          (_) async => value,
+        );
+        when(
+          _argsConverter.createWriteCharacteristicRequest(
+            characteristic,
+            value,
+            packetSize: anyNamed('packetSize'),
+          ),
+        ).thenReturn(request);
+        when(_protobufConverter.writeCharacteristicInfoFrom(value))
+            .thenReturn(expectedResult);
+        result = await _sut.writeCharacteristicWithoutResponseBatch(
+          characteristic,
+          value,
+        );
+      });
+
+      test('It returns correct value', () async {
+        expect(result, expectedResult);
+      });
+
+      test('It invokes method channel with correct arguments', () {
+        verify(
+          _methodChannel.invokeMethod<void>(
+            'writeCharacteristicWithoutResponseBatch',
+            request.writeToBuffer(),
+          ),
+        ).called(1);
+      });
+    });
+
+    group('Write characteristic without response batch with packet size', () {
+      const value = [0, 1];
+      const packetSize = 253;
+      late CharacteristicInstance characteristic;
+      late pb.WriteCharacteristicRequest request;
+
+      setUp(() async {
+        request = pb.WriteCharacteristicRequest();
+        characteristic = CharacteristicInstance(
+          characteristicId: Uuid.parse('FEFF'),
+          characteristicInstanceId: "11",
+          serviceId: Uuid.parse('FEFF'),
+          serviceInstanceId: "101",
+          deviceId: '123',
+        );
+
+        when(_methodChannel.invokeMethod<List<int>?>(any, any)).thenAnswer(
+          (_) async => value,
+        );
+        when(
+          _argsConverter.createWriteCharacteristicRequest(
+            characteristic,
+            value,
+            packetSize: packetSize,
+          ),
+        ).thenReturn(request);
+        when(_protobufConverter.writeCharacteristicInfoFrom(value)).thenReturn(
+          WriteCharacteristicInfo(
+            characteristic: characteristic,
+            result: const Result.success(Unit()),
+          ),
+        );
+        await _sut.writeCharacteristicWithoutResponseBatch(
+          characteristic,
+          value,
+          packetSize: packetSize,
+        );
+      });
+
+      test('It forwards the packet size to the converter', () {
+        verify(
+          _argsConverter.createWriteCharacteristicRequest(
+            characteristic,
+            value,
+            packetSize: packetSize,
+          ),
+        ).called(1);
+      });
+    });
+
     group('Subscribe to notifications', () {
       late CharacteristicInstance characteristic;
       late pb.NotifyCharacteristicRequest request;

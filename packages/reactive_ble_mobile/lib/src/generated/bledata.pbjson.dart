@@ -303,6 +303,7 @@ const WriteCharacteristicRequest$json = {
       '10': 'characteristic'
     },
     {'1': 'value', '3': 2, '4': 1, '5': 12, '10': 'value'},
+    {'1': 'packet_size', '3': 3, '4': 1, '5': 5, '10': 'packetSize'},
   ],
 };
 
@@ -311,7 +312,7 @@ final $typed_data.Uint8List writeCharacteristicRequestDescriptor =
     $convert.base64Decode(
         'ChpXcml0ZUNoYXJhY3RlcmlzdGljUmVxdWVzdBI+Cg5jaGFyYWN0ZXJpc3RpYxgBIAEoCzIWLk'
         'NoYXJhY3RlcmlzdGljQWRkcmVzc1IOY2hhcmFjdGVyaXN0aWMSFAoFdmFsdWUYAiABKAxSBXZh'
-        'bHVl');
+        'bHVlEh8KC3BhY2tldF9zaXplGAMgASgFUgpwYWNrZXRTaXpl');
 
 @$core.Deprecated('Use writeCharacteristicInfoDescriptor instead')
 const WriteCharacteristicInfo$json = {

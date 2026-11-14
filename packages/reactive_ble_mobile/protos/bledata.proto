@@ -64,6 +64,7 @@ message CharacteristicValueInfo {
 message WriteCharacteristicRequest {
     CharacteristicAddress characteristic = 1;
     bytes value = 2;
+    int32 packet_size = 3;
 }
 
 message WriteCharacteristicInfo {

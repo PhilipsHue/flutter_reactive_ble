@@ -291,6 +291,8 @@ struct WriteCharacteristicRequest: Sendable {
 
   var value: Data = Data()
 
+  var packetSize: Int32 = 0
+
   var unknownFields = SwiftProtobuf.UnknownStorage()
 
   init() {}
@@ -1113,7 +1115,7 @@ extension CharacteristicValueInfo: SwiftProtobuf.Message, SwiftProtobuf._Message
 
 extension WriteCharacteristicRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = "WriteCharacteristicRequest"
-  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}characteristic\0\u{1}value\0")
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}characteristic\0\u{1}value\0\u{3}packet_size\0")
 
   mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -1123,6 +1125,7 @@ extension WriteCharacteristicRequest: SwiftProtobuf.Message, SwiftProtobuf._Mess
       switch fieldNumber {
       case 1: try { try decoder.decodeSingularMessageField(value: &self._characteristic) }()
       case 2: try { try decoder.decodeSingularBytesField(value: &self.value) }()
+      case 3: try { try decoder.decodeSingularInt32Field(value: &self.packetSize) }()
       default: break
       }
     }
@@ -1139,12 +1142,16 @@ extension WriteCharacteristicRequest: SwiftProtobuf.Message, SwiftProtobuf._Mess
     if !self.value.isEmpty {
       try visitor.visitSingularBytesField(value: self.value, fieldNumber: 2)
     }
+    if self.packetSize != 0 {
+      try visitor.visitSingularInt32Field(value: self.packetSize, fieldNumber: 3)
+    }
     try unknownFields.traverse(visitor: &visitor)
   }
 
   static func ==(lhs: WriteCharacteristicRequest, rhs: WriteCharacteristicRequest) -> Bool {
     if lhs._characteristic != rhs._characteristic {return false}
     if lhs.value != rhs.value {return false}
+    if lhs.packetSize != rhs.packetSize {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }

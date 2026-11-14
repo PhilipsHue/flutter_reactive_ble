@@ -149,6 +149,9 @@ public class ReactiveBlePlugin: NSObject, FlutterPlugin {
         AnyPlatformMethod(UnaryPlatformMethod(name: "writeCharacteristicWithoutResponse") { (name, context, args: WriteCharacteristicRequest, completion) in
             context.writeCharacteristicWithoutResponse(name: name, args: args, completion: completion)
         }),
+        AnyPlatformMethod(UnaryPlatformMethod(name: "writeCharacteristicWithoutResponseBatch") { (name, context, args: WriteCharacteristicRequest, completion) in
+            context.writeCharacteristicWithoutResponseBatch(name: name, args: args, completion: completion)
+        }),
         AnyPlatformMethod(UnaryPlatformMethod(name: "negotiateMtuSize") { (name, context, args: NegotiateMtuRequest, completion) in
             context.reportMaximumWriteValueLength(name: name, args: args, completion: completion)
         }),

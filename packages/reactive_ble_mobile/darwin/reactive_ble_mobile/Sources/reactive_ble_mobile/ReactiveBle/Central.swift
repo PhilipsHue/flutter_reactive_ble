@@ -35,6 +35,22 @@ final class Central {
     private let characteristicWriteRegistry = PeripheralTaskRegistry<CharacteristicWriteTaskController>()
     private let readRssiRegistry = PeripheralTaskRegistry<ReadRssiTaskController>()
 
+    // A write-without-response that could not be sent immediately because the
+    // peripheral's transmit queue was full (`canSendWriteWithoutResponse` was
+    // false). It is held here until `peripheralIsReady(toSendWriteWithoutResponse:)`
+    // fires, then flushed. This is the flow control CoreBluetooth requires but
+    // that this plugin previously skipped — without it, packets sent to a fast
+    // central (e.g. iPhone 17) are silently dropped, corrupting OTA images.
+    private struct PendingWriteWithoutResponse {
+        let value: Data
+        let characteristic: CBCharacteristic
+        let completion: (Error?) -> Void
+    }
+    // FIFO per peripheral. All access happens on the CBCentralManager queue
+    // (nil == main), which also serializes the Flutter method-channel calls,
+    // so no additional locking is required.
+    private var pendingWritesWithoutResponse = [PeripheralID: [PendingWriteWithoutResponse]]()
+
     init(
         onStateChange: @escaping StateChangeHandler,
         onDiscovery: @escaping DiscoveryHandler,
@@ -119,6 +135,9 @@ final class Central {
                     key: peripheral.identifier,
                     action: { $0.handleReadRssi(rssi: rssi, error: error) }
                 )
+            },
+            onIsReadyToSendWriteWithoutResponse: papply(weak: self) { central, peripheral in
+                central.flushPendingWritesWithoutResponse(for: peripheral)
             }
         )
         self.centralManager = CBCentralManager(
@@ -292,17 +311,54 @@ final class Central {
 
     func writeWithoutResponse(
         value: Data,
-        characteristic characteristicInstance: CharacteristicInstance
+        characteristic characteristicInstance: CharacteristicInstance,
+        completion: @escaping (Error?) -> Void
     ) throws {
         let characteristic = try resolve(characteristic: characteristicInstance)
 
         guard characteristic.properties.contains(.writeWithoutResponse)
         else { throw Failure.notWritable(characteristicInstance) }
 
-        guard let response = characteristic.service?.peripheral?.writeValue(value, for: characteristic, type: .withoutResponse)
+        guard let peripheral = characteristic.service?.peripheral
         else { throw Failure.characteristicNotFound(characteristicInstance) }
 
-        return response
+        let peripheralID = peripheral.identifier
+        let pending = PendingWriteWithoutResponse(
+            value: value,
+            characteristic: characteristic,
+            completion: completion
+        )
+
+        // Preserve FIFO order: if a backlog already exists for this peripheral,
+        // queue behind it instead of jumping ahead.
+        if pendingWritesWithoutResponse[peripheralID]?.isEmpty == false {
+            pendingWritesWithoutResponse[peripheralID, default: []].append(pending)
+            return
+        }
+
+        if peripheral.canSendWriteWithoutResponse {
+            peripheral.writeValue(value, for: characteristic, type: .withoutResponse)
+            completion(nil)
+        } else {
+            // Transmit queue is full — hold the write and flush it from
+            // `peripheralIsReady(toSendWriteWithoutResponse:)`. The Flutter-side
+            // Future stays pending until then, which is the backpressure that
+            // prevents packet loss on fast centrals.
+            pendingWritesWithoutResponse[peripheralID, default: []].append(pending)
+        }
+    }
+
+    private func flushPendingWritesWithoutResponse(for peripheral: CBPeripheral) {
+        let peripheralID = peripheral.identifier
+        while peripheral.canSendWriteWithoutResponse,
+              let pending = pendingWritesWithoutResponse[peripheralID]?.first {
+            pendingWritesWithoutResponse[peripheralID]?.removeFirst()
+            peripheral.writeValue(pending.value, for: pending.characteristic, type: .withoutResponse)
+            pending.completion(nil)
+        }
+        if pendingWritesWithoutResponse[peripheralID]?.isEmpty == true {
+            pendingWritesWithoutResponse[peripheralID] = nil
+        }
     }
 
     func maximumWriteValueLength(for peripheral: PeripheralID, type: CBCharacteristicWriteType) throws -> Int {
@@ -344,6 +400,13 @@ final class Central {
             in: peripheral.identifier,
             action: { $0.cancel(error: error) }
         )
+
+        // Fail any write-without-response packets still queued for this
+        // peripheral so their Flutter Futures reject instead of hanging until
+        // their timeout.
+        if let pending = pendingWritesWithoutResponse.removeValue(forKey: peripheral.identifier) {
+            pending.forEach { $0.completion(error) }
+        }
     }
 
     private func resolve(known peripheralID: PeripheralID) throws -> CBPeripheral {

@@ -33,6 +33,7 @@ class PluginController {
             "readCharacteristic" to this::readCharacteristic,
             "writeCharacteristicWithResponse" to this::writeCharacteristicWithResponse,
             "writeCharacteristicWithoutResponse" to this::writeCharacteristicWithoutResponse,
+            "writeCharacteristicWithoutResponseBatch" to this::writeCharacteristicWithoutResponseBatch,
             "readNotifications" to this::readNotifications,
             "stopNotifications" to this::stopNotifications,
             "negotiateMtuSize" to this::negotiateMtuSize,
@@ -231,6 +232,24 @@ class PluginController {
         )
     }
 
+    private fun writeCharacteristicWithoutResponseBatch(
+        call: MethodCall,
+        result: Result,
+    ) {
+        val writeCharMessage = pb.WriteCharacteristicRequest.parseFrom(call.arguments as ByteArray)
+        propagateWriteResultToChannel(
+            writeCharMessage,
+            result,
+            bleClient.writeCharacteristicWithoutResponseBatch(
+                writeCharMessage.characteristic.deviceId,
+                uuidConverter.uuidFromByteArray(writeCharMessage.characteristic.characteristicUuid.data.toByteArray()),
+                writeCharMessage.characteristic.characteristicInstanceId.toInt(),
+                writeCharMessage.value.toByteArray(),
+                writeCharMessage.packetSize,
+            ),
+        )
+    }
+
     private fun executeWriteAndPropagateResultToChannel(
         call: MethodCall,
         result: Result,
@@ -242,12 +261,24 @@ class PluginController {
         ) -> Single<com.signify.hue.flutterreactiveble.ble.CharOperationResult>,
     ) {
         val writeCharMessage = pb.WriteCharacteristicRequest.parseFrom(call.arguments as ByteArray)
-        bleClient.writeOperation(
-            writeCharMessage.characteristic.deviceId,
-            uuidConverter.uuidFromByteArray(writeCharMessage.characteristic.characteristicUuid.data.toByteArray()),
-            writeCharMessage.characteristic.characteristicInstanceId.toInt(),
-            writeCharMessage.value.toByteArray(),
+        propagateWriteResultToChannel(
+            writeCharMessage,
+            result,
+            bleClient.writeOperation(
+                writeCharMessage.characteristic.deviceId,
+                uuidConverter.uuidFromByteArray(writeCharMessage.characteristic.characteristicUuid.data.toByteArray()),
+                writeCharMessage.characteristic.characteristicInstanceId.toInt(),
+                writeCharMessage.value.toByteArray(),
+            ),
         )
+    }
+
+    private fun propagateWriteResultToChannel(
+        writeCharMessage: pb.WriteCharacteristicRequest,
+        result: Result,
+        writeSingle: Single<com.signify.hue.flutterreactiveble.ble.CharOperationResult>,
+    ) {
+        writeSingle
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
                 { operationResult ->

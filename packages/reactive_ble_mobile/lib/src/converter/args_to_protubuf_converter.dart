@@ -16,9 +16,10 @@ abstract class ArgsToProtobufConverter {
   );
 
   pb.WriteCharacteristicRequest createWriteCharacteristicRequest(
-      CharacteristicInstance characteristic,
-    List<int> value,
-  );
+    CharacteristicInstance characteristic,
+    List<int> value, {
+    int? packetSize,
+  });
 
   pb.NotifyCharacteristicRequest createNotifyCharacteristicRequest(
       CharacteristicInstance characteristic,
@@ -107,8 +108,9 @@ class ArgsToProtobufConverterImpl implements ArgsToProtobufConverter {
   @override
   pb.WriteCharacteristicRequest createWriteCharacteristicRequest(
     CharacteristicInstance characteristic,
-    List<int> value,
-  ) {
+    List<int> value, {
+    int? packetSize,
+  }) {
     final args = pb.WriteCharacteristicRequest()
       ..characteristic = (pb.CharacteristicAddress()
         ..deviceId = characteristic.deviceId
@@ -118,6 +120,10 @@ class ArgsToProtobufConverterImpl implements ArgsToProtobufConverter {
             (pb.Uuid()..data = characteristic.characteristicId.data)
         ..characteristicInstanceId = characteristic.characteristicInstanceId)
       ..value = value;
+
+    if (packetSize != null) {
+      args.packetSize = packetSize;
+    }
 
     return args;
   }

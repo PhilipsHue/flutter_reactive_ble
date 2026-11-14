@@ -203,6 +203,29 @@ class ReactiveBleMobilePlatform extends ReactiveBlePlatform {
   }
 
   @override
+  Future<WriteCharacteristicInfo> writeCharacteristicWithoutResponseBatch(
+    CharacteristicInstance characteristic,
+    List<int> value, {
+    int? packetSize,
+  }) async {
+    _logger?.log(
+      'Write without response batch to $characteristic, length: ${value.length}, packetSize: $packetSize',
+    );
+    return _bleMethodChannel
+        .invokeMethod<List<int>>(
+          "writeCharacteristicWithoutResponseBatch",
+          _argsToProtobufConverter
+              .createWriteCharacteristicRequest(
+                characteristic,
+                value,
+                packetSize: packetSize,
+              )
+              .writeToBuffer(),
+        )
+        .then((data) => _protobufConverter.writeCharacteristicInfoFrom(data!));
+  }
+
+  @override
   Stream<void> subscribeToNotifications(
     CharacteristicInstance characteristic,
   ) {
